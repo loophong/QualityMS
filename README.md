@@ -4,10 +4,10 @@
 - 演示环境：http://demo.open.renren.io/renren-security
 - 前端地址：https://gitee.com/renrenio/renren-fast-vue
 - 代码生成器：https://gitee.com/renrenio/renren-generator
-
+- 前端vue: node版本为 18.15.0, 对于本地有不同node版本的可以使用nvm进行版本控制, 切换node版本.
+- 数据库: MySQL 本地测试详情见renren-fast-master/src/main/resource/application-dev.yml
+- 用户名密码默认为: admin/admin
 <br>
- 
-
 **具有如下特点** 
 - 友好的代码结构及注释，便于阅读及二次开发
 - 实现前后端分离，通过token进行数据交互，前端再也不用关注后端技术

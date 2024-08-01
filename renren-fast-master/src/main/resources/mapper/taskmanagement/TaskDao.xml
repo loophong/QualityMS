@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.taskmanagement.dao.TaskDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.taskmanagement.entity.TaskEntity" id="taskMap">
+        <result property="tmTid" column="tm_tid"/>
+        <result property="taskId" column="task_id"/>
+        <result property="taskName" column="task_name"/>
+        <result property="taskContent" column="task_content"/>
+        <result property="taskStartDate" column="task_start_date"/>
+        <result property="taskScheduleCompletionDate" column="task_schedule_completion_date"/>
+        <result property="taskScheduleDays" column="task_schedule_days"/>
+        <result property="taskActualCompletionDate" column="task_actual_completion_date"/>
+        <result property="taskActualDays" column="task_actual_days"/>
+        <result property="taskAssociatedPlanId" column="task_associated_plan_id"/>
+        <result property="taskSchedule" column="task_schedule"/>
+        <result property="taskPrincipal" column="task_principal"/>
+        <result property="taskExecutor" column="task_executor"  typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result property="taskAuditor" column="task_auditor"/>
+        <result property="taskCurrentState" column="task_current_state"/>
+        <result property="taskIsCompleted" column="task_is_completed"/>
+        <result property="taskIsOverdue" column="task_is_overdue"/>
+        <result property="taskIsOnTime" column="task_is_on_time"/>
+        <result property="taskEarlyCompletionDays" column="task_early_completion_days"/>
+        <result property="taskLagDays" column="task_lag_days"/>
+        <result property="taskLagReasons" column="task_lag_reasons"/>
+        <result property="taskAssociatedIndicatorsId" column="task_associated_Indicators_id"/>
+    </resultMap>
+
+
+    <select id="getTasksByUserId" resultMap="taskMap">
+        SELECT * FROM task_management_task
+        WHERE task_principal = #{userId} or task_auditor = #{userId}
+            or  task_executor LIKE concat( '%"', #{userId}, '"%' )
+    </select>
+
+</mapper>

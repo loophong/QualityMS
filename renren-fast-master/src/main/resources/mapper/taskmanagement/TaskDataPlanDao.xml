@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.taskmanagement.dao.TaskDataPlanDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.taskmanagement.entity.TaskDataPlanEntity" id="taskDataPlanMap">
+        <result property="planId" column="plan_id"/>
+        <result property="taskContent" column="task_content"/>
+        <result property="startDate" column="start_date"/>
+        <result property="plannedFinishDate" column="planned_finish_date"/>
+        <result property="scheduleDays" column="schedule_days"/>
+        <result property="actualFinishingDate" column="actual_finishing_date"/>
+        <result property="actualDays" column="actual_days"/>
+        <result property="tasksAssignment" column="tasks_assignment"/>
+        <result property="associatedTaskNumber" column="associated_task_number"/>
+        <result property="schedule" column="schedule"/>
+        <result property="principal" column="principal"/>
+        <result property="executor" column="executor"/>
+        <result property="auditor" column="auditor"/>
+        <result property="currentState" column="current_state"/>
+        <result property="whetherComplete" column="whether_complete"/>
+        <result property="whetherOverdue" column="whether_overdue"/>
+        <result property="finishOnTime" column="finish_on_time"/>
+        <result property="daysAheadOfSchedule" column="days_ahead_of_schedule"/>
+        <result property="lagDays" column="lag_days"/>
+        <result property="delayReasons" column="delay_reasons"/>
+        <result property="associatedIndexNumber" column="associated_index_number"/>
+    </resultMap>
+
+
+</mapper>

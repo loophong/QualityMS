@@ -37,24 +37,17 @@ const mainRoutes = {
     { path: '/theme', component: _import('common/theme'), name: 'theme', meta: { title: '主题' } },
     { path: '/demo-echarts', component: _import('demo/echarts'), name: 'demo-echarts', meta: { title: 'demo-echarts', isTab: true } },
     { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } },
-    {
-      path: '/plan-add-page',
-      component: _import('modules/taskmanagement/plan/plan-add-page'),
-      name: 'plan-add-page',
-      meta: { title: '计划新建页', isDynamic: true, isTab: true }
+    { 
+      path: '/plan-add-page', 
+      component: _import('modules/taskmanagement/plan/plan-add-page'), 
+      name: 'plan-add-page', 
+      meta: { title: '计划新建页', isDynamic: true, isTab: true } 
     },
-    {
-      path: '/plan-update-page',
-      component: _import('modules/taskmanagement/plan/plan-detail-page'),
-      name: 'plan-update-page',
-      meta: { title: '计划修改页', isDynamic: true, isTab: true }
-    },
-    //指标展示图
-    {
-      path: '/indicator/display/charts',
-      component: () => import('@/views/modules/indicator/display/charts/demo01.vue'),
-      name: 'demo01',
-      meta: { title: '123' ,isTab: true}
+    { 
+      path: '/plan-update-page', 
+      component: _import('modules/taskmanagement/plan/plan-detail-page'), 
+      name: 'plan-update-page', 
+      meta: { title: '计划修改页', isDynamic: true, isTab: true } 
     },
   ],
   beforeEnter (to, from, next) {

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.qcManagement.dao.QcSubjectRegistrationDao">
+
+    <resultMap type="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity" id="qcSubjectRegistrationMap">
+        <result property="qcsrId" column="qcsr_id"/>
+        <result property="topicName" column="topic_name"/>
+        <result property="topicNumber" column="topic_number"/>
+        <result property="topicLeader" column="topic_leader"/>
+        <result property="topicConsultant" column="topic_consultant"/>
+        <result property="teamNumberIds" column="team_number_ids"/>
+        <result property="createDate" column="create_date"/>
+        <result property="creator" column="creator"/>
+        <result property="modificationDate" column="modification_date"/>
+        <result property="modifier" column="modifier"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="topicReviewStatus" column="topic_review_status"/>
+        <result property="topicDescription" column="topic_description"/>
+        <result property="topicType" column="topic_type"/>
+        <result property="activityCharacteristics" column="activity_characteristics"/>
+        <result property="activityPlan" column="activity_plan"/>
+        <result property="keywords" column="keywords"/>
+        <result property="topicActivityStatus" column="topic_activity_status"/>
+        <result property="topicActivityResult" column="topic_activity_result"/>
+        <result property="deleteFlag" column="delete_flag"/>
+        <result property="note" column="note"/>
+    </resultMap>
+
+
+</mapper>

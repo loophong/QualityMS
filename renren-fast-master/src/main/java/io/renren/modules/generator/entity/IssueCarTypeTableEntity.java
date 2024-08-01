@@ -5,36 +5,27 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
- * 
+ * 车型字典
  * 
  * @author chenshun
  * @email sunlightcs@gmail.com
- * @date 2024-07-18 08:58:50
+ * @date 2024-07-22 18:55:06
  */
 @Data
-@TableName("Test_Table")
-public class TestTableEntity implements Serializable {
+@TableName("issue_car_type_table")
+public class IssueCarTypeTableEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 * 车型ID
 	 */
 	@TableId
-	private Long id;
+	private Integer vehicleTypeId;
 	/**
-	 * 
+	 * 具体车型
 	 */
-	private String hongGroupNumber;
-	/**
-	 * 
-	 */
-	private Date startTime;
-	/**
-	 * 
-	 */
-	private Date endTime;
+	private String concreteVehicleType;
 
 }

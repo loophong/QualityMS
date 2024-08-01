@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.generator.dao.IssueTableDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.generator.entity.IssueTableEntity" id="issueTableMap">
+        <result property="issueId" column="issue_id"/>
+        <result property="serialNumber" column="serial_number"/>
+        <result property="issueNumber" column="issue_number"/>
+        <result property="indicatorId" column="indicator_id"/>
+        <result property="inspectionDepartment" column="inspection_department"/>
+        <result property="inspectionDate" column="inspection_date"/>
+        <result property="issueCategoryId" column="issue_category_id"/>
+        <result property="vehicleTypeId" column="vehicle_type_id"/>
+        <result property="vehicleNumberId" column="vehicle_number_id"/>
+        <result property="issueDescription" column="issue_description"/>
+        <result property="issuePhoto" column="issue_photo"/>
+        <result property="rectificationRequirement" column="rectification_requirement"/>
+        <result property="requiredCompletionTime" column="required_completion_time"/>
+        <result property="responsibleDepartment" column="responsible_department"/>
+        <result property="rectificationStatus" column="rectification_status"/>
+        <result property="actualCompletionTime" column="actual_completion_time"/>
+        <result property="rectificationPhotoDeliverable" column="rectification_photo_deliverable"/>
+        <result property="rectificationResponsiblePerson" column="rectification_responsible_person"/>
+        <result property="requiredSecondRectificationTime" column="required_second_rectification_time"/>
+        <result property="remark" column="remark"/>
+        <result property="creator" column="creator"/>
+        <result property="creationTime" column="creation_time"/>
+        <result property="lastModifier" column="last_modifier"/>
+        <result property="lastModificationTime" column="last_modification_time"/>
+        <result property="associatedRectificationRecords" column="associated_rectification_records"/>
+        <result property="associatedIssueAddition" column="associated_issue_addition"/>
+        <result property="creationDuration" column="creation_duration"/>
+        <result property="causeAnalysis" column="cause_analysis"/>
+        <result property="rectificationVerificationStatus" column="rectification_verification_status"/>
+        <result property="verificationConclusion" column="verification_conclusion"/>
+        <result property="verifier" column="verifier"/>
+        <result property="reviewers" column="Reviewers"/>
+        <result property="level" column="level"/>
+        <result property="state" column="state"/>
+        <result property="formula" column="formula"/>
+    </resultMap>
+
+
+</mapper>

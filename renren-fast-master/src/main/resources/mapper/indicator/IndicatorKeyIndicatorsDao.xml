@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.indicator.dao.IndicatorKeyIndicatorsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.indicator.entity.IndicatorKeyIndicatorsEntity" id="indicatorKeyIndicatorsMap">
+        <result property="keyIndicatorId" column="key_indicator_id"/>
+        <result property="indicatorId" column="indicator_id"/>
+        <result property="indicatorName" column="indicator_name"/>
+        <result property="indicatorClassification" column="indicator_classification"/>
+        <result property="assessmentDepartment" column="assessment_department"/>
+        <result property="sourceDepartment" column="source_department"/>
+        <result property="managementContent" column="management_content"/>
+        <result property="isManagementOutOfControl" column="is_management_out_of_control"/>
+        <result property="isNeedsControl" column="is_needs_control"/>
+        <result property="keyElements" column="key_elements"/>
+        <result property="potentialFailureMode" column="potential_failure_mode"/>
+        <result property="potentialFailureConsequences" column="potential_failure_consequences"/>
+        <result property="involvedProduct" column="involved_product"/>
+        <result property="processName" column="process_name"/>
+        <result property="controlPosition" column="control_position"/>
+        <result property="controlPersonnel" column="control_personnel"/>
+        <result property="controlMethod" column="control_method"/>
+        <result property="evaluationMeasurementTechnique" column="evaluation_measurement_technique"/>
+        <result property="sampleSize" column="sample_size"/>
+        <result property="samplingFrequency" column="sampling_frequency"/>
+        <result property="controlList" column="control_list"/>
+    </resultMap>
+
+
+</mapper>

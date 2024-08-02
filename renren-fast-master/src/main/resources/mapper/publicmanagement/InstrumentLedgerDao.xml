@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.publicmanagement.dao.InstrumentLedgerDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.publicmanagement.entity.InstrumentLedgerEntity" id="instrumentLedgerMap">
+        <result property="id" column="id"/>
+        <result property="companyId" column="company_id"/>
+        <result property="level" column="level"/>
+        <result property="calibrationCycle" column="calibration_cycle"/>
+        <result property="calibrationStatus" column="calibration_status"/>
+        <result property="usageStatus" column="usage_status"/>
+        <result property="location" column="location"/>
+        <result property="responsibleDepartment" column="responsible_department"/>
+        <result property="user" column="user"/>
+        <result property="calibrationDate" column="calibration_date"/>
+        <result property="calibrationValidity" column="calibration_validity"/>
+        <result property="calibrationUnit" column="calibration_unit"/>
+        <result property="certificateNumber" column="certificate_number"/>
+        <result property="remark" column="remark"/>
+        <result property="quantity" column="quantity"/>
+        <result property="flag" column="flag"/>
+        <result property="creatTime" column="creat_time"/>
+    </resultMap>
+
+
+</mapper>

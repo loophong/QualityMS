@@ -57,10 +57,10 @@ const mainRoutes = {
     },
     //指标展示图
     {
-      path: '/indicator/display/charts',
-      component: () => import('@/views/modules/indicator/display/charts/demo01.vue'),
-      name: 'demo01',
-      meta: { title: '123' ,isTab: true}
+      path: '/issue-issuemask',
+      component: _import('modules/issuemask/creatorissuemask'),
+      name: 'issue-issuemask',
+      meta: { title: '任务详情', isDynamic: true, isTab: true }
     },
   ],
   beforeEnter (to, from, next) {

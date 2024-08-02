@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.generator.dao.IssueMaskTableDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.generator.entity.IssueMaskTableEntity" id="issueMaskTableMap">
+        <result property="issuemaskId" column="issuemask_id"/>
+        <result property="serialNumber" column="serial_number"/>
+        <result property="issueNumber" column="issue_number"/>
+        <result property="reviewers" column="Reviewers"/>
+        <result property="recipients" column="Recipients"/>
+        <result property="maskcontent" column="maskcontent"/>
+        <result property="creator" column="creator"/>
+        <result property="creationTime" column="creation_time"/>
+        <result property="requiredCompletionTime" column="required_completion_time"/>
+        <result property="state" column="state"/>
+    </resultMap>
+
+
+</mapper>

@@ -55,7 +55,7 @@ const mainRoutes = {
       name: 'qcPlanNew',
       meta: { title: '新建计划', isDynamic: true, isTab: true }
     },
-    //指标展示图
+    //任务
     {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/creatorissuemask'),

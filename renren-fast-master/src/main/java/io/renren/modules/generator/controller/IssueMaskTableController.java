@@ -49,6 +49,17 @@ public class IssueMaskTableController {
     }
 
     /**
+     * 列表，审核人可见
+     */
+    @RequestMapping("/Auditlist")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R Auditlist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueMaskTableService.AuditqueryPage(params);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
      * 信息
      */
     @RequestMapping("/info/{issuemaskId}")

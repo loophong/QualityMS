@@ -239,13 +239,13 @@
 
 <script>
 import AddOrUpdate from './issuetable-add-or-update.vue'
-// import {isAuth} from "../../../utils";
 export default {
   data () {
     return {
       // issuenumber: '',
       dataForm: {
-        key: ''
+        key: '',
+        userinfo: null //新增用户字段
       },
       dataList: [],
       pageIndex: 1,
@@ -254,14 +254,15 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
-      assertOrUpdateVisible: false
+      assertOrUpdateVisible: false,
+      currentUser: null // 新增当前用户信息
     }
   },
   components: {
     AddOrUpdate
   },
   activated () {
-    this.getDataList()
+        this.getDataList()
   },
   methods: {
     openNewPage (issueId, issueNumber) {
@@ -353,7 +354,7 @@ export default {
           }
         })
       })
-    }
+    },
   }
 }
 </script>

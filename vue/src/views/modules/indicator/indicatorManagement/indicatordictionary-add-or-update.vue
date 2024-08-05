@@ -13,7 +13,7 @@
     <el-form-item label="管理部门" prop="managementDepartment">
       <el-input v-model="dataForm.managementDepartment" placeholder="管理部门"></el-input>
     </el-form-item>
-    <el-form-item label="指标定义" prop="indicatorDefinition">
+    <el-form-item label="指标公式定义" prop="indicatorDefinition">
       <el-input v-model="dataForm.indicatorDefinition" placeholder="指标定义"></el-input>
     </el-form-item>
     <el-form-item label="指标分级" prop="indicatorClassification">
@@ -22,7 +22,7 @@
     <el-form-item label="管理内容（现状分析）" prop="managementContentCurrentAnalysis">
       <el-input v-model="dataForm.managementContentCurrentAnalysis" placeholder="管理内容（现状分析）"></el-input>
     </el-form-item>
-    <el-form-item label="数据ID" prop="dataId">
+    <!-- <el-form-item label="数据ID" prop="dataId">
       <el-input v-model="dataForm.dataId" placeholder="数据ID"></el-input>
     </el-form-item>
     <el-form-item label="来源部门" prop="sourceDepartment">
@@ -33,25 +33,25 @@
     </el-form-item>
     <el-form-item label="收集频次" prop="collectionFrequency">
       <el-input v-model="dataForm.collectionFrequency" placeholder="收集频次"></el-input>
+    </el-form-item> -->
+    <el-form-item label="关联计划" prop="planId">
+      <el-input v-model="dataForm.planId" placeholder="关联计划"></el-input>
     </el-form-item>
-    <el-form-item label="关联计划id" prop="planId">
-      <el-input v-model="dataForm.planId" placeholder="关联计划id"></el-input>
-    </el-form-item>
-    <el-form-item label="关联任务id" prop="taskId">
+    <!-- <el-form-item label="关联任务id" prop="taskId">
       <el-input v-model="dataForm.taskId" placeholder="关联任务id"></el-input>
-    </el-form-item>
-    <el-form-item label="指标父节点" prop="indicatorParentNode">
-      <el-input v-model="dataForm.indicatorParentNode" placeholder="指标父节点"></el-input>
+    </el-form-item> -->
+    <el-form-item label="上级指标" prop="indicatorParentNode">
+      <el-input v-model="dataForm.indicatorParentNode" placeholder="上级指标"></el-input>
     </el-form-item>
     <el-form-item label="指标创建时间" prop="indicatorCreatTime">
       <el-input v-model="dataForm.indicatorCreatTime" placeholder="指标创建时间"></el-input>
     </el-form-item>
-    <el-form-item label="0表示弃用，1表示使用中" prop="indicatorState">
+    <!-- <el-form-item label="0表示弃用，1表示使用中" prop="indicatorState">
       <el-input v-model="dataForm.indicatorState" placeholder="0表示弃用，1表示使用中"></el-input>
-    </el-form-item>
-    <el-form-item label="指标子节点" prop="indicatorChildNode">
+    </el-form-item> -->
+    <!-- <el-form-item label="指标子节点" prop="indicatorChildNode">
       <el-input v-model="dataForm.indicatorChildNode" placeholder="指标子节点"></el-input>
-    </el-form-item>
+    </el-form-item> -->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>

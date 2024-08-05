@@ -50,7 +50,7 @@
         prop="indicatorDefinition"
         header-align="center"
         align="center"
-        label="指标定义">
+        label="指标公式定义">
       </el-table-column>
       <el-table-column
         prop="indicatorClassification"
@@ -104,7 +104,7 @@
         prop="indicatorParentNode"
         header-align="center"
         align="center"
-        label="父节点指标">
+        label="上级指标">
       </el-table-column>
       <el-table-column
         prop="indicatorCreatTime"

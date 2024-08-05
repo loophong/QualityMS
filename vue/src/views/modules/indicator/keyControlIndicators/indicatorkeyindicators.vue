@@ -23,18 +23,18 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         prop="keyIndicatorId"
         header-align="center"
         align="center"
         label="重点指标ID（主键）">
-      </el-table-column>
-      <el-table-column
+      </el-table-column> -->
+      <!-- <el-table-column
         prop="indicatorId"
         header-align="center"
         align="center"
         label="指标ID">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         prop="indicatorName"
         header-align="center"

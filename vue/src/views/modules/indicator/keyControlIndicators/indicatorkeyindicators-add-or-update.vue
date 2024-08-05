@@ -4,9 +4,9 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="指标ID" prop="indicatorId">
+    <!-- <el-form-item label="指标ID" prop="indicatorId">
       <el-input v-model="dataForm.indicatorId" placeholder="指标ID"></el-input>
-    </el-form-item>
+    </el-form-item> -->
     <el-form-item label="指标名称" prop="indicatorName">
       <el-input v-model="dataForm.indicatorName" placeholder="指标名称"></el-input>
     </el-form-item>

@@ -35,12 +35,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         SysUserEntity role = ShiroUtils.getUserEntity();
         String rolename = role.getUsername();
         String issueNumber = (String) params.get("issueNumber");
-        System.out.println("当前登录人信息"+role);
-        System.out.println("当前问题编号"+issueNumber);
-//        IPage<IssueMaskTableEntity> page = this.page(
-//                new Query<IssueMaskTableEntity>().getPage(params),
-//                new QueryWrapper<IssueMaskTableEntity>().eq("creator", rolename)
-//        );
+
         QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<IssueMaskTableEntity>()
                 .eq("creator", rolename)
                 .eq("issue_number", issueNumber);
@@ -49,19 +44,18 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
                 new Query<IssueMaskTableEntity>().getPage(params),
                 queryWrapper
         );
-//        String username = getCurrentUsername();
-//        String issueNumber = (String) params.get("issueNumber");
-//        QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<IssueMaskTableEntity>()
-//                .eq("creator", username);
-//
-//        if (issueNumber != null && !issueNumber.isEmpty()) {
-//            queryWrapper.eq("issueNumber", issueNumber);
-//        }
-//
-//        IPage<IssueMaskTableEntity> page = this.page(
-//                new Query<IssueMaskTableEntity>().getPage(params),
-//                queryWrapper
-//        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils AuditqueryPage(Map<String, Object> params) {
+        SysUserEntity role = ShiroUtils.getUserEntity();
+        String rolename = role.getUsername();
+        System.out.println("当前登录人信息"+role);
+        IPage<IssueMaskTableEntity> page = this.page(
+                new Query<IssueMaskTableEntity>().getPage(params),
+                new QueryWrapper<IssueMaskTableEntity>().eq("Reviewers", rolename)
+        );
         return new PageUtils(page);
     }
 }

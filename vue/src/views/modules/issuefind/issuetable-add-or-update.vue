@@ -237,6 +237,7 @@
         visible1: false,
         file: null,
         dataForm: {
+          userinfo: '',
           vehicles: [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }],
           vehicleTypeIds: [],
           vehicleNumbers: [],
@@ -304,6 +305,9 @@
       this.fetchIssueCategories()
       this.fetchVehicleTypes()
       this.fetchIssueOptions() // 获取所有问题编号选项
+    },
+    activated () {
+
     },
     methods: {
       handlePictureCardPreview (file) {
@@ -435,9 +439,29 @@
           console.error('There was an error fetching the issue options!', error)
         })
       },
+      //获取用户人信息
+      fetchuserinform () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/useinfo'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log('Successfully fetched user info:', data.userinfo)
+            this.dataForm.userinfo = data.userinfo // 将后端返回的 userinfo 赋值给 this.userinfo
+            console.log('Successfully fetched user info:', this.userinfo)
+          } else {
+            console.error('Failed to fetch vehicle types:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the vehicle types!', error)
+        })
+      },
       init (id) {
+        this.fetchuserinform() //获取用户名
         this.dataForm.issueId = id || 0
         this.visible = true
+        console.log("成功获取用户名：" ,this.dataForm.userinfo)
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.issueId) {
@@ -466,7 +490,7 @@
                 this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
                 this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
                 this.dataForm.remark = data.issueTable.remark
-                this.dataForm.creator = data.issueTable.creator
+                this.dataForm.creator = this.dataForm.userinfo
                 this.dataForm.creationTime = data.issueTable.creationTime
                 this.dataForm.lastModifier = data.issueTable.lastModifier
                 this.dataForm.lastModificationTime = data.issueTable.lastModificationTime

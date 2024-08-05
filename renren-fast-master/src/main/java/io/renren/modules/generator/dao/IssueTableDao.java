@@ -1,17 +1,17 @@
 package io.renren.modules.generator.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.renren.modules.generator.entity.TestTableEntity;
+import io.renren.modules.generator.entity.IssueTableEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 
+ * 问题表
  * 
  * @author chenshun
  * @email sunlightcs@gmail.com
- * @date 2024-07-18 08:58:50
+ * @date 2024-07-22 11:15:58
  */
 @Mapper
-public interface TestTableDao extends BaseMapper<TestTableEntity> {
+public interface IssueTableDao extends BaseMapper<IssueTableEntity> {
 	
 }

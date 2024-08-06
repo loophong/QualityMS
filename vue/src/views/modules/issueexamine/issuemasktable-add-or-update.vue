@@ -32,6 +32,21 @@
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
+
+    <!-- 审核弹窗 -->
+    <el-dialog
+      title="审核"
+      :close-on-click-modal="false"
+      :visible.sync="visible1">
+      <div>
+        <!-- 审核内容，可以根据需要添加表单或其他内容 -->
+        <p>审核内容</p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="visible1 = false">取 消</el-button>
+        <el-button type="primary" @click="confirmAudit">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -138,6 +153,12 @@
       },
       resetForm (formName) {
         this.$refs[formName].resetFields()
+      },
+
+      confirmAudit () {
+        // 确认审核的逻辑
+        console.log('确认审核')
+        this.visible1 = false // 关闭审核弹窗
       },
       // 表单提交
       dataFormSubmit () {

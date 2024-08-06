@@ -233,7 +233,7 @@
       return {
         bloburl: '',
         imageurl: '',
-        visible: true,
+        visible: false,
         visible1: false,
         file: null,
         dataForm: {

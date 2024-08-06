@@ -32,6 +32,25 @@
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
+
+    <!-- 派发弹窗 -->
+    <el-dialog
+      title="派发"
+      :close-on-click-modal="false"
+      :visible.sync="visible1">
+      <el-form :model="dataForm" :rules="dataRule" ref="dispatchForm" @keyup.enter.native="dispatchFormSubmit()" label-width="80px">
+        <el-form-item label="接收人" prop="recipients">
+          <el-input v-model="dataForm.recipients" placeholder="接收人"></el-input>
+        </el-form-item>
+        <el-form-item label="派发时间" prop="dispatchTime">
+          <el-date-picker v-model="dataForm.creationTime" type="datetime" placeholder="选择派发时间"></el-date-picker>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="visible1 = false">取消</el-button>
+        <el-button type="primary" @click="dispatchFormSubmit()">确定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -138,6 +157,25 @@
       },
       resetForm (formName) {
         this.$refs[formName].resetFields()
+      },
+      initDispatch (id) {
+        console.log('初始化派发弹窗，ID:', id)
+        this.dataForm.issuemaskId = id || 0
+        this.visible1 = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetForm()
+        })
+      },
+      dispatchFormSubmit () {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            console.log('派发表单提交', this.dispatchForm)
+            this.visible1 = false // 关闭派发弹窗
+          } else {
+            console.log('派发表单验证失败')
+            return false
+          }
+        })
       },
       // 表单提交
       dataFormSubmit () {

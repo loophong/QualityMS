@@ -82,7 +82,7 @@
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="executeHandle(scope.row.issuemaskId)">执行</el-button>-->
           <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">审核</el-button>
           <!-- 完成按钮 -->
-          <el-button v-if="showCompleteButton" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>
+<!--          <el-button v-if="showCompleteButton" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -150,7 +150,7 @@ export default {
         })
       })
     },
-    // 任务派发
+    // 任务审核
     dispatchHandle (id) {
       // 派发操作的逻辑
       console.log('派发操作', id)

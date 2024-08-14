@@ -18,7 +18,7 @@
       </el-table-column> -->
       <el-table-column header-align="center" align="center" label="" width="40">
       </el-table-column>
-      <el-table-column prop="qcgmId" header-align="center" align="center" label="小组ID" width="70">
+      <el-table-column prop="qcgmId" header-align="center" align="center" label="小组序号" width="70">
       </el-table-column>
       <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="200">
       </el-table-column>

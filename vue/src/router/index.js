@@ -49,12 +49,7 @@ const mainRoutes = {
       name: 'plan-update-page',
       meta: { title: '计划修改页', isDynamic: true, isTab: true }
     },
-    {
-      path: '/qcPlanNew',
-      component: _import('@/views/modules/QCmanagement/qcSubjectManagement/plan/qcPlanNew'),
-      name: 'qcPlanNew',
-      meta: { title: '新建计划', isDynamic: true, isTab: true }
-    },
+   
     //任务
     {
       path: '/issue-issuemask',

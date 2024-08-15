@@ -152,6 +152,8 @@
   export default {
     data () {
       return {
+        indicatorDictionaryList: {},
+
         //excel上传
         showUploadDialog:false,
         dataForm: {
@@ -199,33 +201,14 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        const params = {
-          page: this.pageIndex,
-          limit: this.pageSize,
-          key: this.dataForm.key
-        }
-        listIndicatorSummary(params).then(({data}) => {
-          if (data && data.code === 0) {
-            console.log("1235454")
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
-          } else {
-            this.dataList = []
-            this.totalPage = 0
-          }
-          this.dataListLoading = false
-        })
-
-        // this.$http({
-        //   url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
-        //   method: 'get',
-        //   params: this.$http.adornParams({
-        //     'page': this.pageIndex,
-        //     'limit': this.pageSize,
-        //     'key': this.dataForm.key
-        //   })
-        // }).then(({data}) => {
+        // const params = {
+        //   page: this.pageIndex,
+        //   limit: this.pageSize,
+        //   key: this.dataForm.key
+        // }
+        // listIndicatorSummary(params).then(({data}) => {
         //   if (data && data.code === 0) {
+        //     console.log("1235454")
         //     this.dataList = data.page.list
         //     this.totalPage = data.page.totalCount
         //   } else {
@@ -234,6 +217,25 @@
         //   }
         //   this.dataListLoading = false
         // })
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.dataForm.key
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log("data====>",data)
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
       },
       // 根据月份获取数据列表
       getDataListByMonth () {

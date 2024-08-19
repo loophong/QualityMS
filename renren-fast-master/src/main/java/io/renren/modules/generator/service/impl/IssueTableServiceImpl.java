@@ -6,14 +6,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.common.utils.ShiroUtils;
+import io.renren.config.FileUploadProperties;
 import io.renren.modules.generator.dao.IssueTableDao;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,9 +25,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
 @Service("issueTableService")
 public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTableEntity> implements IssueTableService {
+    private final String uploadDir;
+
+    @Value("${file.upload.dir}")
+    private String uploadPath;
+
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
+    @Value("${server.port}")
+    private String serverPort;
+
+    @Value("${server.address}")
+    private String serverAddress;
+
+    @Autowired
+    public IssueTableServiceImpl(FileUploadProperties fileUploadProperties) {
+        this.uploadDir = fileUploadProperties.getUploadDir();
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -37,37 +58,67 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
     @Override
     public List<IssueTableEntity> listAll() {
-        System.out.println("///"+list());
+        System.out.println("///" + list());
         return this.list();
     }
 
     @Override
     public String saveUploadedFile(MultipartFile file) throws IOException {
-
-        // 定义文件存储的目录
-        String uploadDir = "/path/to/your/upload/directory";
-        // 创建目录（如果不存在）
-        Files.createDirectories(Paths.get(uploadDir));
-
-        // 生成唯一的文件名
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(uploadDir, fileName);
-
-        // 保存文件到指定路径
-        Files.copy(file.getInputStream(), filePath);
-
-        // 返回文件的相对路径或URL
-        return "/uploads/" + fileName;
-    }
-
-    @Override
-    public void updateIssuePhoto(Integer issueId, String imagePath) {
-        IssueTableEntity issueTable = this.getById(issueId);
-        if (issueTable != null) {
-            issueTable.setIssuePhoto(imagePath);
-            this.updateById(issueTable);
+        if (uploadPath == null) {
+            throw new IllegalStateException("Upload path is not configured.");
         }
+
+        // 创建目标文件路径
+        String originalFilename = file.getOriginalFilename();
+        String filePath = uploadPath + File.separator + originalFilename;
+        File dest = new File(filePath);
+
+        // 检查目录是否存在，不存在则创建
+        if (!dest.getParentFile().exists()) {
+            dest.getParentFile().mkdirs();
+        }
+
+        // 直接保存文件到目标路径
+        try (InputStream inputStream = file.getInputStream();
+             OutputStream outputStream = new FileOutputStream(dest)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+
+        // 生成文件URL
+        String fileUrl = generateFileUrl(originalFilename);
+        return fileUrl;
     }
+
+    private String generateFileUrl(String filename) {
+        return "http://" + serverAddress + ":" + serverPort + contextPath + "/upload/" + filename;
+    }
+//    }
+//        // 创建目标文件路径
+//        File dest = new File(uploadPath + file.getOriginalFilename());
+//
+//        // 检查目录是否存在，不存在则创建
+//        if (!dest.getParentFile().exists()) {
+//            dest.getParentFile().mkdirs();
+//        }
+//
+//        // 保存文件到目标路径
+//        file.transferTo(dest);
+//
+//        return dest.getAbsolutePath();
+
+
+//    @Override
+//    public void updateIssuePhoto(Integer issueId, String imagePath) {
+//        IssueTableEntity issueTable = this.getById(issueId);
+//        if (issueTable != null) {
+//            issueTable.setIssuePhoto(imagePath);
+//            this.updateById(issueTable);
+//        }
+//    }
 
     @Override
     public String getuserinfo() {
@@ -75,5 +126,4 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         String rolename = role.getUsername();
         return rolename;
     }
-
 }

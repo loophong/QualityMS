@@ -255,6 +255,7 @@
 
 <script>
 import AddOrUpdate from './issuetable-add-or-update.vue'
+import openNewPage from '../issueset/issueSet.vue'
 // import {isAuth} from "../../../utils";
 export default {
   data () {
@@ -283,6 +284,15 @@ export default {
     this.getDataList()
   },
   methods: {
+    openNewPage (issueId, issueNumber) {
+      this.$router.push({
+        name: 'issue-issuemask',
+        params: {
+          issueId: issueId,
+          issueNumber: issueNumber
+        }
+      })
+    },
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true

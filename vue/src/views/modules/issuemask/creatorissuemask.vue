@@ -71,6 +71,18 @@
         label="发起时间">
       </el-table-column>
       <el-table-column
+        prop="requiredcompletiontime"
+        header-align="center"
+        align="center"
+        label="要求完成时间">
+      </el-table-column>
+      <el-table-column
+        prop="state"
+        header-align="center"
+        align="center"
+        label="状态">
+      </el-table-column>
+      <el-table-column
         fixed="right"
         header-align="center"
         align="center"

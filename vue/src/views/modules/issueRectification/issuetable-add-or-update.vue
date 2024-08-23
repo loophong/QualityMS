@@ -215,28 +215,95 @@
         <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
       </span>
   </el-dialog>
-  <el-dialog
-    :title="'问题分析'"
-    :close-on-click-modal="false"
-    :visible.sync="visible1">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-          <el-form-item label="原因分析" prop="causeAnalysis">
-            <el-input v-model="dataForm.causeAnalysis" placeholder="原因分析"></el-input>
-          </el-form-item>
-      <el-form-item label="分析人" prop="lastModifier">
-        <el-input v-model="dataForm.lastModifier" placeholder="分析人"></el-input>
-      </el-form-item>
-    </el-form>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="visible1 = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+<!--  <el-dialog-->
+<!--    :title="'问题分析'"-->
+<!--    :close-on-click-modal="false"-->
+<!--    :visible.sync="visible1">-->
+<!--    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">-->
+<!--          <el-form-item label="原因分析" prop="causeAnalysis">-->
+<!--            <el-input v-model="dataForm.causeAnalysis" placeholder="原因分析"></el-input>-->
+<!--          </el-form-item>-->
+<!--      <el-form-item label="分析人" prop="lastModifier">-->
+<!--        <el-input v-model="dataForm.lastModifier" placeholder="分析人"></el-input>-->
+<!--      </el-form-item>-->
+<!--    </el-form>-->
+<!--    <span slot="footer" class="dialog-footer">-->
+<!--      <el-button @click="visible1 = false">取消</el-button>-->
+<!--      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>-->
+<!--    </span>-->
+<!--  </el-dialog>-->
+    <el-dialog
+      :title="'任务发起'"
+      :close-on-click-modal="false"
+      :visible.sync="visible1">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+        <el-form-item label="审核人" prop="reviewers">
+          <el-select v-model="dataForm.reviewers" filterable placeholder="请选择审核人">
+            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.label">
+              </el-option>
+            </el-option-group>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item
+          v-for="(subtask, index) in dataForm.subtasks"
+          :key="subtask.key"
+          :label="'子任务 ' + (index + 1)"
+          :prop="'subtasks.' + index + '.name'"
+          :rules="{ required: true, message: '子任务不能为空', trigger: 'blur' }">
+          <el-input v-model="subtask.name" placeholder="请输入子任务"></el-input>
+          <!--          <el-select v-model="subtask.assignee" placeholder="请选择接收人">-->
+          <!--            <el-option label="甲" value="甲"></el-option>-->
+          <!--            <el-option label="乙" value="乙"></el-option>-->
+          <!--            <el-option label="丙" value="丙"></el-option>-->
+          <!--          </el-select>-->
+          <el-select v-model="subtask.assignee" filterable placeholder="请选择接收人">
+            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.label">
+              </el-option>
+            </el-option-group>
+          </el-select>
+          <el-button @click.prevent="removeSubtask(subtask)">删除</el-button>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="addSubtask">增加子任务</el-button>
+          <el-button @click="resetForm('dataForm')">重置</el-button>
+        </el-form-item>
+        <!--        <el-form-item label="要求完成日期" prop="requiredCompletionTime">-->
+        <!--          <el-date-picker-->
+        <!--            v-model="requiredCompletionTime"-->
+        <!--            type="date"-->
+        <!--            value-format="yyyy-MM-dd HH:mm:ss"-->
+        <!--            placeholder="选择日期">-->
+        <!--          </el-date-picker>-->
+        <!--        </el-form-item>-->
+        <el-form-item label="要求完成日期" prop="requiredCompletionTime">
+          <el-date-picker
+            v-model="dataForm.requiredCompletionTime"
+            type="date"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="请选择日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+      <el-button @click="cancel">取消</el-button>
+      <el-button type="primary" @click="submitForm('dataForm')">提交</el-button>
     </span>
-  </el-dialog>
+    </el-dialog>
+    <!--  </div>-->
+    <!--  <div>-->
   </div>
+
 </template>
 
 <script>
   // import axios from 'axios'
+  import init1 from '../issueset/issuetable-add-or-update.vue'
 
   export default {
     data () {
@@ -556,53 +623,53 @@
           }
         })
       },
-      init1 (id) {
-        this.dataForm.issueId = id || 0
-        this.visible1 = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-          if (this.dataForm.issueId) {
-            this.$http({
-              url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.dataForm.serialNumber = data.issueTable.serialNumber
-                this.dataForm.issueNumber = data.issueTable.issueNumber
-                this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
-                this.dataForm.inspectionDate = data.issueTable.inspectionDate
-                this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
-                this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
-                this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
-                this.dataForm.issueDescription = data.issueTable.issueDescription
-                this.dataForm.issuePhoto = data.issueTable.issuePhoto
-                this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
-                this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
-                this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
-                this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
-                this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
-                this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
-                this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
-                this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
-                this.dataForm.remark = data.issueTable.remark
-                this.dataForm.creator = data.issueTable.creator
-                this.dataForm.creationTime = data.issueTable.creationTime
-                this.dataForm.lastModifier = data.issueTable.lastModifier
-                this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
-                this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
-                this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
-                this.dataForm.creationDuration = data.issueTable.creationDuration
-                this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
-                this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
-                this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
-                this.dataForm.verifier = data.issueTable.verifier
-                this.dataForm.formula = data.issueTable.formula
-              }
-            })
-          }
-        })
-      },
+      // init1 (id) {
+      //   this.dataForm.issueId = id || 0
+      //   this.visible1 = true
+      //   this.$nextTick(() => {
+      //     this.$refs['dataForm'].resetFields()
+      //     if (this.dataForm.issueId) {
+      //       this.$http({
+      //         url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
+      //         method: 'get',
+      //         params: this.$http.adornParams()
+      //       }).then(({data}) => {
+      //         if (data && data.code === 0) {
+      //           this.dataForm.serialNumber = data.issueTable.serialNumber
+      //           this.dataForm.issueNumber = data.issueTable.issueNumber
+      //           this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
+      //           this.dataForm.inspectionDate = data.issueTable.inspectionDate
+      //           this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
+      //           this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
+      //           this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
+      //           this.dataForm.issueDescription = data.issueTable.issueDescription
+      //           this.dataForm.issuePhoto = data.issueTable.issuePhoto
+      //           this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+      //           this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
+      //           this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
+      //           this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
+      //           this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+      //           this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
+      //           this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
+      //           this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
+      //           this.dataForm.remark = data.issueTable.remark
+      //           this.dataForm.creator = data.issueTable.creator
+      //           this.dataForm.creationTime = data.issueTable.creationTime
+      //           this.dataForm.lastModifier = data.issueTable.lastModifier
+      //           this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
+      //           this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
+      //           this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
+      //           this.dataForm.creationDuration = data.issueTable.creationDuration
+      //           this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
+      //           this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
+      //           this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
+      //           this.dataForm.verifier = data.issueTable.verifier
+      //           this.dataForm.formula = data.issueTable.formula
+      //         }
+      //       })
+      //     }
+      //   })
+      // },
       // 表单提交
       dataFormSubmit () {
         console.log('Successfully 获得 vehicle:', this.dataForm.vehicles)

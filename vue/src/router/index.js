@@ -49,13 +49,20 @@ const mainRoutes = {
       name: 'plan-update-page',
       meta: { title: '计划修改页', isDynamic: true, isTab: true }
     },
-   
+
     //任务
     {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/creatorissuemask'),
       name: 'issue-issuemask',
       meta: { title: '任务详情', isDynamic: true, isTab: true }
+    },
+    //指标
+    {
+      path: '/indicator-display-charts-indicatorchart/:indicatorName',
+      component: _import('modules/indicator/display/charts/indicatorchart'),
+      name: 'indicatorchart',
+      meta: { title: '指标详情',  isTab: true }
     },
   ],
   beforeEnter (to, from, next) {

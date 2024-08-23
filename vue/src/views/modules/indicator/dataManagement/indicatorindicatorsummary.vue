@@ -2,7 +2,7 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="queryParams.indicatorName" placeholder="请输入指标名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -37,7 +37,7 @@
       </el-form-item>
       <el-form-item label="选择月份">
         <el-date-picker
-          v-model="dataForm.key.yearMonth"
+          v-model="dataForm.key"
           type="month"
           placeholder="选择月份"
           format="yyyy-MM"
@@ -159,6 +159,29 @@
         dataForm: {
           key: ''
         },
+        //查询参数列表
+        queryParams: {
+          indicatorName: '',
+          indicatorValue: '',
+          indicatorValueUpperBound: '',
+          indicatorValueLowerBound: '',
+          assessmentDepartment: '',
+          managementDepartment: '',
+          indicatorDefinition: '',
+          indicatorClassification: '',
+          managementContentCurrentAnalysis: '',
+          dataId: '',
+          sourceDepartment: '',
+          collectionMethod: '',
+          collectionFrequency: '',
+          planId: '',
+          taskId: '',
+          indicatorParentNode: '',
+          indicatorCreatTime: '',
+          yearMonth: '',
+          indicatorState: '',
+          indicatorChildNode: ''
+        },
         form: {
           indicatorId: 0,
           indicatorName: '',
@@ -223,7 +246,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.queryParams
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -239,25 +262,25 @@
       },
       // 根据月份获取数据列表
       getDataListByMonth () {
-        // this.dataListLoading = true
-        // this.$http({
-        //   url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/listByMonth'),
-        //   method: 'get',
-        //   params: this.$http.adornParams({
-        //     'month': this.dataForm.month,
-        //     'page': this.pageIndex,
-        //     'limit': this.pageSize
-        //   })
-        // }).then(({data}) => {
-        //   if (data && data.code === 0) {
-        //     this.dataList = data.page.list
-        //     this.totalPage = data.page.totalCount
-        //   } else {
-        //     this.dataList = []
-        //     this.totalPage = 0
-        //   }
-        //   this.dataListLoading = false
-        // })
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.form.yearMonth,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
       },
       // 导入excel，检查文件类型
       checkFile() {
@@ -294,22 +317,29 @@
           }
         } else {
           console.log("formData=====>",formData);
-          const aimUrl = http.adornUrl('/indicator/indicatorindicatorsummary/upload')
+          const aimUrl = http.adornUrl('/indicator/indicatorindicatorsummary/upload');
           uploadFile(formData, aimUrl)
-            .then(data => {
-              // 处理上传成功的情况
-              this.$message.success("上传成功");
-              this.getDataList();
+            .then(response => {
+              console.log("response=====>",response);
+              if (response && response.data.code === 0) {
+                if (response.data.msg.includes('存在未定义的指标')) {
+                  this.$message.warning(response.data.msg); // 提示存在未定义的指标
+                } else {
+                  this.$message.success(response.data.msg); // 正常成功提示
+                }
+                this.getDataList();
+              } else {
+                this.$message.error("上传失败，请重试");
+              }
             })
             .catch(error => {
-              // 处理上传失败的情况
               console.error('上传失败：', error);
               this.$message.error("上传失败，请重试");
             })
             .finally(() => {
-              // 无论成功或失败，都关闭上传面板
               this.showUploadDialog = false;
             });
+
         }
       },
       // 每页数

@@ -64,8 +64,15 @@
       <!-- <el-form-item label="关联任务id" prop="taskId">
       <el-input v-model="dataForm.taskId" placeholder="关联任务id"></el-input>
     </el-form-item> -->
+<!--      <el-form-item label="上级指标" prop="indicatorParentNode">-->
+<!--        <el-input v-model="dataForm.indicatorParentNode" placeholder="上级指标"></el-input>-->
+<!--      </el-form-item>-->
       <el-form-item label="上级指标" prop="indicatorParentNode">
-        <el-input v-model="dataForm.indicatorParentNode" placeholder="上级指标"></el-input>
+        <el-select v-model="dataForm.indicatorParentNode" placeholder="请选择指标名称" >
+          <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
+            {{ field.indicatorName }}
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="指标创建时间" prop="indicatorCreatTime">
         <el-date-picker
@@ -104,7 +111,8 @@ export default {
         { id: 7, name: '(a + b) / c', template: '(a + b) / c' },
         { id: 8, name: '(a + b + c) / d', template: '(a + b + c) / d' },
       ],
-      dataList: [],  // 指标数据列表
+      dataList: [],  // 指标数据源列表
+      indicatorDictionaryList: [], //指标列表
       selectedFormula: null,
       placeholders: [],
       placeholderMapping: {},
@@ -133,7 +141,8 @@ export default {
       dataDictionaryForm: {},  // 指标数据字典表
       dataRule: {
         indicatorName: [
-          { required: true, message: '指标名称不能为空', trigger: 'blur' }
+          { required: true, message: '指标名称不能为空', trigger: 'blur' },
+          { validator: this.validateIndicatorName, trigger: 'blur' }
         ],
         assessmentDepartment: [
           { required: true, message: '考核部门不能为空', trigger: 'blur' }
@@ -184,7 +193,7 @@ export default {
     }
   },
   computed: {
-    //生成的公式
+    //填入数据源后最终生成的公式
     generatedFormula() {
       let formula = this.selectedFormula;
       for (const [placeholder, field] of Object.entries(this.placeholderMapping)) {
@@ -198,6 +207,39 @@ export default {
     this.getDataDictionaryList()
   },
   methods: {
+    //新增指标时验证是否有同名指标
+    validateIndicatorName(rule, value, callback) {
+      if (!value) {
+        return callback();
+      }
+      this.$http({
+        url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'limit': 10000,
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          console.log("validateIndicatorName===>data=====>",data)
+          this.indicatorDictionaryList = data.page.list
+          // 在数组最前面添加新的对象
+          this.indicatorDictionaryList.unshift({
+            indicatorId: 1,
+            indicatorName: '公司质量指标管控体系',
+            indicatorParentNode: ''
+          });
+          this.totalPage = data.page.totalCount
+        }
+      })
+      // 假设 indicatorDictionaryList 已经从后端获取
+      const existingIndicator = this.indicatorDictionaryList.find(indicator => indicator.indicatorName === value);
+
+      if (existingIndicator) {
+        callback(new Error('已有同名指标'));
+      } else {
+        callback();
+      }
+    },
     getDataDictionaryList() {
       this.$http({
         url: this.$http.adornUrl('/indicator/indicatordatadictionary/list'),
@@ -211,6 +253,25 @@ export default {
           this.dataList = data.page.list
           this.totalPage = data.page.totalCount
         }
+      })
+      this.$http({
+        url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'limit': 10000,
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          console.log("data=====>",data)
+          this.indicatorDictionaryList = data.page.list
+          // 在数组最前面添加新的对象
+          this.indicatorDictionaryList.unshift({
+            indicatorId: 1,
+            indicatorName: '公司质量指标管控体系',
+            indicatorParentNode: ''
+          });
+          this.totalPage = data.page.totalCount
+       }
       })
     },
     init(id) {

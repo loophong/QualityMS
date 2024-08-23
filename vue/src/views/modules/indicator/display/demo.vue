@@ -1,47 +1,84 @@
 <template>
-  <div ref="graph_container" class="graph_container"></div>
+  <div id="tree-chart" style="width: 100%; height: 500px;"></div>
 </template>
 
 <script>
-import { mxGraph } from 'mxgraph-js'
+import * as echarts from 'echarts';
+import 'echarts/lib/chart/tree'; // 引入树状图
+console.log("echarts===>",echarts);
+import 'echarts/lib/component/tooltip'; // 如果用到了提示工具，也要引入
+import 'echarts/lib/component/title'; // 如果用到了标题组件，也要引入
+
+
+
 export default {
-  name: 'indicatorDisplay',
-  mounted () {
-    // 创建画布
-    var graph = new mxGraph(this.$refs.graph_container);
-    // 获取容器的宽度和高度
-    var containerWidth = this.$refs.graph_container.clientWidth;
-    var containerHeight = this.$refs.graph_container.clientHeight;
-    // 计算根节点的坐标，使其位于容器的中央
-    var rootNodeWidth = 240;
-    var rootNodeHeight = 120;
-    var rootNodeX = (containerWidth - rootNodeWidth) / 2;
-    var rootNodeY = (containerHeight - rootNodeHeight) / 2;
-    var parent = graph.getDefaultParent();
-    // 开始更新画布
-    graph.getModel().beginUpdate();
-    try {
-      // 插入根节点
-      let parentVertex = graph.insertVertex(parent, null, '公司质量指标体系', rootNodeX, rootNodeY, rootNodeWidth, rootNodeHeight);
-      // 插入节点
-      let v0 = graph.insertVertex();
-      let v1 = graph.insertVertex(parent, null, 'Hello,', 20, 20, 80, 30);
-      let v2 = graph.insertVertex(parent, null, 'World!', 200, 150, 80, 30);
-      // 插入连线
-      graph.insertEdge(parent, null, '', parentVertex, v1);
-      graph.insertEdge(parent, null, '', parentVertex, v2);
-    } finally {
-      // 画布更新结束
-      graph.getModel().endUpdate();
+  data() {
+    return {
+      treeData: [], // 树形数据
+    }
+  },
+  mounted() {
+    this.initChart();
+  },
+  created() {
+    const data = [
+      {id: 1, name: '指标 A', parentId: null},
+      {id: 2, name: '指标 B', parentId: 1},
+      {id: 3, name: '指标 C', parentId: 1},
+      {id: 4, name: '指标 D', parentId: 2}
+    ];
+
+    // 构建树状图数据
+    this.treeData = this.buildTree(data)[0];  // 根节点
+  },
+  methods: {
+    initChart() {
+      console.log("initChart");
+      const chartDom = document.getElementById('tree-chart');
+      console.log('chartDom===>', chartDom)
+      if (!chartDom) {
+        console.log("DOM element not found: #tree-chart");
+      }
+
+      const myChart = echarts.init(chartDom);
+      console.log('myChart===>', myChart)
+      if (!myChart) {
+        console.error("ECharts initialization failed");
+      }
+      const option = {
+        tooltip: {
+          trigger: 'item',
+          triggerOn: 'mousemove'
+        },
+        series: [
+          {
+            type: 'tree',  // 指定使用树图
+            data: [this.treeData],  // 根节点的数组
+            top: '1%',
+            left: '7%',
+            bottom: '1%',
+            right: '20%',
+            symbolSize: 7,
+            label: {
+              position: 'left',
+              verticalAlign: 'middle',
+              align: 'right',
+              fontSize: 9
+            },
+            leaves: {
+              label: {
+                position: 'right',
+                verticalAlign: 'middle',
+                align: 'left'
+              }
+            },
+            expandAndCollapse: true,
+            animationDuration: 550,
+            animationDurationUpdate: 750
+          }
+        ]
+      };
     }
   }
-};
-</script>
-
-<style>
-.graph_container {
-  width: 100%;
-  height: 1000px;
-  border: 1px solid #ccc;
 }
-</style>
+</script>

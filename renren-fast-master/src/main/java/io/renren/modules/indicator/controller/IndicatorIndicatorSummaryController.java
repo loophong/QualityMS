@@ -94,17 +94,18 @@ public class IndicatorIndicatorSummaryController {
      * 上传excel
      */
     @PostMapping("/upload")
-    public R simpleRead(@RequestParam(value = "multipartFile") MultipartFile multipartFile, @RequestParam(value = "yearMonth") @DateTimeFormat(pattern = "yyyy-MM")Date yearMonth) {
-
+    public R simpleRead(@RequestParam("multipartFile") MultipartFile multipartFile, @RequestParam("yearMonth") @DateTimeFormat(pattern = "yyyy-MM") Date yearMonth) {
         try (InputStream inputStream = multipartFile.getInputStream()) {
-            indicatorIndicatorSummaryService.readProductionExcelToDB(multipartFile.getOriginalFilename(), inputStream,yearMonth);
-            return  R.ok();
+            // 调用服务方法，并获取返回结果
+            R result = indicatorIndicatorSummaryService.readProductionExcelToDB(multipartFile.getOriginalFilename(), inputStream, yearMonth);
+
+            // 根据服务方法的返回结果决定返回给前端的消息
+            return result;
         } catch (Exception e) {
-            System.out.println("读取 " + multipartFile.getName() + " 文件失败, 原因: {}");
-            throw new ServiceException("读取 " + multipartFile.getName() + " 文件失败");
-//            sysLog.error("读取 " + multipartFile.getName() + " 文件失败, 原因: {}", e.getMessage());
-//            throw new ServiceException("读取 " + multipartFile.getName() + " 文件失败");
+            System.out.println("读取 " + multipartFile.getName() + " 文件失败, 原因: " + e.getMessage());
+            throw new ServiceException("读取 " + multipartFile.getName() + " 文件失败", e);
         }
     }
+
 
 }

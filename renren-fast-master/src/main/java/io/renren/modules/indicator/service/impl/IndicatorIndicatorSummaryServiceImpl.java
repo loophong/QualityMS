@@ -1,6 +1,7 @@
 package io.renren.modules.indicator.service.impl;
 
 import com.alibaba.excel.EasyExcel;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.common.utils.R;
 import io.renren.modules.indicator.listener.DataReadListener;
 import io.renren.modules.indicator.service.IndicatorDictionaryService;
@@ -32,25 +33,73 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
     @Autowired
     private IndicatorDictionaryService indicatorDictionaryService;
 
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        System.out.println("params:" + params);
+        String key = (String) params.get("key");
+        QueryWrapper<IndicatorIndicatorSummaryEntity> queryWrapper = new QueryWrapper<>();
+
+        if (key != null && !key.isEmpty()) {
+            try {
+                // 将 key 字符串解析为 Map
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> keyMap = objectMapper.readValue(key, Map.class);
+
+                // 遍历 Map 并添加查询条件
+                for (Map.Entry<String, String> entry : keyMap.entrySet()) {
+                    String field = entry.getKey();
+                    String value = entry.getValue();
+
+                    if (value != null && !value.isEmpty()) {
+                        switch (field) {
+                            case "indicatorName":
+                                queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getIndicatorName, value);
+                                break;
+                            case "indicatorValue":
+                                queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getIndicatorValue, value);
+                                break;
+                            case "managementDepartment":
+                                queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getManagementDepartment, value);
+                                break;
+                            case "assessmentDepartment":
+                                queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getAssessmentDepartment, value);
+                                break;
+                            // 继续为其他字段添加查询条件...
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace(); // 处理 JSON 解析异常
+            }
+        }
+
         IPage<IndicatorIndicatorSummaryEntity> page = this.page(
                 new Query<IndicatorIndicatorSummaryEntity>().getPage(params),
-                new QueryWrapper<IndicatorIndicatorSummaryEntity>()
+                queryWrapper
         );
+
         return new PageUtils(page);
     }
+
+
+
 
     @Override
     public R readProductionExcelToDB(String fileName, InputStream inputStream, Date yearMonth) {
         try {
-            // 使用 EasyExcel 读取文件
-            EasyExcel.read(inputStream, IndicatorIndicatorSummaryEntity.class, new DataReadListener(indicatorIndicatorSummaryService,indicatorDictionaryService,yearMonth)).sheet().doRead();
+            DataReadListener listener = new DataReadListener(indicatorIndicatorSummaryService, indicatorDictionaryService, yearMonth);
+            EasyExcel.read(inputStream, IndicatorIndicatorSummaryEntity.class, listener).sheet().doRead();
 
-            return R.ok("读取" + fileName + "文件成功");
+            if (listener.hasUndefinedIndicator()) {
+                return R.ok("读取" + fileName + "文件成功，但存在未定义的指标，已自动忽略");
+            } else {
+                return R.ok("读取" + fileName + "文件成功");
+            }
         } catch (Exception e) {
             log.error("读取 " + fileName + " 文件失败, 原因: {}", e.getMessage());
             return R.error("读取文件失败,您需要上传指标汇总表,当前上传的文件为：" + fileName);
         }
     }
+
 }

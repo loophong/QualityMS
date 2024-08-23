@@ -26,6 +26,9 @@
     <el-form-item label="发起时间" prop="creationTime">
       <el-input v-model="dataForm.creationTime" placeholder="发起时间"></el-input>
     </el-form-item>
+      <el-form-item label="要求完成时间" prop="creationTime">
+        <el-input v-model="dataForm.requiredcompletiontime" placeholder="要求完成时间"></el-input>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -68,7 +71,8 @@
           recipients: '',
           maskcontent: '',
           creator: '',
-          creationTime: ''
+          creationTime: '',
+          requiredcompletiontime: ''
         },
         dataRule: {
           // serialNumber: [
@@ -115,6 +119,8 @@
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
                 this.dataForm.creator = data.issueMaskTable.creator
                 this.dataForm.creationTime = data.issueMaskTable.creationTime
+                this.dataForm.requiredcompletiontime = data.issueMaskTable.requiredcompletiontime
+                this.dataForm.state = '审核中'
               }
             })
           }

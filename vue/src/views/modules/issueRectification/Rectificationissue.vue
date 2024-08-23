@@ -228,6 +228,9 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle()">整改记录</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
+          <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId)">任务发起</el-button>
+          <el-button type="text" size="small" @click="openNewPage(scope.row.issueId,scope.row.issueNumber)">任务详情</el-button>
+          <el-button type="text" size="small" @click="openNewPage(scope.row.issueId)">任务流程</el-button>
         </template>
       </el-table-column>
     </el-table>

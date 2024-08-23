@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="recigetDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:issuemasktable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+<!--        <el-button v-if="isAuth('generator:issuemasktable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+<!--        <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
     </el-form>
     <el-table
@@ -22,12 +22,12 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
-        prop="issuemaskId"
-        header-align="center"
-        align="center"
-        label="">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="issuemaskId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="serialNumber"
         header-align="center"
@@ -69,6 +69,18 @@
         header-align="center"
         align="center"
         label="发起时间">
+      </el-table-column>
+      <el-table-column
+        prop="requiredcompletiontime"
+        header-align="center"
+        align="center"
+        label="要求完成时间">
+      </el-table-column>
+      <el-table-column
+        prop="state"
+        header-align="center"
+        align="center"
+        label="状态">
       </el-table-column>
       <el-table-column
         fixed="right"

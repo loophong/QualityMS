@@ -102,5 +102,27 @@ public class IssueMaskTableController {
 
         return R.ok();
     }
+    /**
+     * 审核
+     */
+    @RequestMapping("/audit")
+    @RequiresPermissions("generator:issuemasktable:delete")
+    public R audit(@RequestBody Integer[] issuemaskIds){
+        for (Integer id : issuemaskIds) {
+            // 根据id获取对应的实体对象
+            IssueMaskTableEntity issueMaskTable = issueMaskTableService.getById(id);
+
+            if (issueMaskTable != null) {
+                // 修改state为“执行中”
+                issueMaskTable.setState("执行中");
+
+                // 更新数据库中的记录
+                issueMaskTableService.updateById(issueMaskTable);
+            } else {
+                System.out.println("未找到id为" + id + "的记录");
+            }
+        }
+        return R.ok();
+    }
 
 }

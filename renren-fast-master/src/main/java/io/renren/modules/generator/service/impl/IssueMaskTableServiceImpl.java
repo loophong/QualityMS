@@ -12,6 +12,7 @@ import io.renren.modules.generator.service.IssueMaskTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -58,4 +59,5 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         );
         return new PageUtils(page);
     }
+
 }

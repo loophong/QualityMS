@@ -6,10 +6,10 @@
     :visible.sync="visible1">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="审核人" prop="reviewers">
-        <el-select v-model="dataForm.reviewers" filterable placeholder="请选择验证人">
+        <el-select v-model="dataForm.reviewers" filterable placeholder="请选择审核人">
           <el-option-group v-for="group in options" :key="group.label" :label="group.label">
             <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                       :value="item.value">
+                       :value="item.label">
             </el-option>
           </el-option-group>
         </el-select>
@@ -30,7 +30,7 @@
           <el-select v-model="subtask.assignee" filterable placeholder="请选择接收人">
             <el-option-group v-for="group in options" :key="group.label" :label="group.label">
               <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                         :value="item.value">
+                         :value="item.label">
               </el-option>
             </el-option-group>
           </el-select>
@@ -54,7 +54,7 @@
           v-model="dataForm.requiredCompletionTime"
           type="date"
           value-format="yyyy-MM-dd HH:mm:ss"
-          placeholder="请选择上传日期">
+          placeholder="请选择日期">
         </el-date-picker>
       </el-form-item>
     </el-form>
@@ -116,7 +116,8 @@
           rectificationVerificationStatus: '',
           verificationConclusion: '',
           verifier: '',
-          formula: ''
+          formula: '',
+          state: ''
         },
         dataRule: {
           initiator: [
@@ -138,9 +139,7 @@
         method: 'get',
       }).then(({ data }) => {
         this.options = data;
-
-
-        console.log(data);
+        console.log('获取的角色信息' ,data);
         // if (data && data.code === 0) {
         //   console.log(data);
         // }
@@ -201,7 +200,8 @@
                   'maskcontent': subtask.name,
                   'creator': this.dataForm.userinfo,
                   'creationTime': this.dataForm.creationTime,
-                  'requiredCompletionTime': this.dataForm.requiredCompletionTime
+                  'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+                  'state': '审核中'
                 })
               }).then(({data}) => {
                 if (data && data.code === 0) {

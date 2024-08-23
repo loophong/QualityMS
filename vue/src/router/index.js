@@ -62,8 +62,15 @@ const mainRoutes = {
       name: 'issue-issuemask',
       meta: { title: '任务详情', isDynamic: true, isTab: true }
     },
+    //指标
+    {
+      path: '/indicator-display-charts-indicatorchart/:indicatorName',
+      component: _import('modules/indicator/display/charts/indicatorchart'),
+      name: 'indicatorchart',
+      meta: { title: '指标详情',  isTab: true }
+    },
   ],
-  beforeEnter (to, from, next) {
+  beforeEnter(to, from, next) {
     let token = Vue.cookie.get('token')
     if (!token || !/\S/.test(token)) {
       clearLoginInfo()
@@ -91,7 +98,7 @@ router.beforeEach((to, from, next) => {
       url: http.adornUrl('/sys/menu/nav'),
       method: 'get',
       params: http.adornParams()
-    }).then(({data}) => {
+    }).then(({ data }) => {
       if (data && data.code === 0) {
         fnAddDynamicMenuRoutes(data.menuList)
         router.options.isAddDynamicMenuRoutes = true

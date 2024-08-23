@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
@@ -79,7 +81,9 @@ public class IndicatorDictionaryEntity implements Serializable {
 	/**
 	 * 指标创建时间
 	 */
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date indicatorCreatTime;
+
 	/**
 	 * 0表示弃用，1表示使用中
 	 */

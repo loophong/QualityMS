@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('indicator:indicatordictionary:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('indicator:indicatordictionary:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('indicator:indicatordatadictionary:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('indicator:indicatordatadictionary:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -23,107 +23,23 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="indicatorId"
+        prop="dataId"
         header-align="center"
         align="center"
-        label="指标ID">
+        label="数据ID">
       </el-table-column>
       <el-table-column
-        prop="indicatorName"
+        prop="dataContent"
         header-align="center"
         align="center"
-        label="指标名称">
+        label="数据">
       </el-table-column>
       <el-table-column
-        prop="managementDepartment"
+        prop="dataType"
         header-align="center"
         align="center"
-        label="管理部门">
+        label="数据类型">
       </el-table-column>
-      <el-table-column
-        prop="assessmentDepartment"
-        header-align="center"
-        align="center"
-        label="考核部门">
-      </el-table-column>
-      <el-table-column
-        prop="indicatorDefinition"
-        header-align="center"
-        align="center"
-        label="指标公式定义">
-      </el-table-column>
-      <el-table-column
-        prop="indicatorClassification"
-        header-align="center"
-        align="center"
-        label="指标分级">
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="managementContentCurrentAnalysis"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="管理内容（现状分析）">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="dataId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="数据ID">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="sourceDepartment"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="来源部门">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="collectionMethod"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="收集方法">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="collectionFrequency"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="收集频次">-->
-<!--      </el-table-column>-->
-      <el-table-column
-        prop="planId"
-        header-align="center"
-        align="center"
-        label="关联计划">
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="taskId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="关联任务id">-->
-<!--      </el-table-column>-->
-      <el-table-column
-        prop="indicatorParentNode"
-        header-align="center"
-        align="center"
-        label="上级指标">
-      </el-table-column>
-      <el-table-column
-        prop="indicatorCreatTime"
-        header-align="center"
-        align="center"
-        label="指标创建时间">
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="indicatorState"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="0表示弃用，1表示使用中">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="indicatorChildNode"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="指标子节点">-->
-<!--      </el-table-column>-->
       <el-table-column
         fixed="right"
         header-align="center"
@@ -131,8 +47,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.indicatorId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.indicatorId)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.dataId)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.dataId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -151,7 +67,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './indicatordictionary-add-or-update'
+  import AddOrUpdate from './indicatordatadictionary-add-or-update'
   export default {
     data () {
       return {
@@ -178,7 +94,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+          url: this.$http.adornUrl('/indicator/indicatordatadictionary/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -221,7 +137,7 @@
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.indicatorId
+          return item.dataId
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
@@ -229,7 +145,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/indicator/indicatordictionary/delete'),
+            url: this.$http.adornUrl('/indicator/indicatordatadictionary/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

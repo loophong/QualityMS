@@ -5,7 +5,11 @@
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="指标名称" prop="indicatorName">
-      <el-input v-model="dataForm.indicatorName" placeholder="指标名称"></el-input>
+      <el-select v-model="dataForm.indicatorName" placeholder="请选择指标名称">
+        <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
+          {{ field.indicatorName }}
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="指标值" prop="indicatorValue">
       <el-input v-model="dataForm.indicatorValue" placeholder="指标值"></el-input>
@@ -84,6 +88,7 @@
   export default {
     data () {
       return {
+        indicatorDictionaryList: {},
         visible: false,
         dataForm: {
           indicatorId: 0,
@@ -163,7 +168,29 @@
         }
       }
     },
+    created() {
+      this.getIndicatorDictionaryList()
+    },
     methods: {
+      //获取全部指标列表
+      getIndicatorDictionaryList() {
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 10000,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log("data2====>",data)
+            this.indicatorDictionaryList = data.page.list
+          } else {
+            this.dataList = []
+          }
+        })
+      },
+
       init (id) {
         this.dataForm.indicatorId = id || 0
         this.visible = true
@@ -193,6 +220,7 @@
                 this.dataForm.indicatorCreatTime = data.indicatorIndicatorSummary.indicatorCreatTime
                 this.dataForm.indicatorState = data.indicatorIndicatorSummary.indicatorState
                 this.dataForm.indicatorChildNode = data.indicatorIndicatorSummary.indicatorChildNode
+                this.dataForm.yearMonth = data.indicatorIndicatorSummary.yearMonth
               }
             })
           }
@@ -240,7 +268,8 @@
                 'indicatorParentNode': this.dataForm.indicatorParentNode,
                 'indicatorCreatTime': this.dataForm.indicatorCreatTime,
                 'indicatorState': this.dataForm.indicatorState,
-                'indicatorChildNode': this.dataForm.indicatorChildNode
+                'indicatorChildNode': this.dataForm.indicatorChildNode,
+                'yearMonth': this.dataForm.yearMonth
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

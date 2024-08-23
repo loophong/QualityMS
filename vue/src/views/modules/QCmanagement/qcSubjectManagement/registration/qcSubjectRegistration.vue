@@ -35,7 +35,7 @@
         </template>
 </el-table-column> -->
 
-      <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员ids">
+      <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员序号">
       </el-table-column>
       <!-- <el-table-column prop="createDate" header-align="center" align="center" label="创建日期">
       </el-table-column>
@@ -58,7 +58,7 @@
       </el-table-column>
       <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划">
       </el-table-column>
-      <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字tag">
+      <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
       </el-table-column>
       <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
       </el-table-column>

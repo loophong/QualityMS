@@ -8,9 +8,9 @@
       <el-form-item label="课题编号" prop="topicNumber">
         <el-input v-model="dataForm.topicNumber" placeholder="课题编号"></el-input>
       </el-form-item>
-      <el-form-item label="课题组长" prop="topicLeader">
+      <!-- <el-form-item label="课题组长" prop="topicLeader">
         <el-input v-model="dataForm.topicLeader" placeholder="课题组长"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <!-- <el-form-item label="课题顾问" prop="topicConsultant">
         <el-input v-model="dataForm.topicConsultant" placeholder="课题顾问"></el-input>
       </el-form-item> -->
@@ -20,9 +20,16 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="小组成员ids" prop="teamNumberIds">
-        <el-input v-model="dataForm.teamNumberIds" placeholder="小组成员ids"></el-input>
+      <!-- <el-form-item label="小组成员" prop="teamNumberIds">
+        <el-input v-model="dataForm.teamNumberIds" placeholder="小组成员"></el-input>
+      </el-form-item> -->
+      <el-form-item label="小组成员" prop="teamNumberIds">
+        <el-select v-model="dataForm.teamNumberIds" multiple placeholder="请选择小组成员">
+          <el-option v-for="item in membersSelect" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
+
       <el-form-item label="开始日期" prop="startDate">
         <el-date-picker clearable v-model="dataForm.startDate" type="date" value-format="yyyy-MM-dd" placeholder="开始日期">
         </el-date-picker>
@@ -111,6 +118,15 @@ export default {
         { value: 'consultant2', label: '顾问2' },
         // 其他顾问选项
       ],
+      membersSelect: [
+        { value: 'member1', label: '成员1' },
+        { value: 'member2', label: '成员2' },
+        { value: 'member3', label: '成员3' },
+        { value: 'member4', label: '成员4' },
+        { value: 'member5', label: '成员5' },
+        // 其他顾问选项
+      ],
+
       dataRule: {
         topicName: [
           { required: true, message: '课题名称不能为空', trigger: 'blur' }

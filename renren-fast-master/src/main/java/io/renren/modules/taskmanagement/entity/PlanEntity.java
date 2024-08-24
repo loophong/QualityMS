@@ -11,7 +11,6 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.renren.modules.taskmanagement.utils.JacksonListTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import javafx.concurrent.Task;
 import lombok.Data;
 
 /**

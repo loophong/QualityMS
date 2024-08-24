@@ -8,7 +8,6 @@ import cn.hutool.log.Log;
 import io.renren.modules.taskmanagement.entity.PlanAndTaskDTO;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.service.TaskService;
-import javafx.concurrent.Task;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -147,7 +146,7 @@ public class PlanController {
      * @date: 2024/7/24 10:11
      **/
     @GetMapping("/getTasksByUserId")
-    public List<TaskEntity> getTasksByUserId(@RequestParam String userId){
+    public List<TaskEntity> getTasksByUserId(@RequestParam Long userId){
         return taskService.getTasksByUserId(userId);
     }
 

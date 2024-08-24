@@ -177,6 +177,8 @@ export default {
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
+
+            console.log("data" + data);
             if (data && data.code === 0) {
               this.dataForm.taskId = data.taskManagementTask.taskId
               this.dataForm.taskName = data.taskManagementTask.taskName
@@ -209,7 +211,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.$http({
-            url: this.$http.adornUrl(`/taskmanagement/task/${!this.dataForm.tmTid ? 'save' : 'update'}`),
+            url: this.$http.adornUrl(`/taskmanagement/task/info/${this.dataForm.tmTid}`),
             method: 'post',
             data: this.$http.adornData({
               'tmTid': this.dataForm.tmTid || undefined,

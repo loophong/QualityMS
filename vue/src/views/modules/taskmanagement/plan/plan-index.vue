@@ -52,7 +52,7 @@
       <el-table-column prop="planExecutor" header-align="center" align="center" label="执行人" width="110">
         <template slot-scope="scope">
           <span v-for="(executorId, index) in scope.row.planExecutor" :key="executorId">
-            {{ getUserameByUserId(scope.row.planPrincipal) }}
+            {{ getUserameByUserId(executorId) }}
             <span v-if="index !== scope.row.planExecutor.length - 1">, </span>
           </span>
         </template>

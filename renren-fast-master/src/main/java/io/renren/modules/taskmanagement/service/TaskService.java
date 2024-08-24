@@ -21,6 +21,16 @@ public interface TaskService extends IService<TaskEntity> {
 
     public List<TaskEntity> getTasksByPlanId(String planId);
 
-    List<TaskEntity> getTasksByUserId(String userId);
+    List<TaskEntity> getTasksByUserId(Long userId);
+
+    List<TaskEntity> selectTasksByUserId(Long userId);
+
+     PageUtils queryPageSelectTasksByUserId(Map<String, Object> params, Long userId);
+
+     TaskEntity getByTaskId(Long taskId);
+
+    PageUtils queryPageGetUnfinishedTasks(Map<String, Object> params, Long userId);
+
+    PageUtils queryPageGetCompletedTasksList(Map<String, Object> params, Long userId);
 }
 

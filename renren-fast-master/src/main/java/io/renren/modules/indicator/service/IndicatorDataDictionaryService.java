@@ -3,7 +3,9 @@ package io.renren.modules.indicator.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.indicator.entity.IndicatorDataDictionaryEntity;
+import io.renren.modules.indicator.entity.IndicatorListEntityDTO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +18,7 @@ import java.util.Map;
 public interface IndicatorDataDictionaryService extends IService<IndicatorDataDictionaryEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    List<IndicatorListEntityDTO> getIndicatorsList();
 }
 

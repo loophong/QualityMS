@@ -1,15 +1,13 @@
 package io.renren.modules.indicator.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import io.renren.modules.indicator.entity.IndicatorListEntityDTO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.indicator.entity.IndicatorDataDictionaryEntity;
 import io.renren.modules.indicator.service.IndicatorDataDictionaryService;
@@ -40,6 +38,18 @@ public class IndicatorDataDictionaryController {
         PageUtils page = indicatorDataDictionaryService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+
+    /**
+     * @description: 任务模块--获取指标列表，查询指标名称和指标编号
+     * @author: hong
+     * @date: 2024/8/24 14:33
+     * @version: 1.0
+     */
+    @GetMapping("/getIndicatorsList")
+//    @RequiresPermissions("indicator:indicatordatadictionary:list")
+    public List<IndicatorListEntityDTO> getIndicatorsList(){
+        return indicatorDataDictionaryService.getIndicatorsList();
     }
 
 

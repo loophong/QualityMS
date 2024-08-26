@@ -59,6 +59,17 @@
         align="center"
         width="50">
       </el-table-column>
+      <!-- 序号列 -->
+      <el-table-column
+        header-align="center"
+        align="center"
+        label="序号"
+        width="60"
+      >
+        <template slot-scope="scope">
+          {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
+        </template>
+      </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="indicatorId"-->
 <!--        header-align="center"-->

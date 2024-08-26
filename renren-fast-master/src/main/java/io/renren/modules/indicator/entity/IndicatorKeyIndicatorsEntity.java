@@ -51,11 +51,11 @@ public class IndicatorKeyIndicatorsEntity implements Serializable {
 	/**
 	 * 是否管理失控
 	 */
-	private Integer isManagementOutOfControl;
+	private String isManagementOutOfControl;
 	/**
 	 * 是否需要理攻关
 	 */
-	private Integer isNeedsControl;
+	private String isNeedsControl;
 	/**
 	 * 关键要素
 	 */

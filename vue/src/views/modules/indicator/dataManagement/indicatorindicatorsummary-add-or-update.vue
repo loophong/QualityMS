@@ -5,7 +5,7 @@
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="指标名称" prop="indicatorName">
-      <el-select v-model="dataForm.indicatorName" placeholder="请选择指标名称">
+      <el-select v-model="dataForm.indicatorName" placeholder="请选择指标名称" :disabled="!!dataForm.indicatorId">  <!-- 当 indicatorId 存在时禁用选择 -->
         <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
           {{ field.indicatorName }}
         </el-option>
@@ -60,13 +60,14 @@
 <!--          clearable>-->
 <!--        </el-date-picker>-->
 <!--      </el-form-item>-->
-      <el-form-item label="年月" prop="yearMonth">
+      <el-form-item label="年月" prop="yearMonth" >
         <el-date-picker
           v-model="dataForm.yearMonth"
           type="month"
           placeholder="选择月份"
           format="yyyy-MM"
           value-format="yyyy-MM"
+          :disabled="!!dataForm.indicatorId"
         ></el-date-picker>
       </el-form-item>
 
@@ -90,6 +91,21 @@
       return {
         indicatorDictionaryList: {},
         visible: false,
+        // 查询参数列表
+        queryParams: {
+          indicatorName: '',
+          indicatorValue: '',
+          indicatorValueUpperBound: '',
+          indicatorValueLowerBound: '',
+          assessmentDepartment: '',
+          managementDepartment: '',
+          indicatorDefinition: '',
+          indicatorClassification: '',
+          indicatorParentNode: '',
+          indicatorCreatTime: '',
+          yearMonth: '',
+          indicatorState: '',
+        },
         dataForm: {
           indicatorId: 0,
           indicatorName: '',
@@ -190,7 +206,7 @@
           }
         })
       },
-
+      //修改时初始化数据（根据id判断：id=1为修改）
       init (id) {
         this.dataForm.indicatorId = id || 0
         this.visible = true
@@ -247,44 +263,63 @@
 
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.queryParams.indicatorName = this.dataForm.indicatorName
+            console.log('this.queryParams===>',this.queryParams)
+            //按指标名称查询
             this.$http({
-              url: this.$http.adornUrl(`/indicator/indicatorindicatorsummary/${!this.dataForm.indicatorId ? 'save' : 'update'}`),
-              method: 'post',
-              data: this.$http.adornData({
-                'indicatorId': this.dataForm.indicatorId || undefined,
-                'indicatorName': this.dataForm.indicatorName,
-                'indicatorValue': this.dataForm.indicatorValue,
-                'assessmentDepartment': this.dataForm.assessmentDepartment,
-                'managementDepartment': this.dataForm.managementDepartment,
-                'indicatorDefinition': this.dataForm.indicatorDefinition,
-                'indicatorClassification': this.dataForm.indicatorClassification,
-                'managementContentCurrentAnalysis': this.dataForm.managementContentCurrentAnalysis,
-                'dataId': this.dataForm.dataId,
-                'sourceDepartment': this.dataForm.sourceDepartment,
-                'collectionMethod': this.dataForm.collectionMethod,
-                'collectionFrequency': this.dataForm.collectionFrequency,
-                'planId': this.dataForm.planId,
-                'taskId': this.dataForm.taskId,
-                'indicatorParentNode': this.dataForm.indicatorParentNode,
-                'indicatorCreatTime': this.dataForm.indicatorCreatTime,
-                'indicatorState': this.dataForm.indicatorState,
-                'indicatorChildNode': this.dataForm.indicatorChildNode,
-                'yearMonth': this.dataForm.yearMonth
+              url: this.$http.adornUrl('/indicator/indicatordictionary/querylist'),
+              method: 'get',
+              params: this.$http.adornParams({
+                'key': this.queryParams
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
+                console.log("data33333333====>",data)
+                this.dataForm.assessmentDepartment = data.page.list[0].assessmentDepartment
+                this.dataForm.managementDepartment = data.page.list[0].managementDepartment
+                console.log("this.dataForm=====>",this.dataForm);
+                this.queryParams = []
               }
+            }).then(() => {
+              this.$http({
+                url: this.$http.adornUrl(`/indicator/indicatorindicatorsummary/${!this.dataForm.indicatorId ? 'save' : 'update'}`),
+                method: 'post',
+                data: this.$http.adornData({
+                  'indicatorId': this.dataForm.indicatorId || undefined,
+                  'indicatorName': this.dataForm.indicatorName,
+                  'indicatorValue': this.dataForm.indicatorValue,
+                  'assessmentDepartment': this.dataForm.assessmentDepartment,
+                  'managementDepartment': this.dataForm.managementDepartment,
+                  'indicatorDefinition': this.dataForm.indicatorDefinition,
+                  'indicatorClassification': this.dataForm.indicatorClassification,
+                  'managementContentCurrentAnalysis': this.dataForm.managementContentCurrentAnalysis,
+                  'dataId': this.dataForm.dataId,
+                  'sourceDepartment': this.dataForm.sourceDepartment,
+                  'collectionMethod': this.dataForm.collectionMethod,
+                  'collectionFrequency': this.dataForm.collectionFrequency,
+                  'planId': this.dataForm.planId,
+                  'taskId': this.dataForm.taskId,
+                  'indicatorParentNode': this.dataForm.indicatorParentNode,
+                  'indicatorCreatTime': this.dataForm.indicatorCreatTime,
+                  'indicatorState': this.dataForm.indicatorState,
+                  'indicatorChildNode': this.dataForm.indicatorChildNode,
+                  'yearMonth': this.dataForm.yearMonth
+                })
+              }).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$emit('refreshDataList')
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
+                }
+              })
             })
           }
         })

@@ -45,6 +45,17 @@ public class IndicatorIndicatorSummaryController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 查询时间范围内的指标列表
+     */
+    @RequestMapping("/indicatorlist")
+    @RequiresPermissions("indicator:indicatorindicatorsummary:list")
+    public R indicatorList(@RequestParam Map<String, Object> params){
+        PageUtils page = indicatorIndicatorSummaryService.queryIndicatorList(params);
+
+        return R.ok().put("page", page);
+    }
+
 
     /**
      * 信息

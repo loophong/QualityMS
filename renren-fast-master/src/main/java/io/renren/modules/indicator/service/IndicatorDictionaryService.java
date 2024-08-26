@@ -17,6 +17,7 @@ import java.util.Map;
 public interface IndicatorDictionaryService extends IService<IndicatorDictionaryEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+    PageUtils queryIndicatorList(Map<String, Object> params);
     public List<IndicatorDictionaryEntity> getDictionaryEntitiesByName(String indicatorName);
 
 }

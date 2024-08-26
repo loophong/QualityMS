@@ -22,6 +22,8 @@ public interface IndicatorIndicatorSummaryService extends IService<IndicatorIndi
 
     PageUtils queryPage(Map<String, Object> params);
 
+    PageUtils queryIndicatorList(Map<String, Object> params);
+
     public R readProductionExcelToDB(String fileName, InputStream inputStream, Date yearMonth);
 
 }

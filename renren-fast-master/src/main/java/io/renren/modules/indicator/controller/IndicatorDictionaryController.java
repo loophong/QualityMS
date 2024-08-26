@@ -43,6 +43,17 @@ public class IndicatorDictionaryController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 根据具体字段查询列表
+     */
+    @RequestMapping("/querylist")
+    @RequiresPermissions("indicator:indicatordictionary:list")
+    public R queryList(@RequestParam Map<String, Object> params){
+        PageUtils page = indicatorDictionaryService.queryPage(params);
+
+
+        return R.ok().put("page", page);
+    }
 
     /**
      * 信息

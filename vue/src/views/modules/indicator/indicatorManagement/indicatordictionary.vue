@@ -22,12 +22,23 @@
         align="center"
         width="50">
       </el-table-column>
+      <!-- 序号列 -->
       <el-table-column
-        prop="indicatorId"
         header-align="center"
         align="center"
-        label="指标ID">
+        label="序号"
+        width="60"
+      >
+        <template slot-scope="scope">
+          {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
+        </template>
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="indicatorId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="指标ID">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="indicatorName"
         header-align="center"
@@ -133,6 +144,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.indicatorId)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.indicatorId)">删除</el-button>
+          <el-button type="text" size="small" @click="keyControlHandle(scope.row.indicatorId)">重点管控</el-button>
         </template>
       </el-table-column>
     </el-table>

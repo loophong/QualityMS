@@ -41,7 +41,7 @@ export default {
         id: 1,
         name: '公司质量指标管控体系',
         parentName: '',
-        url: '/some-url-based-on-indicator-id/1',
+        url: '',
         classification: 'A'
       };
       // 格式化数据并插入根节点

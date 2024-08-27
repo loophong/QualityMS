@@ -58,16 +58,16 @@
         label="指标分级">
       </el-table-column>
       <el-table-column
+        prop="sourceDepartment"
+        header-align="center"
+        align="center"
+        label="管理部门">
+      </el-table-column>
+      <el-table-column
         prop="assessmentDepartment"
         header-align="center"
         align="center"
         label="考核部门">
-      </el-table-column>
-      <el-table-column
-        prop="sourceDepartment"
-        header-align="center"
-        align="center"
-        label="来源部门">
       </el-table-column>
       <el-table-column
         prop="managementContent"

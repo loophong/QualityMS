@@ -58,9 +58,9 @@
     <el-form-item label="收集频次" prop="collectionFrequency">
       <el-input v-model="dataForm.collectionFrequency" placeholder="收集频次"></el-input>
     </el-form-item> -->
-      <el-form-item label="关联计划" prop="planId">
-        <el-input v-model="dataForm.planId" placeholder="关联计划"></el-input>
-      </el-form-item>
+<!--      <el-form-item label="关联计划" prop="planId">-->
+<!--        <el-input v-model="dataForm.planId" placeholder="关联计划"></el-input>-->
+<!--      </el-form-item>-->
       <!-- <el-form-item label="关联任务id" prop="taskId">
       <el-input v-model="dataForm.taskId" placeholder="关联任务id"></el-input>
     </el-form-item> -->
@@ -110,6 +110,8 @@ export default {
         { id: 6, name: '(a + b + c - d) / e', template: '(a + b + c - d) / e' },
         { id: 7, name: '(a + b) / c', template: '(a + b) / c' },
         { id: 8, name: '(a + b + c) / d', template: '(a + b + c) / d' },
+        { id: 9, name: 'a + b + c - d', template: 'a + b + c - d' },
+        { id: 10, name: 'a / (b * c)', template: 'a / (b * c)' },
       ],
       dataList: [],  // 指标数据源列表
       indicatorDictionaryList: [], //指标列表
@@ -171,12 +173,12 @@ export default {
         collectionFrequency: [
           { required: true, message: '收集频次不能为空', trigger: 'blur' }
         ],
-        planId: [
-          { required: true, message: '关联计划id不能为空', trigger: 'blur' }
-        ],
-        taskId: [
-          { required: true, message: '关联任务id不能为空', trigger: 'blur' }
-        ],
+        // planId: [
+        //   { required: true, message: '关联计划id不能为空', trigger: 'blur' }
+        // ],
+        // taskId: [
+        //   { required: true, message: '关联任务id不能为空', trigger: 'blur' }
+        // ],
         indicatorParentNode: [
           { required: true, message: '指标父节点不能为空', trigger: 'blur' }
         ],

@@ -1,5 +1,7 @@
 <template>
-  <div ref="treeChart" style="width: 100%; height: 500px;"></div>
+  <div ref="treeChartContainer" style="width: 100%; height: 100%; overflow: auto;">
+    <div ref="treeChart" style="width: 100%; height: 100%;"></div>
+  </div>
 </template>
 
 <script>
@@ -12,9 +14,28 @@ export default {
     };
   },
   mounted() {
-    this.getDataList();
+    this.$nextTick(() => {
+      this.updateSvgSize();
+      window.addEventListener('resize', this.updateSvgSize); // 添加窗口大小变化监听器，实时调整SVG大小
+      this.getDataList();
+    });
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.updateSvgSize); // 组件销毁前移除监听器
   },
   methods: {
+    updateSvgSize() {
+      this.$nextTick(() => {
+        const mainContainer = document.querySelector('main');
+        if (mainContainer) {
+          const mainWidth = mainContainer.clientWidth;
+          const mainHeight = mainContainer.clientHeight;
+          const svg = d3.select(this.$refs.treeChart).select('svg');
+          svg.attr('width', mainWidth).attr('height', mainHeight);
+          console.log(`Updated SVG size to width: ${mainWidth}, height: ${mainHeight}`);
+        }
+      });
+    },
     getDataList() {
       this.$http({
         url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
@@ -25,10 +46,8 @@ export default {
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
-          console.log('data:', data);
           this.dataList = data.page.list;
-          console.log('DataList222:', this.dataList);
-          this.renderTree();  // 在数据加载完成后渲染树状图
+          this.renderTree();
         } else {
           this.dataList = [];
         }
@@ -36,7 +55,10 @@ export default {
     },
 
     renderTree() {
-      // 创建根节点
+      const mainContainer = document.querySelector('main');
+      const mainWidth = mainContainer.clientWidth;
+      const mainHeight = mainContainer.clientHeight;
+
       const rootNode = {
         id: 1,
         name: '公司质量指标管控体系',
@@ -44,35 +66,39 @@ export default {
         url: '',
         classification: 'A'
       };
-      // 格式化数据并插入根节点
+
       const formattedData = [rootNode, ...this.dataList.map(item => ({
         id: item.indicatorId,
         name: item.indicatorName,
         parentName: item.indicatorParentNode,
-        // url: '/some-url-based-on-indicator-id/' + item.indicatorId,
         url: 'indicatorchart',
         classification: item.indicatorClassification,
       }))];
 
-      console.log('Formatted Data:', formattedData); // 调试信息
-
       const treeData = this.buildTree(formattedData);
-      console.log('Tree Data:', treeData); // 调试信息
 
-      const margin = { top: 20, right: 120, bottom: 20, left: 120 };
-      const width = 960 - margin.right - margin.left;
-      const height = 500 - margin.top - margin.bottom;
+      const margin = {top: 20, right: 120, bottom: 20, left: 120};
+      const width = mainWidth - margin.right - margin.left;
+      const height = mainHeight - margin.top - margin.bottom;
 
       const svg = d3.select(this.$refs.treeChart)
         .append('svg')
-        .attr('width', width + margin.right + margin.left)
-        .attr('height', height + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
+        .attr('width', mainWidth)
+        .attr('height', mainHeight)
+        .call(d3.zoom().on("zoom", (event) => {  //添加缩放和平移功能
+          svg.attr("transform", event.transform);
+        }))
+        .append('g');
+
 
       const root = d3.hierarchy(treeData[0]);
+      const treeLayout = d3.tree().size([height * 2, width]); // 增加高度比例
+      // const treeLayout = d3.tree()
+      //   .size([height, width]) // 使用大小指定树的整体尺寸
+      //   .nodeSize([120, 200]) // 动态调整每个节点的尺寸（高度, 宽度）
+      //   .separation((a, b) => a.parent == b.parent ? 1 : 1.5); // 动态调整兄弟节点和不同父节点之间的间距
 
-      const treeLayout = d3.tree().size([height, width]);
+
       treeLayout(root);
 
       svg.selectAll('line.link')
@@ -93,14 +119,12 @@ export default {
         .attr('class', 'node')
         .attr('transform', d => `translate(${d.y},${d.x})`);
 
-      // 根据指标等级设置矩形颜色
       const colorScale = {
-        'A': '#e74c3c', // 红色
-        'B': '#e67e22', // 橙色
-        'C': '#3498db'  // 蓝色
+        'A': '#e74c3c',
+        'B': '#e67e22',
+        'C': '#3498db'
       };
 
-      // 添加圆角矩形
       nodes.append('rect')
         .attr('width', 200)
         .attr('height', 80)
@@ -108,29 +132,20 @@ export default {
         .attr('y', -25)
         .attr('rx', 10)
         .attr('ry', 10)
-        .style('fill', d => {
-          const color = colorScale[d.data.classification] || '#000'; // 如果未匹配到颜色，使用默认黑色
-          return color;
-        })
+        .style('fill', d => colorScale[d.data.classification] || '#000')
         .on('click', (event, d) => {
-          console.log('Clicked on1:', d); // 打印节点数据
-          console.log('d.data 内容:', d.data);
-          console.log("即将传递的url:", d.data.url);
-          console.log("即将传递的参数:", d.data.name);
           this.$router.push({
             name: d.data.url,
-            params: { indicatorName: d.data.name }
+            params: {indicatorName: d.data.name}
           });
         });
 
-      // 在矩形左上角添加小圆圈
       nodes.append('circle')
         .attr('cx', -90)
         .attr('cy', -15)
         .attr('r', 10)
         .style('fill', '#fff');
 
-      // 在小圆圈内添加指标等级文本
       nodes.append('text')
         .attr('x', -90)
         .attr('y', -15)
@@ -138,11 +153,8 @@ export default {
         .style('dominant-baseline', 'middle')
         .style('font-size', '10px')
         .style('fill', '#000')
-        .text(d => {
-          return d.data.classification;
-        });
+        .text(d => d.data.classification);
 
-      // 在矩形中添加文本
       nodes.append('text')
         .attr('dy', '.9em')
         .attr('x', 0)
@@ -150,32 +162,18 @@ export default {
         .attr('text-anchor', 'middle')
         .style('dominant-baseline', 'central')
         .text(d => d.data.name)
-        .style('fill', 'white')
-        .on('click', (event, d) => {
-          console.log('Clicked on2:', d); // 打印节点数据
-          console.log('d.data 内容:', d.data);
-          console.log("即将传递的url:", d.data.url);
-          console.log("即将传递的参数:", d.data.name);
-          this.$router.push({
-            name: d.data.url,
-            params: { indicatorName: d.data.name }
-          });
-        });
-
-
+        .style('fill', 'white');
     },
-
-
 
     buildTree(data, parentName = '') {
       return data
-        .filter(item => item.parentName === parentName)  // 使用parentName来过滤
+        .filter(item => item.parentName === parentName)
         .map(item => ({
           id: item.id,
           name: item.name,
           classification: item.classification,
           url: item.url,
-          children: this.buildTree(data, item.name)  // 使用name来匹配
+          children: this.buildTree(data, item.name)
         }));
     },
   }

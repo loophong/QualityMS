@@ -99,12 +99,12 @@
 <!--        align="center"-->
 <!--        label="收集频次">-->
 <!--      </el-table-column>-->
-      <el-table-column
-        prop="planId"
-        header-align="center"
-        align="center"
-        label="关联计划">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="planId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="关联计划">-->
+<!--      </el-table-column>-->
 <!--      <el-table-column-->
 <!--        prop="taskId"-->
 <!--        header-align="center"-->
@@ -159,11 +159,13 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <key-control v-if="keyControlVisible" ref="keyControl" @refreshDataList="getDataList"></key-control>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './indicatordictionary-add-or-update'
+  import KeyControl from './keyindicator-add'
   export default {
     data () {
       return {
@@ -176,11 +178,14 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        // 关键指标
+        keyControlVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      KeyControl
     },
     activated () {
       this.getDataList()
@@ -228,6 +233,13 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      //重点指标管控
+      keyControlHandle (id) {
+        this.keyControlVisible = true
+        this.$nextTick(() => {
+          this.$refs.keyControl.init(id)
         })
       },
       // 删除

@@ -118,4 +118,6 @@ public class TaskEntity implements Serializable {
 	 */
 	private String taskAssociatedIndicatorsId;
 
+	private String taskParentNode;
+
 }

@@ -60,4 +60,15 @@ public class ApprovalServiceImpl extends ServiceImpl<ApprovalDao, ApprovalEntity
         return new PageUtils(page);
     }
 
+    @Override
+    public PageUtils queryPageGetMySubmitApprovalList(Map<String, Object> params, Long userId) {
+        IPage<ApprovalEntity> page = this.page(
+                new Query<ApprovalEntity>().getPage(params),
+                new QueryWrapper<ApprovalEntity>().eq("submitter", userId)
+                        .orderByDesc("task_submission_time")
+        );
+
+        return new PageUtils(page);
+    }
+
 }

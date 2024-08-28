@@ -43,7 +43,7 @@ public class ApprovalEntity implements Serializable {
 	/**
 	 * 相关计划编号
 	 */
-	private Integer taskAssociatedPlanId;
+	private String taskAssociatedPlanId;
 	/**
 	 * 负责人
 	 */
@@ -55,7 +55,7 @@ public class ApprovalEntity implements Serializable {
 	/**
 	 * 关联指标编号
 	 */
-	private Integer taskAssociatedIndicatorsId;
+	private String taskAssociatedIndicatorsId;
 	/**
 	 * 任务送审时间
 	 */

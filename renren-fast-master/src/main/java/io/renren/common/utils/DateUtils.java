@@ -23,6 +23,28 @@ import java.util.Date;
  * @author Mark sunlightcs@gmail.com
  */
 public class DateUtils {
+
+    /**
+     * @description: 获取当前时间，0时0点0分
+     * @author: hong
+     * @date: 2024/8/27 14:19
+     * @version: 1.0
+     */
+    public static Date getZeroTime() {
+        DateTime dateTime = new DateTime();
+        return dateTime.withTimeAtStartOfDay().toDate();
+    }
+
+    /**
+     * @description: 获取当前CST时间
+     * @author: hong
+     * @date: 2024/8/27 13:49
+     * @version: 1.0
+     */
+    public static Date getNow() {
+        return new Date();
+    }
+
 	/** 时间格式(yyyy-MM-dd) */
 	public final static String DATE_PATTERN = "yyyy-MM-dd";
 	/** 时间格式(yyyy-MM-dd HH:mm:ss) */

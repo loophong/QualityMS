@@ -41,13 +41,55 @@ const mainRoutes = {
       path: '/plan-add-page',
       component: _import('modules/taskmanagement/plan/plan-add-page'),
       name: 'plan-add-page',
-      meta: { title: '计划新建页', isDynamic: true, isTab: true }
+      meta: { title: '计划新建页', isDynamic: false, isTab: false }
     },
     {
-      path: '/plan-update-page',
+      path: '/plan-list',
+      component: _import('modules/taskmanagement/plan/plan-index'),
+      name: 'plan-list',
+      meta: { title: '工作计划', isDynamic: true, isTab: true }
+    },
+    // {
+    //   path: '/plan-update-page',
+    //   component: _import('modules/taskmanagement/plan/plan-detail-page'),
+    //   name: 'plan-update-page',
+    //   meta: { title: '计划修改页', isDynamic: false, isTab: true },
+    // },
+
+    // this.$router.push({
+    //   path: '/taskmanagement/plan/plan-detail-page',
+    //   query: {
+    //     taskId: taskId
+    //   }
+    // })
+    {
+      path: '/task-update-page',
+      component: _import('modules/taskmanagement/task/task-detail-page'),
+      name: 'task-update-page',
+      meta: { title: '任务修改页', isDynamic: true, isTab: false },
+      props: true
+    },
+    {
+      path: '/plan-tree',
+      component: _import('modules/taskmanagement/tree/plan-tree-display'),
+      name: 'plan-tree',
+      meta: { title: '计划结构图', isDynamic: false, isTab: false },
+      props: true
+    },
+
+    // this.$router.push({
+    //   path: '/taskmanagement/task/task-detail-page',
+    //   query: {
+    //     taskId: taskId
+    //   }
+    // })
+
+    {
+      path: '/plan-update-page/:plabId',
       component: _import('modules/taskmanagement/plan/plan-detail-page'),
       name: 'plan-update-page',
-      meta: { title: '计划修改页', isDynamic: true, isTab: true }
+      meta: { title: '计划修改页', isDynamic: false, isTab: false },
+      props: true
     },
     //QC
     {

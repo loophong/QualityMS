@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.Map;
 
 import io.renren.common.utils.ShiroUtils;
+import io.renren.modules.taskmanagement.entity.ApprovalStatus;
+import io.renren.modules.taskmanagement.entity.TaskEntity;
+import io.renren.modules.taskmanagement.entity.TaskStatus;
+import io.renren.modules.taskmanagement.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +37,26 @@ import io.renren.common.utils.R;
 public class ApprovalController {
     @Autowired
     private ApprovalService approvalService;
+
+    @Autowired
+    private TaskService taskService;
+
+    /**
+     * @description: 获取我提交的审批getMySubmitApprovalList
+     * @param: null
+     * @return:
+     * @author: hong
+     * @date: 2024/8/25 13:28
+     */
+    @RequestMapping("/getMySubmitApprovalList")
+//    @RequiresPermissions("taskmanagement:task:list")
+    public R getMySubmitApprovalList(@RequestParam Map<String, Object> params){
+
+        PageUtils page = approvalService.queryPageGetMySubmitApprovalList(params, ShiroUtils.getUserId());
+
+        return R.ok().put("page", page);
+
+    }
 
     /**
      * @description: 查询我的审批全部列表
@@ -119,8 +143,20 @@ public class ApprovalController {
     @RequestMapping("/update")
     @RequiresPermissions("taskmanagement:approval:update")
     public R update(@RequestBody ApprovalEntity taskManagementApprovalTable){
-        approvalService.updateById(taskManagementApprovalTable);
 
+        //检查任务是否存在
+
+        if (taskService.getByTaskId(taskManagementApprovalTable.getTaskId()) == null){
+            return R.error("任务不存在");
+        }
+        TaskEntity task = taskService.getByTaskId(taskManagementApprovalTable.getTaskId());
+        if (taskManagementApprovalTable.getApprovalStatus() == ApprovalStatus.APPROVED){
+            task.setTaskCurrentState(TaskStatus.COMPLETED);
+        }else {
+            task.setTaskCurrentState(TaskStatus.IN_PROGRESS);
+        }
+        taskService.updateById(task);
+        approvalService.updateById(taskManagementApprovalTable);
         return R.ok();
     }
 

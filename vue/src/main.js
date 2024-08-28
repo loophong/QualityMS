@@ -28,6 +28,8 @@ if (process.env.NODE_ENV !== 'production') {
 Vue.prototype.$http = httpRequest // ajax请求方法
 Vue.prototype.isAuth = isAuth     // 权限方法
 
+Vue.prototype.$globalVar = '这是一个全局变量';
+
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state)
 

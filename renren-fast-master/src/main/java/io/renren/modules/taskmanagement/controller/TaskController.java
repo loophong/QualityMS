@@ -3,10 +3,7 @@ package io.renren.modules.taskmanagement.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.alibaba.excel.util.DateUtils;
 import com.aliyun.oss.common.utils.DateUtil;
@@ -14,10 +11,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.taskmanagement.entity.ApprovalEntity;
+import io.renren.modules.taskmanagement.entity.TaskDetailDTO;
 import io.renren.modules.taskmanagement.entity.TaskStatus;
+import io.renren.modules.taskmanagement.service.ApprovalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.taskmanagement.entity.TaskEntity;
@@ -40,6 +41,129 @@ import io.renren.common.utils.R;
 public class TaskController {
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private ApprovalService approvalService;
+
+
+
+    /**
+     * @description: 检查当前taskId,任务编号是否被使用
+     * @author: hong
+     * @date: 2024/8/26 15:37
+     * @version: 1.0
+     */
+    @GetMapping("/checkTaskId")
+    public ResponseEntity<Boolean> checkPlanNumber(@RequestParam String taskId) {
+        boolean isUsed = taskService.isTaskIdUsed(taskId);
+        log.info("当前taskId"+taskId+",是否使用"+isUsed);
+        return ResponseEntity.ok(isUsed);
+    }
+
+
+    /**
+     * @description: 查询当前任务，以及其子任务
+     * @author: hong
+     * @date: 2024/8/26 10:37
+     * @version: 1.0
+     */
+    @RequestMapping("/getTaskDetailInfo")
+    public R getTaskDetailInfo(@RequestParam String taskId){
+        log.info("taskId"+taskId);
+        TaskDetailDTO taskDetailDTO = taskService.getTaskDetailInfo(taskId);
+
+        return R.ok().put("taskDetail", taskDetailDTO);
+    }
+
+    /**
+     * @description: 任务分解
+     * @author: hong
+     * @date: 2024/8/26 14:35
+     * @version: 1.0
+     */
+    @PostMapping("/decomposition")
+//    @RequiresPermissions("taskmanagement:task:list")
+    public R decompositionTask(@RequestBody TaskDetailDTO taskDetailDTO){
+        log.info("当前分解的任务详情为：" + taskDetailDTO);
+        int i = taskService.saveDecompositionTasks(taskDetailDTO.getTasks());
+        return R.ok();
+
+    }
+
+
+
+
+    /**
+     * @description: 通过planId，查询属于该id的全部任务
+     * @param: planId
+     * @author: hong
+     * @date: 2024/8/25 16:08
+     */
+//    @RequestMapping("/getAllTasksByPlanId")
+////    @RequiresPermissions("taskmanagement:task:list")
+//    public R getAllTasksByPlanId(String planId){
+//
+//        taskService.selectAllTasksByPlanId(planId);
+//        log.info("当前用户的任务为：" + page);
+//
+//
+//        return R.ok().put("page", page);
+//
+//    }
+
+
+
+    /**
+     * @description: 提交审批
+     * @author: hong
+     * @date: 2024/8/24 18:50
+     */
+    /**
+     * @description: 修改任务状态，进行中--》审核中
+     * @param: null
+     * @return:
+     * @author: hong
+     * @date: 2024/8/21 19:46
+     */
+//    @RequestMapping("/executeTask")
+//    @RequiresPermissions("taskmanagement:task:list")
+    @RequestMapping("/submitApprover")
+//    @GetMapping("/executeTask/{taskId}")
+    public R executeTask(Long taskId,String taskApprovalor){
+
+        log.info("当前任务id为：" + taskId);
+        TaskEntity task = taskService.getByTaskId(taskId);
+
+        if (task.getTaskCurrentState() == TaskStatus.IN_PROGRESS){
+            ApprovalEntity approvalEntity = new ApprovalEntity();
+            approvalEntity.setTaskId(taskId);
+            approvalEntity.setTaskName(task.getTaskName());
+            approvalEntity.setTaskContent(task.getTaskContent());
+            approvalEntity.setTaskAssociatedPlanId(task.getTaskAssociatedPlanId());
+            approvalEntity.setTaskPrincipal(task.getTaskPrincipal());
+            approvalEntity.setTaskAssociatedIndicatorsId(task.getTaskAssociatedIndicatorsId());
+            //获取当前时间
+
+            approvalEntity.setTaskStartDate(task.getTaskStartDate());
+            approvalEntity.setTaskSubmissionTime(new Date());
+//            approvalEntity.setTaskStartDate(task.getTaskStartDate());
+            approvalEntity.setApprover(taskApprovalor);
+            approvalEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
+
+
+            task.setTaskCurrentState(TaskStatus.APPROVAL_IN_PROGRESS);
+
+            taskService.updateById(task);
+            approvalService.save(approvalEntity);
+        } else {
+            return R.error("当前任务状态不是进行中，不能进行审核");
+        }
+//
+//
+//        taskService.updateById(taskEntity);
+
+        return R.ok();
+
+    }
     
     /** 
      * @description: 测试获取当前登录的用户信息用户信息
@@ -112,7 +236,7 @@ public class TaskController {
      * @date: 2024/8/23 15:53
      */
     @RequestMapping("/getCompletedTasksList")
-    @RequiresPermissions("taskmanagement:task:list")
+//    @RequiresPermissions("taskmanagement:task:list")
     public R getCompletedTasksList(@RequestParam Map<String, Object> params){
         PageUtils page = taskService.queryPageGetCompletedTasksList(params,ShiroUtils.getUserId());
         log.info("当前用户已完成的任务为：" + page);
@@ -230,6 +354,18 @@ public class TaskController {
     public R delete(@RequestBody Long[] tmTids){
         taskService.removeByIds(Arrays.asList(tmTids));
 
+        return R.ok();
+    }
+
+    /**
+     * @description: 删除 通过taskId
+     * @author: hong
+     * @date: 2024/8/26 17:20
+     */
+    @RequestMapping("/deleteByTaskId")
+//    @RequiresPermissions("taskmanagement:task:delete")
+    public R deleteByTaskId(@RequestParam Long tmTid){
+        taskService.removeById(tmTid);
         return R.ok();
     }
 

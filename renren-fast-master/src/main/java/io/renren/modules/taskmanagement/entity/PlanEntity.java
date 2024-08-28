@@ -78,6 +78,12 @@ public class PlanEntity implements Serializable {
      */
     private String planSchedule;
     /**
+     * 发起人
+     */
+    private String planInitiator;
+
+
+    /**
      * 负责人
      */
     private String planPrincipal;
@@ -97,7 +103,7 @@ public class PlanEntity implements Serializable {
     /**
      * 当前状态
      */
-    private Integer planCurrentState;
+    private TaskStatus planCurrentState;
     /**
      * 是否完成
      */

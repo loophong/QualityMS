@@ -14,7 +14,7 @@
         <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
           <el-table-column prop="approvalId" header-align="center" align="center" label="审批编号">
           </el-table-column>
-          <el-table-column prop="taskId" header-align="center" align="center" label="任务ID">
+          <el-table-column prop="taskId" header-align="center" align="center" label="任务编号">
           </el-table-column>
           <el-table-column prop="taskName" header-align="center" align="center" label="任务名">
           </el-table-column>
@@ -68,7 +68,7 @@
           </el-table-column>
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.approvalId)">审批</el-button>
+              <el-button type="text" size="small" @click="approvalDialogHandle(scope.row.approvalId)">审批</el-button>
               <!-- <el-button type="text" size="small" @click="deleteHandle(scope.row.approvalId)">删除</el-button> -->
             </template>
           </el-table-column>
@@ -153,11 +153,10 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-          :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+        <el-pagination @size-change="historySizeChangeHandle" @current-change="historyCurrentChangeHandle" :current-page="historyPageIndex"
+          :page-sizes="[10, 20, 50, 100]" :page-size="historyPageSize" :total="historyTotalPage"
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
-
 
       </el-tab-pane>
     </el-tabs>
@@ -247,34 +246,53 @@
     </el-pagination> -->
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+
+    <approval-dialog v-if="approvalDialogVisible" ref="approvalDialog" @refreshDataList="getDataList"></approval-dialog>
   </div>
 </template>
 
 <script>
 import AddOrUpdate from './approval-add-or-update'
+import ApprovalDialog from './approval-dialog'
 export default {
   data() {
     return {
       dataForm: {
         key: ''
       },
+
+
+      dataListSelections: [],
+      addOrUpdateVisible: false,
+
+      // 审批
+      approvalDialogVisible: false,
+
+      // 待审批列表、分页
       dataList: [],
-      historyDataList: [],
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
-      historyTotalPage: 0,
       dataListLoading: false,
+
+      // 已审批列表、分页
+      historyDataList: [],
+      historyTotalPage: 0,
+      historyPageIndex: 1,
+      historyPageSize: 10,
       historyDataListLoading: false,
-      dataListSelections: [],
-      addOrUpdateVisible: false
+
+
+
+
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    ApprovalDialog
   },
   activated() {
-      this.getDataList(),
+    this.getDataList(),
       this.getHistoryApprovalList()
   },
   async created() {
@@ -339,8 +357,8 @@ export default {
 
         method: 'get',
         params: this.$http.adornParams({
-          'page': this.pageIndex,
-          'limit': this.pageSize,
+          'page': this.historyPageIndex,
+          'limit': this.historyPageSize,
           'key': this.dataForm.key
         })
       }).then(({ data }) => {
@@ -366,6 +384,19 @@ export default {
       this.pageIndex = val
       this.getDataList()
     },
+
+    // 历史审批记录-每页数
+    historySizeChangeHandle(val) {
+      this.historyPageSize = val
+      this.historyPageIndex = 1
+      this.getHistoryApprovalList()
+    },
+    // 历史审批记录-当前页
+    historyCurrentChangeHandle(val) {
+      this.historyPageIndex = val
+      this.getHistoryApprovalList()
+    },
+
     // 多选
     // selectionChangeHandle(val) {
     //   this.dataListSelections = val
@@ -377,6 +408,15 @@ export default {
         this.$refs.addOrUpdate.init(id)
       })
     },
+
+    // 审批弹窗
+    approvalDialogHandle(id) {
+      this.approvalDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.approvalDialog.init(id)
+      })
+    },
+
     // 删除
     deleteHandle(id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {

@@ -3,6 +3,7 @@ package io.renren.modules.taskmanagement.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.taskmanagement.entity.PlanEntity;
+import io.renren.modules.taskmanagement.entity.TaskDetailDTO;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 
 import java.util.List;
@@ -32,5 +33,14 @@ public interface TaskService extends IService<TaskEntity> {
     PageUtils queryPageGetUnfinishedTasks(Map<String, Object> params, Long userId);
 
     PageUtils queryPageGetCompletedTasksList(Map<String, Object> params, Long userId);
+
+    TaskDetailDTO getTaskDetailInfo(String taskId);
+
+    int saveDecompositionTasks(List<TaskEntity> tasks);
+
+    boolean isTaskIdUsed(String taskId);
+
+
+//    void selectAllTasksByPlanId(String planId);
 }
 

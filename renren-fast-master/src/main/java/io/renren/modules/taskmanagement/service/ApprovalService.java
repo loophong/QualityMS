@@ -23,5 +23,7 @@ public interface ApprovalService extends IService<ApprovalEntity> {
     PageUtils queryPagePendingApprovalsList(Map<String, Object> params, Long userId);
 
     PageUtils queryPageHistoryApprovalList(Map<String, Object> params, Long userId);
+
+    PageUtils queryPageGetMySubmitApprovalList(Map<String, Object> params, Long userId);
 }
 

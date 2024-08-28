@@ -1,7 +1,10 @@
 package io.renren.modules.taskmanagement.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import io.renren.modules.taskmanagement.entity.ApprovalEntity;
+import io.renren.modules.taskmanagement.entity.TaskDetailDTO;
 import io.renren.modules.taskmanagement.entity.TaskStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,7 @@ import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.service.TaskService;
 
 
+@Slf4j
 @Service("taskService")
 public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements TaskService {
 
@@ -99,6 +103,58 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public TaskDetailDTO getTaskDetailInfo(String taskId) {
+        TaskEntity task = taskDao.selectOne(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskId, taskId));
+
+        // taskParentNode = taskId 查询列表
+        List<TaskEntity> tasks = taskDao.selectList(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskParentNode, taskId));
+
+        log.info("rootNode"+task);
+        log.info("tasks"+tasks);
+
+        TaskDetailDTO taskDetailDTO = new TaskDetailDTO();
+
+        // 封装任务信息
+        taskDetailDTO.setRootTask(task);
+        // 封装任务子任务信息
+        taskDetailDTO.setTasks(tasks);
+
+        return taskDetailDTO;
+
+
+    }
+
+    @Override
+    public int saveDecompositionTasks(List<TaskEntity> tasks) {
+        if (tasks != null && tasks.size() > 0) {
+
+            for (TaskEntity task : tasks) {
+                TaskEntity task1 = taskDao.selectById(task.getTmTid());
+                log.info("当前task为"+task.getTaskId());
+                log.info("当前task是否存在"+task1);
+                if (task1 != null) {
+                    // 更新
+                    taskDao.updateById(task);
+                } else {
+                    // 插入
+                    taskDao.insert(task);
+                }
+            }
+
+            // 根据taskId检查当前数据是否存在，如果存在则更新，不存在则插入
+
+
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean isTaskIdUsed(String taskId) {
+//        return planDao.countByPlanNumber(planId) > 0;
+        return taskDao.selectList(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskId, taskId)).size() > 0;
     }
 
 

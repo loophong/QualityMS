@@ -6,8 +6,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('taskmanagement:plan:save')" type="primary"
-          @click="addPlanPage()">新增</el-button>
+        <el-button v-if="isAuth('taskmanagement:plan:save')" type="primary" @click="addPlanPage()">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -22,8 +21,7 @@
       </el-table-column>
       <el-table-column prop="planStartDate" header-align="center" align="center" label="开始日期" width="110">
       </el-table-column>
-      <el-table-column prop="planScheduleCompletionDate" header-align="center" align="center" label="计划完成日期"
-        width="110">
+      <el-table-column prop="planScheduleCompletionDate" header-align="center" align="center" label="计划完成日期" width="110">
       </el-table-column>
       <el-table-column prop="planScheduleDays" header-align="center" align="center" label="计划天数">
       </el-table-column>
@@ -71,11 +69,26 @@
       <el-table-column prop="planIsOnTime" header-align="center" align="center" label="按时完工">
       </el-table-column> -->
 
-      <el-table-column prop="planCurrentState" label="当前状态" header-align="center" align="center">
+      <!-- <el-table-column prop="planCurrentState" label="当前状态" header-align="center" align="center">
         <template slot-scope="scope">
           <span v-if="scope.row.planCurrentState === 0" style="color: gray;">未开始</span>
           <span v-else-if="scope.row.planCurrentState === 1" style="color: gray;">进行中</span>
           <span v-else-if="scope.row.planCurrentState === 2" style="color: green;">已完成</span>
+          <span v-else>-</span> 
+        </template>
+      </el-table-column> -->
+      <el-table-column prop="planCurrentState" label="当前状态" header-align="center" align="center">
+        <template slot-scope="scope">
+          <span v-if="scope.row.planCurrentState === 'NOT_STARTED'">
+            <el-tag type="info" disable-transitions>未开始</el-tag></span>
+          <span v-else-if="scope.row.planCurrentState === 'IN_PROGRESS'">
+            <el-tag disable-transitions>进行中</el-tag></span>
+          <span v-else-if="scope.row.planCurrentState === 'APPROVAL_IN_PROGRESS'">
+            <el-tag disable-transitions>审批中</el-tag></span>
+          <span v-else-if="scope.row.planCurrentState === 'OVERDUE'">
+            <el-tag type="danger" disable-transitions>已逾期</el-tag></span>
+          <span v-else-if="scope.row.planCurrentState === 'COMPLETED'">
+            <el-tag type="success" disable-transitions>已完成</el-tag></span>
           <span v-else>-</span> <!-- 处理未知状态 -->
         </template>
       </el-table-column>
@@ -103,26 +116,26 @@
       <el-table-column prop="planEarlyCompletionDays" header-align="center" align="center" label="提前完工">
         <template slot-scope="scope">
           {{ scope.row.planEarlyCompletionDays !== null && scope.row.planEarlyCompletionDays !== undefined &&
-      scope.row.planEarlyCompletionDays !== '' ? scope.row.planEarlyCompletionDays : '-' }}
+            scope.row.planEarlyCompletionDays !== '' ? scope.row.planEarlyCompletionDays : '-' }}
         </template>
       </el-table-column>
       <el-table-column prop="planLagDays" header-align="center" align="center" label="滞后天数">
         <template slot-scope="scope">
           {{ scope.row.planLagDays !== null && scope.row.planLagDays !== undefined && scope.row.planLagDays !== '' ?
-      scope.row.planLagDays : '-' }}
+            scope.row.planLagDays : '-' }}
         </template>
       </el-table-column>
       <el-table-column prop="planLagReasons" header-align="center" align="center" label="滞后原因">
         <template slot-scope="scope">
           {{ scope.row.planLagReasons !== null && scope.row.planLagReasons !== undefined && scope.row.planLagReasons !==
-      '' ? scope.row.planLagReasons : '-' }}
+            '' ? scope.row.planLagReasons : '-' }}
         </template>
       </el-table-column>
-      <el-table-column prop="planAssociatedIndicatorsId" header-align="center" align="center" label="关联指标编号"
-        width="110">
+      <el-table-column prop="planAssociatedIndicatorsId" header-align="center" align="center" label="关联指标编号" width="110">
       </el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
+          <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
           <el-button type="text" size="small" @click="updatePlanPage(scope.row.planId)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.tmPid)">删除</el-button>
         </template>
@@ -262,6 +275,14 @@ export default {
         name: 'plan-add-page',
       });
     },
+    // addPlanPage() {
+    //   // 获取当前域名和端口
+    //   const baseUrl = window.location.origin;
+    //   // 指定要打开的新标签页的完整 URL
+    //   const url = `${baseUrl}/#/plan-add-page`;
+    //   // 使用 window.open 打开新标签页
+    //   window.open(url, '_blank');
+    // },
     updatePlanPage(planId) {
       // 使用Vue Router进行页面跳转
       this.$router.push({
@@ -269,6 +290,15 @@ export default {
         query: { planId } // 如果需要，可以通过query传递参数
       });
     },
+
+    showPlanTree(planId) {
+      // 使用Vue Router进行页面跳转
+      this.$router.push({
+        name: 'plan-tree',
+        query: { planId } // 如果需要，可以通过query传递参数
+      });
+    },
+
     // 删除
     deleteHandle(id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {

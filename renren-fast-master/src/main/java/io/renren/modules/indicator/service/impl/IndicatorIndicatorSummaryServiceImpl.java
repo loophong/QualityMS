@@ -61,18 +61,20 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
                             case "indicatorValue":
                                 queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getIndicatorValue, value);
                                 break;
+                            case "yearMonth":
+                                queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getYearMonth, value);
+                                break;
                             case "managementDepartment":
                                 queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getManagementDepartment, value);
                                 break;
                             case "assessmentDepartment":
                                 queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getAssessmentDepartment, value);
                                 break;
-                            // 继续为其他字段添加查询条件...
                         }
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace(); // 处理 JSON 解析异常
+                e.printStackTrace();
             }
         }
 

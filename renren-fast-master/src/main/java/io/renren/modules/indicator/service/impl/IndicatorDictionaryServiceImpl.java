@@ -52,12 +52,17 @@ public class IndicatorDictionaryServiceImpl extends ServiceImpl<IndicatorDiction
                             case "assessmentDepartment":
                                 queryWrapper.lambda().like(IndicatorDictionaryEntity::getAssessmentDepartment, value);
                                 break;
-                            // 继续为其他字段添加查询条件...
+                            case "indicatorClassification":
+                                queryWrapper.lambda().like(IndicatorDictionaryEntity::getIndicatorClassification, value);
+                                break;
+                            case "indicatorParentNode":
+                                queryWrapper.lambda().like(IndicatorDictionaryEntity::getIndicatorParentNode, value);
+                                break;
                         }
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace(); // 处理 JSON 解析异常
+                e.printStackTrace();
             }
         }
 

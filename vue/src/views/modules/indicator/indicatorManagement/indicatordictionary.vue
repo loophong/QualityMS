@@ -1,21 +1,54 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+    <el-form :inline="true" :model="queryParams" @keyup.enter.native="getDataList()">
+      <el-form-item label="指标名称" prop="indicatorName">
+        <el-select v-model="queryParams.indicatorName" filterable placeholder="请选择指标名称">
+          <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
+            {{ field.indicatorName }}
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="管理部门" prop="managementDepartment">
+        <el-input v-model="queryParams.managementDepartment" placeholder="请输入管理部门"></el-input>
+      </el-form-item>
+      <el-form-item label="考核部门" prop="assessmentDepartment">
+        <el-input v-model="queryParams.assessmentDepartment" placeholder="请输入考核部门"></el-input>
+      </el-form-item>
+      <el-form-item label="指标分级" prop="indicatorClassification">
+        <el-select v-model="queryParams.indicatorClassification" placeholder="请选择指标分级">
+          <el-option label="A" value="A"></el-option>
+          <el-option label="B" value="B"></el-option>
+          <el-option label="C" value="C"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="上级指标" prop="indicatorParentNode">
+        <el-select v-model="queryParams.indicatorParentNode" filterable placeholder="请选择上级指标">
+          <el-option v-for="field in indicatorDictionaryList1" :key="field.indicatorId" :value="field.indicatorName">
+            {{ field.indicatorName }}
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('indicator:indicatordictionary:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('indicator:indicatordictionary:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button @click="resetQuery()">重置</el-button>
       </el-form-item>
     </el-form>
+
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button v-if="isAuth('indicator:indicatordictionary:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button v-if="isAuth('indicator:indicatordictionary:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+      </el-col>
+    </el-row>
+
     <el-table
       :data="dataList"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
-      style="width: 100%;">
+      style="width: 100%; margin-top: 10px;">
       <el-table-column
         type="selection"
         header-align="center"
@@ -172,7 +205,28 @@
         dataForm: {
           key: ''
         },
+        //查询参数列表
+        queryParams: {
+          indicatorName: '',
+          assessmentDepartment: '',
+          managementDepartment: '',
+          indicatorDefinition: '',
+          indicatorClassification: '',
+          managementContentCurrentAnalysis: '',
+          dataId: '',
+          sourceDepartment: '',
+          collectionMethod: '',
+          collectionFrequency: '',
+          planId: '',
+          taskId: '',
+          indicatorParentNode: '',
+          indicatorCreatTime: '',
+          indicatorState: '',
+          indicatorChildNode: ''
+        },
         dataList: [],
+        indicatorDictionaryList: [], //指标列表（不分页）
+        indicatorDictionaryList1: [],//包括根节点的指标列表
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -200,7 +254,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.queryParams
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -212,6 +266,64 @@
           }
           this.dataListLoading = false
         })
+
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 10000,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log("data2====>",data)
+            this.indicatorDictionaryList = data.page.list
+          } else {
+            this.indicatorDictionaryList = []
+          }
+        })
+
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'limit': 10000,
+          })
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            console.log("data=====>",data)
+            this.indicatorDictionaryList1 = data.page.list
+            // 在数组最前面添加新的对象
+            this.indicatorDictionaryList1.unshift({
+              indicatorId: 1,
+              indicatorName: '公司质量指标管控体系',
+              indicatorParentNode: ''
+            });
+          }
+        })
+
+      },
+      //查询重置
+      resetQuery() {
+        this.queryParams = {
+          indicatorName: null,
+          assessmentDepartment: null,
+          managementDepartment: null,
+          indicatorDefinition: null,
+          indicatorClassification: null,
+          managementContentCurrentAnalysis: null,
+          dataId: null,
+          sourceDepartment: null,
+          collectionMethod: null,
+          collectionFrequency: null,
+          planId: null,
+          taskId: null,
+          indicatorParentNode: null,
+          indicatorCreatTime: null,
+          indicatorState: null,
+          indicatorChildNode: null
+        }
+        this.getDataList()
       },
       // 每页数
       sizeChangeHandle (val) {

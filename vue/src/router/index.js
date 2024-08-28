@@ -64,13 +64,20 @@ const mainRoutes = {
       name: 'issue-issuemask',
       meta: { title: '任务详情', isDynamic: true, isTab: true }
     },
-    //指标
+    // 指标
     {
       path: '/indicator-display-charts-indicatorchart/:indicatorName',
       component: _import('modules/indicator/display/charts/indicatorchart'),
       name: 'indicatorchart',
       meta: { title: '指标详情',  isTab: true }
     },
+    // {
+    //   path: '/indicator-display-charts-indicatorchart/:indicatorName',
+    //   component: _import('modules/indicator/display/charts/indicatorchart'),
+    //   name: route => `indicatorchart-${route.params.indicatorName}`, // 动态生成name
+    //   meta: { title: '指标详情', isTab: true }
+    // }
+
   ],
   beforeEnter(to, from, next) {
     let token = Vue.cookie.get('token')

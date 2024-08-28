@@ -1,11 +1,16 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="queryParams" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-select v-model="queryParams.dataContent" filterable placeholder="请选择数据">
+          <el-option v-for="field in dataList1" :key="field.dataId" :value="field.dataContent">
+            {{ field.dataContent }}
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="resetQuery()">重置</el-button>
         <el-button v-if="isAuth('indicator:indicatordatadictionary:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('indicator:indicatordatadictionary:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -85,7 +90,13 @@
         dataForm: {
           key: ''
         },
+        //查询残水列表
+        queryParams: {
+          dataContent: '',
+          dataType: ''
+        },
         dataList: [],
+        dataList1: [], //查询列表（不分页）
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -110,7 +121,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.queryParams
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -122,6 +133,30 @@
           }
           this.dataListLoading = false
         })
+        //不分页查询
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatordatadictionary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 10000,
+            'key': this.queryParams
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList1 = data.page.list
+          } else {
+            this.dataList1 = []
+          }
+        })
+      },
+      //查询重置
+      resetQuery() {
+        this.queryParams = {
+          dataContent: null,
+          dataType: null
+        }
+        this.getDataList()
       },
       // 每页数
       sizeChangeHandle (val) {

@@ -85,20 +85,13 @@ export default {
         .append('svg')
         .attr('width', mainWidth)
         .attr('height', mainHeight)
-        .call(d3.zoom().on("zoom", (event) => {  //添加缩放和平移功能
+        .call(d3.zoom().on("zoom", (event) => {  // 添加缩放和平移功能
           svg.attr("transform", event.transform);
         }))
         .append('g');
 
-
       const root = d3.hierarchy(treeData[0]);
       const treeLayout = d3.tree().size([height * 2, width]); // 增加高度比例
-      // const treeLayout = d3.tree()
-      //   .size([height, width]) // 使用大小指定树的整体尺寸
-      //   .nodeSize([120, 200]) // 动态调整每个节点的尺寸（高度, 宽度）
-      //   .separation((a, b) => a.parent == b.parent ? 1 : 1.5); // 动态调整兄弟节点和不同父节点之间的间距
-
-
       treeLayout(root);
 
       svg.selectAll('line.link')
@@ -117,7 +110,22 @@ export default {
         .enter()
         .append('g')
         .attr('class', 'node')
-        .attr('transform', d => `translate(${d.y},${d.x})`);
+        .attr('transform', d => `translate(${d.y},${d.x})`)
+        .on('click', (event, d) => {
+          this.$router.push({
+            name: d.data.url,
+            params: {indicatorName: d.data.name}
+          });
+        })
+        .on('mouseover', function(event, d) { // 鼠标移入事件
+          d3.select(this).select('rect')
+            .style('stroke', '#000')
+            .style('stroke-width', 2);
+        })
+        .on('mouseout', function(event, d) { // 鼠标移出事件
+          d3.select(this).select('rect')
+            .style('stroke', 'none');
+        });
 
       const colorScale = {
         'A': '#e74c3c',
@@ -132,21 +140,15 @@ export default {
         .attr('y', -25)
         .attr('rx', 10)
         .attr('ry', 10)
-        .style('fill', d => colorScale[d.data.classification] || '#000')
-        .on('click', (event, d) => {
-          this.$router.push({
-            name: d.data.url,
-            params: {indicatorName: d.data.name}
-          });
-        });
+        .style('fill', d => colorScale[d.data.classification] || '#000');
 
-      nodes.append('circle')
+      nodes.append('circle')  // 添加圆圈
         .attr('cx', -90)
         .attr('cy', -15)
         .attr('r', 10)
         .style('fill', '#fff');
 
-      nodes.append('text')
+      nodes.append('text')      // 圆圈添加文本
         .attr('x', -90)
         .attr('y', -15)
         .attr('text-anchor', 'middle')
@@ -155,7 +157,7 @@ export default {
         .style('fill', '#000')
         .text(d => d.data.classification);
 
-      nodes.append('text')
+      nodes.append('text')     // 节点添加文本
         .attr('dy', '.9em')
         .attr('x', 0)
         .attr('y', 0)

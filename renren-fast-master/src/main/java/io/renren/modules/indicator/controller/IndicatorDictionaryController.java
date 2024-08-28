@@ -32,11 +32,22 @@ public class IndicatorDictionaryController {
     private IndicatorDictionaryService indicatorDictionaryService;
 
     /**
-     * 列表
+     * 查询列表
      */
     @RequestMapping("/list")
     @RequiresPermissions("indicator:indicatordictionary:list")
     public R list(@RequestParam Map<String, Object> params){
+        PageUtils page = indicatorDictionaryService.queryPage(params);
+
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 查询列表（无权限）
+     */
+    @RequestMapping("/list02")
+    public R list02(@RequestParam Map<String, Object> params){
         PageUtils page = indicatorDictionaryService.queryPage(params);
 
 

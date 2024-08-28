@@ -38,7 +38,7 @@ export default {
     },
     getDataList() {
       this.$http({
-        url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+        url: this.$http.adornUrl('/indicator/indicatordictionary/list02'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,

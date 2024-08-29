@@ -112,26 +112,32 @@ public class TaskController {
 
 
 
+
     /**
      * @description: 提交审批
-     * @author: hong
-     * @date: 2024/8/24 18:50
-     */
-    /**
-     * @description: 修改任务状态，进行中--》审核中
      * @param: null
      * @return:
      * @author: hong
-     * @date: 2024/8/21 19:46
+     * @date: 2024/8/24 18:50
      */
-//    @RequestMapping("/executeTask")
-//    @RequiresPermissions("taskmanagement:task:list")
+
     @RequestMapping("/submitApprover")
-//    @GetMapping("/executeTask/{taskId}")
+    //    @RequiresPermissions("taskmanagement:task:list")
     public R executeTask(Long taskId,String taskApprovalor){
 
         log.info("当前任务id为：" + taskId);
         TaskEntity task = taskService.getByTaskId(taskId);
+
+        // 审批之前先检查其子任务是否全部完成
+        // 查询当前任务的子任务
+        List<TaskEntity> childrenTasks = taskService.list(new QueryWrapper<TaskEntity>().eq("task_parent_node", taskId));
+        if (childrenTasks.size() > 0){
+            for (TaskEntity childrenTask : childrenTasks) {
+                if (childrenTask.getTaskCurrentState() != TaskStatus.COMPLETED){
+                    return R.error("当前任务子任务未全部完成，不能进行审批");
+                }
+            }
+        }
 
         if (task.getTaskCurrentState() == TaskStatus.IN_PROGRESS){
             ApprovalEntity approvalEntity = new ApprovalEntity();

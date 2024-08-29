@@ -2,7 +2,12 @@ package io.renren.modules.indicator.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.modules.indicator.entity.IndicatorDictionaryEntity;
+import io.renren.modules.indicator.entity.IndicatorListEntityDTO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,9 +19,12 @@ import io.renren.modules.indicator.dao.IndicatorDataDictionaryDao;
 import io.renren.modules.indicator.entity.IndicatorDataDictionaryEntity;
 import io.renren.modules.indicator.service.IndicatorDataDictionaryService;
 
-
+@Slf4j
 @Service("indicatorDataDictionaryService")
 public class IndicatorDataDictionaryServiceImpl extends ServiceImpl<IndicatorDataDictionaryDao, IndicatorDataDictionaryEntity> implements IndicatorDataDictionaryService {
+
+    @Autowired
+    private IndicatorDataDictionaryDao indicatorDataDictionaryDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -57,6 +65,13 @@ public class IndicatorDataDictionaryServiceImpl extends ServiceImpl<IndicatorDat
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<IndicatorListEntityDTO> getIndicatorsList() {
+        List<IndicatorListEntityDTO> indicatorsList = indicatorDataDictionaryDao.getIndicatorsList();
+        log.info("indicatorsList:{}", indicatorsList);
+        return indicatorsList;
     }
 
 }

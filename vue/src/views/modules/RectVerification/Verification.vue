@@ -6,7 +6,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
         <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -29,12 +29,12 @@
       <!--        align="center"-->
       <!--        label="">-->
       <!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="serialNumber"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="序号">-->
-<!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="serialNumber"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="序号">-->
+      <!--      </el-table-column>-->
       <el-table-column
         prop="issueNumber"
         header-align="center"
@@ -87,12 +87,12 @@
           <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
         </template>
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="issuePhoto"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题照片">-->
-<!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="issuePhoto"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="问题照片">-->
+      <!--      </el-table-column>-->
       <el-table-column
         prop="rectificationRequirement"
         header-align="center"
@@ -111,114 +111,114 @@
         align="center"
         label="责任科室">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="rectificationStatus"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改情况">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="actualCompletionTime"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="实际完成时间">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="rectificationPhotoDeliverable"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改照片交付物">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="rectificationResponsiblePerson"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改责任人">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="requiredSecondRectificationTime"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="要求二次整改时间">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="remark"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="备注">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="creator"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="创建人">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="creationTime"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="创建时间">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="lastModifier"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="最后修改人">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="lastModificationTime"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="最后修改时间">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="associatedRectificationRecords"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="关联问题整改记录">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="associatedIssueAddition"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="关联问题添加">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="creationDuration"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="创建时长">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="causeAnalysis"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="原因分析">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="rectificationVerificationStatus"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改验证情况">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="verificationConclusion"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="验证结论">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="verifier"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="验证人">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="formula"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="公式">-->
-<!--      </el-table-column>-->
+      <el-table-column
+        prop="causeAnalysis"
+        header-align="center"
+        align="center"
+        label="原因分析">
+      </el-table-column>
+      <el-table-column
+        prop="rectificationStatus"
+        header-align="center"
+        align="center"
+        label="整改情况">
+      </el-table-column>
+      <el-table-column
+        prop="actualCompletionTime"
+        header-align="center"
+        align="center"
+        label="实际完成时间">
+      </el-table-column>
+      <el-table-column
+        prop="rectificationPhotoDeliverable"
+        header-align="center"
+        align="center"
+        label="整改照片交付物">
+      </el-table-column>
+      <el-table-column
+        prop="rectificationResponsiblePerson"
+        header-align="center"
+        align="center"
+        label="整改责任人">
+      </el-table-column>
+      <!--      <el-table-column-->
+      <!--        prop="requiredSecondRectificationTime"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="要求二次整改时间">-->
+      <!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="remark"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="备注">-->
+      <!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="creator"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="创建人">-->
+      <!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="creationTime"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="创建时间">-->
+      <!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="lastModifier"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="最后修改人">-->
+      <!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="lastModificationTime"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="最后修改时间">-->
+      <!--      </el-table-column>-->
+            <el-table-column
+              prop="associatedRectificationRecords"
+              header-align="center"
+              align="center"
+              label="关联问题整改记录">
+            </el-table-column>
+      <!--      <el-table-column-->
+      <!--        prop="associatedIssueAddition"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="关联问题添加">-->
+      <!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="creationDuration"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="创建时长">-->
+      <!--      </el-table-column>-->
+            <el-table-column
+              prop="rectificationVerificationStatus"
+              header-align="center"
+              align="center"
+              label="整改验证情况">
+            </el-table-column>
+            <el-table-column
+              prop="verificationConclusion"
+              header-align="center"
+              align="center"
+              label="验证结论">
+            </el-table-column>
+            <el-table-column
+              prop="verifier"
+              header-align="center"
+              align="center"
+              label="验证人">
+            </el-table-column>
+      <!--      <el-table-column-->
+      <!--        prop="formula"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="公式">-->
+      <!--      </el-table-column>-->
       <el-table-column
         fixed="right"
         header-align="center"
@@ -226,7 +226,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-<!--          <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId)">问题分析</el-button>-->
+          <el-button type="text" size="small" @click="addOrUpdateHandle()">验证记录</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
         </template>
       </el-table-column>

@@ -88,8 +88,7 @@
         align="center"
         label="问题照片">
         <template slot-scope="scope">
-          <img v-if="scope.row.issuePhoto" :src="scope.row.issuePhoto" alt="问题照片" style="max-width: 100px; max-height: 100px;">
-          <span v-else>无图片</span>
+          <el-image :src="scope.row.issuePhoto" style="width: 100px;height: 100px;"></el-image>
         </template>
       </el-table-column>
       <el-table-column

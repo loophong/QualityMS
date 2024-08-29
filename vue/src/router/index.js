@@ -108,17 +108,30 @@ const mainRoutes = {
 
     //任务
     {
+      path: '/issue-issuetable',
+      component: _import('modules/issueRectification/Rectificationissue'),
+      name: 'issue-issueRectification',
+      meta: { title: '任务详情', isDynamic: true, isTab: true }
+    },
+    {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/creatorissuemask'),
       name: 'issue-issuemask',
       meta: { title: '任务详情', isDynamic: true, isTab: true }
     },
+    {
+      path: '/issue-issuemask',
+      component: _import('modules/issuemask/issuemaskflow'),
+      name: 'issue-issueflow',
+      meta: { title: '任务流程', isDynamic: true, isTab: true }
+    },
+    //指标
     // 指标
     {
       path: '/indicator-display-charts-indicatorchart/:indicatorName',
       component: _import('modules/indicator/display/charts/indicatorchart'),
       name: 'indicatorchart',
-      meta: { title: '指标详情', isTab: true }
+      meta: { title: '指标详情',  isTab: true }
     },
     // {
     //   path: '/indicator-display-charts-indicatorchart/:indicatorName',

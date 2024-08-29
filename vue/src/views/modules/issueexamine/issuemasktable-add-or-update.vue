@@ -175,7 +175,8 @@
                 'recipients': this.dataForm.recipients,
                 'maskcontent': this.dataForm.maskcontent,
                 'creator': this.dataForm.creator,
-                'creationTime': this.dataForm.creationTime
+                'creationTime': this.dataForm.creationTime,
+                'state': '执行中'
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

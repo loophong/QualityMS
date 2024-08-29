@@ -26,6 +26,9 @@
     <el-form-item label="发起时间" prop="creationTime">
       <el-input v-model="dataForm.creationTime" placeholder="发起时间"></el-input>
     </el-form-item>
+      <el-form-item label="要求完成时间" prop="creationTime">
+        <el-input v-model="dataForm.requiredcompletiontime" placeholder="要求完成时间"></el-input>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -68,7 +71,9 @@
           recipients: '',
           maskcontent: '',
           creator: '',
-          creationTime: ''
+          creationTime: '',
+          state: '',
+          requiredcompletiontime: ''
         },
         dataRule: {
           // serialNumber: [
@@ -115,6 +120,8 @@
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
                 this.dataForm.creator = data.issueMaskTable.creator
                 this.dataForm.creationTime = data.issueMaskTable.creationTime
+                this.dataForm.requiredcompletiontime = data.issueMaskTable.requiredcompletiontime
+                this.dataForm.state = '审核中'
               }
             })
           }
@@ -144,6 +151,25 @@
             })
           }
         })
+      },
+      completeHandle (id) {
+        this.$confirm('是否确认完成?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 设置issueId和state属性
+          this.dataForm.issueId = id || 0;
+          this.dataForm.state = '已完成'; // 将state属性改为“已完成”
+
+          // 调用dataFormSubmit方法
+          this.dataFormSubmit();
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });
+        });
       },
       submitForm (formName) {
         this.$refs[formName].validate((valid) => {
@@ -177,6 +203,7 @@
           }
         })
       },
+
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
@@ -192,7 +219,8 @@
                 'recipients': this.dataForm.recipients,
                 'maskcontent': this.dataForm.maskcontent,
                 'creator': this.dataForm.creator,
-                'creationTime': this.dataForm.creationTime
+                'creationTime': this.dataForm.creationTime,
+                'state': this.dataForm.state
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

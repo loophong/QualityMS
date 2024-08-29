@@ -5,114 +5,6 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="150px">
-<!--    <el-form-item label="序号" prop="serialNumber">-->
-<!--      <el-input v-model="dataForm.serialNumber" placeholder="序号"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="问题编号" prop="issueNumber">-->
-<!--      <el-input v-model="dataForm.issueNumber" placeholder="问题编号"></el-input>-->
-<!--    </el-form-item>-->
-<!--      <el-form-item label="检查科室" prop="inspectionDepartment">-->
-<!--        <el-select v-model="dataForm.inspectionDepartment" placeholder="请选择检查科室">-->
-<!--          <el-option-->
-<!--            v-for="department in departmentOptions"-->
-<!--            :key="department.value"-->
-<!--            :label="department.label"-->
-<!--            :value="department.value">-->
-<!--          </el-option>-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
-<!--    <el-form-item label="检查日期" prop="inspectionDate">-->
-<!--      <el-input v-model="dataForm.inspectionDate" placeholder="检查日期"></el-input>-->
-<!--    </el-form-item>-->
-<!--      :before-upload="handleFileChange"-->
-<!--      <el-form-item label="检查日期" prop="inspectionDate">-->
-<!--        <el-date-picker-->
-<!--          v-model="dataForm.inspectionDate"-->
-<!--          type="date"-->
-<!--          placeholder="选择日期">-->
-<!--          value-format="yyyy-MM-dd HH:mm:ss">-->
-<!--        </el-date-picker>-->
-<!--      </el-form-item>-->
-<!--            <el-form-item label="检查日期" prop="inspectionDate">-->
-<!--              <el-date-picker-->
-<!--                v-model="dataForm.inspectionDate"-->
-<!--                type="date"-->
-<!--                value-format="yyyy-MM-dd HH:mm:ss"-->
-<!--                placeholder="请选择上传日期">-->
-<!--              </el-date-picker>-->
-<!--            </el-form-item>-->
-<!--      <el-form-item label="问题类别" prop="issueCategoryId">-->
-<!--        <el-select v-model="dataForm.issueCategoryId" placeholder="请选择问题类别">-->
-<!--          <el-option-->
-<!--            v-for="item in issueCategoryOptions"-->
-<!--            :key="item.value"-->
-<!--            :label="item.label"-->
-<!--            :value="item.value">-->
-<!--          </el-option>-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
-<!--      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">-->
-<!--        <div v-for="(vehicle, index) in dataForm.vehicles" :key="vehicle.key">-->
-<!--          <el-form-item :label="'车型 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleTypeId'" :rules="{ required: true, message: '请选择车型', trigger: 'change' }">-->
-<!--            <el-select v-model="vehicle.vehicleTypeId" placeholder="请选择车型">-->
-<!--              <el-option-->
-<!--                v-for="item in vehicleTypeOptions"-->
-<!--                :key="item.value"-->
-<!--                :label="item.label"-->
-<!--                :value="item.value">-->
-<!--              </el-option>-->
-<!--            </el-select>-->
-<!--          </el-form-item>-->
-<!--          <el-form-item :label="'车号 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleNumber'" :rules="{ required: true, message: '请输入车号', trigger: 'blur' }">-->
-<!--            <el-input v-model="vehicle.vehicleNumber" placeholder="请输入车号"></el-input>-->
-<!--          </el-form-item>-->
-<!--          <el-button @click.prevent="removeVehicle(vehicle)">删除</el-button>-->
-<!--        </div>-->
-<!--        <el-form-item>-->
-<!--          <el-button type="primary" @click="addVehicle">新增一组车型和车号</el-button>-->
-<!--        </el-form-item>-->
-<!--      </el-form>-->
-<!--    <el-form-item label="问题描述" prop="issueDescription">-->
-<!--      <el-input v-model="dataForm.issueDescription" placeholder="问题描述"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="问题照片" prop="issuePhoto">-->
-<!--      <img v-if="dataForm.issuePhoto" :src="dataForm.issuePhoto" alt="问题照片" style="max-width: 100%;">-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="整改要求" prop="rectificationRequirement">-->
-<!--      <el-input v-model="dataForm.rectificationRequirement" placeholder="整改要求"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="要求完成时间" prop="requiredCompletionTime">-->
-<!--      <el-input v-model="dataForm.requiredCompletionTime" placeholder="要求完成时间"></el-input>-->
-<!--    </el-form-item>-->
-<!--      <el-form-item label="要求完成时间" prop="requiredCompletionTime">-->
-<!--        <el-date-picker-->
-<!--          v-model="dataForm.requiredCompletionTime"-->
-<!--          type="datetime"-->
-<!--          placeholder="选择日期">-->
-<!--          value-format="yyyy-MM-dd HH:mm:ss"-->
-<!--        </el-date-picker>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="要求完成时间" prop="requiredCompletionTime">-->
-<!--        <el-date-picker-->
-<!--          v-model="dataForm.requiredCompletionTime"-->
-<!--          type="date"-->
-<!--          value-format="yyyy-MM-dd HH:mm:ss"-->
-<!--          placeholder="请选择上传日期">-->
-<!--        </el-date-picker>-->
-<!--      </el-form-item>-->
-<!--    <el-form-item label="责任科室" prop="responsibleDepartment">-->
-<!--      <el-input v-model="dataForm.responsibleDepartment" placeholder="责任科室"></el-input>-->
-<!--    </el-form-item>-->
-<!--      <el-form-item label="责任科室" prop="responsibleDepartment">-->
-<!--        <el-select v-model="dataForm.responsibleDepartment" placeholder="请选择检查科室">-->
-<!--          <el-option-->
-<!--            v-for="department in departmentOptions"-->
-<!--            :key="department.value"-->
-<!--            :label="department.label"-->
-<!--            :value="department.value">-->
-<!--          </el-option>-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
       <el-form-item label="原因分析" prop="causeAnalysis">
         <el-input v-model="dataForm.causeAnalysis" placeholder="原因分析"></el-input>
       </el-form-item>
@@ -122,12 +14,6 @@
     <el-form-item label="实际完成时间" prop="actualCompletionTime">
       <el-input v-model="dataForm.actualCompletionTime" placeholder="实际完成时间"></el-input>
     </el-form-item>
-<!--    <el-form-item label="整改照片交付物" prop="rectificationPhotoDeliverable">-->
-<!--      <el-input v-model="dataForm.rectificationPhotoDeliverable" placeholder="整改照片交付物"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
-<!--      <el-input v-model="dataForm.rectificationResponsiblePerson" placeholder="整改责任人"></el-input>-->
-<!--    </el-form-item>-->
       <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
         <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择验证人">
           <el-option-group v-for="group in options" :key="group.label" :label="group.label">
@@ -137,63 +23,6 @@
           </el-option-group>
         </el-select>
       </el-form-item>
-<!--    <el-form-item label="要求二次整改时间" prop="requiredSecondRectificationTime">-->
-<!--      <el-input v-model="dataForm.requiredSecondRectificationTime" placeholder="要求二次整改时间"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="备注" prop="remark">-->
-<!--      <el-input v-model="dataForm.remark" placeholder="备注"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="创建人" prop="creator">-->
-<!--      <el-input v-model="dataForm.creator" placeholder="创建人"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="创建时间" prop="creationTime">-->
-<!--      <el-input v-model="dataForm.creationTime" placeholder="创建时间"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="最后修改人" prop="lastModifier">-->
-<!--      <el-input v-model="dataForm.lastModifier" placeholder="最后修改人"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="最后修改时间" prop="lastModificationTime">-->
-<!--      <el-input v-model="dataForm.lastModificationTime" placeholder="最后修改时间"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="关联问题整改记录" prop="associatedRectificationRecords">-->
-<!--      <el-input v-model="dataForm.associatedRectificationRecords" placeholder="关联问题整改记录"></el-input>-->
-<!--    </el-form-item>-->
-      <!-- 新增关联问题多选框 -->
-<!--      <el-form-item label="关联问题" prop="associatedIssueIds">-->
-<!--        <el-select v-model="dataForm.associatedIssueIds" multiple placeholder="请选择关联问题">-->
-<!--          <el-option-->
-<!--            v-for="item in issueOptions"-->
-<!--            :key="item.value"-->
-<!--            :label="item.label"-->
-<!--            :value="item.value">-->
-<!--          </el-option>-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
-<!--    <el-form-item label="创建时长" prop="creationDuration">-->
-<!--      <el-input v-model="dataForm.creationDuration" placeholder="创建时长"></el-input>-->
-<!--    </el-form-item>-->
-
-<!--    <el-form-item label="整改验证情况" prop="rectificationVerificationStatus">-->
-<!--      <el-input v-model="dataForm.rectificationVerificationStatus" placeholder="整改验证情况"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="验证结论" prop="verificationConclusion">-->
-<!--      <el-input v-model="dataForm.verificationConclusion" placeholder="验证结论"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="验证人" prop="verifier">-->
-<!--      <el-input v-model="dataForm.verifier" placeholder="验证人"></el-input>-->
-<!--    </el-form-item>-->
-<!--      <el-form-item label="审核人" prop="reviewers">-->
-<!--        <el-input v-model="dataForm.reviewers" placeholder="审核人"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="问题等级" prop="level">-->
-<!--        <el-input v-model="dataForm.level" placeholder="问题等级"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="问题状态" prop="state">-->
-<!--        <el-input v-model="dataForm.state" placeholder="问题状态"></el-input>-->
-<!--      </el-form-item>-->
-<!--    <el-form-item label="公式" prop="formula">-->
-<!--      <el-input v-model="dataForm.formula" placeholder="公式"></el-input>-->
-<!--    </el-form-item>-->
       <el-form-item label="整改图片/交付物" prop="image">
         <el-upload
           action="#"
@@ -215,23 +44,6 @@
         <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
       </span>
   </el-dialog>
-<!--  <el-dialog-->
-<!--    :title="'问题分析'"-->
-<!--    :close-on-click-modal="false"-->
-<!--    :visible.sync="visible1">-->
-<!--    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">-->
-<!--          <el-form-item label="原因分析" prop="causeAnalysis">-->
-<!--            <el-input v-model="dataForm.causeAnalysis" placeholder="原因分析"></el-input>-->
-<!--          </el-form-item>-->
-<!--      <el-form-item label="分析人" prop="lastModifier">-->
-<!--        <el-input v-model="dataForm.lastModifier" placeholder="分析人"></el-input>-->
-<!--      </el-form-item>-->
-<!--    </el-form>-->
-<!--    <span slot="footer" class="dialog-footer">-->
-<!--      <el-button @click="visible1 = false">取消</el-button>-->
-<!--      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>-->
-<!--    </span>-->
-<!--  </el-dialog>-->
     <el-dialog
       :title="'任务发起'"
       :close-on-click-modal="false"
@@ -254,11 +66,6 @@
           :prop="'subtasks.' + index + '.name'"
           :rules="{ required: true, message: '子任务不能为空', trigger: 'blur' }">
           <el-input v-model="subtask.name" placeholder="请输入子任务"></el-input>
-          <!--          <el-select v-model="subtask.assignee" placeholder="请选择接收人">-->
-          <!--            <el-option label="甲" value="甲"></el-option>-->
-          <!--            <el-option label="乙" value="乙"></el-option>-->
-          <!--            <el-option label="丙" value="丙"></el-option>-->
-          <!--          </el-select>-->
           <el-select v-model="subtask.assignee" filterable placeholder="请选择接收人">
             <el-option-group v-for="group in options" :key="group.label" :label="group.label">
               <el-option v-for="item in group.options" :key="item.value" :label="item.label"
@@ -266,6 +73,21 @@
               </el-option>
             </el-option-group>
           </el-select>
+          <el-form-item label="上级任务" prop="superiorMask">
+            <el-select v-model="subtask.parentTask" placeholder="请选择上级任务">
+              <el-option
+                key="question"
+                label="问题"
+                value="0">
+              </el-option>
+              <el-option
+                v-for="item in taskList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
           <el-button @click.prevent="removeSubtask(subtask)">删除</el-button>
         </el-form-item>
 
@@ -273,14 +95,6 @@
           <el-button type="primary" @click="addSubtask">增加子任务</el-button>
           <el-button @click="resetForm('dataForm')">重置</el-button>
         </el-form-item>
-        <!--        <el-form-item label="要求完成日期" prop="requiredCompletionTime">-->
-        <!--          <el-date-picker-->
-        <!--            v-model="requiredCompletionTime"-->
-        <!--            type="date"-->
-        <!--            value-format="yyyy-MM-dd HH:mm:ss"-->
-        <!--            placeholder="选择日期">-->
-        <!--          </el-date-picker>-->
-        <!--        </el-form-item>-->
         <el-form-item label="要求完成日期" prop="requiredCompletionTime">
           <el-date-picker
             v-model="dataForm.requiredCompletionTime"
@@ -291,7 +105,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-      <el-button @click="cancel">取消</el-button>
+      <el-button @click="cancel1">取消</el-button>
       <el-button type="primary" @click="submitForm('dataForm')">提交</el-button>
     </span>
     </el-dialog>
@@ -319,6 +133,7 @@
         dataForm: {
           userinfo: '',
           vehicles: [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }],
+          subtasks: [{ name: '', assignee: '', parentTask: '',serialNumber: this.generateSerialNumber(),key: Date.now() }],
           vehicleTypeIds: [],
           vehicleNumbers: [],
           associatedIssueIds: [],
@@ -360,12 +175,15 @@
           reviewers: '',
           level: '',
           state: '',
+          superiorMask: '',
+          nextMask: '',
           formula: ''
         },
         vehicleTypeOptions: [],
         issueCategoryOptions: [],
         selectedIssue: '',
         issueOptions: [], // 所有问题编号选项
+        taskList: [], // 任务列表
         departmentOptions: [
           { value: '财务科', label: '财务科' },
           { value: '市场科', label: '市场科' },
@@ -390,8 +208,6 @@
         method: 'get',
       }).then(({ data }) => {
         this.options = data;
-
-
         console.log(data);
         // if (data && data.code === 0) {
         //   console.log(data);
@@ -399,9 +215,109 @@
       })
     },
     activated () {
-
+        this.fetchuserinform()
     },
     methods: {
+      generateSerialNumber() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        return `${year}${month}${day}${random}`;
+      },
+      cancel1 () {
+        // 重置 subtasks 数组，只保留一个初始组合
+        this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
+        this.visible1 = false // 关闭对话框或重置其他状态
+      },
+      addSubtask () {
+        const serialNumber = this.generateSerialNumber();
+        console.log('Successfully setnumber:', serialNumber)
+        this.dataForm.subtasks.push({
+          name: '',
+          assignee: '',
+          parentTask: '',
+          serialNumber: serialNumber,
+          key: Date.now()
+        })
+      },
+      removeSubtask (subtask) {
+        let index = this.dataForm.subtasks.indexOf(subtask)
+        if (index !== -1) {
+          this.dataForm.subtasks.splice(index, 1)
+        }
+      },
+      //获取用户人信息
+      fetchuserinform () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/useinfo'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // console.log('Successfully fetched user info1:', data.userinfo)
+            this.dataForm.userinfo = data.userinfo // 将后端返回的 userinfo 赋值给 this.userinfo
+            // console.log('Successfully fetched user info2:', this.dataForm.userinfo)
+            this.dataForm.creator = this.dataForm.userinfo
+            // console.log('Successfully fetched user info3:', this.dataForm.creator)
+          } else {
+            console.error('Failed to fetch vehicle types:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the vehicle types!', error)
+        })
+      },
+      submitForm (formName) {
+        this.fetchuserinform()
+        console.log('Successfully fetched user info4:', this.dataForm.creator)
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.dataForm.subtasks.forEach(subtask => {
+              this.$http({
+                url: this.$http.adornUrl(`/generator/issuemasktable/save`),
+                method: 'post',
+                data: this.$http.adornData({
+                  'issuemaskId': this.dataForm.issuemaskId || undefined,
+                  'serialNumber': subtask.serialNumber,
+                  'issueNumber': this.dataForm.issueNumber,
+                  'reviewers': this.dataForm.reviewers,
+                  'recipients': subtask.assignee,
+                  'maskcontent': subtask.name,
+                  'creator': this.dataForm.creator,
+                  'creationTime': this.dataForm.creationTime,
+                  'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+                  'superiorMask': subtask.parentTask, // 确保上级任务数据被包含                  'nextMask': this.dataForm.nextMask,
+                  'state': '审核中'
+                })
+              }).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$emit('refreshDataList')
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
+                }
+              })
+              console.log('时间:', this.dataForm.requiredCompletionTime)
+              console.log('发起人:', this.dataForm.userinfo)
+            })
+          }
+          // 重置 subtasks 数组，只保留一个初始组合
+          this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
+          this.visible1 = false // 关闭对话框或重置其他状态
+        })
+      },
+      resetForm (formName) {
+        // 重置 subtasks 数组，只保留一个初始组合
+        this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
+      },
       handlePictureCardPreview (file) {
         this.dialogImageUrl = file.url
         console.log('图片路径：', file.url)
@@ -495,6 +411,31 @@
           this.dataForm.vehicles.splice(index, 1)
         }
       },
+      fetchTasksByIssueNumber (issueNumber) {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuemasktable/issuemasklist'),
+          method: 'get',
+          params: this.$http.adornParams({ issueNumber: issueNumber })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log('任务数据' ,data)
+            console.log('任务' ,data.issues)
+            console.log('++++++++++++++++++')
+            console.log('任务' ,data.issues[0].serialNumber)
+
+
+            // 过滤任务列表，只保留所述问题编号与当前问题编号相同的问题
+            this.taskList = data.issues.map(issue => ({
+              value: issue.serialNumber,
+              label: issue.serialNumber
+            }))
+          } else {
+            console.error('Failed to fetch tasks:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the tasks!', error)
+        })
+      },
       fetchIssueCategories () {
         this.$http({
           url: this.$http.adornUrl('/generator/issuetypetable/issuestype'),
@@ -553,25 +494,6 @@
           console.error('There was an error fetching the issue options!', error)
         })
       },
-      //获取用户人信息
-      fetchuserinform () {
-        this.$http({
-          url: this.$http.adornUrl('/generator/issuetable/useinfo'),
-          method: 'get',
-          params: this.$http.adornParams()
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            // console.log('Successfully fetched user info:', data.userinfo)
-            this.dataForm.userinfo = data.userinfo // 将后端返回的 userinfo 赋值给 this.userinfo
-            this.dataForm.creator = this.dataForm.userinfo
-            // console.log('Successfully fetched user info:', this.userinfo)
-          } else {
-            console.error('Failed to fetch vehicle types:', data.msg)
-          }
-        }).catch(error => {
-          console.error('There was an error fetching the vehicle types!', error)
-        })
-      },
       init (id) {
         this.fetchuserinform() //获取用户名
         this.dataForm.issueId = id || 0
@@ -615,6 +537,8 @@
                 this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
                 this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
                 this.dataForm.verifier = data.issueTable.verifier
+                this.dataForm.superiorMask = data.issueMaskTable.superiorMask
+                this.dataForm.nextMask = data.issueMaskTable.nextMask
                 this.dataForm.formula = data.issueTable.formula
                 // 设置关联问题
                 this.dataForm.associatedIssueIds = data.issueTable.associatedIssueAddition ? data.issueTable.associatedIssueAddition.split(',') : [] // 将逗号分隔的字符串转换为数组
@@ -623,53 +547,57 @@
           }
         })
       },
-      // init1 (id) {
-      //   this.dataForm.issueId = id || 0
-      //   this.visible1 = true
-      //   this.$nextTick(() => {
-      //     this.$refs['dataForm'].resetFields()
-      //     if (this.dataForm.issueId) {
-      //       this.$http({
-      //         url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
-      //         method: 'get',
-      //         params: this.$http.adornParams()
-      //       }).then(({data}) => {
-      //         if (data && data.code === 0) {
-      //           this.dataForm.serialNumber = data.issueTable.serialNumber
-      //           this.dataForm.issueNumber = data.issueTable.issueNumber
-      //           this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
-      //           this.dataForm.inspectionDate = data.issueTable.inspectionDate
-      //           this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
-      //           this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
-      //           this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
-      //           this.dataForm.issueDescription = data.issueTable.issueDescription
-      //           this.dataForm.issuePhoto = data.issueTable.issuePhoto
-      //           this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
-      //           this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
-      //           this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
-      //           this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
-      //           this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
-      //           this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
-      //           this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
-      //           this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
-      //           this.dataForm.remark = data.issueTable.remark
-      //           this.dataForm.creator = data.issueTable.creator
-      //           this.dataForm.creationTime = data.issueTable.creationTime
-      //           this.dataForm.lastModifier = data.issueTable.lastModifier
-      //           this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
-      //           this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
-      //           this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
-      //           this.dataForm.creationDuration = data.issueTable.creationDuration
-      //           this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
-      //           this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
-      //           this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
-      //           this.dataForm.verifier = data.issueTable.verifier
-      //           this.dataForm.formula = data.issueTable.formula
-      //         }
-      //       })
-      //     }
-      //   })
-      // },
+      init1 (id,issueNumber) {
+        this.fetchTasksByIssueNumber(issueNumber)
+        this.dataForm.issueId = id || 0
+        this.visible1 = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields()
+          if (this.dataForm.issueId) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.dataForm.serialNumber = data.issueTable.serialNumber
+                this.dataForm.issueNumber = data.issueTable.issueNumber
+                this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
+                this.dataForm.inspectionDate = data.issueTable.inspectionDate
+                this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
+                this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
+                this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
+                this.dataForm.issueDescription = data.issueTable.issueDescription
+                this.dataForm.issuePhoto = data.issueTable.issuePhoto
+                this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+                this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
+                this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
+                this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
+                this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+                this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
+                this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
+                this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
+                this.dataForm.remark = data.issueTable.remark
+                this.dataForm.creator = data.issueTable.creator
+                this.dataForm.creationTime = data.issueTable.creationTime
+                this.dataForm.lastModifier = data.issueTable.lastModifier
+                this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
+                this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
+                this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
+                this.dataForm.creationDuration = data.issueTable.creationDuration
+                this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
+                this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
+                this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
+                this.dataForm.verifier = data.issueTable.verifier
+                this.dataForm.superiorMask = data.issueMaskTable.superiorMask
+                this.dataForm.nextMask = data.issueMaskTable.nextMask
+                this.dataForm.formula = data.issueTable.formula
+              }
+            })
+          }
+        })
+      },
+
       // 表单提交
       dataFormSubmit () {
         console.log('Successfully 获得 vehicle:', this.dataForm.vehicles)
@@ -728,6 +656,8 @@
                   'reviewers': this.dataForm.reviewers,
                   'level': this.dataForm.level,
                   'state': '审核中',
+                  'superiorMask': this.dataForm.superiorMask,
+                  'nextMask': this.dataForm.nextMask,
                   'formula': this.dataForm.formula
                 })
               }).then(({data}) => {

@@ -91,10 +91,8 @@
         <template slot-scope="scope">
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>-->
-          <el-button v-if="showButtons" type="text" size="small" @click="executeHandle(scope.row.issuemaskId)">执行</el-button>
+          <el-button v-if="showButtons" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>
           <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">派发</el-button>
-          <!-- 完成按钮 -->
-          <el-button v-if="showCompleteButton" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -110,6 +108,8 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="recigetDataList"></add-or-update>
     <add-or-update v-if="assertOrUpdateVisible" ref="assetOrUpdate" @refreshDataList="recigetDataList"></add-or-update>
+    <add-or-update v-if="completeVisible" ref="comleted" @refreshDataList="recigetDataList"></add-or-update>
+
   </div>
 </template>
 
@@ -130,7 +130,8 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        completeVisible: false
       }
     },
     components: {
@@ -140,28 +141,6 @@
       this.recigetDataList()
     },
     methods: {
-      executeHandle (id) {
-        this.$confirm('是否确认执行此操作?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          // 确认执行操作的逻辑
-          console.log('执行操作', id)
-          this.$message({
-            type: 'success',
-            message: '执行成功!'
-          })
-          // 隐藏执行和派发按钮
-          this.showButtons = false
-          this.showCompleteButton = true
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消执行'
-          })
-        })
-      },
       // 任务派发
       dispatchHandle (id) {
         // 派发操作的逻辑
@@ -214,6 +193,12 @@
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
         })
+      },
+      completeHandle (id) {
+        this.assertOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.assetOrUpdate.completeHandle(id)
+        });
       },
       // 删除
       deleteHandle (id) {

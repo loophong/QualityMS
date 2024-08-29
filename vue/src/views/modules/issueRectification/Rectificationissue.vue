@@ -227,10 +227,10 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle()">整改记录</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
-          <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId)">任务发起</el-button>
-          <el-button type="text" size="small" @click="openNewPage(scope.row.issueId,scope.row.issueNumber)">任务详情</el-button>
-          <el-button type="text" size="small" @click="openNewPage(scope.row.issueId)">任务流程</el-button>
+<!--          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>-->
+          <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId,scope.row.issueNumber)">任务发起</el-button>
+          <el-button type="text" size="small" @click="openflow(scope.row.issueId,scope.row.issueNumber)">任务流程</el-button>
+          <el-button type="text" size="small" @click="openNewPage(scope.row.issueId,scope.row.issueNumber)">任务列表</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -255,7 +255,6 @@
 
 <script>
 import AddOrUpdate from './issuetable-add-or-update.vue'
-import openNewPage from '../issueset/issueSet.vue'
 // import {isAuth} from "../../../utils";
 export default {
   data () {
@@ -287,6 +286,15 @@ export default {
     openNewPage (issueId, issueNumber) {
       this.$router.push({
         name: 'issue-issuemask',
+        params: {
+          issueId: issueId,
+          issueNumber: issueNumber
+        }
+      })
+    },
+    openflow (issueId, issueNumber) {
+      this.$router.push({
+        name: 'issue-issueflow',
         params: {
           issueId: issueId,
           issueNumber: issueNumber
@@ -337,11 +345,11 @@ export default {
         this.$refs.addOrUpdate.init(id)
       })
     },
-    // 问题分析
-    assetOrUpdateHandle (id) {
+    // 任务发起
+    assetOrUpdateHandle (id,issueNumber) {
       this.assertOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.assetOrUpdate.init1(id)
+        this.$refs.assetOrUpdate.init1(id,issueNumber)
       })
     },
     // 图片预览

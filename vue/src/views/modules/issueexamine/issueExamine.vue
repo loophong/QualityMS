@@ -8,7 +8,7 @@
         <el-button @click="recigetDataList()">查询</el-button>
 <!--        <el-button v-if="isAuth('generator:issuemasktable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
 <!--        <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
-        <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="auditHandle()" :disabled="dataListSelections.length <= 0">批量审核</el-button>
+        <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="auditHandle()" :disabled="dataListSelections.length <= 0">审核</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -89,14 +89,14 @@
         align="center"
         width="150"
         label="操作">
-        <template slot-scope="scope">
+<!--        <template slot-scope="scope">-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="executeHandle(scope.row.issuemaskId)">执行</el-button>-->
-          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">审核</el-button>
+<!--          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">审核</el-button>-->
           <!-- 完成按钮 -->
 <!--          <el-button v-if="showCompleteButton" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>-->
-        </template>
+<!--        </template>-->
       </el-table-column>
     </el-table>
     <el-pagination

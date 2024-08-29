@@ -72,6 +72,7 @@
           maskcontent: '',
           creator: '',
           creationTime: '',
+          state: '',
           requiredcompletiontime: ''
         },
         dataRule: {
@@ -151,6 +152,25 @@
           }
         })
       },
+      completeHandle (id) {
+        this.$confirm('是否确认完成?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 设置issueId和state属性
+          this.dataForm.issueId = id || 0;
+          this.dataForm.state = '已完成'; // 将state属性改为“已完成”
+
+          // 调用dataFormSubmit方法
+          this.dataFormSubmit();
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });
+        });
+      },
       submitForm (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -183,6 +203,7 @@
           }
         })
       },
+
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
@@ -198,7 +219,8 @@
                 'recipients': this.dataForm.recipients,
                 'maskcontent': this.dataForm.maskcontent,
                 'creator': this.dataForm.creator,
-                'creationTime': this.dataForm.creationTime
+                'creationTime': this.dataForm.creationTime,
+                'state': this.dataForm.state
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

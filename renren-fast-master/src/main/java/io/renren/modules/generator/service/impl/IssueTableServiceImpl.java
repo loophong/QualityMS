@@ -29,7 +29,7 @@ import java.util.UUID;
 public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTableEntity> implements IssueTableService {
     private final String uploadDir;
 
-    @Value("${file.upload.dir}")
+//    @Value("${file.upload.dir}")
     private String uploadPath;
 
     @Value("${server.servlet.context-path}")
@@ -38,7 +38,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     @Value("${server.port}")
     private String serverPort;
 
-    @Value("${server.address}")
+//    @Value("${server.address}")
     private String serverAddress;
 
     @Autowired

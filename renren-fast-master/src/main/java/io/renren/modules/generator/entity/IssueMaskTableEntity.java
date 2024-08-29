@@ -25,7 +25,7 @@ public class IssueMaskTableEntity implements Serializable {
 	@TableId
 	private Integer issuemaskId;
 	/**
-	 * 序号
+	 * 编号
 	 */
 	private String serialNumber;
 	/**
@@ -60,5 +60,13 @@ public class IssueMaskTableEntity implements Serializable {
 	 * 状态
 	 */
 	private String state;
+	/**
+	 * 上级任务
+	 */
+	private String superiorMask;
+	/**
+	 * 下级任务
+	 */
+	private String nextMask;
 
 }

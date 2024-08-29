@@ -12,7 +12,9 @@ import io.renren.modules.generator.service.IssueMaskTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service("issueMaskTableService")
@@ -58,4 +60,15 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         );
         return new PageUtils(page);
     }
+
+
+    @Override
+    public List<IssueMaskTableEntity> listAll(String issueNumber) {
+        System.out.println("获取任务列表///" + list());
+        List<IssueMaskTableEntity> list1 = this.list();
+        return list1.stream()
+                .filter(issue -> issue.getIssueNumber().equals(issueNumber))
+                .collect(Collectors.toList());
+    }
+
 }

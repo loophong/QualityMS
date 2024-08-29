@@ -6,8 +6,9 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="recigetDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:issuemasktable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+<!--        <el-button v-if="isAuth('generator:issuemasktable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+<!--        <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
+        <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="auditHandle()" :disabled="dataListSelections.length <= 0">审核</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -71,19 +72,31 @@
         label="发起时间">
       </el-table-column>
       <el-table-column
+        prop="requiredcompletiontime"
+        header-align="center"
+        align="center"
+        label="要求完成时间">
+      </el-table-column>
+      <el-table-column
+        prop="state"
+        header-align="center"
+        align="center"
+        label="状态">
+      </el-table-column>
+      <el-table-column
         fixed="right"
         header-align="center"
         align="center"
         width="150"
         label="操作">
-        <template slot-scope="scope">
+<!--        <template slot-scope="scope">-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="executeHandle(scope.row.issuemaskId)">执行</el-button>-->
-          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">审核</el-button>
+<!--          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">审核</el-button>-->
           <!-- 完成按钮 -->
 <!--          <el-button v-if="showCompleteButton" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>-->
-        </template>
+<!--        </template>-->
       </el-table-column>
     </el-table>
     <el-pagination
@@ -153,7 +166,7 @@ export default {
     // 任务审核
     dispatchHandle (id) {
       // 派发操作的逻辑
-      console.log('派发操作', id)
+      console.log('审核', id)
       this.assertOrUpdateVisible = true
       this.$nextTick(() => {
         this.$refs.assetOrUpdate.init1(id)
@@ -232,6 +245,43 @@ export default {
           }
         })
       })
+    },
+    auditHandle (id) {
+      var ids = id ? [id] : this.dataListSelections.map(item => {
+        return item.issuemaskId
+      })
+      this.$confirm(`确定审核?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuemasktable/audit'),
+          method: 'post',
+          data: this.$http.adornData(ids, false)
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.recigetDataList();
+              }
+            });
+          } else {
+            this.$message.error(data.msg);
+          }
+        }).catch(error => {
+          this.$message.error('请求失败，请稍后重试');
+          console.error(error);
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消审核'
+        });
+      });
     }
   }
 }

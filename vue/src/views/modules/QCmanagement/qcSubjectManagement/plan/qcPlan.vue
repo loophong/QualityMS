@@ -64,7 +64,7 @@
           <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
           <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
           <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
-          <span v-else>-</span> 
+          <span v-else>-</span>
         </template>
 </el-table-column> -->
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">

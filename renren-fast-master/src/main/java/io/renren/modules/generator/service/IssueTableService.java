@@ -22,7 +22,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     List<IssueTableEntity> listAll();
     String saveUploadedFile(MultipartFile file) throws IOException;
 
-    void updateIssuePhoto(Integer issueId, String filePath);
+//    void updateIssuePhoto(String filePath);
 
     String getuserinfo();
 }

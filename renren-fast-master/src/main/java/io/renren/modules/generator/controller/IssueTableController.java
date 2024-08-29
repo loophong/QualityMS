@@ -28,27 +28,35 @@ import java.util.Map;
 public class IssueTableController {
     @Autowired
     private IssueTableService issueTableService;
+
     /**
      * 上传图片
      */
 //    @Value("${file.upload-dir}")
     @PostMapping("/upload")
     @RequiresPermissions("generator:issuetable:update")
-    public R uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("issueId") Integer issueId) {
+    public R uploadImage(@RequestParam("file") MultipartFile file) {
+        System.out.println("文件上传开始-------------");
         if (file.isEmpty()) {
             return R.error("上传的文件为空");
         }
         try {
-            // 这里调用您的服务层方法来处理文件上传逻辑
+            // 调用服务层方法来处理文件上传逻辑
             String filePath = issueTableService.saveUploadedFile(file);
-            System.out.println("+++"+filePath+"+++图片路径");
-            // 更新 issuePhoto 字段
-            issueTableService.updateIssuePhoto(issueId, filePath);
-            return R.ok().put("filePath", filePath);
+            System.out.println("+++" + filePath + "+++图片路径");
+
+            // 更新 issuePhoto 字段（如果需要）
+            // issueTableService.updateIssuePhoto(filePath);
+
+            System.out.println("文件上传成功-------------");
+            return R.ok().put("data", filePath);
         } catch (Exception e) {
+            System.out.println("文件上传失败-------------");
+            e.printStackTrace(); // 打印完整的异常堆栈信息
             return R.error("文件上传失败: " + e.getMessage());
         }
     }
+
     /**
      * 获取所有问题列表
      */

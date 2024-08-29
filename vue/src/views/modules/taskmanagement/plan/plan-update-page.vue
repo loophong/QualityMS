@@ -349,60 +349,52 @@ export default {
       ],
 
       //员工列表
-      options: [{
-        label: '企管科',
-        options: [{
-          value: 'Shanghai',
-          label: '张科长'
-        }, {
-          value: 'Beijing',
-          label: '李部长'
-        }]
-      }, {
-        label: '生产科',
-        options: [{
-          value: 'Chengdu',
-          label: '刘工'
-        }, {
-          value: 'Shenzhen',
-          label: '李工'
-        }, {
-          value: 'Guangzhou',
-          label: '张工'
-        }, {
-          value: 'Dalian',
-          label: '何工'
-        }]
-      }],
+      options: [],
       value: '',
     }
   },
 
 
   async created() {
-    // 获取分组后的员工数据
-    // const response = await fetch('/taskmanagement/user/getEmployeesGroupedByDepartment'); // 假设这是你的 API 路由
-    // const data = await response.json();
 
+    // 获取分组后的员工数据
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
     }).then(({ data }) => {
       this.options = data;
-
-
       console.log(data);
-      // if (data && data.code === 0) {
-      //   console.log(data);
-      // } 
     })
 
-    // console.log(data);
-    // this.options = data;
+
   },
 
 
   methods: {
+
+
+    init(planId) {
+
+      this.$nextTick(() => {
+        this.$refs['dataForm'].resetFields()
+
+        if (this.dataForm.tmPid) {
+          this.$http({
+            url: this.$http.adornUrl(`/taskmanagement/plan/info/` + { planId }),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+
+            }
+          })
+        }
+      })
+    },
+
+
+
+
     //
     dateValidate(rule, value, callback) {
       let startDate = this.dataForm.planStartDate;
@@ -571,24 +563,24 @@ export default {
     },
 
 
-    // checkPlanNumber() {
-    //   if (this.dataForm.planId) {
-    //     this.$http({
-    //       url: this.$http.adornUrl(`/taskmanagement/plan/checkPlanNumber`),
-    //       method: 'get',
-    //       params: {
-    //         planId: this.dataForm.planId
-    //       }
-    //     }).then(response => {
-    //       if (response.data) {
-    //         this.$message.error('计划编号已被使用');
-    //       }
-    //     })
-    //       .catch(error => {
-    //         console.error(error);
-    //       });
-    //   }
-    // },
+    checkPlanNumber() {
+      if (this.dataForm.planId) {
+        this.$http({
+          url: this.$http.adornUrl(`/taskmanagement/plan/checkPlanNumber`),
+          method: 'get',
+          params: {
+            planId: this.dataForm.planId
+          }
+        }).then(response => {
+          if (response.data) {
+            this.$message.error('计划编号已被使用');
+          }
+        })
+          .catch(error => {
+            console.error(error);
+          });
+      }
+    },
 
 
 

@@ -11,7 +11,6 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.renren.modules.taskmanagement.utils.JacksonListTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import javafx.concurrent.Task;
 import lombok.Data;
 
 /**
@@ -79,6 +78,12 @@ public class PlanEntity implements Serializable {
      */
     private String planSchedule;
     /**
+     * 发起人
+     */
+    private String planInitiator;
+
+
+    /**
      * 负责人
      */
     private String planPrincipal;
@@ -98,7 +103,7 @@ public class PlanEntity implements Serializable {
     /**
      * 当前状态
      */
-    private Integer planCurrentState;
+    private TaskStatus planCurrentState;
     /**
      * 是否完成
      */

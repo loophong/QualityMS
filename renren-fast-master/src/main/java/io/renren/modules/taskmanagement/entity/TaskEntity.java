@@ -88,7 +88,7 @@ public class TaskEntity implements Serializable {
 	/**
 	 * 当前状态
 	 */
-	private String taskCurrentState;
+	private TaskStatus taskCurrentState;
 	/**
 	 * 是否完成
 	 */
@@ -117,5 +117,7 @@ public class TaskEntity implements Serializable {
 	 * 关联指标编号
 	 */
 	private String taskAssociatedIndicatorsId;
+
+	private String taskParentNode;
 
 }

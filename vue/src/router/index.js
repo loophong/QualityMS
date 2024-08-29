@@ -41,13 +41,55 @@ const mainRoutes = {
       path: '/plan-add-page',
       component: _import('modules/taskmanagement/plan/plan-add-page'),
       name: 'plan-add-page',
-      meta: { title: '计划新建页', isDynamic: true, isTab: true }
+      meta: { title: '计划新建页', isDynamic: false, isTab: false }
     },
     {
-      path: '/plan-update-page',
+      path: '/plan-list',
+      component: _import('modules/taskmanagement/plan/plan-index'),
+      name: 'plan-list',
+      meta: { title: '工作计划', isDynamic: true, isTab: true }
+    },
+    // {
+    //   path: '/plan-update-page',
+    //   component: _import('modules/taskmanagement/plan/plan-detail-page'),
+    //   name: 'plan-update-page',
+    //   meta: { title: '计划修改页', isDynamic: false, isTab: true },
+    // },
+
+    // this.$router.push({
+    //   path: '/taskmanagement/plan/plan-detail-page',
+    //   query: {
+    //     taskId: taskId
+    //   }
+    // })
+    {
+      path: '/task-update-page',
+      component: _import('modules/taskmanagement/task/task-detail-page'),
+      name: 'task-update-page',
+      meta: { title: '任务修改页', isDynamic: true, isTab: false },
+      props: true
+    },
+    {
+      path: '/plan-tree',
+      component: _import('modules/taskmanagement/tree/plan-tree-display'),
+      name: 'plan-tree',
+      meta: { title: '计划结构图', isDynamic: false, isTab: false },
+      props: true
+    },
+
+    // this.$router.push({
+    //   path: '/taskmanagement/task/task-detail-page',
+    //   query: {
+    //     taskId: taskId
+    //   }
+    // })
+
+    {
+      path: '/plan-update-page/:plabId',
       component: _import('modules/taskmanagement/plan/plan-detail-page'),
       name: 'plan-update-page',
-      meta: { title: '计划修改页', isDynamic: true, isTab: true }
+      meta: { title: '计划修改页', isDynamic: false, isTab: false },
+      props: true
     },
     // {
     //   path: '/qcPlanNew',
@@ -75,12 +117,20 @@ const mainRoutes = {
       meta: { title: '任务流程', isDynamic: true, isTab: true }
     },
     //指标
+    // 指标
     {
       path: '/indicator-display-charts-indicatorchart/:indicatorName',
       component: _import('modules/indicator/display/charts/indicatorchart'),
       name: 'indicatorchart',
       meta: { title: '指标详情',  isTab: true }
     },
+    // {
+    //   path: '/indicator-display-charts-indicatorchart/:indicatorName',
+    //   component: _import('modules/indicator/display/charts/indicatorchart'),
+    //   name: route => `indicatorchart-${route.params.indicatorName}`, // 动态生成name
+    //   meta: { title: '指标详情', isTab: true }
+    // }
+
   ],
   beforeEnter(to, from, next) {
     let token = Vue.cookie.get('token')
@@ -133,7 +183,7 @@ router.beforeEach((to, from, next) => {
  * 判断当前路由类型, global: 全局路由, main: 主入口路由
  * @param {*} route 当前路由
  */
-function fnCurrentRouteType (route, globalRoutes = []) {
+function fnCurrentRouteType(route, globalRoutes = []) {
   var temp = []
   for (var i = 0; i < globalRoutes.length; i++) {
     if (route.path === globalRoutes[i].path) {
@@ -150,7 +200,7 @@ function fnCurrentRouteType (route, globalRoutes = []) {
  * @param {*} menuList 菜单列表
  * @param {*} routes 递归创建的动态(菜单)路由
  */
-function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
+function fnAddDynamicMenuRoutes(menuList = [], routes = []) {
   var temp = []
   for (var i = 0; i < menuList.length; i++) {
     if (menuList[i].list && menuList[i].list.length >= 1) {
@@ -177,7 +227,7 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
       } else {
         try {
           route['component'] = _import(`modules/${menuList[i].url}`) || null
-        } catch (e) {}
+        } catch (e) { }
       }
       routes.push(route)
     }

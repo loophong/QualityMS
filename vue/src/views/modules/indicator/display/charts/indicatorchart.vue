@@ -2,9 +2,13 @@
   <div>
     <div class="block">
       <span class="DataSelect" style="margin-right:10px">日期选择</span>
-      <el-date-picker v-model="selectedDate" type="monthrange" unlink-panels range-separator="至"
-                      start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions"
-                      @change="handleDateChange">
+      <el-date-picker
+        v-model="selectedDate"
+        type="monthrange"
+        start-placeholder="开始月份"
+        end-placeholder="结束月份"
+        style="width: 250px;"
+        @change="handleDateChange">
       </el-date-picker>
     </div>
     <div v-if="loading"
@@ -21,35 +25,41 @@ export default {
   data() {
     return {
       loading: false,
-      selectedDate: [],
+      selectedDate: [],  // 选择日期范围
       pickerOptions: [],
-      chartData: [
-        { date: '2023-01', value: 120 },
-        { date: '2023-02', value: 200 },
-        { date: '2023-03', value: 150 },
-        { date: '2023-04', value: 80 },
-        { date: '2023-05', value: 70 },
-        { date: '2023-06', value: 110 },
-        { date: '2023-07', value: 130 }
-      ],
+      timeData: {        //起止时间
+        startTime: new Date(),
+        endTime: new Date(),
+      },
+      chartData: [],  // 图表数据
       dataList: [],
+      queryParams: {
+        indicatorName: this.$route.params.indicatorName,
+        startTime: new Date(),
+        endTime: new Date(),
+      },
     };
   },
   mounted() {
     console.log("接收到的参数:", this.$route.params);
     console.log("Indicator Name:", this.$route.params.indicatorName);
+    this.defaultMonth();
     this.getDataList();
-    this.renderChart();
   },
   methods: {
+    //根据路由传递的指标名获取列表
     getDataList() {
+      console.log('getDataList===>',this.selectedDate);
+      this.queryParams.startTime = this.selectedDate[0];
+      this.queryParams.endTime = this.selectedDate[1];
+      console.log('queryParams:', this.queryParams);
       this.$http({
-        url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+        url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/indicatorlist'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
           'limit': 10000,
-          'key': this.$route.params.indicatorName,
+          'key': this.queryParams,
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
@@ -59,12 +69,18 @@ export default {
         } else {
           this.dataList = [];
         }
+      }).then(() => {
+        this.chartData = this.dataList.map(item => ({     //填充图表数据
+          date: item.yearMonth,
+          value: item.indicatorValue
+        }));
+        console.log('Chart Data:', this.chartData);
+      }).then(() => {
+        this.renderChart();
       });
     },
-    handleDateChange() {
-
-    },
     renderChart() {
+      console.log('renderChart===>',this.selectedDate);
       const chart = echarts.init(this.$refs.indicatorChart);
 
       const option = {
@@ -104,6 +120,27 @@ export default {
 
       chart.setOption(option);
     },
+
+    handleDateChange(value) {
+      if (value && value[1]) {
+        let endDate = new Date(value[1]);
+        endDate.setMonth(endDate.getMonth() + 1);
+        endDate.setDate(0);
+        this.selectedDate[1] = endDate;
+      }
+      this.getDataList();
+      console.log('value======>',value)
+      console.log('this.selectedDate======>',this.selectedDate)
+    },
+    defaultMonth() {
+      const currentDate = new Date();
+      // 获取当前月份（JavaScript 中的月份是从0开始的，所以这里需要 +1）
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth() + 1;
+      const startDate = new Date(currentYear, 0, 1);
+      const endDate = new Date(currentYear, currentMonth, 0);
+      this.selectedDate = [startDate, endDate];
+    },
   },
 };
 </script>
@@ -119,4 +156,7 @@ export default {
   margin-top: 100px;
   text-align: center;
 }
+
+
+
 </style>

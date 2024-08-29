@@ -10,5 +10,9 @@
         <result property="dataType" column="data_type"/>
     </resultMap>
 
+    <select id="getIndicatorsList" resultType="io.renren.modules.indicator.entity.IndicatorListEntityDTO">
+        select indicator_id as value,indicator_name as label from indicator_dictionary
+    </select>
+
 
 </mapper>

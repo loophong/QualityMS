@@ -8,7 +8,6 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('indicator:indicatorkeyindicators:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('indicator:indicatorkeyindicators:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('indicator:indicatorkeyindicators:save')" type="primary" @click="UploadHandle()">导入</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -22,6 +21,17 @@
         header-align="center"
         align="center"
         width="50">
+      </el-table-column>
+      <!-- 序号列 -->
+      <el-table-column
+        header-align="center"
+        align="center"
+        label="序号"
+        width="60"
+      >
+        <template slot-scope="scope">
+          {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
+        </template>
       </el-table-column>
       <!-- <el-table-column
         prop="keyIndicatorId"
@@ -48,16 +58,16 @@
         label="指标分级">
       </el-table-column>
       <el-table-column
+        prop="sourceDepartment"
+        header-align="center"
+        align="center"
+        label="管理部门">
+      </el-table-column>
+      <el-table-column
         prop="assessmentDepartment"
         header-align="center"
         align="center"
         label="考核部门">
-      </el-table-column>
-      <el-table-column
-        prop="sourceDepartment"
-        header-align="center"
-        align="center"
-        label="来源部门">
       </el-table-column>
       <el-table-column
         prop="managementContent"

@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.common.utils.R;
 import io.renren.modules.indicator.listener.DataReadListener;
 import io.renren.modules.indicator.service.IndicatorDictionaryService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -59,18 +61,20 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
                             case "indicatorValue":
                                 queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getIndicatorValue, value);
                                 break;
+                            case "yearMonth":
+                                queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getYearMonth, value);
+                                break;
                             case "managementDepartment":
                                 queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getManagementDepartment, value);
                                 break;
                             case "assessmentDepartment":
                                 queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getAssessmentDepartment, value);
                                 break;
-                            // 继续为其他字段添加查询条件...
                         }
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace(); // 处理 JSON 解析异常
+                e.printStackTrace();
             }
         }
 
@@ -83,7 +87,55 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
     }
 
 
+    @Override
+    public PageUtils queryIndicatorList(Map<String, Object> params) {
+        System.out.println("params:" + params);
+        // 获取 key 参数
+        String keyStr = (String) params.get("key");
+        Map<String, Object> keyParams = new HashMap<>();
 
+        if (keyStr != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                keyParams = objectMapper.readValue(keyStr, Map.class);
+            } catch (Exception e) {
+                throw new RuntimeException("解析 key 参数时出错", e);
+            }
+        }
+        // 从 keyParams 中获取具体的查询条件
+        String indicatorName = (String) keyParams.get("indicatorName");
+        String startTimeStr = (String) keyParams.get("startTime");
+        String endTimeStr = (String) keyParams.get("endTime");
+
+        // 定义日期格式
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        Date startTime = null;
+        Date endTime = null;
+
+        try {
+            if (startTimeStr != null) {
+                startTime = sdf.parse(startTimeStr);
+            }
+            if (endTimeStr != null) {
+                endTime = sdf.parse(endTimeStr);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("日期解析错误", e);
+        }
+        System.out.println("indicatorName:" +indicatorName + "startTime:" + startTime + ",endTime:" + endTime);
+        QueryWrapper<IndicatorIndicatorSummaryEntity> queryWrapper = new QueryWrapper<>();
+        //数据库查询语句
+        queryWrapper.like(StringUtils.isNotBlank(indicatorName), "indicator_name", indicatorName)
+                .between((startTime != null && endTime != null), "`year_month`", startTime, endTime)
+                .orderByAsc("`year_month`");  // 根据年月降序排列
+
+        // 分页查询
+        IPage<IndicatorIndicatorSummaryEntity> page = this.page(
+                new Query<IndicatorIndicatorSummaryEntity>().getPage(params),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
 
     @Override
     public R readProductionExcelToDB(String fileName, InputStream inputStream, Date yearMonth) {

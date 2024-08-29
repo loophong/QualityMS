@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.taskmanagement.dao.ApprovalDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.taskmanagement.entity.ApprovalEntity" id="approvalMap">
+        <result property="approvalId" column="approval_id"/>
+        <result property="taskId" column="task_id"/>
+        <result property="taskName" column="task_name"/>
+        <result property="taskContent" column="task_content"/>
+        <result property="taskStartDate" column="task_start_date"/>
+        <result property="taskAssociatedPlanId" column="task_associated_plan_id"/>
+        <result property="taskPrincipal" column="task_principal"/>
+        <result property="taskExecutor" column="task_executor"/>
+        <result property="taskAssociatedIndicatorsId" column="task_associated_Indicators_id"/>
+        <result property="taskSubmissionTime" column="task_submission_time"/>
+        <result property="approvalEndTime" column="approval_end_time"/>
+        <result property="approver" column="approver"/>
+        <result property="submitter" column="submitter"/>
+        <result property="approvalStatus" column="approval_status"/>
+        <result property="approvalComments" column="approval_comments"/>
+        <result property="remarks" column="remarks"/>
+    </resultMap>
+
+
+</mapper>

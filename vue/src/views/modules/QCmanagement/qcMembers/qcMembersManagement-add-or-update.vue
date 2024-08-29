@@ -1,52 +1,76 @@
 <template>
   <el-dialog :title="!dataForm.qcgmId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
-      label-width="120px">
-      <el-form-item label="姓名" prop="name">
-        <el-input v-model="dataForm.name" placeholder="姓名"></el-input>
+    <el-form v-if="!dataForm.qcgmId || !isEditingMember" :model="dataForm" :rules="dataRule" ref="dataForm"
+      @keyup.enter.native="dataFormSubmit()" label-width="120px">
+      <el-row :gutter="20" v-show="!isAddMember">
+        <el-col :span="12">
+          <el-form-item v-if="isAdmin" prop="groupName" label="小组名称">
+            <el-input v-model="dataForm.groupName" placeholder="请输入小组名称"></el-input>
+          </el-form-item>
+          <el-form-item prop="mainName" label="姓名">
+            <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input>
+          </el-form-item>
+          <el-form-item prop="number" label="员工编号">
+            <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
+          </el-form-item>
+          <el-form-item v-if="!isAdmin" label="组内角色" prop="roleInTopic">
+            <el-select v-model="dataForm.roleInTopic" placeholder="请选择组内角色">
+              <el-option label="组长" value="组长"></el-option>
+              <el-option label="成员" value="成员"></el-option>
+              <el-option label="顾问" value="顾问"></el-option>
+              <el-option label="评审员" value="评审员"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item prop="participationDate" label="参加QC时间">
+            <el-date-picker v-model="dataForm.participationDate" type="date" value-format="yyyy-MM-dd"
+              placeholder="请选择日期" clearable></el-date-picker>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <div v-for="(member, index) in dataForm.members" :key="index" style="background-color:#EEEEEE;"
+        class="members-list-item">
+        <el-form :model="member" :rules="dataRule" :ref="'dataForm' + index" label-width="120px">
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <h3>{{ '成员 ' + (index + 1) }}</h3>
+            </el-col>
+            <el-col :span="12" class="button-col">
+              <el-button type="text" icon="el-icon-close" size="large" @click="removeMember(member)"
+                class="remove-member-button"></el-button>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="姓名" prop="name">
+                <el-input v-model="member.name" placeholder="请输入姓名"></el-input>
+              </el-form-item>
+              <el-form-item label="员工编号" prop="number">
+                <el-input v-model="member.number" placeholder="请输入员工编号"></el-input>
+              </el-form-item>
+              <el-form-item label="组内角色" prop="roleInTopic">
+                <el-select v-model="member.roleInTopic" placeholder="请选择组内角色">
+                  <el-option label="组长" value="组长"></el-option>
+                  <el-option label="成员" value="成员"></el-option>
+                  <el-option label="顾问" value="顾问"></el-option>
+                  <el-option label="评审员" value="评审员"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="参加时间" prop="participationDate">
+                <el-date-picker v-model="member.participationDate" type="date" placeholder="请输入参加时间"></el-date-picker>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
+      <el-form-item>
+        <br>
+        <el-button v-if="!dataForm.qcgmId || this.isAddMember" type="primary" @click="addMember">新增成员</el-button>
       </el-form-item>
-      <!-- <el-form-item label="性别" prop="gender">
-        <el-input v-model="dataForm.gender" placeholder="性别" disabled></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="手机号" prop="telNumber">
-        <el-input v-model="dataForm.telNumber" placeholder="手机号" disabled></el-input>
-      </el-form-item> -->
-      <el-form-item label="员工编号" prop="number">
-        <el-input v-model="dataForm.number" placeholder="员工编号"></el-input>
-      </el-form-item>
-      <!-- <el-form-item label="学历" prop="education">
-        <el-input v-model="dataForm.education" placeholder="学历" disabled></el-input>
-      </el-form-item>
-      <el-form-item label="部门" prop="department">
-        <el-input v-model="dataForm.department" placeholder="部门" disabled></el-input>
-      </el-form-item>
-      <el-form-item label="岗位" prop="position">
-        <el-input v-model="dataForm.position" placeholder="岗位" disabled></el-input>
-      </el-form-item>
-      <el-form-item label="班组" prop="team">
-        <el-input v-model="dataForm.team" placeholder="班组" disabled></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="参加QC时间" prop="participationDate">
-        <el-input v-model="dataForm.participationDate" placeholder="参加QC时间"></el-input>
-      </el-form-item> -->
-      <el-form-item label="参加QC时间" prop="participationDate">
-        <el-date-picker clearable v-model="dataForm.participationDate" type="date" value-format="yyyy-MM-dd"
-          placeholder="请选择日期">
-        </el-date-picker>
-      </el-form-item>
-      <!-- <el-form-item label="QC课题" prop="topic">
-        <el-input v-model="dataForm.topic" placeholder="QC课题"></el-input>
-      </el-form-item>
-      <el-form-item label="QC课题内角色" prop="roleInTopic">
-        <el-input v-model="dataForm.roleInTopic" placeholder="QC课题内角色"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="逻辑删除flag" prop="deleteFlag">
-        <el-input v-model="dataForm.deleteFlag" placeholder="逻辑删除flag"></el-input>
-      </el-form-item> -->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-if="!isAddMember" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" v-else @click="dataMembersSubmit()">添加</el-button>
     </span>
   </el-dialog>
 </template>
@@ -55,10 +79,13 @@
 export default {
   data() {
     return {
+      isAddMember: false,
+      parentFlag: '',
       visible: false,
+      isEditingMember: false,
       dataForm: {
         qcgmId: 0,
-        name: '',
+        mainName: '',
         gender: '',
         telNumber: '',
         number: '',
@@ -69,66 +96,58 @@ export default {
         participationDate: '',
         topic: '',
         roleInTopic: '',
-        deleteFlag: ''
+        deleteFlag: '',
+        groupName: '',
+        members: [],
+        parentId: '',
+      },
+      editingMember: {
+        qcgmId: '',
+        name: '',
+        number: '',
+        participationDate: '',
+        parentId: '',
       },
       dataRule: {
-
+        mainName: [
+          { required: true, message: '姓名不能为空', trigger: 'blur' }
+        ],
         name: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
-        // gender: [
-        //   { required: true, message: '性别不能为空', trigger: 'blur' }
-        // ],
-        // telNumber: [
-        //   { required: true, message: '手机号不能为空', trigger: 'blur' }
-        // ],
         number: [
           { required: true, message: '员工编号不能为空', trigger: 'blur' }
         ],
-        // education: [
-        //   { required: true, message: '学历不能为空', trigger: 'blur' }
-        // ],
-        // department: [
-        //   { required: true, message: '部门不能为空', trigger: 'blur' }
-        // ],
-        // position: [
-        //   { required: true, message: '岗位不能为空', trigger: 'blur' }
-        // ],
-        // team: [
-        //   { required: true, message: '班组不能为空', trigger: 'blur' }
-        // ],
-
         participationDate: [
-          { required: true, message: '参加QC时间不能为空', trigger: 'blur' }
+          { required: true, message: '参加时间不能为空', trigger: 'blur' }
         ],
-        // topic: [
-        //   { required: true, message: 'QC课题不能为空', trigger: 'blur' }
-        // ],
-        // roleInTopic: [
-        //   { required: true, message: 'QC课题内角色不能为空', trigger: 'blur' }
-        // ],
-        // deleteFlag: [
-        //   { required: true, message: '逻辑删除flag不能为空', trigger: 'blur' }
-        // ]
       }
     }
   },
   mounted() {
-    // 设置默认时间为当前时间
     this.setDefaultDate();
+    this.parentFlag = this.dataForm.qcgmId;
+  },
+  computed: {
+    isAdmin() {
+      if (!this.dataForm.parentId || this.dataForm.parentId == '') {
+        return true;
+      } else {
+        return false;
+      }
+    }
   },
   methods: {
     setDefaultDate() {
-      // 获取当前时间并格式化为 yyyy-MM-dd
       const currentDate = new Date().toISOString().slice(0, 10);
-      // 设置 dataForm.participationDate 的值为当前时间
       this.dataForm.participationDate = currentDate;
+      this.dataForm.members.joinDate = currentDate;
     },
     init(id) {
-      this.dataForm.qcgmId = id || 0
-      this.visible = true
+      this.dataForm.qcgmId = id || 0;
+      this.visible = true;
       this.$nextTick(() => {
-        this.$refs['dataForm'].resetFields()
+        this.$refs['dataForm'].resetFields();
         if (this.dataForm.qcgmId) {
           this.$http({
             url: this.$http.adornUrl(`/qcMembers/qcGroupMember/info/${this.dataForm.qcgmId}`),
@@ -136,24 +155,26 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 0) {
-              this.dataForm.name = data.qcGroupMember.name
-              this.dataForm.gender = data.qcGroupMember.gender
-              this.dataForm.telNumber = data.qcGroupMember.telNumber
-              this.dataForm.number = data.qcGroupMember.number
-              this.dataForm.education = data.qcGroupMember.education
-              this.dataForm.department = data.qcGroupMember.department
-              this.dataForm.position = data.qcGroupMember.position
-              this.dataForm.team = data.qcGroupMember.team
-              this.dataForm.participationDate = data.qcGroupMember.participationDate
-              this.dataForm.topic = data.qcGroupMember.topic
-              this.dataForm.roleInTopic = data.qcGroupMember.roleInTopic
-              this.dataForm.deleteFlag = data.qcGroupMember.deleteFlag
+              this.dataForm.mainName = data.qcGroupMember.name;
+              this.dataForm.gender = data.qcGroupMember.gender;
+              this.dataForm.telNumber = data.qcGroupMember.telNumber;
+              this.dataForm.number = data.qcGroupMember.number;
+              this.dataForm.education = data.qcGroupMember.education;
+              this.dataForm.department = data.qcGroupMember.department;
+              this.dataForm.position = data.qcGroupMember.position;
+              this.dataForm.team = data.qcGroupMember.team;
+              this.dataForm.participationDate = data.qcGroupMember.participationDate;
+              this.dataForm.topic = data.qcGroupMember.topic;
+              this.dataForm.roleInTopic = data.qcGroupMember.roleInTopic;
+              this.dataForm.deleteFlag = data.qcGroupMember.deleteFlag;
+              this.dataForm.groupName = data.qcGroupMember.groupName;
+              this.dataForm.parentId = data.qcGroupMember.parentId || '';
+              this.dataForm.members = data.qcGroupMember.members || [];
             }
-          })
+          });
         }
-      })
+      });
     },
-    // 表单提交
     dataFormSubmit() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
@@ -162,7 +183,7 @@ export default {
             method: 'post',
             data: this.$http.adornData({
               'qcgmId': this.dataForm.qcgmId || undefined,
-              'name': this.dataForm.name,
+              'name': this.dataForm.mainName,
               'gender': this.dataForm.gender,
               'telNumber': this.dataForm.telNumber,
               'number': this.dataForm.number,
@@ -173,7 +194,8 @@ export default {
               'participationDate': this.dataForm.participationDate,
               'topic': this.dataForm.topic,
               'roleInTopic': this.dataForm.roleInTopic,
-              'deleteFlag': this.dataForm.deleteFlag
+              'deleteFlag': this.dataForm.deleteFlag,
+              'groupName': this.dataForm.groupName
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {
@@ -182,17 +204,176 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.visible = false
-                  this.$emit('refreshDataList')
+                  this.visible = false;
+                  this.$emit('refreshDataList');
                 }
-              })
+              });
+
+              const parentId = data.id;
+              this.dataForm.members.forEach(member => {
+                member.parentId = parentId;
+              });
+
+              Promise.all(this.dataForm.members.map(member => {
+                return this.$http({
+                  url: this.$http.adornUrl(`/qcMembers/qcGroupMember/${!member.qcgmId ? 'save' : 'update'}`),
+                  method: 'post',
+                  data: this.$http.adornData({
+                    'qcgmId': member.qcgmId || undefined,
+                    'name': member.name,
+                    'team': member.team,
+                    'number': member.number,
+                    'participationDate': member.participationDate,
+                    'roleInTopic': member.roleInTopic,
+                    'deleteFlag': member.deleteFlag,
+                    'parentId': member.parentId,
+                    'groupName': this.dataForm.groupName
+                  })
+                });
+              })).then(responses => {
+                console.log('所有成员数据提交完成:', responses);
+              }).catch(error => {
+                console.error('成员数据提交时发生错误:', error);
+              });
+
             } else {
-              this.$message.error(data.msg)
+              this.$message.error(data.msg);
             }
-          })
+          });
         }
-      })
+      });
+    },
+    dataMembersSubmit() {
+      Promise.all(this.dataForm.members.map(member => {
+        return this.$http({
+          url: this.$http.adornUrl(`/qcMembers/qcGroupMember/${!member.qcgmId ? 'save' : 'update'}`),
+          method: 'post',
+          data: this.$http.adornData({
+            'qcgmId': member.qcgmId || undefined,
+            'name': member.name,
+            'team': member.team,
+            'number': member.number,
+            'participationDate': member.participationDate,
+            'roleInTopic': member.roleInTopic,
+            'deleteFlag': member.deleteFlag,
+            'parentId': this.dataForm.qcgmId,
+            'groupName': this.dataForm.groupName
+          })
+        });
+      })).then(responses => {
+        console.log('所有成员数据提交完成:', responses);
+        this.$message({
+          message: '操作成功',
+          type: 'success',
+          duration: 1500,
+          onClose: () => {
+            this.visible = false;
+            this.$emit('refreshDataList');
+          }
+        });
+      }).catch(error => {
+        console.error('成员数据提交时发生错误:', error);
+      });
+    },
+    addMember() {
+      const currentDate = new Date().toISOString().slice(0, 10);
+      this.dataForm.members.push({ qcgmId: '', name: '', number: '', participationDate: currentDate, parentId: this.dataForm.qcgmId, roleInTopic: '' });
+    },
+    removeMember(item) {
+      var index = this.dataForm.members.indexOf(item);
+      if (index !== -1) {
+        this.dataForm.members.splice(index, 1);
+      }
+    },
+    editMember(member) {
+      this.isEditingMember = true;
+      this.editingMember = { ...member };
+    },
+    updateMember() {
+      this.$refs['editingMemberForm'].validate((valid) => {
+        if (valid) {
+          const index = this.dataForm.members.findIndex(m => m.qcgmId === this.editingMember.qcgmId);
+          if (index !== -1) {
+            this.dataForm.members.splice(index, 1, { ...this.editingMember });
+          }
+          this.isEditingMember = false;
+        }
+      });
+    },
+    cancelEditMember() {
+      this.isEditingMember = false;
     }
   }
 }
 </script>
+
+<style scoped>
+.form-actions {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.main-content {
+  padding: 20px;
+}
+
+.el-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 4px;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.el-form-item {
+  margin-bottom: 16px;
+}
+
+.el-col {
+  margin-bottom: 0px;
+}
+
+.members-list-item {
+  background-color: #f9fafb;
+  padding: 2px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+  transition: all 0.3s ease;
+}
+
+.members-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+}
+
+.members-list-title {
+  margin-bottom: 8px;
+}
+
+.form-actions {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.form-actions .el-button {
+  margin-left: 10px;
+}
+
+.center-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.button-col {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.remove-member-button {
+  color: #979a9f;
+  font-size: 18px;
+  padding: 10px 20px;
+  font-weight: 900;
+}
+</style>

@@ -30,14 +30,14 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="开始日期" prop="startDate">
+      <!-- <el-form-item label="开始日期" prop="startDate">
         <el-date-picker clearable v-model="dataForm.startDate" type="date" value-format="yyyy-MM-dd" placeholder="开始日期">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="结束日期" prop="endDate">
         <el-date-picker clearable v-model="dataForm.endDate" type="date" value-format="yyyy-MM-dd" placeholder="结束日期">
         </el-date-picker>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="课题描述/摘要" prop="topicDescription">
         <el-input v-model="dataForm.topicDescription" placeholder="课题描述/摘要"></el-input>
       </el-form-item>
@@ -55,8 +55,8 @@
         </el-select>
       </el-form-item>
       <el-form-item label="活动计划" prop="activityPlan">
-        <el-date-picker clearable v-model="dataForm.activityPlan" type="date" value-format="yyyy-MM-dd"
-          placeholder="活动计划">
+        <el-date-picker clearable v-model="dataForm.activityPlan" type="daterange" range-separator="-"
+          start-placeholder="开始日期" end-placeholder="结束日期" placeholder="活动计划">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="课题关键字tag" prop="keywords">
@@ -83,6 +83,7 @@
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -106,6 +107,7 @@ export default {
         topicType: '',
         activityCharacteristics: '',
         activityPlan: '',
+        activityPlanEnd: '',
         keywords: '',
         topicActivityStatus: '',
         topicActivityResult: '',
@@ -190,6 +192,8 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 0) {
+
+
               this.dataForm.topicName = data.qcSubjectRegistration.topicName
               this.dataForm.topicNumber = data.qcSubjectRegistration.topicNumber
               this.dataForm.topicLeader = data.qcSubjectRegistration.topicLeader
@@ -206,6 +210,7 @@ export default {
               this.dataForm.topicType = data.qcSubjectRegistration.topicType
               this.dataForm.activityCharacteristics = data.qcSubjectRegistration.activityCharacteristics
               this.dataForm.activityPlan = data.qcSubjectRegistration.activityPlan
+              this.dataForm.activityPlanEnd = data.qcSubjectRegistration.activityPlanEnd
               this.dataForm.keywords = data.qcSubjectRegistration.keywords
               this.dataForm.topicActivityStatus = data.qcSubjectRegistration.topicActivityStatus
               this.dataForm.topicActivityResult = data.qcSubjectRegistration.topicActivityResult
@@ -239,6 +244,13 @@ export default {
       } else {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+
+            const startDatePlan = new Date(this.dataForm.activityPlan[0]);
+            const endDatePlan = new Date(this.dataForm.activityPlan[1]);
+            startDatePlan.setHours(startDatePlan.getHours() + 13);
+            endDatePlan.setHours(endDatePlan.getHours() + 13);
+
+
             this.$http({
               url: this.$http.adornUrl(`/qcSubject/registration/${!this.dataForm.qcsrId ? 'save' : 'update'}`),
               method: 'post',
@@ -259,7 +271,8 @@ export default {
                 'topicDescription': this.dataForm.topicDescription,
                 'topicType': this.dataForm.topicType,
                 'activityCharacteristics': this.dataForm.activityCharacteristics,
-                'activityPlan': this.dataForm.activityPlan,
+                'activityPlan': startDatePlan,
+                'activityPlanEnd': endDatePlan,
                 'keywords': this.dataForm.keywords,
                 'topicActivityStatus': this.dataForm.topicActivityStatus,
                 'topicActivityResult': this.dataForm.topicActivityResult,

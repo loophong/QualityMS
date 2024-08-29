@@ -91,12 +91,19 @@ const mainRoutes = {
       meta: { title: '计划修改页', isDynamic: false, isTab: false },
       props: true
     },
+
     //QC
     {
       path: '/qcPlanNew',
       component: _import('modules/QCmanagement/qcSubjectManagement/plan/qcPlanNew'),
       name: 'qcPlanNew',
       meta: { title: '新建计划', isDynamic: true, isTab: true }
+    },
+    {
+      path: '/submitEx',
+      component: _import('modules/QCmanagement/qcSubjectManagement/examine/submitEx'),
+      name: 'qcExamineStatus',
+      meta: { title: '计划审核', isDynamic: true, isTab: true }
     },
 
     //任务
@@ -111,7 +118,7 @@ const mainRoutes = {
       path: '/indicator-display-charts-indicatorchart/:indicatorName',
       component: _import('modules/indicator/display/charts/indicatorchart'),
       name: 'indicatorchart',
-      meta: { title: '指标详情',  isTab: true }
+      meta: { title: '指标详情', isTab: true }
     },
     // {
     //   path: '/indicator-display-charts-indicatorchart/:indicatorName',

@@ -26,7 +26,17 @@
         <result property="topicActivityResult" column="topic_activity_result"/>
         <result property="deleteFlag" column="delete_flag"/>
         <result property="note" column="note"/>
+        <result property="resultType" column="result_type"/>
+        <result property="examineId" column="examine_id"/>
     </resultMap>
+
+<!--    <select id="getMembersOfGroup" resultType="QcGroupMemberEntity">-->
+<!--        SELECT *-->
+<!--        FROM qc_group_member-->
+<!--        WHERE group_name = #{groupName}-->
+<!--          AND role_in_topic = '成员'-->
+<!--    </select>-->
+
 
 
 </mapper>

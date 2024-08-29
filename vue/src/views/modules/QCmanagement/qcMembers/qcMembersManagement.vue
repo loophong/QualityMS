@@ -7,34 +7,40 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
-          @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('qcMembers:qcGroupMember:delete')" type="danger" @click="deleteHandle()"
-          :disabled="dataListSelections.length <= 0">批量删除</el-button>
+          @click="addOrUpdateHandle()">新增小组</el-button>
+        <!-- <el-button v-if="isAuth('qcMembers:qcGroupMember:delete')" type="danger" @click="deleteHandle()"
+          :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-      style="width: 100%;">
-      <el-table-column type="selection" header-align="center" align="center" width="50">
+    <el-table :data="tableData" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
+      style="width: 100%;" row-key="id">
+      <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
+      </el-table-column> -->
+      <el-table-column header-align="center" align="center" label="" width="40">
       </el-table-column>
-      <el-table-column prop="qcgmId" header-align="center" align="center" label="组员ID" width="70">
+      <el-table-column prop="qcgmId" header-align="center" align="center" label="小组序号" width="70">
       </el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="姓名">
+      <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="200">
       </el-table-column>
-      <el-table-column prop="gender" header-align="center" align="center" label="性别">
+      <el-table-column prop="name" header-align="center" align="center" label="姓名" width="100">
       </el-table-column>
-      <el-table-column prop="telNumber" header-align="center" align="center" label="手机号">
+      <!-- <el-table-column prop="gender" header-align="center" align="center" label="性别">
+      </el-table-column> -->
+      <!-- <el-table-column prop="telNumber" header-align="center" align="center" label="手机号">
+      </el-table-column> -->
+      <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="140">
       </el-table-column>
-      <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="120">
+      <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="80">
       </el-table-column>
-      <el-table-column prop="education" header-align="center" align="center" label="学历">
+      <!-- <el-table-column prop="education" header-align="center" align="center" label="学历">
       </el-table-column>
       <el-table-column prop="department" header-align="center" align="center" label="部门">
       </el-table-column>
       <el-table-column prop="position" header-align="center" align="center" label="岗位">
       </el-table-column>
       <el-table-column prop="team" header-align="center" align="center" label="班组">
-      </el-table-column>
-      <el-table-column prop="participationDate" header-align="center" align="center" label="参加QC时间">
+      </el-table-column> -->
+      <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="240">
       </el-table-column>
       <!-- <el-table-column label="参加QC时间" align="center" prop="participationDate" width="150">
         <template slot-scope="scope">
@@ -43,14 +49,15 @@
 </el-table-column> -->
       <!-- <el-table-column prop="topic" header-align="center" align="center" label="QC课题">
       </el-table-column>
-      <el-table-column prop="roleInTopic" header-align="center" align="center" label="QC课题内角色">
-      </el-table-column> -->
+       -->
       <!-- <el-table-column prop="deleteFlag" header-align="center" align="center" label="逻辑删除flag">
       </el-table-column> -->
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+      <el-table-column fixed="right" header-align="center" align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcgmId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.qcgmId)">删除</el-button>
+          <el-button v-if="!scope.row.parentId" type="text" size="small"
+            @click="addMemberHandle(scope.row.id)">新增成员</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -65,9 +72,6 @@
 
 <script>
 import AddOrUpdate from './qcMembersManagement-add-or-update'
-// import { numValidator } from '@/api/QCmanagement/numValidator.js';
-// import { getList } from '@/view/api/QCmanagement/qcMembers.js';
-// import moment from 'moment';
 
 export default {
   data() {
@@ -76,46 +80,103 @@ export default {
         key: ''
       },
       dataList: [],
+      groupList: [],
+      originList: [],
+      tableData: [],
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
       dataListSelections: [],
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      map: {}
     }
   },
   components: {
     AddOrUpdate
   },
   activated() {
-    this.getDataList()
+    this.getDataList().then(groupList => {
+      this.groupList = groupList;
+    });
+  },
+  computed: {
+    isAdmin() {
+      if (!this.dataForm.parentId || this.dataForm.parentId == '') {
+        return true;
+      } else {
+        return false;
+      }
+    }
   },
   methods: {
+    // 获取数据列表
+    getDataList() {
+      return new Promise((resolve, reject) => {
+        let groupList = [];
+        this.dataListLoading = true;
+        this.$http({
+          url: this.$http.adornUrl('/qcMembers/qcGroupMember/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.dataForm.key
+          })
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.dataList = data.page.list;
+            this.totalPage = data.page.totalCount;
+            groupList = this.dataList;
+            // 分组
+            this.tableData = []; // 清空 tableData
+            const map = {};
+            groupList.forEach(item => {
+              if (item.parentId === null) {
+                map[item.qcgmId] = {
+                  id: item.qcgmId,
+                  date: item.participationDate,
+                  name: item.name,
+                  number: item.number,
+                  groupName: item.groupName,
+                  roleInTopic: '管理员',
+                  children: []
+                };
+              }
+            });
+            groupList.forEach(item => {
+              if (item.parentId !== null && map[item.parentId]) {
+                map[item.parentId].children.push({
+                  id: item.qcgmId,
+                  date: item.participationDate,
+                  name: item.name,
+                  number: item.number,
+                  roleInTopic: item.roleInTopic,
+                  parentId: item.parentId,
+                });
+              }
+            });
+            this.tableData = Object.values(map);
+          } else {
+            this.dataList = [];
+            this.totalPage = 0;
+          }
+          this.dataListLoading = false;
+          resolve(groupList);
+        }).catch(error => {
+          console.error('Error fetching data:', error);
+          this.dataList = [];
+          this.totalPage = 0;
+          this.dataListLoading = false;
+          reject(error);
+        });
+      });
+    },
+
     parseTime(time) {
       return new Date(time).toLocaleString();
     },
-    // 获取数据列表
-    getDataList() {
-      this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('/qcMembers/qcGroupMember/list'),
-        method: 'get',
-        params: this.$http.adornParams({
-          'page': this.pageIndex,
-          'limit': this.pageSize,
-          'key': this.dataForm.key
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.page.list
-          this.totalPage = data.page.totalCount
-        } else {
-          this.dataList = []
-          this.totalPage = 0
-        }
-        this.dataListLoading = false
-      })
-    },
+
     // 每页数
     sizeChangeHandle(val) {
       this.pageSize = val
@@ -135,6 +196,15 @@ export default {
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
+        this.$refs.addOrUpdate.isAddMember = false;
+        this.$refs.addOrUpdate.init(id)
+      })
+    },
+    // 新增成员
+    addMemberHandle(id) {
+      this.addOrUpdateVisible = true
+      this.$nextTick(() => {
+        this.$refs.addOrUpdate.isAddMember = true;
         this.$refs.addOrUpdate.init(id)
       })
     },

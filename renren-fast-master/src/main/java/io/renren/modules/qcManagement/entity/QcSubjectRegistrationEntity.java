@@ -1,12 +1,15 @@
 package io.renren.modules.qcManagement.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -114,5 +117,13 @@ public class QcSubjectRegistrationEntity implements Serializable {
 	 * 备注
 	 */
 	private String note;
+	/**
+	 * 提交类型
+	 */
+	private String resultType;
+	/**
+	 * 关联审核状态id
+	 */
+	private String examineId;
 
 }

@@ -37,26 +37,15 @@
 
       <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员序号">
       </el-table-column>
-      <!-- <el-table-column prop="createDate" header-align="center" align="center" label="创建日期">
-      </el-table-column>
-      <el-table-column prop="creator" header-align="center" align="center" label="创建人">
-      </el-table-column>
-      <el-table-column prop="modificationDate" header-align="center" align="center" label="修改日期">
-      </el-table-column>
-      <el-table-column prop="modifier" header-align="center" align="center" label="修改人">
-      </el-table-column> -->
-      <el-table-column prop="startDate" header-align="center" align="center" label="开始日期">
-      </el-table-column>
-      <el-table-column prop="endDate" header-align="center" align="center" label="结束日期">
-      </el-table-column>
-
       <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要">
       </el-table-column>
       <el-table-column prop="topicType" header-align="center" align="center" label="课题类型">
       </el-table-column>
       <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
       </el-table-column>
-      <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划">
+      <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期">
+      </el-table-column>
+      <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期">
       </el-table-column>
       <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
       </el-table-column>

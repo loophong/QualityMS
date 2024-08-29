@@ -6,18 +6,18 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
-          @click="addOrUpdateHandle()">提交计划</el-button>
+        <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+          @click="addOrUpdateHandle(scope.row.stepId)">提交计划</el-button> -->
         <!-- <el-button v-if="isAuth('qcSubject:registration:delete')" type="danger" @click="deleteHandle()"
           :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
       </el-form-item>
     </el-form>
     <el-table :data="filteredDataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
       style="width: 100%;">
-      <el-table-column type="selection" header-align="center" align="center" width="50">
-      </el-table-column>
-      <el-table-column prop="qcsrId" header-align="center" align="center" label="id">
-      </el-table-column>
+      <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
+      </el-table-column> -->
+      <!-- <el-table-column prop="qcsrId" header-align="center" align="center" label="id">
+      </el-table-column> -->
       <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
       </el-table-column>
       <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
@@ -26,7 +26,7 @@
       </el-table-column>
       <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
       </el-table-column>
-      <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员ids">
+      <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
       </el-table-column>
       <!-- <el-table-column prop="createDate" header-align="center" align="center" label="创建日期">
       </el-table-column>
@@ -40,7 +40,7 @@
       </el-table-column>
       <el-table-column prop="endDate" header-align="center" align="center" label="结束日期">
       </el-table-column>
-      <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要">
+      <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述">
       </el-table-column>
       <el-table-column prop="topicType" header-align="center" align="center" label="课题类型">
       </el-table-column>
@@ -48,14 +48,14 @@
       </el-table-column>
       <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划">
       </el-table-column>
-      <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字tag">
+      <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
       </el-table-column>
       <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
       </el-table-column>
       <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
       </el-table-column>
-      <!-- <el-table-column prop="deleteFlag" header-align="center" align="center" label="删除标记位">
-      </el-table-column> -->
+      <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+      </el-table-column>
       <el-table-column prop="note" header-align="center" align="center" label="备注">
       </el-table-column>
       <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
@@ -65,14 +65,14 @@
           <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
           <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
           <span v-else>-</span>
-        </template>
+         </template>
 </el-table-column> -->
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="newPlanHandle(scope.row.qcsrId)">创建计划</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">预览计划</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">提交计划</el-button>
           <!-- TODO -->
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">生成文档</el-button>
+          <el-button type="text" size="small" @click="examineStatus(scope.row.qcsrId)">审核状态</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -110,7 +110,7 @@ export default {
   },
   computed: {
     filteredDataList() {
-      return this.dataList.filter(item => item.topicReviewStatus === 3);
+      return this.dataList.filter(item => item.topicReviewStatus === 3 || item.topicReviewStatus === '3');
     }
   },
   methods: {
@@ -127,6 +127,24 @@ export default {
       this.$router.push(
         {
           name: 'qcPlanNew',
+          query: {
+            data: JSON.stringify(filteredArray)
+          }
+        });
+    },
+    //计划审批跳转
+    examineStatus(id) {
+      let filteredArray = [];
+      // 遍历原始数组
+      for (let i = 0; i < this.dataList.length; i++) {
+        if (this.dataList[i].qcsrId === id) {
+          // 如果满足条件，将对象添加到新数组中
+          filteredArray.push(this.dataList[i]);
+        }
+      }
+      this.$router.push(
+        {
+          name: 'qcExamineStatus',
           query: {
             data: JSON.stringify(filteredArray)
           }

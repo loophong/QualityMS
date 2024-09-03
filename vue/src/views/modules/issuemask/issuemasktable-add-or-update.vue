@@ -35,6 +35,17 @@
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
+    <el-dialog
+      :title="'是否确认完成'"
+      :close-on-click-modal="false"
+      :visible.sync="visible2">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+      <el-button @click="visible2 = false">取消</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+    </span>
+    </el-dialog>
 
     <!-- 派发弹窗 -->
     <el-dialog
@@ -42,8 +53,17 @@
       :close-on-click-modal="false"
       :visible.sync="visible1">
       <el-form :model="dataForm" :rules="dataRule" ref="dispatchForm" @keyup.enter.native="dispatchFormSubmit()" label-width="80px">
+<!--        <el-form-item label="接收人" prop="recipients">-->
+<!--          <el-input v-model="dataForm.recipients" placeholder="接收人"></el-input>-->
+<!--        </el-form-item>-->
         <el-form-item label="接收人" prop="recipients">
-          <el-input v-model="dataForm.recipients" placeholder="接收人"></el-input>
+          <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">
+            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.label">
+              </el-option>
+            </el-option-group>
+          </el-select>
         </el-form-item>
         <el-form-item label="派发时间" prop="dispatchTime">
           <el-date-picker v-model="dataForm.creationTime" type="datetime" placeholder="选择派发时间"></el-date-picker>
@@ -63,6 +83,7 @@
       return {
         visible: false,
         visible1: false,
+        visible2: false,
         dataForm: {
           issuemaskId: 0,
           serialNumber: '',
@@ -73,7 +94,8 @@
           creator: '',
           creationTime: '',
           state: '',
-          requiredcompletiontime: ''
+          requiredcompletiontime: '',
+          options: ''
         },
         dataRule: {
           // serialNumber: [
@@ -99,6 +121,18 @@
           // ]
         }
       }
+    },
+    created () {
+      this.$http({
+        url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+        method: 'get',
+      }).then(({ data }) => {
+        this.options = data;
+        console.log(data);
+        // if (data && data.code === 0) {
+        //   console.log(data);
+        // }
+      })
     },
     methods: {
       init (id) {
@@ -153,31 +187,28 @@
         })
       },
       completeHandle (id) {
-        this.$confirm('是否确认完成?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          // 设置issueId和state属性
-          this.dataForm.issueId = id || 0;
-          this.dataForm.state = '已完成'; // 将state属性改为“已完成”
-
-          // 调用dataFormSubmit方法
-          this.dataFormSubmit();
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          });
-        });
-      },
-      submitForm (formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('提交成功!')
-          } else {
-            console.log('提交失败!!')
-            return false
+        this.dataForm.issuemaskId = id || 0
+        this.visible2 = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields()
+          if (this.dataForm.issuemaskId) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuemasktable/info/${this.dataForm.issuemaskId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.dataForm.serialNumber = data.issueMaskTable.serialNumber
+                this.dataForm.issueNumber = data.issueMaskTable.issueNumber
+                this.dataForm.reviewers = data.issueMaskTable.reviewers
+                this.dataForm.recipients = data.issueMaskTable.recipients
+                this.dataForm.maskcontent = data.issueMaskTable.maskcontent
+                this.dataForm.creator = data.issueMaskTable.creator
+                this.dataForm.creationTime = data.issueMaskTable.creationTime
+                this.dataForm.requiredcompletiontime = data.issueMaskTable.requiredcompletiontime
+                this.dataForm.state = '已完成'
+              }
+            })
           }
         })
       },
@@ -230,6 +261,7 @@
                   duration: 1500,
                   onClose: () => {
                     this.visible = false
+                    this.visible2 = false
                     this.$emit('refreshDataList')
                   }
                 })

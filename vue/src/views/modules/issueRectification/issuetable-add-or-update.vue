@@ -418,12 +418,6 @@
           params: this.$http.adornParams({ issueNumber: issueNumber })
         }).then(({data}) => {
           if (data && data.code === 0) {
-            console.log('任务数据' ,data)
-            console.log('任务' ,data.issues)
-            console.log('++++++++++++++++++')
-            console.log('任务' ,data.issues[0].serialNumber)
-
-
             // 过滤任务列表，只保留所述问题编号与当前问题编号相同的问题
             this.taskList = data.issues.map(issue => ({
               value: issue.serialNumber,
@@ -655,7 +649,7 @@
                   'verifier': this.dataForm.verifier,
                   'reviewers': this.dataForm.reviewers,
                   'level': this.dataForm.level,
-                  'state': '审核中',
+                  'state': '持续',
                   'superiorMask': this.dataForm.superiorMask,
                   'nextMask': this.dataForm.nextMask,
                   'formula': this.dataForm.formula

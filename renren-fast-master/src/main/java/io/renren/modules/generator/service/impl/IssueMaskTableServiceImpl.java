@@ -56,7 +56,9 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         System.out.println("当前登录人信息"+role);
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
-                new QueryWrapper<IssueMaskTableEntity>().eq("Reviewers", rolename)
+                new QueryWrapper<IssueMaskTableEntity>()
+                        .eq("Reviewers", rolename) // 筛选Reviewers为当前登录用户
+                        .eq("state", "审核中") // 筛选state为“审核中”的数据
         );
         return new PageUtils(page);
     }
@@ -64,11 +66,24 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
 
     @Override
     public List<IssueMaskTableEntity> listAll(String issueNumber) {
-        System.out.println("获取任务列表///" + list());
         List<IssueMaskTableEntity> list1 = this.list();
         return list1.stream()
                 .filter(issue -> issue.getIssueNumber().equals(issueNumber))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String listRecords(String issueNumber) {
+        List<IssueMaskTableEntity> list1 = this.list();
+        boolean allCompleted = list1.stream()
+                .filter(issue -> issue.getIssueNumber().equals(issueNumber))
+                .allMatch(issue -> "已完成".equals(issue.getState()));
+
+        if (allCompleted) {
+            return "success";
+        } else {
+            return "error";
+        }
     }
 
 }

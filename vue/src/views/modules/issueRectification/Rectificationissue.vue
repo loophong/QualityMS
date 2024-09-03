@@ -226,7 +226,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle()">整改记录</el-button>
+          <el-button type="text" size="small" @click="handleRectificationRecords(scope.row.issueNumber)">整改记录</el-button>
 <!--          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>-->
           <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId,scope.row.issueNumber)">任务发起</el-button>
           <el-button type="text" size="small" @click="openflow(scope.row.issueId,scope.row.issueNumber)">任务流程</el-button>
@@ -291,6 +291,27 @@ export default {
           issueNumber: issueNumber
         }
       })
+    },
+    // 处理整改记录
+    handleRectificationRecords (issueNumber, issueId) {
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuemasktable/records'),
+        method: 'post',
+        params: this.$http.adornParams({ issueNumber: issueNumber })
+      }).then(({data}) => {
+        console.log("返回数据：" ,data)
+        if (data && data.msg === 'success') {
+          // 操作成功后触发addOrUpdateHandle
+          this.addOrUpdateHandle(issueId)
+        }else if (data && data.msg === 'error') {
+          this.$message.error('任务未全部完成')
+        } else {
+          this.$message.error('操作失败')
+        }
+      }).catch(() => {
+        this.$message.error('请求失败')
+      })
+
     },
     openflow (issueId, issueNumber) {
       this.$router.push({

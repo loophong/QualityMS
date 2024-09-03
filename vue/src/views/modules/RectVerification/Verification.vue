@@ -226,7 +226,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle()">验证记录</el-button>
+          <el-button type="text" size="small" @click="checkStateAndHandle(scope.row)">验证记录</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
         </template>
       </el-table-column>
@@ -280,6 +280,16 @@ export default {
     this.getDataList()
   },
   methods: {
+    // 检查state并处理
+    checkStateAndHandle (row) {
+      if (row.state === '持续') {
+        this.addOrUpdateHandle(row.issueId)
+      } else if (row.state === '未完成') {
+        this.$message.error('问题未完成')
+      } else {
+        this.$message.error('未知状态')
+      }
+    },
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true

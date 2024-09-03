@@ -8,9 +8,9 @@
 <!--    <el-form-item label="序号" prop="serialNumber">-->
 <!--      <el-input v-model="dataForm.serialNumber" placeholder="序号"></el-input>-->
 <!--    </el-form-item>-->
-    <el-form-item label="问题编号" prop="issueNumber">
-      <el-input v-model="dataForm.issueNumber" placeholder="问题编号"></el-input>
-    </el-form-item>
+<!--    <el-form-item label="问题编号" prop="issueNumber">-->
+<!--      <el-input v-model="dataForm.issueNumber" placeholder="问题编号"></el-input>-->
+<!--    </el-form-item>-->
       <el-form-item label="检查科室" prop="inspectionDepartment">
         <el-select v-model="dataForm.inspectionDepartment" placeholder="请选择检查科室">
           <el-option
@@ -334,6 +334,15 @@
 
     },
     methods: {
+      //问题编号
+      generateSerialNumber() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const random = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+        return `${year}${month}${day}${random}`;
+      },
       handlePictureCardPreview (file) {
         this.dialogImageUrl = file.url
         console.log('图片路径：', file.url)
@@ -519,7 +528,7 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.dataForm.serialNumber = data.issueTable.serialNumber
-                this.dataForm.issueNumber = data.issueTable.issueNumber
+                this.dataForm.issueNumber = this.generateSerialNumber();
                 this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
                 this.dataForm.inspectionDate = data.issueTable.inspectionDate
                 this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
@@ -568,7 +577,7 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.dataForm.serialNumber = data.issueTable.serialNumber
-                this.dataForm.issueNumber = data.issueTable.issueNumber
+                this.dataForm.issueNumber = this.generateSerialNumber();
                 this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
                 this.dataForm.inspectionDate = data.issueTable.inspectionDate
                 this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
@@ -629,7 +638,7 @@
                 data: this.$http.adornData({
                   'issueId': this.dataForm.issueId || undefined,
                   'serialNumber': this.dataForm.serialNumber,
-                  'issueNumber': this.dataForm.issueNumber,
+                  'issueNumber': this.generateSerialNumber(),
                   'inspectionDepartment': this.dataForm.inspectionDepartment,
                   'inspectionDate': this.dataForm.inspectionDate,
                   'issueCategoryId': issueCategoryIdString, // 使用转换后的字符串
@@ -659,7 +668,7 @@
                   'verifier': this.dataForm.verifier,
                   'reviewers': this.dataForm.reviewers,
                   'level': this.dataForm.level,
-                  'state': '审核中',
+                  'state': '未完成',
                   'formula': this.dataForm.formula
                 })
               }).then(({data}) => {

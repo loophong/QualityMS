@@ -77,6 +77,18 @@ public class IssueMaskTableController {
         return R.ok().put("issues", issues);
     }
     /**
+     * 问题对应任务是否全部完成
+     */
+    @RequestMapping("/records")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R handleRectificationRecords(@RequestParam String issueNumber){
+//        System.out.println("获取任务编号成功："+issueNumber);
+        String fin = issueMaskTableService.listRecords(issueNumber);
+        System.out.println("返回的数据为："+fin);
+        return R.ok(fin);
+    }
+
+    /**
      * 信息
      */
     @RequestMapping("/info/{issuemaskId}")

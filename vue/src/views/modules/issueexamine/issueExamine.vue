@@ -83,12 +83,12 @@
         align="center"
         label="状态">
       </el-table-column>
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="150"
-        label="操作">
+<!--      <el-table-column-->
+<!--        fixed="right"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        width="150"-->
+<!--        label="操作">-->
 <!--        <template slot-scope="scope">-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>-->
@@ -97,7 +97,7 @@
           <!-- 完成按钮 -->
 <!--          <el-button v-if="showCompleteButton" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>-->
 <!--        </template>-->
-      </el-table-column>
+<!--      </el-table-column>-->
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"

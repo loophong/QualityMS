@@ -13,10 +13,15 @@ export default {
       },
     };
   },
-  mounted() {
+  activated() {
+    this.cleartree();
     this.getDataList();
   },
   methods: {
+    cleartree(){
+      // 清空 SVG 元素
+      d3.select(this.$refs.treeChart).select('svg').remove();
+    },
     getDataList() {
       const issueNumber = this.$route.params.issueNumber
       console.log('Successfully fetched issueNumber :', issueNumber)

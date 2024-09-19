@@ -80,9 +80,9 @@
                   </el-option>
                 </el-select>
               </el-form-item> -->
-              <el-form-item label="任务派发" prop="planTasksAssignment">
+              <!-- <el-form-item label="任务派发" prop="planTasksAssignment">
                 <el-input v-model="dataForm.planTasksAssignment" placeholder="任务派发"></el-input>
-              </el-form-item>
+              </el-form-item> -->
               <!-- <el-form-item label="关联任务编号" prop="planAssociatedTasksId">
                 <el-input v-model="dataForm.planAssociatedTasksId" placeholder="关联任务编号"></el-input>
               </el-form-item> -->
@@ -129,6 +129,11 @@
                 <el-col :span="12">
                   <h3>{{ '任务 ' + (index + 1) }}</h3>
                 </el-col>
+                <!-- <el-col :span="12" class="button-col"> -->
+                <!-- <i class="el-icon-close" @click="removeTask(index)" aria-hidden="true"></i> -->
+                <!-- <el-button type="text" icon="el-icon-close" size="large" @click="removeTask(index)"
+                    class="remove-task-button"></el-button>
+                </el-col> -->
                 <el-col :span="12" class="button-col">
                   <!-- <i class="el-icon-close" @click="removeTask(index)" aria-hidden="true"></i> -->
                   <el-button type="text" icon="el-icon-close" size="large" @click="removeTask(index)"
@@ -320,10 +325,10 @@ export default {
         taskAssociatedIndicatorsId: ''
       }], // 初始化成员列表
       dataRule: {
-        planId: [
-          { required: true, message: '计划编号不能为空', trigger: 'blur' },
-          { validator: this.validatePlanId, trigger: 'blur' }
-        ],
+        // planId: [
+        //   { required: true, message: '计划编号不能为空', trigger: 'blur' },
+        //   { validator: this.validatePlanId, trigger: 'blur' }
+        // ],
         planName: [
           { required: true, message: '计划名不能为空', trigger: 'blur' }
         ],
@@ -585,9 +590,28 @@ export default {
         taskAssociatedIndicatorsId: ''
       });
     },
+
     // 移除任务
     removeTask(index) {
-      this.tasks.splice(index, 1);
+      // 弹窗询问用户是否确认删除
+      this.$confirm('此操作将永久删除该任务, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteTaskByTaskId(this.tasks[index].tmTid);
+
+        this.tasks.splice(index, 1);
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     },
 
     updatePlanScheduleDays() {
@@ -648,6 +672,18 @@ export default {
             console.error(error);
           });
       }
+    },
+
+    deleteTaskByTaskId(tmTid) {
+      console.log("删除任务" + tmTid);
+      this.$http({
+        url: this.$http.adornUrl(`/taskmanagement/task/deleteByTaskId`),
+        method: 'get',
+        params: {
+          tmTid: tmTid
+        }
+      })
+
     },
 
 

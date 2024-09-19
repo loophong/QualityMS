@@ -137,7 +137,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
           <el-button type="text" size="small" @click="updatePlanPage(scope.row.planId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.tmPid)">删除</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -166,33 +166,8 @@ export default {
       dataListSelections: [],
       addOrUpdateVisible: false,
 
-
       //员工列表
-      options: [{
-        label: '企管科',
-        options: [{
-          value: 'Shanghai',
-          label: '张科长'
-        }, {
-          value: 'Beijing',
-          label: '李部长'
-        }]
-      }, {
-        label: '生产科',
-        options: [{
-          value: 'Chengdu',
-          label: '刘工'
-        }, {
-          value: 'Shenzhen',
-          label: '李工'
-        }, {
-          value: 'Guangzhou',
-          label: '张工'
-        }, {
-          value: 'Dalian',
-          label: '何工'
-        }]
-      }],
+      options: [],
     }
   },
   components: {
@@ -203,28 +178,16 @@ export default {
   },
   async created() {
     // 获取分组后的员工数据
-    // const response = await fetch('/taskmanagement/user/getEmployeesGroupedByDepartment'); // 假设这是你的 API 路由
-    // const data = await response.json();
-
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
     }).then(({ data }) => {
-      console.log(data);
-      console.log(1111);
-
       this.options = data;
-
-
       console.log(this.options);
-      // if (data && data.code === 0) {
-      //   console.log(data);
-      // } 
     })
-
-    // console.log(data);
-    // this.options = data;
   },
+
+
   methods: {
     // 获取数据列表
     getDataList() {
@@ -300,19 +263,16 @@ export default {
     },
 
     // 删除
-    deleteHandle(id) {
-      var ids = id ? [id] : this.dataListSelections.map(item => {
-        return item.tmPid
-      })
-      this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+    deleteHandle(row) {
+      this.$confirm(`确定删除计划[${row.planName}]?删除计划将同时删除其子任务`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         this.$http({
-          url: this.$http.adornUrl('/taskmanagement/plan/delete'),
-          method: 'post',
-          data: this.$http.adornData(ids, false)
+          url: this.$http.adornUrl('/taskmanagement/plan/delete/'+row.planId),
+          method: 'get',
+          params: this.$http.adornParams()
         }).then(({ data }) => {
           if (data && data.code === 0) {
             this.$message({

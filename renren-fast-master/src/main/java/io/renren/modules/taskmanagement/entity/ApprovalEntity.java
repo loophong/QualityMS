@@ -27,7 +27,7 @@ public class ApprovalEntity implements Serializable {
 	/**
 	 * 任务ID
 	 */
-	private Long taskId;
+	private String taskId;
 	/**
 	 * 任务名
 	 */

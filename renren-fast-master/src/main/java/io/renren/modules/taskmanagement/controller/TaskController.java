@@ -123,7 +123,7 @@ public class TaskController {
 
     @RequestMapping("/submitApprover")
     //    @RequiresPermissions("taskmanagement:task:list")
-    public R executeTask(Long taskId,String taskApprovalor){
+    public R executeTask(String taskId,String taskApprovalor){
 
         log.info("当前任务id为：" + taskId);
         TaskEntity task = taskService.getByTaskId(taskId);
@@ -258,24 +258,24 @@ public class TaskController {
      */
 //    @RequestMapping("/executeTask")
 //    @RequiresPermissions("taskmanagement:task:list")
-    @RequestMapping("/executeTask/{taskId}")
+//    @RequestMapping("/executeTask/{taskId}")
 //    @GetMapping("/executeTask/{taskId}")
-    public R executeTask(@PathVariable("taskId") Long taskId){
-        log.info("当前任务id为：" + taskId);
+//    public R executeTask(@PathVariable("taskId") Long taskId){
+//        log.info("当前任务id为：" + taskId);
 //        TaskEntity taskEntity = taskService.getOne(new QueryWrapper<>())
 
-        TaskEntity taskEntity = taskService.getByTaskId(taskId);
+//        TaskEntity taskEntity = taskService.getByTaskId(taskId);
 //        Integer taskCurrentState = taskEntity.getTaskCurrentState();
 //        log.info("当前任务状态为：" + taskCurrentState);
 //        if (taskCurrentState.equals(1)){
 //            taskEntity.setTaskCurrentState(2);
 //        }
 
-        if (taskEntity.getTaskCurrentState() == TaskStatus.IN_PROGRESS){
-            taskEntity.setTaskCurrentState(TaskStatus.APPROVAL_IN_PROGRESS);
-        } else {
-            return R.error("当前任务状态不是进行中，不能进行审核");
-        }
+//        if (taskEntity.getTaskCurrentState() == TaskStatus.IN_PROGRESS){
+//            taskEntity.setTaskCurrentState(TaskStatus.APPROVAL_IN_PROGRESS);
+//        } else {
+//            return R.error("当前任务状态不是进行中，不能进行审核");
+//        }
 
 //        LocalDate localDate = LocalDateTime.now().toLocalDate();
 //        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -292,11 +292,11 @@ public class TaskController {
 //        log.info("实际天数"+diffDays);
 //        taskEntity.setTaskActualDays(diffDays);
         
-        taskService.updateById(taskEntity);
+//        taskService.updateById(taskEntity);
         
-        return R.ok();
+//        return R.ok();
 
-    }
+//    }
     
     /** 
      * @description:

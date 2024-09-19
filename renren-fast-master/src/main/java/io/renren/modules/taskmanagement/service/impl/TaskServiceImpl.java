@@ -59,7 +59,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
     }
 
     @Override
-    public TaskEntity getByTaskId(Long taskId) {
+    public TaskEntity getByTaskId(String taskId) {
         //使用mybatis-plus通过taskId查询task
         LambdaQueryWrapper<TaskEntity> eq = new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskId, taskId);
         return taskDao.selectOne(eq);

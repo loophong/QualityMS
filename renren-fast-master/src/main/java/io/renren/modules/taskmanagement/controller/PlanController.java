@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.hutool.log.Log;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.taskmanagement.entity.PlanAndTaskDTO;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.service.TaskService;
@@ -80,23 +81,49 @@ public class PlanController {
     }
 
     /**
-     * 修改
+     * @description: 更新计划和任务
+     * @author: hong
+     * @date: 2024/8/30 16:15
+     * @version: 1.0
      */
     @RequestMapping("/update")
     @RequiresPermissions("taskmanagement:plan:update")
-    public R update(@RequestBody PlanEntity taskManagementPlan){
-        planService.updateById(taskManagementPlan);
+    public R update(@RequestBody PlanAndTaskDTO planAndTaskDTO){
+//        planService.updateById(taskManagementPlan);
+
+        PlanEntity plan = planAndTaskDTO.getPlan();
+        planService.updateById(plan);
+
+        List<TaskEntity> tasks = planAndTaskDTO.getTasks();
+        tasks.forEach(task -> {
+            if (taskService.isTaskIdUsed(task.getTaskId())) {
+                taskService.updateById(task);
+            } else {
+                taskService.save(task);
+            }
+        });
 
         return R.ok();
     }
 
     /**
-     * 删除
+     * @description: 删除计划时删除其全部子任务
+     * @author: hong
+     * @date: 2024/8/30 15:51
+     * @version: 1.0
      */
-    @RequestMapping("/delete")
+    @RequestMapping("/delete/{planId}")
     @RequiresPermissions("taskmanagement:plan:delete")
-    public R delete(@RequestBody Long[] tmPids){
-        planService.removeByIds(Arrays.asList(tmPids));
+    public R delete(@PathVariable String planId){
+        QueryWrapper<PlanEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("plan_id", planId);
+        planService.remove(queryWrapper);
+//        planService.remove();
+        // 当任务关联计划编号=planId的任务全部删除
+        QueryWrapper<TaskEntity> taskQueryWrapper = new QueryWrapper<>();
+        taskQueryWrapper.eq("task_associated_plan_id", planId);
+        taskService.remove(taskQueryWrapper);
+//        taskService.remove()
 
         return R.ok();
     }

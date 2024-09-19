@@ -1,8 +1,10 @@
 package io.renren.modules.taskmanagement.controller;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
+import io.renren.common.utils.DateUtils;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.taskmanagement.entity.ApprovalStatus;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
@@ -23,7 +25,6 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 
 
-
 /**
  * 任务审批表
  *
@@ -42,6 +43,26 @@ public class ApprovalController {
     private TaskService taskService;
 
     /**
+     * @description: 取消审批
+     * @author: hong
+     * @date: 2024/8/30 17:17
+     * @version: 1.0
+     */
+//    @RequestMapping("/update")
+//    @RequiresPermissions("taskmanagement:approval:update")
+//    public R update(@RequestBody String taskId) {
+//
+//        //检查任务是否存在
+//        if (taskService.getByTaskId(taskId) == null) {
+//            return R.error("任务不存在");
+//        }
+//        TaskEntity task = taskService.getByTaskId(taskId);
+//        task.setTaskCurrentState(TaskStatus.IN_PROGRESS);
+//
+//        return approvalService.query().eq("task_id", taskId).eq("approval_status",ApprovalStatus.PENDING);
+//    }
+
+    /**
      * @description: 获取我提交的审批getMySubmitApprovalList
      * @param: null
      * @return:
@@ -50,7 +71,7 @@ public class ApprovalController {
      */
     @RequestMapping("/getMySubmitApprovalList")
 //    @RequiresPermissions("taskmanagement:task:list")
-    public R getMySubmitApprovalList(@RequestParam Map<String, Object> params){
+    public R getMySubmitApprovalList(@RequestParam Map<String, Object> params) {
 
         PageUtils page = approvalService.queryPageGetMySubmitApprovalList(params, ShiroUtils.getUserId());
 
@@ -67,8 +88,8 @@ public class ApprovalController {
      */
     @RequestMapping("/myApprovalList")
 //    @RequiresPermissions("taskmanagement:approval:list")
-    public R myApprovalList(@RequestParam Map<String, Object> params){
-        log.info("查询我的审批列表"+ShiroUtils.getUserId());
+    public R myApprovalList(@RequestParam Map<String, Object> params) {
+        log.info("查询我的审批列表" + ShiroUtils.getUserId());
         PageUtils page = approvalService.queryPageMyApprovalList(params, ShiroUtils.getUserId());
 
         return R.ok().put("page", page);
@@ -81,9 +102,9 @@ public class ApprovalController {
      */
     @RequestMapping("/pendingApprovalsList")
 //    @RequiresPermissions("taskmanagement:approval:list")
-    public R getPendingApprovalsList(@RequestParam Map<String, Object> params){
+    public R getPendingApprovalsList(@RequestParam Map<String, Object> params) {
         PageUtils page = approvalService.queryPagePendingApprovalsList(params, ShiroUtils.getUserId());
-        log.info("查询待审批列表"+page);
+        log.info("查询待审批列表" + page);
 
         return R.ok().put("page", page);
     }
@@ -95,9 +116,9 @@ public class ApprovalController {
      */
     @RequestMapping("/historyApprovalList")
 //    @RequiresPermissions("taskmanagement:approval:list")
-    public R getHistoryApprovalList(@RequestParam Map<String, Object> params){
+    public R getHistoryApprovalList(@RequestParam Map<String, Object> params) {
         PageUtils page = approvalService.queryPageHistoryApprovalList(params, ShiroUtils.getUserId());
-        log.info("查询已审批列表"+page);
+        log.info("查询已审批列表" + page);
 
         return R.ok().put("page", page);
     }
@@ -108,7 +129,7 @@ public class ApprovalController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("taskmanagement:approval:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = approvalService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -120,8 +141,8 @@ public class ApprovalController {
      */
     @RequestMapping("/info/{approvalId}")
     @RequiresPermissions("taskmanagement:approval:info")
-    public R info(@PathVariable("approvalId") Long approvalId){
-		ApprovalEntity taskManagementApprovalTable = approvalService.getById(approvalId);
+    public R info(@PathVariable("approvalId") Long approvalId) {
+        ApprovalEntity taskManagementApprovalTable = approvalService.getById(approvalId);
 
         return R.ok().put("taskManagementApprovalTable", taskManagementApprovalTable);
     }
@@ -131,28 +152,63 @@ public class ApprovalController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("taskmanagement:approval:save")
-    public R save(@RequestBody ApprovalEntity taskManagementApprovalTable){
+    public R save(@RequestBody ApprovalEntity taskManagementApprovalTable) {
         approvalService.save(taskManagementApprovalTable);
 
         return R.ok();
     }
 
     /**
-     * 修改
+     * @description: 审批
+     * @author: hong
+     * @date: 2024/8/30 16:39
+     * @version: 1.0
      */
     @RequestMapping("/update")
     @RequiresPermissions("taskmanagement:approval:update")
-    public R update(@RequestBody ApprovalEntity taskManagementApprovalTable){
+    public R update(@RequestBody ApprovalEntity taskManagementApprovalTable) {
 
         //检查任务是否存在
 
-        if (taskService.getByTaskId(taskManagementApprovalTable.getTaskId()) == null){
+        if (taskService.getByTaskId(taskManagementApprovalTable.getTaskId()) == null) {
             return R.error("任务不存在");
         }
         TaskEntity task = taskService.getByTaskId(taskManagementApprovalTable.getTaskId());
-        if (taskManagementApprovalTable.getApprovalStatus() == ApprovalStatus.APPROVED){
+        if (taskManagementApprovalTable.getApprovalStatus() == ApprovalStatus.APPROVED) {
+            // 如果审批通过，则将任务状态改为已完成，并且记录相关信息
             task.setTaskCurrentState(TaskStatus.COMPLETED);
-        }else {
+            task.setTaskIsCompleted(1L);
+            // 项目实际完成时间
+            Date now = DateUtils.getNow();
+            task.setTaskActualCompletionDate(now);
+            // 项目实际完成天数
+            long completionDays = (DateUtils.getZeroTime().getTime() - task.getTaskStartDate().getTime()) / (1000 * 60 * 60 * 24);
+            task.setTaskActualDays(completionDays);
+
+            // 任务是否超期,设置超期时间
+            if (DateUtils.getZeroTime().getTime() - task.getTaskScheduleCompletionDate().getTime() > 0) {
+                task.setTaskIsOverdue(1L);
+                task.setTaskLagDays((DateUtils.getZeroTime().getTime() - task.getTaskScheduleCompletionDate().getTime()) / (1000 * 60 * 60 * 24));
+            } else {
+                task.setTaskIsOverdue(0L);
+                task.setTaskLagDays(0L);
+            }
+
+            // 任务是否按时完工
+            if (DateUtils.getZeroTime().getTime() == task.getTaskScheduleCompletionDate().getTime() ) {
+                task.setTaskIsOnTime(0L);
+            } else {
+                task.setTaskIsOnTime(1L);
+            }
+
+            // 任务是否提前完工
+            if (DateUtils.getZeroTime().getTime() - task.getTaskScheduleCompletionDate().getTime() < 0) {
+                task.setTaskEarlyCompletionDays((task.getTaskScheduleCompletionDate().getTime() - DateUtils.getZeroTime().getTime()) / (1000 * 60 * 60 * 24));
+            } else {
+                task.setTaskEarlyCompletionDays(0L);
+            }
+
+        } else {
             task.setTaskCurrentState(TaskStatus.IN_PROGRESS);
         }
         taskService.updateById(task);
@@ -165,7 +221,7 @@ public class ApprovalController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("taskmanagement:approval:delete")
-    public R delete(@RequestBody Long[] approvalIds){
+    public R delete(@RequestBody Long[] approvalIds) {
         approvalService.removeByIds(Arrays.asList(approvalIds));
 
         return R.ok();

@@ -177,7 +177,7 @@
         <el-select v-model="dataForm.verifier" filterable placeholder="请选择验证人">
           <el-option-group v-for="group in options" :key="group.label" :label="group.label">
             <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                       :value="item.value">
+                       :value="item.label">
             </el-option>
           </el-option-group>
         </el-select>
@@ -194,21 +194,21 @@
 <!--    <el-form-item label="公式" prop="formula">-->
 <!--      <el-input v-model="dataForm.formula" placeholder="公式"></el-input>-->
 <!--    </el-form-item>-->
-      <el-form-item label="整改图片/交付物" prop="image">
-        <el-upload
-          action="#"
-          list-type="picture-card"
-          :on-preview="handlePictureCardPreview"
-          :on-remove="handleRemove"
-          :on-change="handleFileChange"
-          :file-list="imageList"
-          :auto-upload="false">
-          <i class="el-icon-plus"></i>
-        </el-upload>
-        <el-dialog :visible.sync="dialogVisible">
-          <img width="100%" :src="dialogImageUrl" alt="">
-        </el-dialog>
-      </el-form-item>
+<!--      <el-form-item label="整改图片/交付物" prop="image">-->
+<!--        <el-upload-->
+<!--          action="#"-->
+<!--          list-type="picture-card"-->
+<!--          :on-preview="handlePictureCardPreview"-->
+<!--          :on-remove="handleRemove"-->
+<!--          :on-change="handleFileChange"-->
+<!--          :file-list="imageList"-->
+<!--          :auto-upload="false">-->
+<!--          <i class="el-icon-plus"></i>-->
+<!--        </el-upload>-->
+<!--        <el-dialog :visible.sync="dialogVisible">-->
+<!--          <img width="100%" :src="dialogImageUrl" alt="">-->
+<!--        </el-dialog>-->
+<!--      </el-form-item>-->
     </el-form>
     <span slot="footer" class="dialog-footer">
         <el-button @click="cancel()">取消</el-button>
@@ -617,10 +617,10 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             // 检查是否上传了图片
-            if (!this.imageurl) {
-              this.$message.error('请上传图片')
-              return
-            }
+            // if (!this.imageurl) {
+            //   this.$message.error('请上传图片')
+            //   return
+            // }
             // 创建 vehicleTypeIds 数组
             this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
             this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
@@ -636,39 +636,39 @@
                 method: 'post',
                 data: this.$http.adornData({
                   'issueId': this.dataForm.issueId || undefined,
-                  'serialNumber': this.dataForm.serialNumber,
-                  'issueNumber': this.dataForm.issueNumber,
-                  'inspectionDepartment': this.dataForm.inspectionDepartment,
-                  'inspectionDate': this.dataForm.inspectionDate,
-                  'issueCategoryId': issueCategoryIdString, // 使用转换后的字符串
-                  'vehicleTypeId': this.dataForm.vehicleTypeIds.join(','),
-                  'vehicleNumberId': this.dataForm.vehicleNumbers.join(','),
-                  'issueDescription': this.dataForm.issueDescription,
-                  // 'issuePhoto': this.dataForm.issuePhoto,
-                  'rectificationRequirement': this.dataForm.rectificationRequirement,
-                  'requiredCompletionTime': this.dataForm.requiredCompletionTime,
-                  'responsibleDepartment': this.dataForm.responsibleDepartment,
-                  'rectificationStatus': this.dataForm.rectificationStatus,
-                  'actualCompletionTime': this.dataForm.actualCompletionTime,
-                  'rectificationPhotoDeliverable': this.dataForm.issuePhoto,
-                  'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
-                  'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
-                  'remark': this.dataForm.remark,
-                  'creator': this.dataForm.creator,
-                  'creationTime': this.dataForm.creationTime,
-                  'lastModifier': this.dataForm.lastModifier,
-                  'lastModificationTime': this.dataForm.lastModificationTime,
-                  'associatedRectificationRecords': this.dataForm.associatedRectificationRecords,
+                  // 'serialNumber': this.dataForm.serialNumber,
+                  // 'issueNumber': this.dataForm.issueNumber,
+                  // 'inspectionDepartment': this.dataForm.inspectionDepartment,
+                  // 'inspectionDate': this.dataForm.inspectionDate,
+                  // 'issueCategoryId': issueCategoryIdString, // 使用转换后的字符串
+                  // 'vehicleTypeId': this.dataForm.vehicleTypeIds.join(','),
+                  // 'vehicleNumberId': this.dataForm.vehicleNumbers.join(','),
+                  // 'issueDescription': this.dataForm.issueDescription,
+                  // // 'issuePhoto': this.dataForm.issuePhoto,
+                  // 'rectificationRequirement': this.dataForm.rectificationRequirement,
+                  // 'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+                  // 'responsibleDepartment': this.dataForm.responsibleDepartment,
+                  // 'rectificationStatus': this.dataForm.rectificationStatus,
+                  // 'actualCompletionTime': this.dataForm.actualCompletionTime,
+                  // 'rectificationPhotoDeliverable': this.dataForm.issuePhoto,
+                  // 'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+                  // 'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
+                  // 'remark': this.dataForm.remark,
+                  // 'creator': this.dataForm.creator,
+                  // 'creationTime': this.dataForm.creationTime,
+                  // 'lastModifier': this.dataForm.lastModifier,
+                  // 'lastModificationTime': this.dataForm.lastModificationTime,
+                  // 'associatedRectificationRecords': this.dataForm.associatedRectificationRecords,
                   'associatedIssueAddition': this.dataForm.associatedIssueIds.join(','), // 将数组转换为逗号分隔的字符串
-                  'creationDuration': this.dataForm.creationDuration,
-                  'causeAnalysis': this.dataForm.causeAnalysis,
+                  // 'creationDuration': this.dataForm.creationDuration,
+                  // 'causeAnalysis': this.dataForm.causeAnalysis,
                   'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
                   'verificationConclusion': this.dataForm.verificationConclusion,
                   'verifier': this.dataForm.verifier,
-                  'reviewers': this.dataForm.reviewers,
-                  'level': this.dataForm.level,
+                  // 'reviewers': this.dataForm.reviewers,
+                  // 'level': this.dataForm.level,
                   'state': '已完成',
-                  'formula': this.dataForm.formula
+                  // 'formula': this.dataForm.formula
                 })
               }).then(({data}) => {
                 if (data && data.code === 0) {

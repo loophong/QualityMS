@@ -5,34 +5,56 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="序号" prop="serialNumber">
-      <el-input v-model="dataForm.serialNumber" placeholder="序号"></el-input>
-    </el-form-item>
-    <el-form-item label="问题编号(所属问题)" prop="issueNumber">
-      <el-input v-model="dataForm.issueNumber" placeholder="问题编号(所属问题)"></el-input>
-    </el-form-item>
+<!--    <el-form-item label="序号" prop="serialNumber">-->
+<!--      <el-input v-model="dataForm.serialNumber" placeholder="序号"></el-input>-->
+<!--    </el-form-item>-->
+<!--    <el-form-item label="问题编号(所属问题)" prop="issueNumber">-->
+<!--      <el-input v-model="dataForm.issueNumber" placeholder="问题编号(所属问题)"></el-input>-->
+<!--    </el-form-item>-->
     <el-form-item label="审核人" prop="reviewers">
-      <el-input v-model="dataForm.reviewers" placeholder="审核人"></el-input>
+<!--      <el-input v-model="dataForm.reviewers" placeholder="审核人"></el-input>-->
+      <el-select v-model="dataForm.reviewers" filterable placeholder="请选择审核人">
+        <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+          <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                     :value="item.label">
+          </el-option>
+        </el-option-group>
+      </el-select>
     </el-form-item>
     <el-form-item label="接收人" prop="recipients">
-      <el-input v-model="dataForm.recipients" placeholder="接收人"></el-input>
+<!--      <el-input v-model="dataForm.recipients" placeholder="接收人"></el-input>-->
+      <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">
+        <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+          <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                     :value="item.label">
+          </el-option>
+        </el-option-group>
+      </el-select>
     </el-form-item>
     <el-form-item label="任务内容" prop="maskcontent">
       <el-input v-model="dataForm.maskcontent" placeholder="任务内容"></el-input>
     </el-form-item>
-    <el-form-item label="任务发起人" prop="creator">
-      <el-input v-model="dataForm.creator" placeholder="任务发起人"></el-input>
-    </el-form-item>
-    <el-form-item label="发起时间" prop="creationTime">
-      <el-input v-model="dataForm.creationTime" placeholder="发起时间"></el-input>
-    </el-form-item>
+<!--    <el-form-item label="任务发起人" prop="creator">-->
+<!--      <el-input v-model="dataForm.creator" placeholder="任务发起人"></el-input>-->
+<!--    </el-form-item>-->
+<!--    <el-form-item label="发起时间" prop="creationTime">-->
+<!--      <el-input v-model="dataForm.creationTime" placeholder="发起时间"></el-input>-->
+<!--    </el-form-item>-->
+<!--      <el-form-item label="要求完成时间" prop="requiredCompletionTime">-->
+<!--        <el-input v-model="dataForm.requiredCompletionTime" placeholder="要求完成时间"></el-input>-->
+<!--      </el-form-item>-->
       <el-form-item label="要求完成时间" prop="requiredCompletionTime">
-        <el-input v-model="dataForm.requiredCompletionTime" placeholder="要求完成时间"></el-input>
+        <el-date-picker
+          v-model="dataForm.requiredCompletionTime"
+          type="date"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          placeholder="请选择日期">
+        </el-date-picker>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFSubmit()">确定</el-button>
     </span>
   </el-dialog>
     <el-dialog
@@ -142,7 +164,8 @@
           // creationTime: [
           //   { required: true, message: '发起时间不能为空', trigger: 'blur' }
           // ]
-        }
+        },
+        options: ''
       }
     },
     computed: {
@@ -184,21 +207,22 @@
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.issuemaskId) {
+            console.log('huoqu ' ,this.dataForm.issuemaskId)
             this.$http({
               url: this.$http.adornUrl(`/generator/issuemasktable/info/${this.dataForm.issuemaskId}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.serialNumber = data.issueMaskTable.serialNumber
-                this.dataForm.issueNumber = data.issueMaskTable.issueNumber
+                // this.dataForm.serialNumber = data.issueMaskTable.serialNumber
+                // this.dataForm.issueNumber = data.issueMaskTable.issueNumber
                 this.dataForm.reviewers = data.issueMaskTable.reviewers
                 this.dataForm.recipients = data.issueMaskTable.recipients
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
-                this.dataForm.creator = data.issueMaskTable.creator
-                this.dataForm.creationTime = data.issueMaskTable.creationTime
+                // this.dataForm.creator = data.issueMaskTable.creator
+                // this.dataForm.creationTime = data.issueMaskTable.creationTime
                 this.dataForm.requiredCompletionTime = data.issueMaskTable.requiredCompletionTime
-                this.dataForm.state = '已派发'
+                // this.dataForm.state = '已派发'
               }
             })
           }
@@ -258,29 +282,39 @@
           }
         })
       },
-      // resetForm (formName) {
-      //   this.$refs[formName].resetFields()
-      // },
-      // initDispatch (id) {
-      //   console.log('初始化派发弹窗，ID:', id)
-      //   this.dataForm.issuemaskId = id || 0
-      //   this.visible1 = true
-      //   this.$nextTick(() => {
-      //     this.$refs['dataForm'].resetForm()
-      //   })
-      // },
-      // dispatchFormSubmit () {
-      //   this.$refs['dataForm'].validate((valid) => {
-      //     if (valid) {
-      //       console.log('派发表单提交', this.dispatchForm)
-      //       this.visible1 = false // 关闭派发弹窗
-      //     } else {
-      //       console.log('派发表单验证失败')
-      //       return false
-      //     }
-      //   })
-      // },
 
+      dataFSubmit () {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuemasktable/${!this.dataForm.issuemaskId ? 'save' : 'update'}`),
+              method: 'post',
+              data: this.$http.adornData({
+                'issuemaskId': this.dataForm.issuemaskId || undefined,
+                'reviewers': this.dataForm.reviewers,
+                'recipients': this.dataForm.recipients,
+                'maskcontent': this.dataForm.maskcontent,
+                'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.visible2 = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
+        })
+      },
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {

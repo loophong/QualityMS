@@ -144,8 +144,10 @@ public class IssueTableController {
     @RequestMapping("/update")
     @RequiresPermissions("generator:issuetable:update")
     public R update(@RequestBody IssueTableEntity issueTable){
-		issueTableService.updateById(issueTable);
 
+        System.out.println("开始修改整改数据"+issueTable);
+		issueTableService.updateById(issueTable);
+        System.out.println("结束修改整改数据");
         return R.ok();
     }
 

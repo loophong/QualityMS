@@ -71,7 +71,7 @@
         label="发起时间">
       </el-table-column>
       <el-table-column
-        prop="requiredcompletiontime"
+        prop="requiredCompletionTime"
         header-align="center"
         align="center"
         label="要求完成时间">
@@ -214,6 +214,7 @@ export default {
     // 新增 / 修改
     addOrUpdateHandle (id) {
       this.addOrUpdateVisible = true
+      console.log('id获取' ,id)
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
       })

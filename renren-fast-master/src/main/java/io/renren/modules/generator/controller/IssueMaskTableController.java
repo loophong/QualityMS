@@ -129,6 +129,7 @@ public class IssueMaskTableController {
     @RequestMapping("/update")
     @RequiresPermissions("generator:issuemasktable:update")
     public R update(@RequestBody IssueMaskTableEntity issueMaskTable){
+        System.out.println("开始修改整改数据"+issueMaskTable);
 		issueMaskTableService.updateById(issueMaskTable);
 
         return R.ok();

@@ -77,7 +77,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         List<IssueMaskTableEntity> list1 = this.list();
         boolean allCompleted = list1.stream()
                 .filter(issue -> issue.getIssueNumber().equals(issueNumber))
-                .allMatch(issue -> "已完成".equals(issue.getState()));
+                .allMatch(issue -> "已完成".equals(issue.getState()) || "已派发".equals(issue.getState()));
 
         if (allCompleted) {
             return "success";
@@ -89,15 +89,16 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     @Override
     public String dispatch(String issueNumber , String serialNumber) {
         List<IssueMaskTableEntity> list1 = this.list();
-        // 遍历所有任务，将其中issueNumber为传入的issueNumber的serialNumber修改为null
+        // 遍历所有任务，将其中issueNumber为传入的issueNumber的serialNumber修改为null（原任务的上级任务改为1，原问题状态改为已派发）
         for (IssueMaskTableEntity task : list1) {
             if (task.getSerialNumber().equals(issueNumber)) {
                 task.setSuperiorMask(String.valueOf(1));
+                task.setState("已派发");
                 System.out.println("派发任务前置数节点修改成功++++++++++++++++++");
                 this.updateById(task); // 更新数据库中的记录
             }
         }
-        // 遍历所有任务，将所有serialNumber为传入的issueNumber的任务的serialNumber改为传入的newSerialNumber
+        // 遍历所有任务，将所有serialNumber为传入的issueNumber的任务的serialNumber改为传入的newSerialNumber（将现任务的上级任务改为原任务的上级任务）
         for (IssueMaskTableEntity task : list1) {
             if (task.getSuperiorMask() != null && task.getSuperiorMask().equals(issueNumber)) {
                 task.setSuperiorMask(serialNumber);

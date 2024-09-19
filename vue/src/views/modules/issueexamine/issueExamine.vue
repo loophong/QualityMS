@@ -72,7 +72,7 @@
         label="发起时间">
       </el-table-column>
       <el-table-column
-        prop="requiredcompletiontime"
+        prop="requiredCompletionTime"
         header-align="center"
         align="center"
         label="要求完成时间">

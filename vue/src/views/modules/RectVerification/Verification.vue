@@ -178,7 +178,7 @@
       <!--        label="最后修改时间">-->
       <!--      </el-table-column>-->
             <el-table-column
-              prop="associatedRectificationRecords"
+              prop="associatedIssueAddition"
               header-align="center"
               align="center"
               label="关联问题整改记录">

@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +33,8 @@ public class IssueTableController {
     @Autowired
     private IssueTableService issueTableService;
 
+    private final String uploadDir = "C:/uploads"; // 请确保这个路径已存在或可写
+
     /**
      * 上传图片
      */
@@ -42,15 +47,29 @@ public class IssueTableController {
             return R.error("上传的文件为空");
         }
         try {
-            // 调用服务层方法来处理文件上传逻辑
-            String filePath = issueTableService.saveUploadedFile(file);
-            System.out.println("+++" + filePath + "+++图片路径");
+//            // 调用服务层方法来处理文件上传逻辑
+//            String filePath = issueTableService.saveUploadedFile(file);
+//            System.out.println("+++" + filePath + "+++图片路径");
+//
+//            // 更新 issuePhoto 字段（如果需要）
+//            // issueTableService.updateIssuePhoto(filePath);
+//
+//            System.out.println("文件上传成功-------------");
+            // 创建存储目录
+            Path path = Paths.get(uploadDir);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
 
-            // 更新 issuePhoto 字段（如果需要）
-            // issueTableService.updateIssuePhoto(filePath);
+            // 文件保存路径
+            Path filePath = path.resolve(file.getOriginalFilename());
 
-            System.out.println("文件上传成功-------------");
-            return R.ok().put("data", filePath);
+            // 保存文件
+            file.transferTo(filePath.toFile());
+
+            // 返回文件的网络URL
+            String fileUrl = "http://8.153.37.12:8080/" + uploadDir + "/" + file.getOriginalFilename();
+            return R.ok().put("data", fileUrl);
         } catch (Exception e) {
             System.out.println("文件上传失败-------------");
             e.printStackTrace(); // 打印完整的异常堆栈信息

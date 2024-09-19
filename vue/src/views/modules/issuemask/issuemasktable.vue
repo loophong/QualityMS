@@ -203,7 +203,7 @@
       completeHandle (id ,row) {
         if(row.state === '审核中')
           this.$message.error('任务审核中！')
-        if(row.state === '已派发')
+        else if(row.state === '已派发')
           this.$message.error('任务已派发！')
         else {
           this.assertOrUpdateVisible = true

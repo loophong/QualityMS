@@ -65,9 +65,9 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
     @Override
     public String saveUploadedFile(MultipartFile file) throws IOException {
-        if (uploadPath == null) {
-            throw new IllegalStateException("Upload path is not configured.");
-        }
+//        if (uploadPath == null) {
+//            throw new IllegalStateException("Upload path is not configured.");
+//        }
 
         // 创建目标文件路径
         String originalFilename = file.getOriginalFilename();

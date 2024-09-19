@@ -68,7 +68,8 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     public List<IssueMaskTableEntity> listAll(String issueNumber) {
         List<IssueMaskTableEntity> list1 = this.list();
         return list1.stream()
-                .filter(issue -> issue.getIssueNumber().equals(issueNumber))
+//                .filter(issue -> issue.getIssueNumber().equals(issueNumber))
+                .filter(issue -> issue.getIssueNumber().equals(issueNumber) && !"已派发".equals(issue.getState()))
                 .collect(Collectors.toList());
     }
 

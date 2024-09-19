@@ -26,8 +26,8 @@
     <el-form-item label="发起时间" prop="creationTime">
       <el-input v-model="dataForm.creationTime" placeholder="发起时间"></el-input>
     </el-form-item>
-      <el-form-item label="要求完成时间" prop="creationTime">
-        <el-input v-model="dataForm.requiredcompletiontime" placeholder="要求完成时间"></el-input>
+      <el-form-item label="要求完成时间" prop="requiredCompletionTime">
+        <el-input v-model="dataForm.requiredCompletionTime" placeholder="要求完成时间"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -48,32 +48,54 @@
     </el-dialog>
 
     <!-- 派发弹窗 -->
+<!--    <el-dialog-->
+<!--      title="派发"-->
+<!--      :close-on-click-modal="false"-->
+<!--      :visible.sync="visible1">-->
+<!--      <el-form :model="dataForm" :rules="dataRule" ref="dispatchForm" @keyup.enter.native="datanewSubmit()" label-width="80px">-->
+<!--        <el-form-item label="接收人" prop="recipients">-->
+<!--          <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">-->
+<!--            <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
+<!--              <el-option v-for="item in group.options" :key="item.value" :label="item.label"-->
+<!--                         :value="item.label">-->
+<!--              </el-option>-->
+<!--            </el-option-group>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
+<!--        <el-form-item label="派发时间" prop="dispatchTime">-->
+<!--          <el-date-picker v-model="dataForm.creationTime" type="datetime" placeholder="选择派发时间"></el-date-picker>-->
+<!--        </el-form-item>-->
+<!--      </el-form>-->
+<!--      <span slot="footer" class="dialog-footer">-->
+<!--        <el-button @click="visible1 = false">取消</el-button>-->
+<!--        <el-button type="primary" @click="datanewSubmit()">确定</el-button>-->
+<!--      </span>-->
+<!--    </el-dialog>-->
     <el-dialog
-      title="派发"
+      :title="!dataForm.issuemaskId ? '新增' : '修改'"
       :close-on-click-modal="false"
       :visible.sync="visible1">
-      <el-form :model="dataForm" :rules="dataRule" ref="dispatchForm" @keyup.enter.native="dispatchFormSubmit()" label-width="80px">
-<!--        <el-form-item label="接收人" prop="recipients">-->
-<!--          <el-input v-model="dataForm.recipients" placeholder="接收人"></el-input>-->
-<!--        </el-form-item>-->
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
         <el-form-item label="接收人" prop="recipients">
-          <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">
-            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
-              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                         :value="item.label">
-              </el-option>
-            </el-option-group>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="派发时间" prop="dispatchTime">
-          <el-date-picker v-model="dataForm.creationTime" type="datetime" placeholder="选择派发时间"></el-date-picker>
-        </el-form-item>
+                    <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">
+                      <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+                        <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                                   :value="item.label">
+                        </el-option>
+                      </el-option-group>
+                    </el-select>
+                  </el-form-item>
+<!--                  <el-form-item label="派发时间" prop="creationTime">-->
+<!--                    <el-date-picker v-model="dataForm.creationTime" type="datetime" placeholder="选择派发时间"></el-date-picker>-->
+<!--                  </el-form-item>-->
+
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="visible1 = false">取消</el-button>
-        <el-button type="primary" @click="dispatchFormSubmit()">确定</el-button>
-      </span>
+      <el-button @click="visible1 = false">取消</el-button>
+      <el-button type="primary" @click="datanewSubmit()">确定</el-button>
+    </span>
     </el-dialog>
+
   </div>
 </template>
 
@@ -92,9 +114,10 @@
           recipients: '',
           maskcontent: '',
           creator: '',
-          creationTime: '',
+          creationTime: '', // 初始化为当前时间
           state: '',
-          requiredcompletiontime: '',
+          requiredCompletionTime: '',
+          superiorMask: '',
           options: ''
         },
         dataRule: {
@@ -122,6 +145,18 @@
         }
       }
     },
+    computed: {
+      formattedCreationTime() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      }
+    },
     created () {
       this.$http({
         url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
@@ -135,6 +170,14 @@
       })
     },
     methods: {
+      generateSerialNumber() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        return `${year}${month}${day}${random}`;
+      },
       init (id) {
         this.dataForm.issuemaskId = id || 0
         this.visible = true
@@ -154,8 +197,8 @@
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
                 this.dataForm.creator = data.issueMaskTable.creator
                 this.dataForm.creationTime = data.issueMaskTable.creationTime
-                this.dataForm.requiredcompletiontime = data.issueMaskTable.requiredcompletiontime
-                this.dataForm.state = '审核中'
+                this.dataForm.requiredCompletionTime = data.issueMaskTable.requiredCompletionTime
+                this.dataForm.state = '已派发'
               }
             })
           }
@@ -163,6 +206,7 @@
       },
       init1 (id) {
         console.log('初始化弹窗，ID:', id)
+        console.log('当前时间为: ' ,this.formattedCreationTime )
         this.dataForm.issuemaskId = id || 0
         this.visible1 = true
         this.$nextTick(() => {
@@ -180,7 +224,9 @@
                 this.dataForm.recipients = data.issueMaskTable.recipients
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
                 this.dataForm.creator = data.issueMaskTable.creator
-                this.dataForm.creationTime = data.issueMaskTable.creationTime
+                this.dataForm.creationTime = this.formattedCreationTime // 初始化为当前时间
+                this.dataForm.requiredCompletionTime = data.issueMaskTable.requiredCompletionTime
+                this.dataForm.superiorMask = data.issueMaskTable.superiorMask
               }
             })
           }
@@ -205,35 +251,35 @@
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
                 this.dataForm.creator = data.issueMaskTable.creator
                 this.dataForm.creationTime = data.issueMaskTable.creationTime
-                this.dataForm.requiredcompletiontime = data.issueMaskTable.requiredcompletiontime
+                this.dataForm.requiredCompletionTime = data.issueMaskTable.requiredCompletionTime
                 this.dataForm.state = '已完成'
               }
             })
           }
         })
       },
-      resetForm (formName) {
-        this.$refs[formName].resetFields()
-      },
-      initDispatch (id) {
-        console.log('初始化派发弹窗，ID:', id)
-        this.dataForm.issuemaskId = id || 0
-        this.visible1 = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetForm()
-        })
-      },
-      dispatchFormSubmit () {
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            console.log('派发表单提交', this.dispatchForm)
-            this.visible1 = false // 关闭派发弹窗
-          } else {
-            console.log('派发表单验证失败')
-            return false
-          }
-        })
-      },
+      // resetForm (formName) {
+      //   this.$refs[formName].resetFields()
+      // },
+      // initDispatch (id) {
+      //   console.log('初始化派发弹窗，ID:', id)
+      //   this.dataForm.issuemaskId = id || 0
+      //   this.visible1 = true
+      //   this.$nextTick(() => {
+      //     this.$refs['dataForm'].resetForm()
+      //   })
+      // },
+      // dispatchFormSubmit () {
+      //   this.$refs['dataForm'].validate((valid) => {
+      //     if (valid) {
+      //       console.log('派发表单提交', this.dispatchForm)
+      //       this.visible1 = false // 关闭派发弹窗
+      //     } else {
+      //       console.log('派发表单验证失败')
+      //       return false
+      //     }
+      //   })
+      // },
 
       // 表单提交
       dataFormSubmit () {
@@ -262,6 +308,56 @@
                   onClose: () => {
                     this.visible = false
                     this.visible2 = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
+        })
+      },
+      // 表单提交
+      datanewSubmit () {
+        const serialNumber = this.generateSerialNumber();
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuemasktable/save`),
+              method: 'post',
+              data: this.$http.adornData({
+                'issuemaskId': undefined,
+                'serialNumber': serialNumber,
+                'issueNumber': this.dataForm.issueNumber,
+                'reviewers': this.dataForm.reviewers,
+                'recipients': this.dataForm.recipients,
+                'maskcontent': this.dataForm.maskcontent,
+                'creator': this.dataForm.creator,
+                'creationTime': this.dataForm.creationTime,
+                'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+                'superiorMask': this.dataForm.superiorMask,
+                'state': '审核中'
+              })
+            }).then(({data}) => {
+              this.$http({
+                url: this.$http.adornUrl('/generator/issuemasktable/dispach'),
+                method: 'post',
+                params: this.$http.adornParams({
+                  issueNumber: this.dataForm.serialNumber,
+                  serialNumber: serialNumber
+                })
+              }).catch(() => {
+                this.$message.error('修改失败')
+              })
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible1 = false
+                    // this.visible2 = false
                     this.$emit('refreshDataList')
                   }
                 })

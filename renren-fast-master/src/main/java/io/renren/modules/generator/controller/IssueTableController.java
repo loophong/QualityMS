@@ -3,6 +3,7 @@ package io.renren.modules.generator.controller;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.generator.entity.IssueTableEntity;
+import io.renren.modules.generator.entity.IssueUtils;
 import io.renren.modules.generator.service.IssueTableService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 
 
 /**
@@ -56,6 +57,20 @@ public class IssueTableController {
             return R.error("文件上传失败: " + e.getMessage());
         }
     }
+
+    /**
+     * 关闭相关任务
+     */
+    // 关闭相关任务
+    @RequestMapping("/closeRelatedTasks/{issueId}")
+    @RequiresPermissions("generator:issuetable:delete")
+    public R closeRelatedTasks(@PathVariable("issueId") Long issueId) {
+        return issueTableService.closeRelatedTasks(issueId); // 直接调用服务层方法
+    }
+
+
+
+
 
     /**
      * 获取所有问题列表

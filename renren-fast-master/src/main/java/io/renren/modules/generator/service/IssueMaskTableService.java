@@ -25,5 +25,7 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
     List<IssueMaskTableEntity> listAll(String issueNumber);
 
     String listRecords(String issueNumber);
+
+    String dispatch(String issueNumber ,String serialNumber);
 }
 

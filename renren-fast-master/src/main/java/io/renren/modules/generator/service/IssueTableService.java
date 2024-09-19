@@ -2,6 +2,7 @@ package io.renren.modules.generator.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,5 +26,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 //    void updateIssuePhoto(String filePath);
 
     String getuserinfo();
+
+    R closeRelatedTasks(Long issueId);
 }
 

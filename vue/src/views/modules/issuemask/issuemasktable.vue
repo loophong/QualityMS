@@ -71,7 +71,7 @@
         label="发起时间">
       </el-table-column>
       <el-table-column
-        prop="requiredcompletiontime"
+        prop="requiredCompletionTime"
         header-align="center"
         align="center"
         label="要求完成时间">
@@ -91,8 +91,8 @@
         <template slot-scope="scope">
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>-->
-          <el-button v-if="showButtons" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>
-          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">派发</el-button>
+          <el-button v-if="showButtons" type="text" size="small" @click="completeHandle(scope.row.issuemaskId,scope.row)">完成</el-button>
+          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId,scope.row)">派发</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -142,13 +142,19 @@
     },
     methods: {
       // 任务派发
-      dispatchHandle (id) {
+      dispatchHandle (id ,row) {
         // 派发操作的逻辑
         console.log('派发操作', id)
         this.assertOrUpdateVisible = true
-        this.$nextTick(() => {
-          this.$refs.assetOrUpdate.init1(id)
-        })
+        if(row.state === '审核中')
+          this.$message.error('任务审核中！')
+          else if (row.state === '已派发')
+          this.$message.error('任务已派发！')
+        else {
+          this.$nextTick(() => {
+            this.$refs.assetOrUpdate.init1(id)
+          })
+        }
       },
       // 获取数据列表，接收人可以看见的数据
       recigetDataList () {
@@ -194,11 +200,15 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      completeHandle (id) {
-        this.assertOrUpdateVisible = true
-        this.$nextTick(() => {
-          this.$refs.assetOrUpdate.completeHandle(id)
-        });
+      completeHandle (id ,row) {
+        if(row.state === '审核中')
+          this.$message.error('任务审核中！')
+        else {
+          this.assertOrUpdateVisible = true
+          this.$nextTick(() => {
+            this.$refs.assetOrUpdate.completeHandle(id)
+          });
+        }
       },
       // 删除
       deleteHandle (id) {

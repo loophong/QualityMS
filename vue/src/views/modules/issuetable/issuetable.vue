@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+<!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+<!--        <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
     </el-form>
     <el-table
@@ -15,8 +15,9 @@
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
+      :row-class-name="getRowClassName"
       style="width: 100%;">
-      <el-table-column
+    <el-table-column
         type="selection"
         header-align="center"
         align="center"
@@ -243,7 +244,7 @@
         label="操作">
         <template slot-scope="scope">
 <!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.issueId)">修改</el-button>-->
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
+          <el-button type="text" size="small" @click="closeRelatedTasks(scope.row.issueId)">问题关闭</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -263,6 +264,7 @@
 
 <script>
   import AddOrUpdate from '../issuefind/issuetable-add-or-update.vue'
+
   // import {isAuth} from "../../../utils";
   export default {
     data () {
@@ -288,6 +290,46 @@
       this.fetchData()
     },
     methods: {
+      getRowClassName({ row, rowIndex }) {
+        console.log(`Row index: ${rowIndex}, Class: ${rowIndex % 2 === 0 ? 'row-even' : 'row-odd'}`);
+        return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
+      },
+      // 关闭相关任务
+      closeRelatedTasks(id) {
+        // 提示用户确认
+        this.$confirm(`是否删除此问题并删除关联问题？`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 用户确认后执行删除请求
+          this.$http({
+            url: this.$http.adornUrl(`/generator/issuetable/closeRelatedTasks/${id}`), // 修改为正确的URL
+            method: 'post'
+            // 此处不需要 data，因为我们在方法定义中直接使用了@PathVariable来接收ID
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              // 删除成功的提示
+              this.$message({
+                message: '任务已成功关闭',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  // 删除成功后刷新数据列表
+                  this.getDataList();
+                }
+              });
+            } else {
+              // 删除失败的提示
+              this.$message.error(data.msg);
+            }
+          });
+        }).catch(() => {
+          // 用户点击了取消，不执行任何操作
+          this.$message.info('操作已取消');
+        });
+      },
+
       fetchData () {
         // Assuming you have an API endpoint to fetch the data
         fetch('/api/data')
@@ -427,3 +469,15 @@
     }
   }
 </script>
+
+<style scoped>
+.row-even {
+  background-color: #ffffff !important; /* 白色 */
+}
+
+.row-odd {
+  background-color: #0BB2D4 !important; /* 灰色 */
+}
+</style>
+
+

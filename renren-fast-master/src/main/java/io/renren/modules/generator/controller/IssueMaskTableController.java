@@ -89,6 +89,18 @@ public class IssueMaskTableController {
     }
 
     /**
+     * 分发问题
+     */
+    @RequestMapping("/dispach")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R dispatch(@RequestParam String issueNumber ,@RequestParam String serialNumber){
+        System.out.println("获取数据成功："+issueNumber+"以及"+serialNumber);
+        String fin = issueMaskTableService.dispatch(issueNumber,serialNumber);
+//        System.out.println("返回的数据为："+fin);
+        return R.ok(fin);
+    }
+
+    /**
      * 信息
      */
     @RequestMapping("/info/{issuemaskId}")

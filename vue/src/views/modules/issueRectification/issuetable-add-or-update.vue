@@ -11,9 +11,14 @@
     <el-form-item label="整改情况" prop="rectificationStatus">
       <el-input v-model="dataForm.rectificationStatus" placeholder="整改情况"></el-input>
     </el-form-item>
-    <el-form-item label="实际完成时间" prop="actualCompletionTime">
-      <el-input v-model="dataForm.actualCompletionTime" placeholder="实际完成时间"></el-input>
-    </el-form-item>
+      <el-form-item label="实际完成时间" prop="actualCompletionTime">
+        <el-date-picker
+          v-model="dataForm.actualCompletionTime"
+          type="datetime"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          placeholder="请选择实际完成时间">
+        </el-date-picker>
+      </el-form-item>
       <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
         <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择验证人">
           <el-option-group v-for="group in options" :key="group.label" :label="group.label">
@@ -133,8 +138,7 @@
         dataForm: {
           userinfo: '',
           vehicles: [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }],
-          subtasks: [{ name: '', assignee: '', parentTask: '',serialNumber: this.generateSerialNumber(),key: Date.now() }],
-          vehicleTypeIds: [],
+          subtasks: [{ name: '', assignee: '', parentTask: '', serialNumber: '', key: Date.now() }],          vehicleTypeIds: [],
           vehicleNumbers: [],
           associatedIssueIds: [],
           imageList: [],
@@ -224,6 +228,7 @@
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        console.log('执行随机+++++')
         return `${year}${month}${day}${random}`;
       },
       cancel1 () {
@@ -241,6 +246,7 @@
           serialNumber: serialNumber,
           key: Date.now()
         })
+
       },
       removeSubtask (subtask) {
         let index = this.dataForm.subtasks.indexOf(subtask)
@@ -545,6 +551,8 @@
         this.fetchTasksByIssueNumber(issueNumber)
         this.dataForm.issueId = id || 0
         this.visible1 = true
+        // 为第一个子任务生成序列号
+        this.dataForm.subtasks = [{ name: '', assignee: '', parentTask: '', serialNumber: this.generateSerialNumber(), key: Date.now() }];
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.issueId) {

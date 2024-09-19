@@ -667,7 +667,7 @@
                   'verifier': this.dataForm.verifier,
                   'reviewers': this.dataForm.reviewers,
                   'level': this.dataForm.level,
-                  'state': '审核中',
+                  'state': '已完成',
                   'formula': this.dataForm.formula
                 })
               }).then(({data}) => {

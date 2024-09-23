@@ -667,7 +667,7 @@
                   'associatedIssueAddition': this.dataForm.associatedIssueIds.join(','), // 将数组转换为逗号分隔的字符串
                   'creationDuration': this.dataForm.creationDuration,
                   'causeAnalysis': this.dataForm.causeAnalysis,
-                  'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
+                  'rectificationVerificationStatus':'未完成',
                   'verificationConclusion': this.dataForm.verificationConclusion,
                   'verifier': this.dataForm.verifier,
                   'reviewers': this.dataForm.reviewers,

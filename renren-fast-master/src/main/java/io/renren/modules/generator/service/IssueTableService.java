@@ -28,5 +28,8 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     String getuserinfo();
 
     R closeRelatedTasks(Long issueId);
+
+    R uploadExcelFile(MultipartFile file) throws IOException;
+
 }
 

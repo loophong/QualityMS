@@ -68,6 +68,20 @@ public class IssueTableController {
     }
 
     /**
+     * Excel上传
+     */
+    @PostMapping("/uploadExcel")
+    @RequiresPermissions("generator:issuetable:update")
+    public R uploadExcel(@RequestParam("file") MultipartFile file) {
+        try {
+            System.out.println("接收到的文件名: " + file.getOriginalFilename());
+            return issueTableService.uploadExcelFile(file);
+        } catch (IOException e) {
+            return R.error("文件上传时发生错误: " + e.getMessage());
+        }
+    }
+
+    /**
      * 关闭相关任务
      */
     // 关闭相关任务

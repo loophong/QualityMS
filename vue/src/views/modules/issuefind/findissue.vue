@@ -9,6 +9,17 @@
         <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-upload
+          class="upload-demo"
+          action="上传接口URL"
+        :before-upload="beforeUpload"
+        :on-success="handleUploadSuccess"
+        show-file-list="false">
+        <el-button size="small" type="primary">点击上传 Excel</el-button>
+        </el-upload>
+      </el-form-item>
+
     </el-form>
     <el-table
       v-if="showForm"
@@ -252,6 +263,13 @@
 
 <script>
 import AddOrUpdate from './issuetable-add-or-update.vue'
+
+
+//如果新打开的页面是另外一个项目(前提是另一个项目也是自己的)的话可以在请求拦截request.interceptors.js中获取
+
+//如果新打开的页面是另外一个项目(不是自己的项目)的话我们只负责Cookie.set存，取得话需要根据实际情况考虑
+
+
 // import {isAuth} from "../../../utils";
 export default {
   data () {
@@ -280,6 +298,29 @@ export default {
     this.getDataList()
   },
   methods: {
+    // 在上传前的检查
+    beforeUpload(file) {
+      const isExcel = file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      const isLt2M = file.size / 1024 / 1024 < 2; // 限制文件大小为2MB
+
+      if (!isExcel) {
+        this.$message.error('上传文件只能是 Excel 文件!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传文件大小不能超过 2MB!');
+      }
+      return isExcel && isLt2M; // 返回true表示允许上传
+    },
+
+    // 上传成功的处理
+    handleUploadSuccess(response, file) {
+      if (response && response.code === 0) {
+        this.$message.success('文件上传成功！');
+        this.getDataList(); // 上传成功后可以重新获取数据
+      } else {
+        this.$message.error('文件上传失败：' + response.msg);
+      }
+    },
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true
@@ -333,11 +374,22 @@ export default {
     },
     // 图片预览
     previewImage (imageUrl) {
-      this.imagePreviewUrl = imageUrl
-      this.imagePreviewTitle = '图片预览'
-      this.imagePreviewVisible = true
+      console.log("cur imageUrl====>" + imageUrl);
+      window.open(imageUrl);
+      // this.imagePreviewUrl = imageUrl
+      // this.imagePreviewTitle = '图片预览'
+      // this.imagePreviewVisible = true
       console.log("图片地址：" ,imageUrl)
     },
+    //图片预览2
+
+    // handlePreviewCur(file) {
+    //   console.log(file)
+    //   console.log(file);
+    //   window.open(file);
+    // },
+
+
     // 删除
     deleteHandle (id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {

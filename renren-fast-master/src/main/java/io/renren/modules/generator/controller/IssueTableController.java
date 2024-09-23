@@ -10,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -33,6 +34,9 @@ public class IssueTableController {
     @Autowired
     private IssueTableService issueTableService;
 
+
+    SimpleDateFormat saf = new SimpleDateFormat("/yyyy/MM/dd");
+
     private final String uploadDir = "C:/uploads"; // 请确保这个路径已存在或可写
 
     /**
@@ -41,40 +45,26 @@ public class IssueTableController {
 //    @Value("${file.upload-dir}")
     @PostMapping("/upload")
     @RequiresPermissions("generator:issuetable:update")
-    public R uploadImage(@RequestParam("file") MultipartFile file) {
-        System.out.println("文件上传开始-------------");
-        if (file.isEmpty()) {
-            return R.error("上传的文件为空");
+    @CrossOrigin(origins = "http://localhost:8001") // 只允许这个源
+    public R uploadImage(@RequestParam("file") MultipartFile file , HttpServletRequest request) {
+        String originName = file.getOriginalFilename();
+        String format = saf.format(new Date());
+        String realPath = request.getServletContext().getRealPath("/") + format;
+        File floder = new File(realPath);
+        if (!floder.exists()){
+            floder.mkdirs();
         }
+        String newName = UUID.randomUUID().toString()+".jpg";
         try {
-//            // 调用服务层方法来处理文件上传逻辑
-//            String filePath = issueTableService.saveUploadedFile(file);
-//            System.out.println("+++" + filePath + "+++图片路径");
-//
-//            // 更新 issuePhoto 字段（如果需要）
-//            // issueTableService.updateIssuePhoto(filePath);
-//
-//            System.out.println("文件上传成功-------------");
-            // 创建存储目录
-            Path path = Paths.get(uploadDir);
-            if (!Files.exists(path)) {
-                Files.createDirectories(path);
-            }
-
-            // 文件保存路径
-            Path filePath = path.resolve(file.getOriginalFilename());
-
-            // 保存文件
-            file.transferTo(filePath.toFile());
-
-            // 返回文件的网络URL
-            String fileUrl = "http://8.153.37.12:8080/" + uploadDir + "/" + file.getOriginalFilename();
-            return R.ok().put("data", fileUrl);
-        } catch (Exception e) {
-            System.out.println("文件上传失败-------------");
-            e.printStackTrace(); // 打印完整的异常堆栈信息
-            return R.error("文件上传失败: " + e.getMessage());
+            file.transferTo(new File(floder,newName));
+            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() +"/renren-fast" + format+"/" + newName;
+            System.out.println("获取的url"+url);
+//            R.ok().put("data",url);
+            return R.ok().put("data",url);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+//        return R.ok();
     }
 
     /**

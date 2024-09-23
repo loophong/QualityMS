@@ -363,44 +363,48 @@
         // formData.append('issueId', this.dataForm.issueId)
 
         this.$http({
-          url: this.$http.adornUrl('/generator/issuetable/upload'),
+          url: this.$http.adornUrl('/test/upload'),
           method: 'post',
           data: formData,
           headers: {
             'Content-Type': 'multipart/form-data'
           }
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '文件上传成功',
-              type: 'success'
-            })
-            // 处理上传成功后的逻辑
-            // 例如，更新本地状态或执行其他操作
-            const iamgenewURL = data.data
-            this.dataForm.issuePhoto = iamgenewURL
-          } else {
-            this.$message.error('文件上传失败: ' + (data.message || '未知错误'))
-          }
-        }).catch(error => {
-          console.error('文件上传失败:', error)
-          if (error.response) {
-            // 请求已发出，但服务器响应了状态码
-            // 服务器响应的完整数据
-            console.error('服务器响应数据:', error.response.data)
-            console.error('服务器响应状态码:', error.response.status)
-            console.error('服务器响应头:', error.response.headers)
-          } else if (error.request) {
-            // 请求已发出，但没有收到响应
-            // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
-            // 在 Node.js 中是 http.ClientRequest 的实例
-            console.error('请求未收到响应:', error.request)
-          } else {
-            // 其他错误
-            console.error('设置请求时出错:', error.message)
-          }
-          this.$message.error('文件上传失败: ' + (error.message || '未知错误'))
         })
+        /**
+         * then(({ data }) => {
+         *           if (data && data.code === 0) {
+         *             this.$message({
+         *               message: '文件上传成功',
+         *               type: 'success'
+         *             })
+         *             // 处理上传成功后的逻辑
+         *             // 例如，更新本地状态或执行其他操作
+         *             const iamgenewURL = data.data
+         *             console.log('获得URL成功' ,data)
+         *             this.dataForm.issuePhoto = iamgenewURL
+         *           } else {
+         *             this.$message.error('文件上传失败: ' + (data.message || '未知错误'))
+         *           }
+         *         }).catch(error => {
+         *           console.error('文件上传失败:', error)
+         *           if (error.response) {
+         *             // 请求已发出，但服务器响应了状态码
+         *             // 服务器响应的完整数据
+         *             console.error('服务器响应数据:', error.response.data)
+         *             console.error('服务器响应状态码:', error.response.status)
+         *             console.error('服务器响应头:', error.response.headers)
+         *           } else if (error.request) {
+         *             // 请求已发出，但没有收到响应
+         *             // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+         *             // 在 Node.js 中是 http.ClientRequest 的实例
+         *             console.error('请求未收到响应:', error.request)
+         *           } else {
+         *             // 其他错误
+         *             console.error('设置请求时出错:', error.message)
+         *           }
+         *           this.$message.error('文件上传失败: ' + (error.message || '未知错误'))
+         *         })
+         */
       },
       handleFileChange (file) {
         // this.file = file

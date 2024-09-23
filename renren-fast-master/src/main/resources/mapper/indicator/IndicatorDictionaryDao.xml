@@ -23,8 +23,7 @@
         <result property="indicatorState" column="indicator_state"/>
         <result property="indicatorChildNode" column="indicator_child_node"/>
     </resultMap>
-    
-    <select id=""
+
 
 
 </mapper>

@@ -1,13 +1,8 @@
 <template>
 
 
-
-
   <div class="mod-config">
-
-
     <div>
-
       <el-row type="flex" class="row-bg">
         <el-col :span="12">
           <div class="grid-content bg-purple">
@@ -15,7 +10,7 @@
           </div>
         </el-col>
         <el-col :span="12">
-          <div class="grid-content bg-purple-light"></div>
+          <div class="grid-content bg-purple-light">{{ taskStatistics.taskTotal }}</div>
         </el-col>
         <el-col :span="12">
           <div class="grid-content bg-purple">
@@ -23,7 +18,7 @@
           </div>
         </el-col>
         <el-col :span="12">
-          <div class="grid-content bg-purple-light"></div>
+          <div class="grid-content bg-purple-light">{{ taskStatistics.taskAheadOfTime }}</div>
         </el-col>
         <el-col :span="12">
           <div class="grid-content bg-purple">
@@ -31,7 +26,7 @@
           </div>
         </el-col>
         <el-col :span="12">
-          <div class="grid-content bg-purple-light"></div>
+          <div class="grid-content bg-purple-light">{{ taskStatistics.taskBehindSchedule }}</div>
         </el-col>
         <el-col :span="12">
           <div class="grid-content bg-purple">
@@ -39,7 +34,7 @@
           </div>
         </el-col>
         <el-col :span="12">
-          <div class="grid-content bg-purple-light"></div>
+          <div class="grid-content bg-purple-light">{{ taskStatistics.taskOnTime }}</div>
         </el-col>
         <el-col :span="12">
           <div class="grid-content bg-purple">
@@ -47,7 +42,7 @@
           </div>
         </el-col>
         <el-col :span="12">
-          <div class="grid-content bg-purple-light"></div>
+          <div class="grid-content bg-purple-light">{{ taskStatistics.taskOnTimeRate }}%</div>
         </el-col>
         <el-col :span="12">
           <div class="grid-content bg-purple">
@@ -55,7 +50,7 @@
           </div>
         </el-col>
         <el-col :span="12">
-          <div class="grid-content bg-purple-light"></div>
+          <div class="grid-content bg-purple-light">{{ taskStatistics.taskAheadOfTimeRate }}%</div>
         </el-col>
       </el-row>
     </div>
@@ -65,21 +60,23 @@
     <div style="margin-top: 20px;"></div>
 
     <!-- 将一个div横向分为三个，比例为3:1:1 ，然后把三个div放在一起-->
-    <div class="flex-container" style="height: 240px;">
-      <div class="flex-item item1">
-        <div ref="chartContainer" style="width: 747px; height: 240px;"></div>
+    <div class="flex-container">
+
+      <div class="flex-item" style="width: 60%; height: 100%;">
+        <div class="picture" ref="chartContainer" style="width: 99%; height: 99%;"></div>
       </div>
 
-      <div class="flex-item item2">
+      <div class="flex-item" style="width: 20%; height: 100%;">
         <!-- <div  style="width: 200px; height: 200px; background-color: #fff;"></div> -->
-        <div ref="onTimePieChart" style="width: 240px; height: 240px;"></div>
+        <div class="picture" ref="onTimePieChart" style="width: 99%; height: 99%;"></div>
       </div>
-      <div class="flex-item item3">
-        <!-- <div style="width: 200px; height: 200px; background-color: #ddd;"></div> -->
-        <div ref="earlyCompletionPieChart" style="width: 240px; height: 240px;"></div>
-      </div>
-    </div>
 
+      <div class="flex-item" style="width: 20%; height: 100%;">
+        <!-- <div style="width: 200px; height: 200px; background-color: #ddd;"></div> -->
+        <div class="picture" ref="earlyCompletionPieChart" style="width: 99%; height: 99%;"></div>
+      </div>
+
+    </div>
 
 
     <!-- <div ref="lineChart" style="width: 600px; height: 400px;"></div> -->
@@ -87,38 +84,45 @@
     <!-- <div ref="chartContainer" style="width: 100%; height: 400px;"></div> -->
 
 
-        <!-- 给出一个20px的间隔 -->
-        <div style="margin-top: 20px;"></div>
+    <!-- 给出一个20px的间隔 -->
+    <div style="margin-top: 20px;"></div>
 
     <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
-      <el-table-column prop="taskId" header-align="center" align="center" label="任务ID">
+      <el-table-column prop="taskId" header-align="center" align="center" label="任务编号">
       </el-table-column>
       <el-table-column prop="taskContent" header-align="center" align="center" label="任务内容">
       </el-table-column>
-      <el-table-column prop="startDate" header-align="center" align="center" label="开始日期">
+      <el-table-column prop="taskStartDate" header-align="center" align="center" label="开始日期">
       </el-table-column>
-      <el-table-column prop="plannedFinishDate" header-align="center" align="center" label="计划完成日期">
+      <el-table-column prop="taskScheduleCompletionDate" header-align="center" align="center" label="计划完成日期">
       </el-table-column>
-      <el-table-column prop="scheduleDays" header-align="center" align="center" label="计划天数">
+      <el-table-column prop="taskScheduleDays" header-align="center" align="center" label="计划天数">
       </el-table-column>
-      <el-table-column prop="actualFinishingDate" header-align="center" align="center" label="实际完成日期">
+      <el-table-column prop="taskActualCompletionDate" header-align="center" align="center" label="实际完成日期">
       </el-table-column>
-      <el-table-column prop="actualDays" header-align="center" align="center" label="实际天数">
+      <el-table-column prop="taskActualDays" header-align="center" align="center" label="实际天数">
       </el-table-column>
-      <el-table-column prop="finishOnTime" header-align="center" align="center" label="按时完工">
+<!--      <el-table-column prop="taskIsOnTime" header-align="center" align="center" label="是否按时完工">-->
+<!--      </el-table-column>-->
+      <el-table-column prop="taskIsOnTime" label="是否按时完工" header-align="center" align="center" width="110">
+        <template slot-scope="scope">
+          <span v-if="scope.row.taskIsOnTime === 0" style="color: gray;">否</span>
+          <span v-else-if="scope.row.taskIsOnTime === 1" style="color: gray;">是</span>
+          <span v-else>-</span>
+        </template>
       </el-table-column>
-      <el-table-column prop="daysAheadOfSchedule" header-align="center" align="center" label="提前完工">
+      <el-table-column prop="taskEarlyCompletionDays" header-align="center" align="center" label="提前完工天数">
       </el-table-column>
-      <el-table-column prop="lagDays" header-align="center" align="center" label="滞后天数">
+      <el-table-column prop="taskLagDays" header-align="center" align="center" label="滞后天数">
       </el-table-column>
-      <el-table-column prop="delayReasons" header-align="center" align="center" label="滞后原因">
+      <el-table-column prop="taskLagReasons" header-align="center" align="center" label="滞后原因">
       </el-table-column>
 
 
     </el-table>
     <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-      :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper">
+                   :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+                   layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
 
   </div>
@@ -127,17 +131,14 @@
 <script>
 import AddOrUpdate from './task-add'
 import * as echarts from 'echarts';
+
 export default {
   // name: 'LineChart',
   // mounted() {
   //   this.initChart();
   // },
 
-  mounted() {
-    this.initLineChart();
-    this.initOnTimePieChart();
-    this.initEarlyCompletionPieChart();
-  },
+
   data() {
     return {
       dataForm: {
@@ -151,28 +152,53 @@ export default {
       dataListSelections: [],
       addOrUpdateVisible: false,
 
-      totalTasks: 100
+      totalTasks: 100,
+      taskStatistics: {},
+      taskList: []
     }
   },
+
   components: {
     AddOrUpdate
   },
-  activated() {
-    this.getDataList()
+  // activated() {
+  //   this.getDataList()
+  // },
+  async mounted() {
+    await this.getTasksList();
+    await this.getDataList();
+    this.initLineChart();
+    this.initOnTimePieChart();
+    this.initEarlyCompletionPieChart();
   },
   methods: {
     // 获取数据列表
-    getDataList() {
+    async getDataList() {
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('/taskmanagement/task/list'),
+      await this.$http({
+        url: this.$http.adornUrl('/taskmanagement/task/taskStatistics'),
         method: 'get',
         params: this.$http.adornParams({
+          'planId': "2024-100"
+        })
+      }).then(({data}) => {
+        console.log(data)
+        this.taskStatistics = data
+      })
+    },
+    async getTasksList() {
+      this.dataListLoading = true
+      await this.$http({
+        url: this.$http.adornUrl('/taskmanagement/task/getAllTasksByPlanId'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'planId': "2024-100",
           'page': this.pageIndex,
           'limit': this.pageSize,
           'key': this.dataForm.key
         })
       }).then(({ data }) => {
+        console.log("列表数据"+data)
         if (data && data.code === 0) {
           this.dataList = data.page.list
           this.totalPage = data.page.totalCount
@@ -250,6 +276,8 @@ export default {
       // 使用刚指定的配置项和数据显示图表。
       chartInstance.setOption(option);
     },
+
+
     initOnTimePieChart() {
       this.chartInstance = echarts.init(this.$refs.onTimePieChart);
       const option = {
@@ -291,10 +319,8 @@ export default {
               show: false
             },
             data: [
-              {
-                value: 484, name: '已完成'
-              },
-              { value: 300, name: '未完成'}
+              {value: this.taskStatistics.taskOnTimeRate, name: '已完成'},
+              {value: 100 - this.taskStatistics.taskOnTimeRate, name: '未完成'}
             ]
           }
         ]
@@ -343,8 +369,8 @@ export default {
               show: false
             },
             data: [
-              { value: 1048, name: 'Search Engine' },
-              { value: 735, name: 'Direct' }
+              {value: this.taskStatistics.taskAheadOfTimeRate, name: '已完成'},
+              {value: 100 - this.taskStatistics.taskAheadOfTimeRate, name: '未完成'}
             ]
           }
         ]
@@ -393,6 +419,9 @@ export default {
 }
 
 .grid-content {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
   border-radius: 4px;
   min-height: 36px;
 }
@@ -408,16 +437,21 @@ export default {
   font-weight: bold;
 }
 
-
 .flex-container {
   display: flex;
+  height: 240px;
   width: 100%;
 }
+
 
 .flex-item {
   border: 1px solid #ccc;
   text-align: center;
   line-height: 100%;
   height: 100%;
+}
+
+.picture {
+  display: flex;
 }
 </style>

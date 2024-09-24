@@ -488,7 +488,6 @@ export default {
             taskPrincipal: task.taskPrincipal,
             taskExecutor: task.taskExecutor,
             taskAuditor: task.taskAuditor,
-            taskCurrentState: task.taskCurrentState,
             taskAssociatedIndicatorsId: this.dataForm.planAssociatedIndicatorsId,
             taskCurrentState: 0,
             taskIsCompleted: 0,
@@ -576,7 +575,7 @@ export default {
     //           taskParentNode: this.dataForm.planId
     //         }));
     //     }
-    //   }); 
+    //   });
     //   // Access the nested task form
     //   // const taskForm = this.$refs.dataForm.$refs.task;
 

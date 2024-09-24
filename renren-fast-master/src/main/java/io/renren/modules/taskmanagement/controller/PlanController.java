@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.taskmanagement.entity.PlanAndTaskDTO;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.service.TaskService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,6 +31,7 @@ import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
  * @email ${email}
  * @date 2024-07-22 10:16:37
  */
+@Slf4j
 @RestController
 @RequestMapping("taskmanagement/plan")
 public class PlanController {
@@ -37,6 +39,8 @@ public class PlanController {
     private PlanService planService;
     @Autowired
     private TaskService taskService;
+
+
 
     /**
      * 列表
@@ -96,8 +100,12 @@ public class PlanController {
 
         List<TaskEntity> tasks = planAndTaskDTO.getTasks();
         tasks.forEach(task -> {
+            log.info("当前task为"+ task);
             if (taskService.isTaskIdUsed(task.getTaskId())) {
+                // 如果任务编号已经被使用，则通过taskid更新任务
                 taskService.updateById(task);
+
+
             } else {
                 taskService.save(task);
             }

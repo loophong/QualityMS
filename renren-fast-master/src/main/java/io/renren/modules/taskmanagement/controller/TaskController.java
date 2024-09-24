@@ -11,9 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.sys.entity.SysUserEntity;
-import io.renren.modules.taskmanagement.entity.ApprovalEntity;
-import io.renren.modules.taskmanagement.entity.TaskDetailDTO;
-import io.renren.modules.taskmanagement.entity.TaskStatus;
+import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.ApprovalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -21,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.service.TaskService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
@@ -43,6 +40,17 @@ public class TaskController {
     private TaskService taskService;
     @Autowired
     private ApprovalService approvalService;
+
+    /**
+     * @description: 任务统计
+     * @author: hong
+     * @date: 2024/9/23 17:50
+     * @version: 1.0
+     */
+    @GetMapping("/taskStatistics")
+    public TaskStatisticsDTO taskStatistics(String planId) {
+        return taskService.taskStatistics(planId);
+    }
 
 
 
@@ -98,17 +106,13 @@ public class TaskController {
      * @author: hong
      * @date: 2024/8/25 16:08
      */
-//    @RequestMapping("/getAllTasksByPlanId")
-////    @RequiresPermissions("taskmanagement:task:list")
-//    public R getAllTasksByPlanId(String planId){
-//
-//        taskService.selectAllTasksByPlanId(planId);
-//        log.info("当前用户的任务为：" + page);
-//
-//
-//        return R.ok().put("page", page);
-//
-//    }
+    @RequestMapping("/getAllTasksByPlanId")
+//    @RequiresPermissions("taskmanagement:task:list")
+    public R getAllTasksByPlanId(@RequestParam Map<String, Object>  params){
+        PageUtils page = taskService.queryPageSelectTasksByPlanId(params, params.get("planId").toString());
+
+        return R.ok().put("page", page);
+    }
 
 
 
@@ -232,7 +236,7 @@ public class TaskController {
 //    @RequiresPermissions("taskmanagement:task:list")
     public R getUnfinishedTasksList(@RequestParam Map<String, Object> params){
         PageUtils page = taskService.queryPageGetUnfinishedTasks(params,ShiroUtils.getUserId());
-        log.info("当前用户未完成的任务为：" + page);
+        log.info("当前用户未完成的任务为：" + page.getList().toString());
         return R.ok().put("page", page);
     }
 

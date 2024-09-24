@@ -1,8 +1,10 @@
 package io.renren.modules.indicator.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import io.renren.modules.indicator.entity.IndicatorResponseByDepartmentEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -108,6 +110,15 @@ public class IndicatorDictionaryController {
 		indicatorDictionaryService.removeByIds(Arrays.asList(indicatorIds));
 
         return R.ok();
+    }
+
+    /**
+     * 根据管理部门统计指标数量
+     * */
+    @RequestMapping("/countsByDepartmant")
+    public List<IndicatorResponseByDepartmentEntity> getIndicatorDictionaryByDepartmant(IndicatorResponseByDepartmentEntity indicatorResponseByDepartmentEntity){
+        System.out.println("返回list=============>" + indicatorDictionaryService.countsByDepartmant(indicatorResponseByDepartmentEntity));
+        return indicatorDictionaryService.countsByDepartmant(indicatorResponseByDepartmentEntity);
     }
 
 }

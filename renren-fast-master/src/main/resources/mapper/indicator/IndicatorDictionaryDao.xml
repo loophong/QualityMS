@@ -25,5 +25,12 @@
     </resultMap>
 
 
+    <select id="countsByDepartmant" resultType="IndicatorResponseByDepartmentEntity">
+        select management_department as managementDepartment,
+            count(1) as counts
+        from indicator_dictionary
+        group by management_department
+    </select>
+
 
 </mapper>

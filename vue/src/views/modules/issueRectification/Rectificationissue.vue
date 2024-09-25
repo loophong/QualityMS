@@ -84,7 +84,7 @@
         align="center"
         label="问题照片">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
+          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
         </template>
       </el-table-column>
       <!--      <el-table-column-->
@@ -129,12 +129,15 @@
               align="center"
               label="实际完成时间">
             </el-table-column>
-            <el-table-column
-              prop="rectificationPhotoDeliverable"
-              header-align="center"
-              align="center"
-              label="整改照片交付物">
-            </el-table-column>
+      <el-table-column
+        prop="rectificationPhotoDeliverable"
+        header-align="center"
+        align="center"
+        label="整改照片交付物">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">下载</el-button>
+        </template>
+      </el-table-column>
             <el-table-column
               prop="rectificationResponsiblePerson"
               header-align="center"
@@ -376,9 +379,8 @@ export default {
     },
     // 图片预览
     previewImage (imageUrl) {
-      this.imagePreviewUrl = imageUrl
-      this.imagePreviewTitle = '图片预览'
-      this.imagePreviewVisible = true
+      console.log("cur imageUrl====>" + imageUrl);
+      window.open(imageUrl);
       console.log("图片地址：" ,imageUrl)
     },
     // 删除

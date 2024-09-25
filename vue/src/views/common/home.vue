@@ -50,7 +50,8 @@ export default {
       //----------------任务模块-----------------
       taskData: {},
       issueStats: {}, // 存储当月问题统计数据
-      issueCategories: ["创建", "持续", "未完成", "已完成", "结项"], // 问题分类
+      issueCategories: ["持续", "未完成", "已完成", "结项"], // 问题分类
+      // issueCategories: ["创建", "持续", "未完成", "已完成", "结项"], // 问题分类
     }
   },
   components: {
@@ -309,7 +310,8 @@ export default {
           console.log('数据转换中......', this.issueStats)
           this.renderIssueChart(); // 渲染图表
         } else {
-          this.issueStats = {创建: 0, 持续: 0, 未完成: 0, 已完成: 0, 结项: 0}; // 默认值
+          this.issueStats = { 持续: 0, 未完成: 0, 已完成: 0, 结项: 0}; // 默认值
+          // this.issueStats = {创建: 0, 持续: 0, 未完成: 0, 已完成: 0, 结项: 0};
         }
       });
     },
@@ -348,7 +350,7 @@ export default {
             name: '数量',
             type: 'bar',
             data: [
-              this.issueStats['创建'] || 0,
+              // this.issueStats['创建'] || 0,
               this.issueStats['持续'] || 0,
               this.issueStats['未完成'] || 0,
               this.issueStats['已完成'] || 0,

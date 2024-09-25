@@ -90,13 +90,22 @@
         label="问题描述">
       </el-table-column>
 
+<!--      <el-table-column-->
+<!--        prop="issuePhoto"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题照片">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="issuePhoto"
         header-align="center"
         align="center"
         label="问题照片">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
+          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
         </template>
       </el-table-column>
 <!--      <el-table-column-->
@@ -104,7 +113,20 @@
 <!--        header-align="center"-->
 <!--        align="center"-->
 <!--        label="问题照片">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>-->
+<!--          <el-upload-->
+<!--            class="upload-demo"-->
+<!--            :before-upload="beforeUpload"-->
+<!--            :show-file-list="false"-->
+<!--            :on-success="handleUploadSuccess"-->
+<!--            :on-error="handleUploadError"-->
+<!--            :data="{ issueId: scope.row.issueId }"> &lt;!&ndash; 传递当前行的 issueId &ndash;&gt;-->
+<!--            <el-button type="text" size="small">上传</el-button>-->
+<!--          </el-upload>-->
+<!--        </template>-->
 <!--      </el-table-column>-->
+
       <el-table-column
         prop="rectificationRequirement"
         header-align="center"
@@ -407,16 +429,31 @@ export default {
         this.$refs.assetOrUpdate.init1(id)
       })
     },
-    // 图片预览
+    //图片预览
     previewImage (imageUrl) {
       console.log("cur imageUrl====>" + imageUrl);
       window.open(imageUrl);
-      // this.imagePreviewUrl = imageUrl
-      // this.imagePreviewTitle = '图片预览'
-      // this.imagePreviewVisible = true
       console.log("图片地址：" ,imageUrl)
     },
-    //图片预览2
+    // previewImage(imageUrl) {
+    //   console.log("cur imageUrl====>", imageUrl);
+    //
+    //   // Fetch the image as a blob
+    //   fetch(imageUrl)
+    //     .then(response => {
+    //       if (!response.ok) {
+    //         throw new Error('网络错误，无法获取图片');
+    //       }
+    //       return response.blob();
+    //     })
+    //     .then(blob => {
+    //       const blobUrl = URL.createObjectURL(blob);
+    //       window.open(blobUrl); // 在新窗口打开 Blob URL
+    //     })
+    //     .catch(error => {
+    //       console.error('获取图片失败:', error);
+    //     });
+    // },
 
     // handlePreviewCur(file) {
     //   console.log(file)

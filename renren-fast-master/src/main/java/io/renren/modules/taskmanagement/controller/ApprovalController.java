@@ -168,6 +168,16 @@ public class ApprovalController {
     @RequiresPermissions("taskmanagement:approval:update")
     public R update(@RequestBody ApprovalEntity taskManagementApprovalTable) {
 
+        // 当前任务提交审批前，先检查其下级任务是否已经完成
+//        if (taskManagementApprovalTable.getApprovalStatus() == ApprovalStatus.APPROVED) {
+//            if (taskService.query().eq("task_parent_node", taskManagementApprovalTable.getTaskId()).eq("task_current_state", TaskStatus.COMPLETED).count() == 0) {
+//                return R.error("请先完成下级任务");
+//            }
+//            if (taskService.query().eq("task_parent_node", taskManagementApprovalTable.getTaskId()).notIn("task_current_state", TaskStatus.COMPLETED).count() > 0) {
+//                return R.error("请先完成下级任务");
+//            }
+//        }
+
         //检查任务是否存在
 
         if (taskService.getByTaskId(taskManagementApprovalTable.getTaskId()) == null) {

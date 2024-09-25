@@ -1,6 +1,9 @@
 package io.renren.modules.indicator.entity;
 
+import lombok.Data;
+
+@Data
 public class IndicatorResponseByDepartmentEntity {
-    private String managemantDepartment;
+    private String managementDepartment;
     private Integer counts;
 }

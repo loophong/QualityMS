@@ -2,6 +2,7 @@ package io.renren.modules.indicator.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
+import io.renren.modules.indicator.entity.IndicatorResponseByDepartmentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -88,6 +89,12 @@ public class IndicatorDictionaryServiceImpl extends ServiceImpl<IndicatorDiction
         QueryWrapper<IndicatorDictionaryEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("indicator_name", indicatorName);
         return indicatorDictionaryDao.selectList(queryWrapper);
+    }
+
+    // 根据部门统计指标数量
+    @Override
+    public List<IndicatorResponseByDepartmentEntity> countsByDepartmant(IndicatorResponseByDepartmentEntity indicatorResponseByDepartmentEntity) {
+        return indicatorDictionaryDao.countsByDepartmant(indicatorResponseByDepartmentEntity);
     }
 
 }

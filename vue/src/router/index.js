@@ -64,7 +64,7 @@ const mainRoutes = {
     // })
     {
       path: '/task-update-page',
-      component: _import('modules/taskmanagement/task/task-detail-page'),
+      component: _import('modules/taskmanagement/task/task-update-page'),
       name: 'task-update-page',
       meta: { title: '任务修改页', isDynamic: true, isTab: false },
       props: true
@@ -86,7 +86,7 @@ const mainRoutes = {
 
     {
       path: '/plan-update-page/:plabId',
-      component: _import('modules/taskmanagement/plan/plan-detail-page'),
+      component: _import('modules/taskmanagement/plan/plan-update-page'),
       name: 'plan-update-page',
       meta: { title: '计划修改页', isDynamic: false, isTab: false },
       props: true

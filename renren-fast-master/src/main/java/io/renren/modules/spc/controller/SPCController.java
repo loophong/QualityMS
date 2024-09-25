@@ -1,6 +1,7 @@
 package io.renren.modules.spc.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 import com.aliyun.oss.ServiceException;
@@ -50,57 +51,102 @@ public class SPCController {
             rowIterator.next();
         }
 
-        while (rowIterator.hasNext()) {
-            Row row = rowIterator.next();
 
-            /**
-             * 将excel设置的字段，写入到数据库对应字段
-             */
+        //子组大小
+        int arrayLength = getCellValueAsInt(sheet.getRow(3).getCell(12));
 
-//            marketSalesTable.setMsId(GenerateId.getUUid());
+        int arraySize = getCellValueAsInt(sheet.getRow(5).getCell(12));
 
-
-
-            List<Double> date = new ArrayList<>();
-
-            date.add(getNumericCellValue(row.getCell(0)));
-            date.add(getNumericCellValue(row.getCell(1)));
-            date.add(getNumericCellValue(row.getCell(2)));
-            date.add(getNumericCellValue(row.getCell(3)));
-            date.add(getNumericCellValue(row.getCell(4)));
-            date.add(getNumericCellValue(row.getCell(5)));
-            date.add(getNumericCellValue(row.getCell(6)));
-            date.add(getNumericCellValue(row.getCell(7)));
-            date.add(getNumericCellValue(row.getCell(8)));
-            date.add(getNumericCellValue(row.getCell(9)));
-            date.add(getNumericCellValue(row.getCell(10)));
-            date.add(getNumericCellValue(row.getCell(11)));
-            date.add(getNumericCellValue(row.getCell(12)));
-            date.add(getNumericCellValue(row.getCell(13)));
-            date.add(getNumericCellValue(row.getCell(14)));
-            date.add(getNumericCellValue(row.getCell(15)));
-            date.add(getNumericCellValue(row.getCell(16)));
-            date.add(getNumericCellValue(row.getCell(17)));
-            date.add(getNumericCellValue(row.getCell(18)));
-            date.add(getNumericCellValue(row.getCell(19)));
-            date.add(getNumericCellValue(row.getCell(20)));
-            date.add(getNumericCellValue(row.getCell(21)));
-            date.add(getNumericCellValue(row.getCell(22)));
-            date.add(getNumericCellValue(row.getCell(23)));
-            date.add(getNumericCellValue(row.getCell(24)));
-
-
-//            System.out.println(marketSalesTable);
-
-            dataList.add(date);
+        double[][] date = new double[arrayLength][arraySize];
+        int n = 0;
+        for(int i = 8; i < 8 + arrayLength; i++ ){
+            Row row = sheet.getRow(i);
+            int m = 0;
+            for(int j = 2; j < 2 + arraySize; j++){
+                date[n][m] = getNumericCellValue(row.getCell(j));
+                m++;
+            }
+            n++;
         }
+
+//        for (double[] doubles : date) {
+//            for (int j = 0; j < date[0].length; j++) {
+//                System.out.print(doubles[j] + " ");
+//            }
+//            System.out.println();
+//        }
+
+        //计算求和
+        List<Double> sumList = new ArrayList<>();
+
+        for(int i = 0; i < arraySize; i++){
+            BigDecimal sum = BigDecimal.ZERO;
+            for (int j = 0; j < arrayLength; j++){
+                sum = sum.add(BigDecimal.valueOf(date[j][i]));
+            }
+            sumList.add(sum.doubleValue());
+        }
+        dataList.add(sumList);
+
+        //计算平均值
+        List<Double> averageList = new ArrayList<>();
+        for (Double value : sumList) {
+            BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
+            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(arrayLength)); // 除以5
+            averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
+        }
+        dataList.add(averageList);
+//        System.out.println(averageList);
+
+        //计算R
+        List<Double> R = new ArrayList<>();
+        for(int col = 0; col < arraySize; col++){
+            BigDecimal max = BigDecimal.valueOf(date[0][col]); // 假设第一行的元素是最大值
+            BigDecimal min = BigDecimal.valueOf(date[0][col]); // 假设第一行的元素是最小值
+
+
+            for (int row = 1; row < date.length; row++) { // 遍历该列的每一行
+                BigDecimal current = BigDecimal.valueOf(date[row][col]);
+                if (current.compareTo(max) > 0) {
+                    max = current; // 更新最大值
+                }
+                if (current.compareTo(min) < 0) {
+                    min = current; // 更新最小值
+                }
+            }
+            BigDecimal difference = max.subtract(min); // 计算最大值与最小值的差
+            R.add(difference.doubleValue()); // 将差值转换为Double并添加到列表R中
+        }
+        dataList.add(R);
 
 
 
         workbook.close();
-        System.out.println(dataList.size());
         return dataList;
     }
+
+    // 将单元格内容转换为int类型值
+    private static int getCellValueAsInt(Cell cell) {
+        if (cell == null) {
+            return 0; // 或者你可以选择抛出异常，根据你的业务逻辑来决定
+        }
+        // 确保单元格是数值类型
+        if (cell.getCellType() == CellType.NUMERIC) {
+            return (int) cell.getNumericCellValue();
+        } else if (cell.getCellType() == CellType.STRING) {
+            // 如果单元格是字符串类型，尝试将其转换为整数
+            try {
+                return Integer.parseInt(cell.getStringCellValue());
+            } catch (NumberFormatException e) {
+                // 如果转换失败，可以选择返回默认值或者抛出异常
+                return 0;
+            }
+        } else {
+            // 如果单元格不是数值类型也不是字符串类型，可以选择返回默认值或者抛出异常
+            return 0;
+        }
+    }
+
 
     // 将单元格内容转换为double类型值
     private static double getNumericCellValue(Cell cell) {

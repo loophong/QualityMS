@@ -11,6 +11,7 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
           @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="danger" @click="toIssue()">问题添加</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="filteredDataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -143,7 +144,15 @@ export default {
       }
     },
 
-
+    toIssue() {
+      this.$router.push(
+        {
+          name: 'otherToIssue',
+          // query: {
+          //   data: JSON.stringify(filteredArray)
+          // }
+        });
+    },
 
 
     parseTime(time) {

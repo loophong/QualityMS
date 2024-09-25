@@ -1,11 +1,13 @@
 <template>
   <div class="container">
+
     <div v-if="this.routerParam">
       <ul>
         <li v-for="item in this.routerParam" :key="item.qcsrId">
           {{ item.topicName }}
           {{ item.topicType }}
         </li>
+        <!-- <el-button type="danger" @click="toIssue()" style="justify-content: flex-end;">问题添加</el-button> -->
       </ul>
     </div>
 
@@ -72,6 +74,7 @@
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
+
             </el-form-item>
           </el-form>
         </div>

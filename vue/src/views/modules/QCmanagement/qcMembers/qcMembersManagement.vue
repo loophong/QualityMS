@@ -8,6 +8,7 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
           @click="addOrUpdateHandle()">新增小组</el-button>
+        <el-button type="danger" @click="toIssue()">问题添加</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="tableData" stripe border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -189,6 +190,15 @@ export default {
     // 多选
     selectionChangeHandle(val) {
       this.dataListSelections = val
+    },
+    toIssue() {
+      this.$router.push(
+        {
+          name: 'otherToIssue',
+          // query: {
+          //   data: JSON.stringify(filteredArray)
+          // }
+        });
     },
     // 新增 / 修改
     addOrUpdateHandle(id) {

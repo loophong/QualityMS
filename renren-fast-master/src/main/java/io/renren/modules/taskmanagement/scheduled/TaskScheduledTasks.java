@@ -1,5 +1,6 @@
 package io.renren.modules.taskmanagement.scheduled;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.common.utils.DateUtils;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.entity.TaskStatus;

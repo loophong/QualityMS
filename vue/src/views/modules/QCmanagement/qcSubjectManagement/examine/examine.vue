@@ -76,9 +76,6 @@
         <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
       </div>
     </el-tab-pane>
-    <el-tab-pane label="结题审核" name="2">
-
-    </el-tab-pane>
   </el-tabs>
 </template>
 

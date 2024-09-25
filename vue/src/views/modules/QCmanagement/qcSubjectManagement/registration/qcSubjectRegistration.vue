@@ -1,23 +1,24 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="myQueryParam" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="myQueryParam.topicName" placeholder="课题名称" clearable></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
           @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('qcSubject:registration:delete')" type="danger" @click="deleteHandle()"
-          :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="addOrUpdateHandle()"
+          :disabled="dataListSelections.length > 1">课题重用</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-      style="width: 100%;">
+      style="width: 100%;" stripe>
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
-      <!-- <el-table-column prop="qcsrId" header-align="center" align="center" label="id">
-      </el-table-column> -->
       <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
       </el-table-column>
       <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
@@ -26,46 +27,24 @@
       </el-table-column>
       <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
       </el-table-column>
-      <!-- <el-table-column label="课题顾问" header-align="center" align="center">
-        <template slot-scope="scope">
-          <el-select v-model="scope.row.topicConsultant" multiple placeholder="请选择课题顾问">
-            <el-option v-for="item in consultantOptions" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-        </template>
-</el-table-column> -->
-
-      <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员ids">
+      <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
       </el-table-column>
-      <!-- <el-table-column prop="createDate" header-align="center" align="center" label="创建日期">
-      </el-table-column>
-      <el-table-column prop="creator" header-align="center" align="center" label="创建人">
-      </el-table-column>
-      <el-table-column prop="modificationDate" header-align="center" align="center" label="修改日期">
-      </el-table-column>
-      <el-table-column prop="modifier" header-align="center" align="center" label="修改人">
-      </el-table-column> -->
-      <el-table-column prop="startDate" header-align="center" align="center" label="开始日期">
-      </el-table-column>
-      <el-table-column prop="endDate" header-align="center" align="center" label="结束日期">
-      </el-table-column>
-
       <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要">
       </el-table-column>
       <el-table-column prop="topicType" header-align="center" align="center" label="课题类型">
       </el-table-column>
       <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
       </el-table-column>
-      <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划">
+      <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期">
       </el-table-column>
-      <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字tag">
+      <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期">
+      </el-table-column>
+      <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
       </el-table-column>
       <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
       </el-table-column>
       <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
       </el-table-column>
-      <!-- <el-table-column prop="deleteFlag" header-align="center" align="center" label="删除标记位">
-      </el-table-column> -->
       <el-table-column prop="note" header-align="center" align="center" label="备注">
       </el-table-column>
       <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
@@ -108,7 +87,12 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       dataListSelections: [],
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      groupMemberList: [],
+      myQueryParam: {
+        topicName: '',
+        keywords: '',
+      }
     }
   },
   components: {
@@ -116,6 +100,9 @@ export default {
   },
   activated() {
     this.getDataList()
+    this.getGroupMemberData().then(groupList => {
+      this.groupMemberList = groupList;
+    });
   },
   methods: {
 
@@ -123,15 +110,16 @@ export default {
       return new Date(time).toLocaleString();
     },
     // 获取数据列表
-    getDataList() {
+    async getDataList() {
       this.dataListLoading = true
-      this.$http({
+      await this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/list'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
           'limit': this.pageSize,
-          'key': this.dataForm.key
+          'topicName': this.myQueryParam.topicName,
+          'keywords': this.myQueryParam.keywords
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -141,9 +129,11 @@ export default {
           this.dataList = []
           this.totalPage = 0
         }
+
         this.dataListLoading = false
       })
     },
+
     // 每页数
     sizeChangeHandle(val) {
       this.pageSize = val
@@ -163,6 +153,7 @@ export default {
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
+        this.$refs.addOrUpdate.groupMemberList = this.groupMemberList
         this.$refs.addOrUpdate.init(id)
       })
     },
@@ -193,6 +184,66 @@ export default {
         }
       })
       this.getDataList();
+    },
+    //获取成员小组数据
+    async getGroupMemberData() {
+      return new Promise((resolve, reject) => {
+        let groupList = [];
+        this.$http({
+          url: this.$http.adornUrl('/qcMembers/qcGroupMember/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': 1,
+            'limit': 10000,
+            'key': ''
+          })
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.groupMemberList = data.page.list;
+            // this.totalPage = data.page.totalCount;
+            groupList = this.groupMemberList;
+            // 分组
+            const map = {};
+            groupList.forEach(item => {
+              if (item.parentId === null) {
+                map[item.qcgmId] = {
+                  id: item.qcgmId,
+                  date: item.participationDate,
+                  name: item.name,
+                  number: item.number,
+                  groupName: item.groupName,
+                  roleInTopic: '管理员',
+                  children: []
+                };
+              }
+            });
+            groupList.forEach(item => {
+              if (item.parentId !== null && map[item.parentId]) {
+                map[item.parentId].children.push({
+                  id: item.qcgmId,
+                  date: item.participationDate,
+                  name: item.name,
+                  number: item.number,
+                  roleInTopic: item.roleInTopic,
+                  parentId: item.parentId,
+                });
+              }
+            });
+            groupList = map
+            this.groupMemberList = groupList;
+          } else {
+            this.groupMemberList = [];
+            this.totalPage = 0;
+          }
+          resolve(groupList);
+        }).catch(error => {
+          console.error('Error fetching data:', error);
+          // this.dataList = [];
+          this.totalPage = 0;
+          this.dataListLoading = false;
+          reject(error);
+        });
+      });
     },
     // 删除
     deleteHandle(id) {

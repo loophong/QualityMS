@@ -49,6 +49,7 @@
 		<remote-addr>192.168.1.10:22</remote-addr>
 		<remote-username>root</remote-username>
 		<remote-passwd>123456</remote-passwd>
+<!--		<okhttp3.version>4.9.0</okhttp3.version>-->
 	</properties>
 
 	<dependencies>
@@ -82,6 +83,22 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>4.1.2</version>
+		</dependency>
+
+		<!-- minio -->
+		<dependency>
+			<groupId>io.minio</groupId>
+			<artifactId>minio</artifactId>
+			<version>8.2.2</version>
+		</dependency>
+
+
+
 		<!--<dependency>-->
 			<!--<groupId>org.springframework.boot</groupId>-->
 			<!--<artifactId>spring-boot-devtools</artifactId>-->
@@ -146,11 +163,8 @@
 			<artifactId>commons-fileupload</artifactId>
 			<version>${commons.fileupload.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commons.io.version}</version>
-		</dependency>
+
+
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>

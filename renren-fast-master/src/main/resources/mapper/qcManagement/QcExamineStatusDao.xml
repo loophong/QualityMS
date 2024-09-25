@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.qcManagement.dao.QcExamineStatusDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.qcManagement.entity.QcExamineStatusEntity" id="qcExamineStatusMap">
+        <result property="qcExamineId" column="qc_examine_id"/>
+        <result property="qcExamineSubject" column="qc_examine_subject"/>
+        <result property="qcExamineCurrent" column="qc_examine_current"/>
+        <result property="qcStatusOne" column="qc_status_one"/>
+        <result property="qcStatusTwo" column="qc_status_two"/>
+        <result property="qcStatusThree" column="qc_status_three"/>
+        <result property="qcStatusFour" column="qc_status_four"/>
+        <result property="qcStatusFive" column="qc_status_five"/>
+        <result property="qcStatusSix" column="qc_status_six"/>
+        <result property="qcStatusSeven" column="qc_status_seven"/>
+        <result property="qcSevenContent" column="qc_seven_content"/>
+        <result property="qcSixContent" column="qc_six_content"/>
+        <result property="qcFiveContent" column="qc_five_content"/>
+        <result property="qcSecondScore" column="qc_second_score"/>
+        <result property="qcFourContent" column="qc_four_content"/>
+        <result property="qcFirstScore" column="qc_first_score"/>
+        <result property="qcThreeContent" column="qc_three_content"/>
+        <result property="qcTwoContent" column="qc_two_content"/>
+        <result property="qcOneContent" column="qc_one_content"/>
+        <result property="qcFirstTotal" column="qc_first_total"/>
+        <result property="qcFirstLevel" column="qc_first_level"/>
+        <result property="qcSecondTotal" column="qc_second_total"/>
+        <result property="qcSecondLevel" column="qc_second_level"/>
+    </resultMap>
+
+    <select id="existsBySubject" resultType="boolean">
+        SELECT EXISTS (
+                       SELECT * FROM qc_examine_status WHERE qc_examine_subject = #{qcExamineSubject}
+                   )
+    </select>
+
+    <delete id="deleteBySubject">
+        DELETE FROM qc_examine_status WHERE qc_examine_subject = #{qcExamineSubject}
+    </delete>
+
+</mapper>

@@ -1,0 +1,689 @@
+<template>
+  <div>
+  <el-dialog
+    :title="!dataForm.issueId ? '新增' : '修改'"
+    :close-on-click-modal="false"
+    :visible.sync="visible">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="150px">
+      <el-form-item label="原因分析" prop="causeAnalysis">
+        <el-input v-model="dataForm.causeAnalysis" placeholder="原因分析"></el-input>
+      </el-form-item>
+    <el-form-item label="整改情况" prop="rectificationStatus">
+      <el-input v-model="dataForm.rectificationStatus" placeholder="整改情况"></el-input>
+    </el-form-item>
+      <el-form-item label="实际完成时间" prop="actualCompletionTime">
+        <el-date-picker
+          v-model="dataForm.actualCompletionTime"
+          type="datetime"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          placeholder="请选择实际完成时间">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
+        <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择验证人">
+          <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+            <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                       :value="item.label">
+            </el-option>
+          </el-option-group>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="整改图片/交付物" prop="image">
+        <el-upload
+          action="#"
+          list-type="picture-card"
+          :on-preview="handlePictureCardPreview"
+          :on-remove="handleRemove"
+          :on-change="handleFileChange"
+          :file-list="imageList"
+          :auto-upload="false">
+          <i class="el-icon-plus"></i>
+        </el-upload>
+        <el-dialog :visible.sync="dialogVisible">
+          <img width="100%" :src="dialogImageUrl" alt="">
+        </el-dialog>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+        <el-button @click="cancel()">取消</el-button>
+        <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      </span>
+  </el-dialog>
+    <el-dialog
+      :title="'任务发起'"
+      :close-on-click-modal="false"
+      :visible.sync="visible1">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+        <el-form-item label="审核人" prop="reviewers">
+          <el-select v-model="dataForm.reviewers" filterable placeholder="请选择审核人">
+            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.label">
+              </el-option>
+            </el-option-group>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item
+          v-for="(subtask, index) in dataForm.subtasks"
+          :key="subtask.key"
+          :label="'子任务 ' + (index + 1)"
+          :prop="'subtasks.' + index + '.name'"
+          :rules="{ required: true, message: '子任务不能为空', trigger: 'blur' }">
+          <el-input v-model="subtask.name" placeholder="请输入子任务"></el-input>
+          <el-select v-model="subtask.assignee" filterable placeholder="请选择接收人">
+            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.label">
+              </el-option>
+            </el-option-group>
+          </el-select>
+          <el-form-item label="上级任务" prop="superiorMask">
+            <el-select v-model="subtask.parentTask" placeholder="请选择上级任务">
+              <el-option
+                key="question"
+                label="问题"
+                value="0">
+              </el-option>
+              <el-option
+                v-for="item in taskList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-button @click.prevent="removeSubtask(subtask)">删除</el-button>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="addSubtask">增加子任务</el-button>
+          <el-button @click="resetForm('dataForm')">重置</el-button>
+        </el-form-item>
+        <el-form-item label="要求完成日期" prop="requiredCompletionTime">
+          <el-date-picker
+            v-model="dataForm.requiredCompletionTime"
+            type="date"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="请选择日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+      <el-button @click="cancel1">取消</el-button>
+      <el-button type="primary" @click="submitForm('dataForm')">提交</el-button>
+    </span>
+    </el-dialog>
+    <!--  </div>-->
+    <!--  <div>-->
+  </div>
+
+</template>
+
+<script>
+  // import axios from 'axios'
+  import init1 from '../issueset/issuetable-add-or-update.vue'
+
+  export default {
+    data () {
+      return {
+        bloburl: '',
+        imageurl: '',
+        visible: false,
+        visible1: false,
+        file: null,
+        dialogImageUrl: '',
+        imageList: [],
+        dialogVisible: false,
+        dataForm: {
+          userinfo: '',
+          vehicles: [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }],
+          subtasks: [{ name: '', assignee: '', parentTask: '', serialNumber: '', key: Date.now() }],          vehicleTypeIds: [],
+          vehicleNumbers: [],
+          associatedIssueIds: [],
+          imageList: [],
+          dialogImageUrl: '',
+          issueCategoryOptions: [],
+          issueId: 0,
+          serialNumber: '',
+          issueNumber: '',
+          inspectionDepartment: '',
+          inspectionDate: '',
+          issueCategoryId: '',
+          vehicleTypeId: '',
+          vehicleNumberId: '',
+          issueDescription: '',
+          vehicleTypeOptions: [],
+          vehicleNumberOptions: [],
+          issuePhoto: '',
+          rectificationRequirement: '',
+          requiredCompletionTime: '',
+          responsibleDepartment: '',
+          rectificationStatus: '',
+          actualCompletionTime: '',
+          rectificationPhotoDeliverable: '',
+          rectificationResponsiblePerson: '',
+          requiredSecondRectificationTime: '',
+          remark: '',
+          creator: '',
+          creationTime: '',
+          lastModifier: '',
+          lastModificationTime: '',
+          associatedRectificationRecords: '',
+          associatedIssueAddition: '',
+          creationDuration: '',
+          causeAnalysis: '',
+          rectificationVerificationStatus: '',
+          verificationConclusion: '',
+          verifier: '',
+          reviewers: '',
+          level: '',
+          state: '',
+          superiorMask: '',
+          nextMask: '',
+          formula: ''
+        },
+        vehicleTypeOptions: [],
+        issueCategoryOptions: [],
+        selectedIssue: '',
+        issueOptions: [], // 所有问题编号选项
+        taskList: [], // 任务列表
+        departmentOptions: [
+          { value: '财务科', label: '财务科' },
+          { value: '市场科', label: '市场科' },
+          { value: '安环科', label: '安环科' },
+          { value: '生产科', label: '生产科' },
+          { value: '供应科', label: '供应科' },
+          { value: '技术科', label: '技术科' },
+          { value: '企管科', label: '企管科' }
+          // 其他科室选项
+        ],
+        dataRule: {
+        },
+        options: ''
+      }
+    },
+    created () {
+      this.fetchIssueCategories()
+      this.fetchVehicleTypes()
+      this.fetchIssueOptions() // 获取所有问题编号选项
+      this.$http({
+        url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+        method: 'get',
+      }).then(({ data }) => {
+        this.options = data;
+        console.log(data);
+        // if (data && data.code === 0) {
+        //   console.log(data);
+        // }
+      })
+    },
+    activated () {
+        this.fetchuserinform()
+    },
+    methods: {
+      generateSerialNumber() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        console.log('执行随机+++++')
+        return `${year}${month}${day}${random}`;
+      },
+      cancel1 () {
+        // 重置 subtasks 数组，只保留一个初始组合
+        this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
+        this.visible1 = false // 关闭对话框或重置其他状态
+      },
+      addSubtask () {
+        const serialNumber = this.generateSerialNumber();
+        console.log('Successfully setnumber:', serialNumber)
+        this.dataForm.subtasks.push({
+          name: '',
+          assignee: '',
+          parentTask: '',
+          serialNumber: serialNumber,
+          key: Date.now()
+        })
+
+      },
+      removeSubtask (subtask) {
+        let index = this.dataForm.subtasks.indexOf(subtask)
+        if (index !== -1) {
+          this.dataForm.subtasks.splice(index, 1)
+        }
+      },
+      //获取用户人信息
+      fetchuserinform () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/useinfo'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // console.log('Successfully fetched user info1:', data.userinfo)
+            this.dataForm.userinfo = data.userinfo // 将后端返回的 userinfo 赋值给 this.userinfo
+            // console.log('Successfully fetched user info2:', this.dataForm.userinfo)
+            this.dataForm.creator = this.dataForm.userinfo
+            // console.log('Successfully fetched user info3:', this.dataForm.creator)
+          } else {
+            console.error('Failed to fetch vehicle types:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the vehicle types!', error)
+        })
+      },
+      submitForm (formName) {
+        this.fetchuserinform()
+        console.log('Successfully fetched user info4:', this.dataForm.creator)
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.dataForm.subtasks.forEach(subtask => {
+              this.$http({
+                url: this.$http.adornUrl(`/generator/issuemasktable/save`),
+                method: 'post',
+                data: this.$http.adornData({
+                  'issuemaskId': this.dataForm.issuemaskId || undefined,
+                  'serialNumber': subtask.serialNumber,
+                  'issueNumber': this.dataForm.issueNumber,
+                  'reviewers': this.dataForm.reviewers,
+                  'recipients': subtask.assignee,
+                  'maskcontent': subtask.name,
+                  'creator': this.dataForm.creator,
+                  'creationTime': this.dataForm.creationTime,
+                  'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+                  'superiorMask': subtask.parentTask, // 确保上级任务数据被包含                  'nextMask': this.dataForm.nextMask,
+                  'state': '审核中'
+                })
+              }).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$emit('refreshDataList')
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
+                }
+              })
+              console.log('时间:', this.dataForm.requiredCompletionTime)
+              console.log('发起人:', this.dataForm.userinfo)
+            })
+          }
+          // 重置 subtasks 数组，只保留一个初始组合
+          this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
+          this.visible1 = false // 关闭对话框或重置其他状态
+        })
+      },
+      resetForm (formName) {
+        // 重置 subtasks 数组，只保留一个初始组合
+        this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
+      },
+      handlePictureCardPreview (file) {
+        this.dialogImageUrl = file.url
+        console.log('图片路径：', file.url)
+        this.dialogVisible = true
+      },
+      handleRemove (file, fileList) {
+        console.log('移除图片:', file, fileList)
+      },
+      uploadImage () {
+        if (!this.file) {
+          this.$message.error('请先选择文件')
+          return
+        }
+        console.log('准备上传文件:', this.file)
+
+        const formData = new FormData()
+        formData.append('file', this.file)
+        // formData.append('issueId', this.dataForm.issueId)
+
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/upload'),
+          method: 'post',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '文件上传成功',
+              type: 'success'
+            })
+            // 处理上传成功后的逻辑
+            // 例如，更新本地状态或执行其他操作
+            const iamgenewURL = data.data
+            this.dataForm.issuePhoto = iamgenewURL
+          } else {
+            this.$message.error('文件上传失败: ' + (data.message || '未知错误'))
+          }
+        }).catch(error => {
+          console.error('文件上传失败:', error)
+          if (error.response) {
+            // 请求已发出，但服务器响应了状态码
+            // 服务器响应的完整数据
+            console.error('服务器响应数据:', error.response.data)
+            console.error('服务器响应状态码:', error.response.status)
+            console.error('服务器响应头:', error.response.headers)
+          } else if (error.request) {
+            // 请求已发出，但没有收到响应
+            // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+            // 在 Node.js 中是 http.ClientRequest 的实例
+            console.error('请求未收到响应:', error.request)
+          } else {
+            // 其他错误
+            console.error('设置请求时出错:', error.message)
+          }
+          this.$message.error('文件上传失败: ' + (error.message || '未知错误'))
+        })
+      },
+      handleFileChange (file) {
+        // this.file = file
+        // console.log('Successfully fetched pohto:', this.file)
+        if (file && file.raw) {
+          this.file = file.raw
+          const objectURL = URL.createObjectURL(this.file)
+          console.log('File URL:', objectURL)
+          this.imageurl = objectURL
+          this.uploadImage() // 调用 uploadImage 方法
+          console.log('File URL:', this.imageurl)
+        } else {
+          console.error('Invalid file object:', file)
+        }
+        return false // 阻止自动上传
+      },
+      cancel () {
+        // 重置 vehicles 数组，只保留一个初始组合
+        this.dataForm.vehicles = [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }]
+        this.vehicleNumberOptions = []
+        this.visible = false // 关闭对话框或重置其他状态
+      },
+      addVehicle () {
+        this.dataForm.vehicles.push({
+          vehicleTypeId: '',
+          vehicleNumber: '',
+          key: Date.now()
+        })
+      },
+      removeVehicle (vehicle) {
+        let index = this.dataForm.vehicles.indexOf(vehicle)
+        if (index !== -1) {
+          this.dataForm.vehicles.splice(index, 1)
+        }
+      },
+      fetchTasksByIssueNumber (issueNumber) {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuemasktable/issuemasklist'),
+          method: 'get',
+          params: this.$http.adornParams({ issueNumber: issueNumber })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // 过滤任务列表，只保留所述问题编号与当前问题编号相同的问题
+            this.taskList = data.issues.map(issue => ({
+              value: issue.serialNumber,
+              label: issue.serialNumber
+            }))
+          } else {
+            console.error('Failed to fetch tasks:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the tasks!', error)
+        })
+      },
+      fetchIssueCategories () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetypetable/issuestype'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // console.log('Successfully fetched issue categories:', data.category)
+            this.issueCategoryOptions = data.category.map(category => ({
+              value: category.concreteIssueCategory,
+              label: category.concreteIssueCategory
+            }))
+          } else {
+            console.error('Failed to fetch issue categories:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the issue categories!', error)
+        })
+      },
+      fetchVehicleTypes () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuecartypetable/carname'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // console.log('Successfully fetched vehicle types:', data.carType)
+            this.vehicleTypeOptions = data.carType.map(carType => ({
+              value: carType.concreteVehicleType,
+              label: carType.concreteVehicleType
+            }))
+          } else {
+            console.error('Failed to fetch vehicle types:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the vehicle types!', error)
+        })
+      },
+      fetchIssueOptions () {
+        // 获取所有问题编号选项
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/issuesid'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // console.log('Successfully fetched issue options:', data.issues)
+            this.issueOptions = data.issues.map(issue => ({
+              value: issue.issueNumber,
+              label: issue.issueNumber
+            }))
+          } else {
+            console.error('Failed to fetch issue options:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the issue options!', error)
+        })
+      },
+      init (id) {
+        this.fetchuserinform() //获取用户名
+        this.dataForm.issueId = id || 0
+        this.visible = true
+        // console.log("成功获取用户名：" ,this.dataForm.userinfo)
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields()
+          if (this.dataForm.issueId) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.dataForm.serialNumber = data.issueTable.serialNumber
+                this.dataForm.issueNumber = data.issueTable.issueNumber
+                this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
+                this.dataForm.inspectionDate = data.issueTable.inspectionDate
+                this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
+                this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
+                this.dataForm.vehicleTypeIds = data.issueTable.vehicleTypeId ? data.issueTable.vehicleTypeId.split(',') : [] // 将逗号分隔的字符串转换为数组
+                this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
+                this.dataForm.issueDescription = data.issueTable.issueDescription
+                this.dataForm.issuePhoto = data.issueTable.issuePhoto
+                this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+                this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
+                this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
+                this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
+                this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+                this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
+                this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
+                this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
+                this.dataForm.remark = data.issueTable.remark
+                this.dataForm.creationTime = data.issueTable.creationTime
+                this.dataForm.lastModifier = data.issueTable.lastModifier
+                this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
+                this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
+                this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
+                this.dataForm.creationDuration = data.issueTable.creationDuration
+                this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
+                this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
+                this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
+                this.dataForm.verifier = data.issueTable.verifier
+                this.dataForm.superiorMask = data.issueMaskTable.superiorMask
+                this.dataForm.nextMask = data.issueMaskTable.nextMask
+                this.dataForm.formula = data.issueTable.formula
+                // 设置关联问题
+                // this.dataForm.associatedIssueIds = data.issueTable.associatedIssueAddition ? data.issueTable.associatedIssueAddition.split(',') : [] // 将逗号分隔的字符串转换为数组
+              }
+            })
+          }
+        })
+      },
+      init1 (id,issueNumber) {
+        this.fetchTasksByIssueNumber(issueNumber)
+        this.dataForm.issueId = id || 0
+        this.visible1 = true
+        // 为第一个子任务生成序列号
+        this.dataForm.subtasks = [{ name: '', assignee: '', parentTask: '', serialNumber: this.generateSerialNumber(), key: Date.now() }];
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields()
+          if (this.dataForm.issueId) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.dataForm.serialNumber = data.issueTable.serialNumber
+                this.dataForm.issueNumber = data.issueTable.issueNumber
+                this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
+                this.dataForm.inspectionDate = data.issueTable.inspectionDate
+                this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
+                this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
+                this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
+                this.dataForm.issueDescription = data.issueTable.issueDescription
+                this.dataForm.issuePhoto = data.issueTable.issuePhoto
+                this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+                this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
+                this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
+                this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
+                this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+                this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
+                this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
+                this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
+                this.dataForm.remark = data.issueTable.remark
+                this.dataForm.creator = data.issueTable.creator
+                this.dataForm.creationTime = data.issueTable.creationTime
+                this.dataForm.lastModifier = data.issueTable.lastModifier
+                this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
+                this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
+                this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
+                this.dataForm.creationDuration = data.issueTable.creationDuration
+                this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
+                this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
+                this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
+                this.dataForm.verifier = data.issueTable.verifier
+                this.dataForm.superiorMask = data.issueMaskTable.superiorMask
+                this.dataForm.nextMask = data.issueMaskTable.nextMask
+                this.dataForm.formula = data.issueTable.formula
+              }
+            })
+          }
+        })
+      },
+
+      // 表单提交
+      dataFormSubmit () {
+        console.log('Successfully 获得 vehicle:', this.dataForm.vehicles)
+        console.log('Successfully fetched photo2:', this.imageurl)
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            // 检查是否上传了图片
+            if (!this.imageurl) {
+              this.$message.error('请上传图片')
+              return
+            }
+            // 创建 vehicleTypeIds 数组
+            this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
+            this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
+            console.log('Successfully 获得 vehicle:', this.dataForm.vehicleTypeIds)
+            // 确保 issueCategoryId 是一个数组
+            if (!Array.isArray(this.dataForm.issueCategoryId)) {
+              this.dataForm.issueCategoryId = [this.dataForm.issueCategoryId]
+            }
+            // 将数组转换为逗号分隔的字符串
+            const issueCategoryIdString = this.dataForm.issueCategoryId.join(',')
+              this.$http({
+                url: this.$http.adornUrl(`/generator/issuetable/${!this.dataForm.issueId ? 'save' : 'update'}`),
+                method: 'post',
+                data: this.$http.adornData({
+                  'issueId': this.dataForm.issueId || undefined,
+                  // 'serialNumber': this.dataForm.serialNumber,
+                  // 'issueNumber': this.dataForm.issueNumber,
+                  // 'inspectionDepartment': this.dataForm.inspectionDepartment,
+                  // 'inspectionDate': this.dataForm.inspectionDate,
+                  // 'issueCategoryId': this.dataForm.issueCategoryId, // 使用转换后的字符串
+                  // 'vehicleTypeId': this.dataForm.vehicleTypeIds,
+                  // 'vehicleNumberId': this.dataForm.vehicleNumbers,
+                  // 'issueDescription': this.dataForm.issueDescription,
+                  // 'issuePhoto': this.dataForm.issuePhoto,
+                  // 'rectificationRequirement': this.dataForm.rectificationRequirement,
+                  // 'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+                  // 'responsibleDepartment': this.dataForm.responsibleDepartment,
+                  'rectificationStatus': this.dataForm.rectificationStatus,
+                  'actualCompletionTime': this.dataForm.actualCompletionTime,
+                  'rectificationPhotoDeliverable': this.dataForm.issuePhoto,
+                  'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+                  // 'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
+                  // 'remark': this.dataForm.remark,
+                  // 'creator': this.dataForm.creator,
+                  // 'creationTime': this.dataForm.creationTime,
+                  // 'lastModifier': this.dataForm.lastModifier,
+                  // 'lastModificationTime': this.dataForm.lastModificationTime,
+                  // 'associatedRectificationRecords': this.dataForm.associatedRectificationRecords,
+                  // 'associatedIssueAddition': this.dataForm.associatedIssueIds, // 将数组转换为逗号分隔的字符串
+                  // 'creationDuration': this.dataForm.creationDuration,
+                  'causeAnalysis': this.dataForm.causeAnalysis,
+                  // 'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
+                  // 'verificationConclusion': this.dataForm.verificationConclusion,
+                  // 'verifier': this.dataForm.verifier,
+                  // 'reviewers': this.dataForm.reviewers,
+                  // 'level': this.dataForm.level,
+                  'state': '持续',
+                  // 'superiorMask': this.dataForm.superiorMask,
+                  // 'nextMask': this.dataForm.nextMask,
+                  // 'formula': this.dataForm.formula
+                })
+              }).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$emit('refreshDataList')
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
+                }
+              })
+          }
+        })
+        // 重置 vehicles 数组，只保留一个初始组合
+        this.dataForm.vehicles = [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }]
+        this.vehicleNumberOptions = []
+      }
+
+    }
+  }
+</script>

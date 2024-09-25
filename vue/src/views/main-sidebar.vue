@@ -80,6 +80,28 @@
       this.routeHandle(this.$route)
     },
     methods: {
+      routeHandle1(route) {
+        if (route.meta.isTab) {
+          let tab = this.mainTabs.find(item => item.name === route.name);
+
+          if (!tab) {
+            tab = {
+              menuId: route.meta.menuId || route.name,
+              name: route.name,
+              title: route.meta.title,
+              type: isURL(route.meta.iframeUrl) ? 'iframe' : 'module',
+              iframeUrl: route.meta.iframeUrl || '',
+              params: route.params,
+              query: route.query
+            };
+            this.mainTabs.push(tab);
+          }
+
+          this.menuActiveName = String(tab.menuId);
+          this.mainTabsActiveName = tab.name;
+        }
+      },
+
       // 路由操作
       routeHandle (route) {
         if (route.meta.isTab) {

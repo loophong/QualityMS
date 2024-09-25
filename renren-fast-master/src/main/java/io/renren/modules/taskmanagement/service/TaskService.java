@@ -2,8 +2,9 @@ package io.renren.modules.taskmanagement.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
-import io.renren.modules.taskmanagement.entity.PlanEntity;
+import io.renren.modules.taskmanagement.entity.TaskDetailDTO;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
+import io.renren.modules.taskmanagement.entity.TaskStatisticsDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,31 @@ public interface TaskService extends IService<TaskEntity> {
 
     public List<TaskEntity> getTasksByPlanId(String planId);
 
-    List<TaskEntity> getTasksByUserId(String userId);
+    List<TaskEntity> getTasksByUserId(Long userId);
+
+    List<TaskEntity> selectTasksByUserId(Long userId);
+
+     PageUtils queryPageSelectTasksByUserId(Map<String, Object> params, Long userId);
+
+     TaskEntity getByTaskId(String taskId);
+
+    PageUtils queryPageGetUnfinishedTasks(Map<String, Object> params, Long userId);
+
+    PageUtils queryPageGetCompletedTasksList(Map<String, Object> params, Long userId);
+
+    TaskDetailDTO getTaskDetailInfo(String taskId);
+
+    int saveDecompositionTasks(List<TaskEntity> tasks);
+
+    boolean isTaskIdUsed(String taskId);
+
+    TaskStatisticsDTO taskStatistics(String planId);
+
+    PageUtils queryPageSelectTasksByPlanId(Map<String, Object> params, String planId);
+
+    List<Map<String, Integer>> home();
+
+
+//    void selectAllTasksByPlanId(String planId);
 }
 

@@ -2,6 +2,7 @@ package io.renren.modules.generator.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,8 +23,18 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     List<IssueTableEntity> listAll();
     String saveUploadedFile(MultipartFile file) throws IOException;
 
-    void updateIssuePhoto(Integer issueId, String filePath);
+//    void updateIssuePhoto(String filePath);
 
     String getuserinfo();
+
+    R closeRelatedTasks(Long issueId);
+
+    R uploadExcelFile(MultipartFile file) throws IOException;
+
+    /**
+     * 统计当月各类问题数量
+     */
+    Map<String, Integer> getCurrentMonthVerificationConclusionStatistics();
+
 }
 

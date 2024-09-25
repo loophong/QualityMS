@@ -1,118 +1,187 @@
 <template>
-  <div ref="graph_container" class="graph_container"></div>
+  <div ref="treeChartContainer" style="width: 100%; height: 100%; overflow: auto;">
+    <div ref="treeChart" style="width: 100%; height: 100%;"></div>
+  </div>
 </template>
 
 <script>
-import AddOrUpdate from '../dataManagement/indicatorindicatorsummary-add-or-update'
-import { listIndicatorSummary } from '@/api/indicator/indicator.js'
-import { mxGraph, mxEvent } from 'mxgraph-js'
+import * as d3 from 'd3';
+
 export default {
-  data () {
+  data() {
     return {
-      dataForm: {
-        key: ''
-      },
-      dataList: [],
-      pageIndex: 1,
-      pageSize: 10,
-      totalPage: 0,
-      dataListLoading: false,
-      dataListSelections: [],
-      addOrUpdateVisible: false
-    }
+      dataList: [], // 这里的数据会从服务器获取
+    };
   },
-  components: {
-    AddOrUpdate
+  mounted() {
+    this.$nextTick(() => {
+      this.updateSvgSize();
+      window.addEventListener('resize', this.updateSvgSize); // 添加窗口大小变化监听器，实时调整SVG大小
+      this.getDataList();
+    });
   },
-  activated () {
-    this.getDataList()
-  },
-  mounted () {
-    // 创建画布
-    var graph = new mxGraph(this.$refs.graph_container);
-    // 获取容器的宽度和高度
-    var containerWidth = this.$refs.graph_container.clientWidth;
-    var containerHeight = this.$refs.graph_container.clientHeight;
-    // 计算根节点的坐标，使其位于容器的中央
-    var rootNodeWidth = 240;
-    var rootNodeHeight = 120;
-    var rootNodeX = (containerWidth - rootNodeWidth) / 2;
-    var rootNodeY = (containerHeight - rootNodeHeight) / 2;
-    var parent = graph.getDefaultParent();
-    // 开始更新画布
-    graph.getModel().beginUpdate();
-    try {
-      // 插入根节点
-      let parentVertex = graph.insertVertex(parent, null, '公司质量指标体系', rootNodeX, rootNodeY, rootNodeWidth, rootNodeHeight);
-      // 插入节点
-      let v0 = graph.insertVertex();
-      let v1 = graph.insertVertex(parent, null, '三包期内产品月度返修率', 1500, 300, 120, 60);
-      let v2 = graph.insertVertex(parent, null, '222', 1500, 700, 120, 60);
-      // 插入连线
-      graph.insertEdge(parent, null, '', parentVertex, v1);
-      graph.insertEdge(parent, null, '', parentVertex, v2);
-      // 为节点添加点击事件
-      graph.addListener(mxEvent.CLICK, (sender, evt) => {
-        const cell = evt.getProperty('cell');
-        if (cell) {
-          if (cell === v1) {
-            this.$router.push({ name: 'demo01' });
-          } else if (cell === v2) {
-            window.location.href = '/path/to/statistics/page2';
-          }
-        }
-      });
-    } finally {
-      // 画布更新结束
-      graph.getModel().endUpdate();
-    }
+  beforeDestroy() {
+    window.removeEventListener('resize', this.updateSvgSize); // 组件销毁前移除监听器
   },
   methods: {
-    // 获取数据列表
-    getDataList () {
-      this.dataListLoading = true
-      const params = {
-        page: this.pageIndex,
-        limit: this.pageSize,
-        key: this.dataForm.key
-      }
-      listIndicatorSummary(params).then(({data}) => {
-        if (data && data.code === 0) {
-          this.dataList = data.page.list
-          this.totalPage = data.page.totalCount
-        } else {
-          this.dataList = []
-          this.totalPage = 0
+    updateSvgSize() {
+      this.$nextTick(() => {
+        const mainContainer = document.querySelector('main');
+        if (mainContainer) {
+          const mainWidth = mainContainer.clientWidth;
+          const mainHeight = mainContainer.clientHeight;
+          const svg = d3.select(this.$refs.treeChart).select('svg');
+          svg.attr('width', mainWidth).attr('height', mainHeight);
+          console.log(`Updated SVG size to width: ${mainWidth}, height: ${mainHeight}`);
         }
-        this.dataListLoading = false
-      })
+      });
+    },
+    getDataList() {
+      this.$http({
+        url: this.$http.adornUrl('/indicator/indicatordictionary/list02'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'page': this.pageIndex,
+          'limit': 10000,
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.dataList = data.page.list;
+          this.renderTree();
+        } else {
+          this.dataList = [];
+        }
+      });
+    },
 
-      // this.$http({
-      //   url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
-      //   method: 'get',
-      //   params: this.$http.adornParams({
-      //     'page': this.pageIndex,
-      //     'limit': this.pageSize,
-      //     'key': this.dataForm.key
-      //   })
-      // }).then(({data}) => {
-      //   if (data && data.code === 0) {
-      //     this.dataList = data.page.list
-      //     this.totalPage = data.page.totalCount
-      //   } else {
-      //     this.dataList = []
-      //     this.totalPage = 0
-      //   }
-      //   this.dataListLoading = false
-      // })
+    renderTree() {
+      const mainContainer = document.querySelector('main');
+      const mainWidth = mainContainer.clientWidth;
+      const mainHeight = mainContainer.clientHeight;
+
+      const rootNode = {
+        id: 1,
+        name: '公司质量指标管控体系',
+        parentName: '',
+        url: '',
+        classification: 'A'
+      };
+
+      const formattedData = [rootNode, ...this.dataList.map(item => ({
+        id: item.indicatorId,
+        name: item.indicatorName,
+        parentName: item.indicatorParentNode,
+        url: 'indicatorchart',
+        classification: item.indicatorClassification,
+      }))];
+
+      const treeData = this.buildTree(formattedData);
+
+      const margin = {top: 20, right: 120, bottom: 20, left: 120};
+      const width = mainWidth - margin.right - margin.left;
+      const height = mainHeight - margin.top - margin.bottom;
+
+      const svg = d3.select(this.$refs.treeChart)
+        .append('svg')
+        .attr('width', mainWidth)
+        .attr('height', mainHeight)
+        .call(d3.zoom().on("zoom", (event) => {  // 添加缩放和平移功能
+          svg.attr("transform", event.transform);
+        }))
+        .append('g');
+
+      const root = d3.hierarchy(treeData[0]);
+      const treeLayout = d3.tree().size([height * 2, width]); // 增加高度比例
+      treeLayout(root);
+
+      svg.selectAll('line.link')
+        .data(root.links())
+        .enter()
+        .append('line')
+        .attr('class', 'link')
+        .attr('x1', d => d.source.y + 100)
+        .attr('y1', d => d.source.x)
+        .attr('x2', d => d.target.y - 100)
+        .attr('y2', d => d.target.x)
+        .style('stroke', '#ccc');
+
+      const nodes = svg.selectAll('g.node')
+        .data(root.descendants())
+        .enter()
+        .append('g')
+        .attr('class', 'node')
+        .attr('transform', d => `translate(${d.y},${d.x})`)
+        .on('click', (event, d) => {
+          this.$router.push({
+            name: d.data.url,
+            params: {indicatorName: d.data.name}
+          });
+        })
+        .on('mouseover', function(event, d) { // 鼠标移入事件
+          d3.select(this).select('rect')
+            .style('stroke', '#000')
+            .style('stroke-width', 2);
+        })
+        .on('mouseout', function(event, d) { // 鼠标移出事件
+          d3.select(this).select('rect')
+            .style('stroke', 'none');
+        });
+
+      const colorScale = {
+        'A': '#e74c3c',
+        'B': '#e67e22',
+        'C': '#3498db'
+      };
+
+      nodes.append('rect')
+        .attr('width', 200)
+        .attr('height', 80)
+        .attr('x', -100)
+        .attr('y', -25)
+        .attr('rx', 10)
+        .attr('ry', 10)
+        .style('fill', d => colorScale[d.data.classification] || '#000');
+
+      nodes.append('circle')  // 添加圆圈
+        .attr('cx', -90)
+        .attr('cy', -15)
+        .attr('r', 10)
+        .style('fill', '#fff');
+
+      nodes.append('text')      // 圆圈添加文本
+        .attr('x', -90)
+        .attr('y', -15)
+        .attr('text-anchor', 'middle')
+        .style('dominant-baseline', 'middle')
+        .style('font-size', '10px')
+        .style('fill', '#000')
+        .text(d => d.data.classification);
+
+      nodes.append('text')     // 节点添加文本
+        .attr('dy', '.9em')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('text-anchor', 'middle')
+        .style('dominant-baseline', 'central')
+        .text(d => d.data.name)
+        .style('fill', 'white');
+    },
+
+    buildTree(data, parentName = '') {
+      return data
+        .filter(item => item.parentName === parentName)
+        .map(item => ({
+          id: item.id,
+          name: item.name,
+          classification: item.classification,
+          url: item.url,
+          children: this.buildTree(data, item.name)
+        }));
     },
   }
-}
+};
 </script>
-<style>
-.graph_container {
-  width: 100%;
-  height: 1000px;
 
-}
+<style>
+/* 添加一些样式来美化图表 */
 </style>

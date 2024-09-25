@@ -1,8 +1,10 @@
 package io.renren.modules.indicator.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import io.renren.modules.indicator.entity.IndicatorResponseByDepartmentEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +34,7 @@ public class IndicatorDictionaryController {
     private IndicatorDictionaryService indicatorDictionaryService;
 
     /**
-     * 列表
+     * 查询列表
      */
     @RequestMapping("/list")
     @RequiresPermissions("indicator:indicatordictionary:list")
@@ -43,6 +45,28 @@ public class IndicatorDictionaryController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 查询列表（无权限）
+     */
+    @RequestMapping("/list02")
+    public R list02(@RequestParam Map<String, Object> params){
+        PageUtils page = indicatorDictionaryService.queryPage(params);
+
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 根据具体字段查询列表
+     */
+    @RequestMapping("/querylist")
+    @RequiresPermissions("indicator:indicatordictionary:list")
+    public R queryList(@RequestParam Map<String, Object> params){
+        PageUtils page = indicatorDictionaryService.queryPage(params);
+
+
+        return R.ok().put("page", page);
+    }
 
     /**
      * 信息
@@ -86,6 +110,15 @@ public class IndicatorDictionaryController {
 		indicatorDictionaryService.removeByIds(Arrays.asList(indicatorIds));
 
         return R.ok();
+    }
+
+    /**
+     * 根据管理部门统计指标数量
+     * */
+    @RequestMapping("/countsByDepartmant")
+    public List<IndicatorResponseByDepartmentEntity> getIndicatorDictionaryByDepartmant(IndicatorResponseByDepartmentEntity indicatorResponseByDepartmentEntity){
+        System.out.println("返回list=============>" + indicatorDictionaryService.countsByDepartmant(indicatorResponseByDepartmentEntity));
+        return indicatorDictionaryService.countsByDepartmant(indicatorResponseByDepartmentEntity);
     }
 
 }

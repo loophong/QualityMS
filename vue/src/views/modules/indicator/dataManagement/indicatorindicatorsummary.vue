@@ -1,13 +1,43 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+    <el-form :inline="true" :model="queryParams" @keyup.enter.native="getDataList()">
+
+      <el-form-item label="指标名称" prop="indicatorName">
+        <el-select v-model="queryParams.indicatorName" placeholder="请选择指标名称">
+          <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
+            {{ field.indicatorName }}
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="年月" prop="yearMonth">
+        <el-date-picker
+          v-model="queryParams.yearMonth"
+          type="month"
+          placeholder="选择月份"
+          format="yyyy-MM"
+          value-format="yyyy-MM"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label="管理部门" prop="managementDepartment">
+        <el-input v-model="queryParams.managementDepartment" placeholder="请输入管理部门"></el-input>
+      </el-form-item>
+      <el-form-item label="考核部门" prop="assessmentDepartment">
+        <el-input v-model="queryParams.assessmentDepartment" placeholder="请输入考核部门"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="resetQuery()">重置</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
         <el-button v-if="isAuth('indicator:indicatorindicatorsummary:save')" type="primary" @click="addOrUpdateHandle()">填报</el-button>
+      </el-col>
+      <el-col :span="1.5">
         <el-button v-if="isAuth('indicator:indicatorindicatorsummary:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+      </el-col>
+      <el-col :span="1.5">
         <el-button v-if="isAuth('indicator:indicatorindicatorsummary:save')" type="primary" @click="showUploadDialog = true">Excel导入</el-button>
         <el-col :span="1.5">
           <el-dialog title="导入Excel文件" :visible.sync="showUploadDialog" width="30%" @close="resetFileInput">
@@ -33,31 +63,30 @@
       </span>
           </el-dialog>
         </el-col>
-
-      </el-form-item>
-      <el-form-item label="选择月份">
-        <el-date-picker
-          v-model="dataForm.key.yearMonth"
-          type="month"
-          placeholder="选择月份"
-          format="yyyy-MM"
-          value-format="yyyy-MM"
-          clearable
-          @change="getDataListByMonth">
-        </el-date-picker>
-      </el-form-item>
-    </el-form>
+      </el-col>
+    </el-row>
     <el-table
       :data="dataList"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
-      style="width: 100%;">
+      style="width: 100%; margin-top: 10px;">
       <el-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50">
+      </el-table-column>
+      <!-- 序号列 -->
+      <el-table-column
+        header-align="center"
+        align="center"
+        label="序号"
+        width="60"
+      >
+        <template slot-scope="scope">
+          {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
+        </template>
       </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="indicatorId"-->
@@ -152,10 +181,35 @@
   export default {
     data () {
       return {
+        indicatorDictionaryList: {},
+
         //excel上传
         showUploadDialog:false,
         dataForm: {
           key: ''
+        },
+        //查询参数列表
+        queryParams: {
+          indicatorName: '',
+          indicatorValue: '',
+          indicatorValueUpperBound: '',
+          indicatorValueLowerBound: '',
+          assessmentDepartment: '',
+          managementDepartment: '',
+          indicatorDefinition: '',
+          indicatorClassification: '',
+          managementContentCurrentAnalysis: '',
+          dataId: '',
+          sourceDepartment: '',
+          collectionMethod: '',
+          collectionFrequency: '',
+          planId: '',
+          taskId: '',
+          indicatorParentNode: '',
+          indicatorCreatTime: '',
+          yearMonth: '',
+          indicatorState: '',
+          indicatorChildNode: ''
         },
         form: {
           indicatorId: 0,
@@ -194,19 +248,23 @@
     },
     activated () {
       this.getDataList()
+      this.getIndicatorDictionaryList()
     },
     methods: {
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        const params = {
-          page: this.pageIndex,
-          limit: this.pageSize,
-          key: this.dataForm.key
-        }
-        listIndicatorSummary(params).then(({data}) => {
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.queryParams
+          })
+        }).then(({data}) => {
           if (data && data.code === 0) {
-            console.log("1235454")
+            console.log("data====>",data)
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
@@ -215,47 +273,62 @@
           }
           this.dataListLoading = false
         })
-
-        // this.$http({
-        //   url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
-        //   method: 'get',
-        //   params: this.$http.adornParams({
-        //     'page': this.pageIndex,
-        //     'limit': this.pageSize,
-        //     'key': this.dataForm.key
-        //   })
-        // }).then(({data}) => {
-        //   if (data && data.code === 0) {
-        //     this.dataList = data.page.list
-        //     this.totalPage = data.page.totalCount
-        //   } else {
-        //     this.dataList = []
-        //     this.totalPage = 0
-        //   }
-        //   this.dataListLoading = false
-        // })
+      },
+      //查询重置
+      resetQuery() {
+        this.queryParams = {
+          indicatorName: null,
+          indicatorValue: null,
+          yearMonth: null,
+          indicatorValueUpperBound: null,
+          indicatorValueLowerBound: null,
+          assessmentDepartment: null,
+          managementDepartment: null,
+          indicatorDefinition: null,
+          indicatorClassification: null,
+          managementContentCurrentAnalysis: null,
+        }
+        this.getDataList()
+      },
+      //获取全部指标列表
+      getIndicatorDictionaryList() {
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatordictionary/list02'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 10000,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log("data2====>",data)
+            this.indicatorDictionaryList = data.page.list
+          } else {
+            this.dataList = []
+          }
+        })
       },
       // 根据月份获取数据列表
       getDataListByMonth () {
-        // this.dataListLoading = true
-        // this.$http({
-        //   url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/listByMonth'),
-        //   method: 'get',
-        //   params: this.$http.adornParams({
-        //     'month': this.dataForm.month,
-        //     'page': this.pageIndex,
-        //     'limit': this.pageSize
-        //   })
-        // }).then(({data}) => {
-        //   if (data && data.code === 0) {
-        //     this.dataList = data.page.list
-        //     this.totalPage = data.page.totalCount
-        //   } else {
-        //     this.dataList = []
-        //     this.totalPage = 0
-        //   }
-        //   this.dataListLoading = false
-        // })
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.form.yearMonth,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
       },
       // 导入excel，检查文件类型
       checkFile() {
@@ -292,22 +365,29 @@
           }
         } else {
           console.log("formData=====>",formData);
-          const aimUrl = http.adornUrl('/indicator/indicatorindicatorsummary/upload')
+          const aimUrl = http.adornUrl('/indicator/indicatorindicatorsummary/upload');
           uploadFile(formData, aimUrl)
-            .then(data => {
-              // 处理上传成功的情况
-              this.$message.success("上传成功");
-              this.getDataList();
+            .then(response => {
+              console.log("response=====>",response);
+              if (response && response.data.code === 0) {
+                if (response.data.msg.includes('存在未定义的指标')) {
+                  this.$message.warning(response.data.msg); // 提示存在未定义的指标
+                } else {
+                  this.$message.success(response.data.msg); // 正常成功提示
+                }
+                this.getDataList();
+              } else {
+                this.$message.error("上传失败，请重试");
+              }
             })
             .catch(error => {
-              // 处理上传失败的情况
               console.error('上传失败：', error);
               this.$message.error("上传失败，请重试");
             })
             .finally(() => {
-              // 无论成功或失败，都关闭上传面板
               this.showUploadDialog = false;
             });
+
         }
       },
       // 每页数

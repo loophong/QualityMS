@@ -4,39 +4,50 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="指标ID" prop="indicatorId">
-      <el-input v-model="dataForm.indicatorId" placeholder="指标ID"></el-input>
-    </el-form-item>
-    <el-form-item label="指标名称" prop="indicatorName">
-      <el-input v-model="dataForm.indicatorName" placeholder="指标名称"></el-input>
-    </el-form-item>
+      <el-form-item label="指标名称" prop="indicatorName">
+        <el-select
+          v-model="dataForm.indicatorName"
+          placeholder="请选择指标名称"
+          :disabled="!!dataForm.indicatorId"
+          @change="onIndicatorNameChange"> <!-- 当 indicatorId 存在时禁用选择 -->
+          <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
+            {{ field.indicatorName }}
+          </el-option>
+        </el-select>
+      </el-form-item>
     <el-form-item label="指标分级" prop="indicatorClassification">
-      <el-input v-model="dataForm.indicatorClassification" placeholder="指标分级"></el-input>
+      <el-input v-model="dataForm.indicatorClassification" placeholder="指标分级" :disabled="true"></el-input>
     </el-form-item>
     <el-form-item label="考核部门" prop="assessmentDepartment">
-      <el-input v-model="dataForm.assessmentDepartment" placeholder="考核部门"></el-input>
+      <el-input v-model="dataForm.assessmentDepartment" placeholder="考核部门" :disabled="true"></el-input>
     </el-form-item>
-    <el-form-item label="来源部门" prop="sourceDepartment">
-      <el-input v-model="dataForm.sourceDepartment" placeholder="来源部门"></el-input>
+    <el-form-item label="管理部门" prop="sourceDepartment">
+      <el-input v-model="dataForm.sourceDepartment" placeholder="管理部门" :disabled="true"></el-input>
     </el-form-item>
     <el-form-item label="管理内容" prop="managementContent">
       <el-input v-model="dataForm.managementContent" placeholder="管理内容"></el-input>
     </el-form-item>
-    <el-form-item label="是否管理失控" prop="isManagementOutOfControl">
-      <el-input v-model="dataForm.isManagementOutOfControl" placeholder="是否管理失控"></el-input>
-    </el-form-item>
-    <el-form-item label="是否需要理攻关" prop="isNeedsControl">
-      <el-input v-model="dataForm.isNeedsControl" placeholder="是否需要理攻关"></el-input>
-    </el-form-item>
-    <el-form-item label="关键要素" prop="keyElements">
-      <el-input v-model="dataForm.keyElements" placeholder="关键要素"></el-input>
-    </el-form-item>
-    <el-form-item label="潜在失效模式" prop="potentialFailureMode">
-      <el-input v-model="dataForm.potentialFailureMode" placeholder="潜在失效模式"></el-input>
-    </el-form-item>
-    <el-form-item label="潜在失效后果" prop="potentialFailureConsequences">
-      <el-input v-model="dataForm.potentialFailureConsequences" placeholder="潜在失效后果"></el-input>
-    </el-form-item>
+      <el-form-item label="是否管理失控" prop="isManagementOutOfControl">
+        <el-select v-model="dataForm.isManagementOutOfControl" placeholder="请选择">
+          <el-option label="是" value="是"></el-option>
+          <el-option label="否" value="否"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="是否需要理攻关" prop="isNeedsControl">
+        <el-select v-model="dataForm.isNeedsControl" placeholder="请选择">
+          <el-option label="是" value="是"></el-option>
+          <el-option label="否" value="否"></el-option>
+        </el-select>
+      </el-form-item>
+<!--    <el-form-item label="关键要素" prop="keyElements">-->
+<!--      <el-input v-model="dataForm.keyElements" placeholder="关键要素"></el-input>-->
+<!--    </el-form-item>-->
+<!--    <el-form-item label="潜在失效模式" prop="potentialFailureMode">-->
+<!--      <el-input v-model="dataForm.potentialFailureMode" placeholder="潜在失效模式"></el-input>-->
+<!--    </el-form-item>-->
+<!--    <el-form-item label="潜在失效后果" prop="potentialFailureConsequences">-->
+<!--      <el-input v-model="dataForm.potentialFailureConsequences" placeholder="潜在失效后果"></el-input>-->
+<!--    </el-form-item>-->
     <el-form-item label="涉及产品" prop="involvedProduct">
       <el-input v-model="dataForm.involvedProduct" placeholder="涉及产品"></el-input>
     </el-form-item>
@@ -76,6 +87,7 @@
   export default {
     data () {
       return {
+        indicatorDictionaryList: {},
         visible: false,
         dataForm: {
           keyIndicatorId: 0,
@@ -101,9 +113,6 @@
           controlList: ''
         },
         dataRule: {
-          indicatorId: [
-            { required: true, message: '指标ID不能为空', trigger: 'blur' }
-          ],
           indicatorName: [
             { required: true, message: '指标名称不能为空', trigger: 'blur' }
           ],
@@ -114,7 +123,7 @@
             { required: true, message: '考核部门不能为空', trigger: 'blur' }
           ],
           sourceDepartment: [
-            { required: true, message: '来源部门不能为空', trigger: 'blur' }
+            { required: true, message: '管理部门不能为空', trigger: 'blur' }
           ],
           managementContent: [
             { required: true, message: '管理内容不能为空', trigger: 'blur' }
@@ -125,46 +134,78 @@
           isNeedsControl: [
             { required: true, message: '是否需要理攻关不能为空', trigger: 'blur' }
           ],
-          keyElements: [
-            { required: true, message: '关键要素不能为空', trigger: 'blur' }
-          ],
-          potentialFailureMode: [
-            { required: true, message: '潜在失效模式不能为空', trigger: 'blur' }
-          ],
-          potentialFailureConsequences: [
-            { required: true, message: '潜在失效后果不能为空', trigger: 'blur' }
-          ],
-          involvedProduct: [
-            { required: true, message: '涉及产品不能为空', trigger: 'blur' }
-          ],
-          processName: [
-            { required: true, message: '过程名称不能为空', trigger: 'blur' }
-          ],
-          controlPosition: [
-            { required: true, message: '控制位置不能为空', trigger: 'blur' }
-          ],
-          controlPersonnel: [
-            { required: true, message: '控制人员不能为空', trigger: 'blur' }
-          ],
-          controlMethod: [
-            { required: true, message: '控制方法不能为空', trigger: 'blur' }
-          ],
-          evaluationMeasurementTechnique: [
-            { required: true, message: '评价测量技术不能为空', trigger: 'blur' }
-          ],
-          sampleSize: [
-            { required: true, message: '样本大小不能为空', trigger: 'blur' }
-          ],
-          samplingFrequency: [
-            { required: true, message: '抽样频率不能为空', trigger: 'blur' }
-          ],
-          controlList: [
-            { required: true, message: '控制清单不能为空', trigger: 'blur' }
-          ]
+          // keyElements: [
+          //   { required: true, message: '关键要素不能为空', trigger: 'blur' }
+          // ],
+          // potentialFailureMode: [
+          //   { required: true, message: '潜在失效模式不能为空', trigger: 'blur' }
+          // ],
+          // potentialFailureConsequences: [
+          //   { required: true, message: '潜在失效后果不能为空', trigger: 'blur' }
+          // ],
+          // involvedProduct: [
+          //   { required: true, message: '涉及产品不能为空', trigger: 'blur' }
+          // ],
+          // processName: [
+          //   { required: true, message: '过程名称不能为空', trigger: 'blur' }
+          // ],
+          // controlPosition: [
+          //   { required: true, message: '控制位置不能为空', trigger: 'blur' }
+          // ],
+          // controlPersonnel: [
+          //   { required: true, message: '控制人员不能为空', trigger: 'blur' }
+          // ],
+          // controlMethod: [
+          //   { required: true, message: '控制方法不能为空', trigger: 'blur' }
+          // ],
+          // evaluationMeasurementTechnique: [
+          //   { required: true, message: '评价测量技术不能为空', trigger: 'blur' }
+          // ],
+          // sampleSize: [
+          //   { required: true, message: '样本大小不能为空', trigger: 'blur' }
+          // ],
+          // samplingFrequency: [
+          //   { required: true, message: '抽样频率不能为空', trigger: 'blur' }
+          // ],
+          // controlList: [
+          //   { required: true, message: '控制清单不能为空', trigger: 'blur' }
+          // ]
         }
       }
     },
+    created() {
+      this.getIndicatorDictionaryList()
+    },
     methods: {
+      onIndicatorNameChange(selectedName) {
+        // 根据选中的指标名称查找对应的指标信息
+        const selectedIndicator = this.indicatorDictionaryList.find(field => field.indicatorName === selectedName);
+
+        if (selectedIndicator) {
+          // 设置其他字段的值
+          this.dataForm.indicatorClassification = selectedIndicator.indicatorClassification;
+          this.dataForm.assessmentDepartment = selectedIndicator.assessmentDepartment;
+          this.dataForm.sourceDepartment = selectedIndicator.managementDepartment;
+        }
+      },
+      //获取全部指标列表
+      getIndicatorDictionaryList() {
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 10000,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log("data2====>",data)
+            this.indicatorDictionaryList = data.page.list
+          } else {
+            this.dataList = []
+          }
+        })
+      },
       init (id) {
         this.dataForm.keyIndicatorId = id || 0
         this.visible = true

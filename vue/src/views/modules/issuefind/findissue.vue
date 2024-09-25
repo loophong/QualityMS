@@ -9,6 +9,18 @@
         <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-upload
+          class="upload-demo"
+          :before-upload="beforeUpload"
+          :show-file-list="false"
+          :on-success="handleUploadSuccess"
+          :on-error="handleUploadError">
+          <el-button size="small" type="primary">点击上传 Excel</el-button>
+        </el-upload>
+
+      </el-form-item>
+
     </el-form>
     <el-table
       v-if="showForm"
@@ -29,12 +41,12 @@
       <!--        align="center"-->
       <!--        label="">-->
       <!--      </el-table-column>-->
-      <el-table-column
-        prop="serialNumber"
-        header-align="center"
-        align="center"
-        label="序号">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="serialNumber"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="序号">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="issueNumber"
         header-align="center"
@@ -57,19 +69,19 @@
         prop="issueCategoryId"
         header-align="center"
         align="center"
-        label="问题类别ID">
+        label="问题类别">
       </el-table-column>
       <el-table-column
         prop="vehicleTypeId"
         header-align="center"
         align="center"
-        label="车型ID">
+        label="车型">
       </el-table-column>
       <el-table-column
         prop="vehicleNumberId"
         header-align="center"
         align="center"
-        label="车号ID">
+        label="车号">
       </el-table-column>
       <el-table-column
         prop="issueDescription"
@@ -77,30 +89,40 @@
         align="center"
         label="问题描述">
       </el-table-column>
+
       <el-table-column
         prop="issuePhoto"
         header-align="center"
         align="center"
         label="问题照片">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
+        </template>
       </el-table-column>
 <!--      <el-table-column-->
-<!--        prop="rectificationRequirement"-->
+<!--        prop="issuePhoto"-->
 <!--        header-align="center"-->
 <!--        align="center"-->
-<!--        label="整改要求">-->
+<!--        label="问题照片">-->
 <!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="requiredCompletionTime"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="要求完成时间">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="responsibleDepartment"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="责任科室">-->
-<!--      </el-table-column>-->
+      <el-table-column
+        prop="rectificationRequirement"
+        header-align="center"
+        align="center"
+        label="整改要求">
+      </el-table-column>
+      <el-table-column
+        prop="requiredCompletionTime"
+        header-align="center"
+        align="center"
+        label="要求完成时间">
+      </el-table-column>
+      <el-table-column
+        prop="responsibleDepartment"
+        header-align="center"
+        align="center"
+        label="责任科室">
+      </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="rectificationStatus"-->
 <!--        header-align="center"-->
@@ -131,24 +153,24 @@
 <!--        align="center"-->
 <!--        label="要求二次整改时间">-->
 <!--      </el-table-column>-->
-      <el-table-column
-        prop="remark"
-        header-align="center"
-        align="center"
-        label="备注">
-      </el-table-column>
-      <el-table-column
-        prop="creator"
-        header-align="center"
-        align="center"
-        label="创建人">
-      </el-table-column>
-      <el-table-column
-        prop="creationTime"
-        header-align="center"
-        align="center"
-        label="创建时间">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="remark"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="备注">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="creator"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="创建人">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="creationTime"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="创建时间">-->
+<!--      </el-table-column>-->
 <!--      <el-table-column-->
 <!--        prop="lastModifier"-->
 <!--        header-align="center"-->
@@ -167,24 +189,24 @@
 <!--        align="center"-->
 <!--        label="关联问题整改记录">-->
 <!--      </el-table-column>-->
-      <el-table-column
-        prop="associatedIssueAddition"
-        header-align="center"
-        align="center"
-        label="关联问题添加">
-      </el-table-column>
-      <el-table-column
-        prop="creationDuration"
-        header-align="center"
-        align="center"
-        label="创建时长">
-      </el-table-column>
-      <el-table-column
-        prop="causeAnalysis"
-        header-align="center"
-        align="center"
-        label="原因分析">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="associatedIssueAddition"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="关联问题添加">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="creationDuration"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="创建时长">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="causeAnalysis"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="原因分析">-->
+<!--      </el-table-column>-->
 <!--      <el-table-column-->
 <!--        prop="rectificationVerificationStatus"-->
 <!--        header-align="center"-->
@@ -216,7 +238,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId)">问题分析</el-button>
+<!--          <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId)">问题分析</el-button>-->
           <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
         </template>
       </el-table-column>
@@ -233,11 +255,22 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <add-or-update v-if="assertOrUpdateVisible" ref="assetOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <!-- 图片预览对话框 -->
+    <el-dialog :visible.sync="imagePreviewVisible" :title="imagePreviewTitle">
+      <img :src="imagePreviewUrl" style="width: 100%;">
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import AddOrUpdate from './issuetable-add-or-update.vue'
+
+
+//如果新打开的页面是另外一个项目(前提是另一个项目也是自己的)的话可以在请求拦截request.interceptors.js中获取
+
+//如果新打开的页面是另外一个项目(不是自己的项目)的话我们只负责Cookie.set存，取得话需要根据实际情况考虑
+
+
 // import {isAuth} from "../../../utils";
 export default {
   data () {
@@ -253,7 +286,10 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
-      assertOrUpdateVisible: false
+      assertOrUpdateVisible: false,
+      imagePreviewVisible: false, // 图片预览对话框显示控制
+      imagePreviewUrl: '', // 图片预览URL
+      imagePreviewTitle: '' // 图片预览标题
     }
   },
   components: {
@@ -263,6 +299,63 @@ export default {
     this.getDataList()
   },
   methods: {
+    // 在上传前的检查
+    beforeUpload(file) {
+      const isExcel = file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      const isLt2M = file.size / 1024 / 1024 < 2; // 限制文件大小为2MB
+
+      if (!isExcel) {
+        this.$message.error('上传文件只能是 Excel 文件!');
+        return false; // 返回 false，阻止上传
+      }
+
+      if (!isLt2M) {
+        this.$message.error('上传文件大小不能超过 2MB!');
+        return false; // 返回 false，阻止上传
+      }
+
+      // 使用 FormData 创建上传文件数据
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // 开始上传请求
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuetable/uploadExcel'),
+        method: 'post',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data' // 重要：设置请求头
+        }
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message.success('文件上传成功！');
+          this.getDataList(); // 上传成功后可以重新获取数据
+        } else {
+          this.$message.error('文件上传失败：' + data.msg);
+        }
+      }).catch(error => {
+        this.$message.error('文件上传错误：' + error.message);
+      });
+
+      return false; // 返回 false，阻止 el-upload 的自动上传
+    }
+,
+
+
+    // 上传成功的处理
+    handleUploadSuccess(response, file) {
+      if (response && response.code === 0) {
+        this.$message.success('文件上传成功！');
+        this.getDataList(); // 上传成功后可以重新获取数据
+      } else {
+        this.$message.error('文件上传失败：' + response.msg);
+      }
+    },
+    handleUploadError(error) {
+      console.error('上传错误:', error);  // 打印错误对象
+      this.$message.error('文件上传失败：' + (error.response ? error.response.data.message : error.message)); // 提供更详细的错误信息
+    },
+
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true
@@ -314,6 +407,24 @@ export default {
         this.$refs.assetOrUpdate.init1(id)
       })
     },
+    // 图片预览
+    previewImage (imageUrl) {
+      console.log("cur imageUrl====>" + imageUrl);
+      window.open(imageUrl);
+      // this.imagePreviewUrl = imageUrl
+      // this.imagePreviewTitle = '图片预览'
+      // this.imagePreviewVisible = true
+      console.log("图片地址：" ,imageUrl)
+    },
+    //图片预览2
+
+    // handlePreviewCur(file) {
+    //   console.log(file)
+    //   console.log(file);
+    //   window.open(file);
+    // },
+
+
     // 删除
     deleteHandle (id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {

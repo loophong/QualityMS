@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.generator.entity.IssueMaskTableEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,5 +19,13 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
     PageUtils recipientsqueryPage(Map<String, Object> params);
 
     PageUtils creatorqueryPage(Map<String, Object> params);
+
+    PageUtils AuditqueryPage(Map<String, Object> params);
+
+    List<IssueMaskTableEntity> listAll(String issueNumber);
+
+    String listRecords(String issueNumber);
+
+    String dispatch(String issueNumber ,String serialNumber);
 }
 

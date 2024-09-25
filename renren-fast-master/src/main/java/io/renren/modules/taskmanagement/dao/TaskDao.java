@@ -18,6 +18,6 @@ import java.util.List;
 @Mapper
 public interface TaskDao extends BaseMapper<TaskEntity> {
 
-    List<TaskEntity> getTasksByUserId(@Param("userId") String userId);
-	
+    List<TaskEntity> getTasksByUserId(@Param("userId") Long userId);
+
 }

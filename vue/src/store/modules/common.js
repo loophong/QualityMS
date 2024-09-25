@@ -1,3 +1,5 @@
+import { get } from "lodash"
+
 export default {
   namespaced: true,
   state: {
@@ -18,6 +20,12 @@ export default {
     mainTabs: [],
     mainTabsActiveName: ''
   },
+
+
+  getters: {
+    getMainTabs: state => state.mainTabs
+  },
+
   mutations: {
     updateDocumentClientHeight (state, height) {
       state.documentClientHeight = height
@@ -43,6 +51,9 @@ export default {
     updateMainTabs (state, tabs) {
       state.mainTabs = tabs
     },
+    // getMainTabsActiveName (state) {
+    //   return get(state)
+    // },
     updateMainTabsActiveName (state, name) {
       state.mainTabsActiveName = name
     }

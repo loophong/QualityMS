@@ -2,13 +2,18 @@ package io.renren.modules.qcManagement.controller;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.modules.qcManagement.dao.QcGroupMemberDao;
+import io.renren.modules.qcManagement.dao.QcStepDao;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
+import io.renren.modules.qcManagement.entity.QcStepEntity;
 import io.renren.modules.qcManagement.service.QcGroupMemberService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -24,6 +29,39 @@ import java.util.Map;
 public class QcGroupMemberController {
     @Autowired
     private QcGroupMemberService qcGroupMemberService;
+
+    @Autowired
+    private QcGroupMemberDao qcGroupMemberDao;
+
+
+    /**
+     * QC小组活动率=有课题QC小组数/QC小组注册个数
+     *
+     */
+    @RequestMapping("/activityRate")
+    @RequiresPermissions("qcMembers:qcGroupMember:list")
+    public R activityRateList(){
+        Integer registrationNumbers = qcGroupMemberDao.countRegistrationNumbers();
+        Integer haveRegistrationNumbers = qcGroupMemberDao.countHaveRegistrationNumbers();
+        Map<String, Object> result = new HashMap<>();
+        result.put("registrationNumbers", registrationNumbers);
+        result.put("haveRegistrationNumbers", haveRegistrationNumbers);
+        return R.ok().put("result", result);
+    }
+
+    /**
+     * QC小组普及率=QC小组注册人数/职工总数
+     *
+     */
+    @RequestMapping("/penetrationRate")
+    @RequiresPermissions("qcMembers:qcGroupMember:list")
+    public R penetrationRateList(){
+        Integer registrationPeopleNumbers = qcGroupMemberDao.countMembersUnique();
+        Map<String, Object> result = new HashMap<>();
+        result.put("registrationPeopleNumbers", registrationPeopleNumbers);
+        return R.ok().put("result", result);
+    }
+
 
     /**
      * 列表

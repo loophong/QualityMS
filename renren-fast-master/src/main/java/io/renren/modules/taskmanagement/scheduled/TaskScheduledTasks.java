@@ -1,6 +1,7 @@
 package io.renren.modules.taskmanagement.scheduled;
 
 import io.renren.common.utils.DateUtils;
+import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.entity.TaskStatus;
 import io.renren.modules.taskmanagement.service.PlanService;
 import io.renren.modules.taskmanagement.service.TaskService;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -20,7 +22,7 @@ public class TaskScheduledTasks {
     private TaskService taskService;
 
 
-//    @Scheduled(cron = "0 0 4 * * *")
+    //    @Scheduled(cron = "0 0 4 * * *")
     @Scheduled(cron = "0,30 * * * * *")
     public void taskScheduledTasks() {
         log.info("定时任务执行了");
@@ -29,6 +31,12 @@ public class TaskScheduledTasks {
 
         checkPlanIsOverdue();
         checkTaskIsOverdue();
+
+        checkTaskIsCompleted();
+        checkPlanIsCompleted();
+
+        trackPlanProgress();
+        trackTaskProgress();
     }
 
     /**
@@ -121,6 +129,107 @@ public class TaskScheduledTasks {
                 taskService.updateById(task);
 
             }
+
+        });
+    }
+
+    /**
+     * @description: 检查当前任务是否完成，如果当前任务其子任务全部完成，则修改任务状态  未完成 ==> 已完成
+     * @author: hong
+     * @date: 2024/9/23 16:42
+     * @version: 1.0
+     */
+    public void checkTaskIsCompleted() {
+        taskService.query().eq("task_current_state", TaskStatus.IN_PROGRESS).list().forEach(task -> {
+            log.info("检查任务是否完成，当前检查的任务为：" + task);
+
+            List<TaskEntity> childrenTasks = taskService.list(new QueryWrapper<TaskEntity>().eq("task_parent_node", task.getTaskId()));
+            if (childrenTasks.size() > 0) {
+                for (TaskEntity childrenTask : childrenTasks) {
+                    if (childrenTask.getTaskCurrentState() != TaskStatus.COMPLETED) {
+                        return;
+                    }
+                }
+                task.setTaskCurrentState(TaskStatus.COMPLETED);
+                taskService.updateById(task);
+            }
+
+        });
+    }
+
+    /**
+     * @description: 检查当前计划是否完成，如果当前计划其子任务全部完成，则修改计划状态  未完成 ==> 已完成
+     * @author: hong
+     * @date: 2024/9/23 16:42
+     * @version: 1.0
+     */
+    public void checkPlanIsCompleted() {
+        planService.query().eq("plan_current_state", TaskStatus.IN_PROGRESS).list().forEach(plan -> {
+            log.info("检查计划是否完成,当前检查的计划为：" + plan);
+
+            List<TaskEntity> childrenTasks = taskService.list(new QueryWrapper<TaskEntity>().eq("task_associated_plan_id", plan.getPlanId()));
+            if (childrenTasks.size() > 0) {
+                for (TaskEntity childrenTask : childrenTasks) {
+                    if (childrenTask.getTaskCurrentState() != TaskStatus.COMPLETED) {
+                        return;
+                    }
+                }
+                plan.setPlanCurrentState(TaskStatus.COMPLETED);
+                planService.updateById(plan);
+            }
+
+        });
+    }
+
+    /**
+     * @description: 统计计划进度
+     * @author: hong
+     * @date: 2024/9/25 18:43
+     * @version: 1.0
+     */
+    public void trackPlanProgress() {
+        planService.query().list().forEach(plan -> {
+            log.info("统计计划进度,当前检查的计划为：" + plan);
+
+            //查询计划的直属子任务
+            int allChildNum = taskService.list(new QueryWrapper<TaskEntity>().eq("task_associated_plan_id", plan.getPlanId())
+                    .and(w -> w.eq("task_parent_node", plan.getPlanId()))).size();
+            int allChildFinishedNum = taskService.list(new QueryWrapper<TaskEntity>().eq("task_associated_plan_id", plan.getPlanId())
+                    .and(w -> w.eq("task_parent_node", plan.getPlanId()))
+                    .and(w -> w.eq("task_current_state", TaskStatus.COMPLETED))).size();
+
+            log.info("allChildNum:" + allChildNum);
+            log.info("allChildFinishedNum:" + allChildFinishedNum);
+
+            plan.setPlanSchedule(String.valueOf((int)(allChildFinishedNum * 100.0 / allChildNum)));
+            planService.updateById(plan);
+        });
+    }
+
+    /**
+     * @description: 统计任务进度
+     * @author: hong
+     * @date: 2024/9/25 18:43
+     * @version: 1.0
+     */
+    public void trackTaskProgress() {
+        taskService.query().list().forEach(task -> {
+            log.info("统计计划进度,当前检查的计划为：" + task);
+
+            //查询计划的直属子任务
+            int allChildNum = taskService.list(new QueryWrapper<TaskEntity>().eq("task_parent_node", task.getTaskId())).size();
+            int allChildFinishedNum = taskService.list(new QueryWrapper<TaskEntity>().eq("task_parent_node", task.getTaskId())
+                    .and(w -> w.eq("task_current_state", TaskStatus.COMPLETED))).size();
+
+            log.info("allChildNum:" + allChildNum);
+            log.info("allChildFinishedNum:" + allChildFinishedNum);
+
+            if (allChildNum == 0 || allChildFinishedNum == 0) {
+                task.setTaskSchedule(String.valueOf(0));
+            } else {
+                task.setTaskSchedule(String.valueOf((int)(allChildFinishedNum * 100.0 / allChildNum)));
+            }
+            taskService.updateById(task);
 
         });
     }

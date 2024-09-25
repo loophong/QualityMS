@@ -145,6 +145,11 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
     }
 
     @Override
+    public List<TaskLineChartDTO> taskLineDisplay(String planId) {
+        return taskDao.taskLineDisplay(planId);
+    }
+
+    @Override
     public TaskDetailDTO getTaskDetailInfo(String taskId) {
         TaskEntity task = taskDao.selectOne(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskId, taskId));
 

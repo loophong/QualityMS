@@ -3,6 +3,7 @@ package io.renren.modules.taskmanagement.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.taskmanagement.entity.PlanEntity;
+import io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto;
 
 import java.util.List;
 import java.util.Map;
@@ -25,5 +26,7 @@ public interface PlanService extends IService<PlanEntity> {
     List<PlanEntity> getPlansByUserId(String userId);
 
     List<Map<String, Integer>> home();
+
+    List<PlanStatisticsLabelDto> getPlanLabel();
 }
 

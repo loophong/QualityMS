@@ -119,7 +119,37 @@ public class SPCController {
         }
         dataList.add(R);
 
+        List<Double> unliang = new ArrayList<>();
+        unliang.add(1.97);unliang.add(1.24);unliang.add(3.82);unliang.add(1.71);unliang.add(1.95);
+        unliang.add(2.40);unliang.add(2.42);unliang.add(1.73);unliang.add(1.29);unliang.add(3.15);
+        unliang.add(1.97);unliang.add(1.78);unliang.add(2.38);unliang.add(2.04);unliang.add(1.32);
+        unliang.add(1.61);unliang.add(1.86);unliang.add(1.37);unliang.add(4.22);unliang.add(2.58);
+        unliang.add(3.78);unliang.add(1.07);unliang.add(1.51);unliang.add(0.71);unliang.add(2.16);
+        dataList.add(unliang);
 
+        List<Double> UCL = new ArrayList<>();
+        UCL.add(2.95);UCL.add(3.19);UCL.add(3.04);UCL.add(2.94);UCL.add(3.03);
+        UCL.add(2.99);UCL.add(3.04);UCL.add(3.04);UCL.add(2.97);UCL.add(3.29);
+        UCL.add(2.97);UCL.add(3.29);UCL.add(2.97);UCL.add(3.19);UCL.add(3.01);
+        UCL.add(3.12);UCL.add(2.95);UCL.add(2.95);UCL.add(3.17);UCL.add(2.99);
+        UCL.add(3.13);UCL.add(3.09);UCL.add(3.03);UCL.add(2.95);UCL.add(3.00);
+        dataList.add(UCL);
+
+        List<Double> CL = new ArrayList<>();
+        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
+        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
+        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
+        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
+        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
+        dataList.add(CL);
+
+        List<Double> LCL = new ArrayList<>();
+        LCL.add(1.20);LCL.add(0.95);LCL.add(1.10);LCL.add(1.21);LCL.add(1.12);
+        LCL.add(1.15);LCL.add(1.10);LCL.add(1.11);LCL.add(1.17);LCL.add(0.86);
+        LCL.add(1.18);LCL.add(0.96);LCL.add(1.13);LCL.add(1.03);LCL.add(1.19);
+        LCL.add(1.19);LCL.add(0.97);LCL.add(1.16);LCL.add(1.25);LCL.add(1.17);
+        LCL.add(1.02);LCL.add(1.06);LCL.add(1.12);LCL.add(1.20);LCL.add(1.15);
+        dataList.add(LCL);
 
         workbook.close();
         return dataList;

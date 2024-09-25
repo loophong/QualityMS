@@ -44,6 +44,8 @@ public interface TaskService extends IService<TaskEntity> {
 
     PageUtils queryPageSelectTasksByPlanId(Map<String, Object> params, String planId);
 
+    List<Map<String, Integer>> home();
+
 
 //    void selectAllTasksByPlanId(String planId);
 }

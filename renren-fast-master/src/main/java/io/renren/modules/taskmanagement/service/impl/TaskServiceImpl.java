@@ -1,11 +1,14 @@
 package io.renren.modules.taskmanagement.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import io.renren.common.utils.DateUtils;
 import io.renren.modules.taskmanagement.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -117,6 +120,28 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
                 new QueryWrapper<TaskEntity>().eq("task_associated_plan_id", planId)
         );
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<Map<String, Integer>> home() {
+        int year = DateUtils.getZeroTime().getYear()+1900;
+        log.info("year" + year);
+
+        // 查询当年的任务数量,计划开始时间年份模糊匹配 year
+        int taskNum = taskDao.selectList(new QueryWrapper<TaskEntity>().like("task_start_date", year)).size();
+        // 查询当年 已完成 任务数量,计划开始时间年份模糊匹配 year
+        int completedTaskNum = taskDao.selectList(new QueryWrapper<TaskEntity>().eq("task_current_state", TaskStatus.COMPLETED).like("task_start_date", year)).size();
+
+        List<Map<String, Integer>> maps = new ArrayList<>();
+        Map<String, Integer> taskNumMap = new HashMap<>();
+        taskNumMap.put("taskNum", taskNum);
+        maps.add(taskNumMap);
+
+        Map<String, Integer> completedTaskNumMap = new HashMap<>();
+        completedTaskNumMap.put("completedTaskNum", completedTaskNum);
+        maps.add(completedTaskNumMap);
+
+        return maps;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.renren.modules.taskmanagement.controller;
 
+import java.security.Key;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,26 @@ public class PlanController {
     @Autowired
     private TaskService taskService;
 
+    /**
+     * @description: 大屏展示计划和任务信息
+     * @author: hong
+     * @date: 2024/9/25 9:55
+     * @version: 1.0
+     */
+    @RequestMapping("/home")
+    public List<Map<String, Integer>> home() {
+        // 查询当年的计划数量
+        List<Map<String, Integer>> plan = planService.home();
+
+        List<Map<String, Integer>> task = taskService.home();
+
+        plan.add(0, task.get(0));
+        plan.add(1, task.get(1));
+
+        log.info("大屏数据" + plan.toString());
+
+        return plan;
+    }
 
 
     /**
@@ -47,7 +68,7 @@ public class PlanController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("taskmanagement:plan:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = planService.queryPage(params);
 
         System.out.println(page.getList().toString());
@@ -61,8 +82,8 @@ public class PlanController {
      */
     @RequestMapping("/info/{tmPid}")
     @RequiresPermissions("taskmanagement:plan:info")
-    public R info(@PathVariable("tmPid") Long tmPid){
-		PlanEntity taskManagementPlan = planService.getById(tmPid);
+    public R info(@PathVariable("tmPid") Long tmPid) {
+        PlanEntity taskManagementPlan = planService.getById(tmPid);
 
         return R.ok().put("taskManagementPlan", taskManagementPlan);
     }
@@ -72,7 +93,7 @@ public class PlanController {
      */
     @PostMapping("/save")
     @RequiresPermissions("taskmanagement:plan:save")
-    public R save(@RequestBody PlanAndTaskDTO planAndTaskDTO){
+    public R save(@RequestBody PlanAndTaskDTO planAndTaskDTO) {
         System.out.println(planAndTaskDTO);
 
         planService.save(planAndTaskDTO.getPlan());
@@ -92,7 +113,7 @@ public class PlanController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("taskmanagement:plan:update")
-    public R update(@RequestBody PlanAndTaskDTO planAndTaskDTO){
+    public R update(@RequestBody PlanAndTaskDTO planAndTaskDTO) {
 //        planService.updateById(taskManagementPlan);
 
         PlanEntity plan = planAndTaskDTO.getPlan();
@@ -100,7 +121,7 @@ public class PlanController {
 
         List<TaskEntity> tasks = planAndTaskDTO.getTasks();
         tasks.forEach(task -> {
-            log.info("当前task为"+ task);
+            log.info("当前task为" + task);
             if (taskService.isTaskIdUsed(task.getTaskId())) {
                 // 如果任务编号已经被使用，则通过taskid更新任务
                 taskService.updateById(task);
@@ -122,7 +143,7 @@ public class PlanController {
      */
     @RequestMapping("/delete/{planId}")
     @RequiresPermissions("taskmanagement:plan:delete")
-    public R delete(@PathVariable String planId){
+    public R delete(@PathVariable String planId) {
         QueryWrapper<PlanEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("plan_id", planId);
         planService.remove(queryWrapper);
@@ -153,7 +174,7 @@ public class PlanController {
      * @date: 2024/7/23 23:15
      **/
     @GetMapping("/getPlanAllInfo")
-    public PlanAndTaskDTO getPlanAllInfo(@RequestParam String planId){
+    public PlanAndTaskDTO getPlanAllInfo(@RequestParam String planId) {
 
         PlanAndTaskDTO planAndTaskDTO = new PlanAndTaskDTO();
         PlanEntity plan = planService.getPlanByPlanName(planId);
@@ -171,7 +192,7 @@ public class PlanController {
      * @date: 2024/7/23 23:57
      **/
     @GetMapping("/getPlansByUserId")
-    public List<PlanEntity> getPlansByUserId(@RequestParam String userId){
+    public List<PlanEntity> getPlansByUserId(@RequestParam String userId) {
         return planService.getPlansByUserId(userId);
     }
 
@@ -181,7 +202,7 @@ public class PlanController {
      * @date: 2024/7/24 10:11
      **/
     @GetMapping("/getTasksByUserId")
-    public List<TaskEntity> getTasksByUserId(@RequestParam Long userId){
+    public List<TaskEntity> getTasksByUserId(@RequestParam Long userId) {
         return taskService.getTasksByUserId(userId);
     }
 

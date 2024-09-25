@@ -1,9 +1,13 @@
 package io.renren.modules.taskmanagement.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import io.renren.common.utils.DateUtils;
+import io.renren.modules.taskmanagement.entity.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -49,6 +53,27 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
     @Override
     public List<PlanEntity> getPlansByUserId(String userId) {
         return planDao.getPlansByUserId(userId);
+    }
+
+    @Override
+    public List<Map<String, Integer>> home() {
+        int year = DateUtils.getZeroTime().getYear()+1900;
+
+        // 查询当年的计划数量,计划开始时间年份模糊匹配 year
+        int planNum = planDao.selectList(new QueryWrapper<PlanEntity>().like("plan_start_date", year)).size();
+        // 查询当年 已完成 计划数量,计划开始时间年份模糊匹配 year
+        int completedPlanNum = planDao.selectList(new QueryWrapper<PlanEntity>().eq("plan_current_state", TaskStatus.COMPLETED).like("plan_start_date", year)).size();
+
+        List<Map<String, Integer>> maps = new ArrayList<>();
+        Map<String, Integer> planNumMap = new HashMap<>();
+        planNumMap.put("planNum", planNum);
+        maps.add(planNumMap);
+
+        Map<String, Integer> completedPlanNumMap = new HashMap<>();
+        completedPlanNumMap.put("completedPlanNum", completedPlanNum);
+        maps.add(completedPlanNumMap);
+
+        return maps;
     }
 
 }

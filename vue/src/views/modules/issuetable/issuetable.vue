@@ -83,13 +83,22 @@
 <!--        align="center"-->
 <!--        label="问题照片">-->
 <!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="issuePhoto"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题照片">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-image :src="scope.row.issuePhoto" style="width: 100px;height: 100px;"></el-image>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="issuePhoto"
         header-align="center"
         align="center"
         label="问题照片">
         <template slot-scope="scope">
-          <el-image :src="scope.row.issuePhoto" style="width: 100px;height: 100px;"></el-image>
+          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -122,11 +131,20 @@
         align="center"
         label="实际完成时间">
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="rectificationPhotoDeliverable"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="整改照片交付物">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="rectificationPhotoDeliverable"
         header-align="center"
         align="center"
         label="整改照片交付物">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">下载</el-button>
+        </template>
       </el-table-column>
       <el-table-column
         prop="rectificationResponsiblePerson"
@@ -290,6 +308,11 @@
       this.fetchData()
     },
     methods: {
+      previewImage (imageUrl) {
+        console.log("cur imageUrl====>" + imageUrl);
+        window.open(imageUrl);
+        console.log("图片地址：" ,imageUrl)
+      },
       getRowClassName({ row, rowIndex }) {
         console.log(`Row index: ${rowIndex}, Class: ${rowIndex % 2 === 0 ? 'row-even' : 'row-odd'}`);
         return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';

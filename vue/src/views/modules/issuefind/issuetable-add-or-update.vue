@@ -5,12 +5,7 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="150px">
-<!--    <el-form-item label="序号" prop="serialNumber">-->
-<!--      <el-input v-model="dataForm.serialNumber" placeholder="序号"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="问题编号" prop="issueNumber">-->
-<!--      <el-input v-model="dataForm.issueNumber" placeholder="问题编号"></el-input>-->
-<!--    </el-form-item>-->
+
       <el-form-item label="检查科室" prop="inspectionDepartment">
         <el-select v-model="dataForm.inspectionDepartment" placeholder="请选择检查科室">
           <el-option
@@ -113,101 +108,11 @@
           </el-option>
         </el-select>
       </el-form-item>
-<!--    <el-form-item label="整改情况" prop="rectificationStatus">-->
-<!--      <el-input v-model="dataForm.rectificationStatus" placeholder="整改情况"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="实际完成时间" prop="actualCompletionTime">-->
-<!--      <el-input v-model="dataForm.actualCompletionTime" placeholder="实际完成时间"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="整改照片交付物" prop="rectificationPhotoDeliverable">-->
-<!--      <el-input v-model="dataForm.rectificationPhotoDeliverable" placeholder="整改照片交付物"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
-<!--      <el-input v-model="dataForm.rectificationResponsiblePerson" placeholder="整改责任人"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="要求二次整改时间" prop="requiredSecondRectificationTime">-->
-<!--      <el-input v-model="dataForm.requiredSecondRectificationTime" placeholder="要求二次整改时间"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="备注" prop="remark">-->
-<!--      <el-input v-model="dataForm.remark" placeholder="备注"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="创建人" prop="creator">-->
-<!--      <el-input v-model="dataForm.creator" placeholder="创建人"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="创建时间" prop="creationTime">-->
-<!--      <el-input v-model="dataForm.creationTime" placeholder="创建时间"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="最后修改人" prop="lastModifier">-->
-<!--      <el-input v-model="dataForm.lastModifier" placeholder="最后修改人"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="最后修改时间" prop="lastModificationTime">-->
-<!--      <el-input v-model="dataForm.lastModificationTime" placeholder="最后修改时间"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="关联问题整改记录" prop="associatedRectificationRecords">-->
-<!--      <el-input v-model="dataForm.associatedRectificationRecords" placeholder="关联问题整改记录"></el-input>-->
-<!--    </el-form-item>-->
-      <!-- 新增关联问题多选框 -->
-<!--      <el-form-item label="关联问题" prop="associatedIssueIds">-->
-<!--        <el-select v-model="dataForm.associatedIssueIds" multiple placeholder="请选择关联问题">-->
-<!--          <el-option-->
-<!--            v-for="item in issueOptions"-->
-<!--            :key="item.value"-->
-<!--            :label="item.label"-->
-<!--            :value="item.value">-->
-<!--          </el-option>-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
-<!--    <el-form-item label="创建时长" prop="creationDuration">-->
-<!--      <el-input v-model="dataForm.creationDuration" placeholder="创建时长"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="原因分析" prop="causeAnalysis">-->
-<!--      <el-input v-model="dataForm.causeAnalysis" placeholder="原因分析"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="整改验证情况" prop="rectificationVerificationStatus">-->
-<!--      <el-input v-model="dataForm.rectificationVerificationStatus" placeholder="整改验证情况"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="验证结论" prop="verificationConclusion">-->
-<!--      <el-input v-model="dataForm.verificationConclusion" placeholder="验证结论"></el-input>-->
-<!--    </el-form-item>-->
-<!--    <el-form-item label="验证人" prop="verifier">-->
-<!--      <el-input v-model="dataForm.verifier" placeholder="验证人"></el-input>-->
-<!--    </el-form-item>-->
-<!--      <el-form-item label="审核人" prop="reviewers">-->
-<!--        <el-input v-model="dataForm.reviewers" placeholder="审核人"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="审核人" prop="reviewers">-->
-<!--        <el-select v-model="dataForm.reviewers" filterable placeholder="请选择验证人">-->
-<!--          <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
-<!--            <el-option v-for="item in group.options" :key="item.value" :label="item.label"-->
-<!--                       :value="item.value">-->
-<!--            </el-option>-->
-<!--          </el-option-group>-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="问题等级" prop="level">-->
-<!--        <el-input v-model="dataForm.level" placeholder="问题等级"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="问题状态" prop="state">-->
-<!--        <el-input v-model="dataForm.state" placeholder="问题状态"></el-input>-->
-<!--      </el-form-item>-->
-<!--    <el-form-item label="公式" prop="formula">-->
-<!--      <el-input v-model="dataForm.formula" placeholder="公式"></el-input>-->
-<!--    </el-form-item>-->
-      <el-form-item label="上传图片" prop="image">
-        <el-upload
-          action="#"
-          list-type="picture-card"
-          :on-preview="handlePictureCardPreview"
-          :on-remove="handleRemove"
-          :on-change="handleFileChange"
-          :file-list="imageList"
-          :auto-upload="false">
-          <i class="el-icon-plus"></i>
-        </el-upload>
-        <el-dialog :visible.sync="dialogVisible">
-          <img width="100%" :src="dialogImageUrl" alt="">
-        </el-dialog>
+      <el-form-item label="" prop="issuePhoto">
+        <el-button @click="imageload()">上传图片</el-button>
       </el-form-item>
+
+
     </el-form>
     <span slot="footer" class="dialog-footer">
         <el-button @click="cancel()">取消</el-button>
@@ -231,6 +136,25 @@
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
+
+    <el-dialog
+      title="上传文件"
+      :close-on-click-modal="false"
+      @close="closeHandle"
+      :visible.sync="visibleUpload">
+      <el-upload
+        drag
+        :action="url"
+        :before-upload="beforeUploadHandle"
+        :on-success="successHandle"
+        multiple
+        :file-list="fileList"
+        style="text-align: center;">
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
+      </el-upload>
+    </el-dialog>
   </div>
 </template>
 
@@ -248,6 +172,11 @@
         dialogImageUrl: '',
         imageList: [],
         dialogVisible: false,
+        visibleUpload: false, // 上传对话框的可见性
+        url: '',
+        num: 0,
+        successNum: 0,
+        fileList: [],
         dataForm: {
           userinfo: '',
           vehicles: [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }],
@@ -334,6 +263,44 @@
 
     },
     methods: {
+      imageload() {
+        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`);
+        this.visibleUpload = true; // 打开上传对话框
+      },
+      // 上传之前
+      beforeUploadHandle(file) {
+        if (file.type !== 'image/jpg' && file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
+          this.$message.error('只支持jpg、png、gif格式的图片！');
+          return false;
+        }
+        this.num++;
+      },
+      // 上传成功
+      successHandle(response, file, fileList) {
+        this.fileList = fileList;
+        this.successNum++;
+        if (response && response.code === 0) {
+          console.log('获取图片的返回' ,response)
+          console.log('获取图片的返回' ,response.code)
+          this.dataForm.issuePhoto = response.url; // 假设返回的数据中包含图片地址
+          if (this.num === this.successNum) {
+            this.$confirm('操作成功, 是否继续操作?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).catch(() => {
+              this.visibleUpload = false; // 关闭上传对话框
+            });
+          }
+        } else {
+          this.$message.error(response.msg);
+        }
+      },
+      // 弹窗关闭时
+      closeHandle() {
+        this.fileList = []; // 清空文件列表
+        this.$emit('refreshDataList'); // 可选：触发数据刷新
+      },
       //问题编号
       generateSerialNumber() {
         const now = new Date();
@@ -343,83 +310,10 @@
         const random = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
         return `${year}${month}${day}${random}`;
       },
-      handlePictureCardPreview (file) {
-        this.dialogImageUrl = file.url
-        console.log('图片路径：', file.url)
-        this.dialogVisible = true
-      },
-      handleRemove (file, fileList) {
-        console.log('移除图片:', file, fileList)
-      },
-      uploadImage () {
-        if (!this.file) {
-          this.$message.error('请先选择文件')
-          return
-        }
-        console.log('准备上传文件:', this.file)
-
-        const formData = new FormData()
-        formData.append('file', this.file)
-        // formData.append('issueId', this.dataForm.issueId)
-
-        this.$http({
-          url: this.$http.adornUrl('/generator/issuetypetable/minioimage'),
-          method: 'post',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-        /**
-         * then(({ data }) => {
-         *           if (data && data.code === 0) {
-         *             this.$message({
-         *               message: '文件上传成功',
-         *               type: 'success'
-         *             })
-         *             // 处理上传成功后的逻辑
-         *             // 例如，更新本地状态或执行其他操作
-         *             const iamgenewURL = data.data
-         *             console.log('获得URL成功' ,data)
-         *             this.dataForm.issuePhoto = iamgenewURL
-         *           } else {
-         *             this.$message.error('文件上传失败: ' + (data.message || '未知错误'))
-         *           }
-         *         }).catch(error => {
-         *           console.error('文件上传失败:', error)
-         *           if (error.response) {
-         *             // 请求已发出，但服务器响应了状态码
-         *             // 服务器响应的完整数据
-         *             console.error('服务器响应数据:', error.response.data)
-         *             console.error('服务器响应状态码:', error.response.status)
-         *             console.error('服务器响应头:', error.response.headers)
-         *           } else if (error.request) {
-         *             // 请求已发出，但没有收到响应
-         *             // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
-         *             // 在 Node.js 中是 http.ClientRequest 的实例
-         *             console.error('请求未收到响应:', error.request)
-         *           } else {
-         *             // 其他错误
-         *             console.error('设置请求时出错:', error.message)
-         *           }
-         *           this.$message.error('文件上传失败: ' + (error.message || '未知错误'))
-         *         })
-         */
-      },
-      handleFileChange (file) {
-        // this.file = file
-        // console.log('Successfully fetched pohto:', this.file)
-        if (file && file.raw) {
-          this.file = file.raw
-          const objectURL = URL.createObjectURL(this.file)
-          console.log('File URL:', objectURL)
-          this.imageurl = objectURL
-          this.uploadImage() // 调用 uploadImage 方法
-          console.log('File URL:', this.imageurl)
-        } else {
-          console.error('Invalid file object:', file)
-        }
-        return false // 阻止自动上传
+      // 处理图片预览
+      handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url || file.preview;
+        this.dialogVisible = true;
       },
       cancel () {
         // 重置 vehicles 数组，只保留一个初始组合
@@ -622,10 +516,10 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             // 检查是否上传了图片
-            if (!this.imageurl) {
-              this.$message.error('请上传图片')
-              return
-            }
+            // if (!this.imageurl) {
+            //   this.$message.error('请上传图片')
+            //   return
+            // }
             // 创建 vehicleTypeIds 数组
             this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
             this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)

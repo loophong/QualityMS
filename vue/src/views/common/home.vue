@@ -30,7 +30,8 @@ export default {
       departmentCountsList: [], //查询返回list
       departmentList: ["质量科", "市场科", "企业管理科"], //部门列表
       issueStats: {}, // 存储当月问题统计数据
-      issueCategories: ["创建", "持续", "未完成", "已完成", "结项"], // 问题分类
+      issueCategories: ["持续", "未完成", "已完成", "结项"], // 问题分类
+      // issueCategories: ["创建", "持续", "未完成", "已完成", "结项"], // 问题分类
     }
   },
   mounted() {
@@ -43,57 +44,57 @@ export default {
   },
   methods: {
     //----------------指标模块-----------------
-    getIndicatorCounts() {
-      this.$http({
-        url: this.$http.adornUrl('/indicator/indicatordictionary/countsByDepartmant'),
-        method: 'get',
-        params: this.$http.adornParams({})
-      }).then(({ data }) => {
-        console.log('data123:', data);
-        this.departmentCountsList = data;
-        console.log('departmentCountsList:', this.departmentCountsList);
-        this.indicatorCounts = data.reduce((total, item) => total + item.counts, 0);
-        console.log('indicatorCounts:', this.indicatorCounts);
-        this.renderChart();
-      });
-    },
-    renderChart() {
-      const chart = echarts.init(this.$refs.indicatorChart);
-
-      const option = {
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'category',
-          data: this.departmentCountsList.map(item => item.managementDepartment),
-        },
-        yAxis: {
-          type: 'value',
-        },
-        series: [
-          {
-            name: '指标总数',
-            type: 'bar',
-            data: this.departmentCountsList.map(item => item.counts),
-            itemStyle: {
-              color: '#409EFF',
-            },
-          },
-        ],
-      };
-
-      chart.setOption(option);
-    },
+    // getIndicatorCounts() {
+    //   this.$http({
+    //     url: this.$http.adornUrl('/indicator/indicatordictionary/countsByDepartmant'),
+    //     method: 'get',
+    //     params: this.$http.adornParams({})
+    //   }).then(({ data }) => {
+    //     console.log('data123:', data);
+    //     this.departmentCountsList = data;
+    //     console.log('departmentCountsList:', this.departmentCountsList);
+    //     this.indicatorCounts = data.reduce((total, item) => total + item.counts, 0);
+    //     console.log('indicatorCounts:', this.indicatorCounts);
+    //     this.renderChart();
+    //   });
+    // },
+    // renderChart() {
+    //   const chart = echarts.init(this.$refs.indicatorChart);
+    //
+    //   const option = {
+    //     tooltip: {
+    //       trigger: 'axis',
+    //       axisPointer: {
+    //         type: 'shadow'
+    //       }
+    //     },
+    //     grid: {
+    //       left: '3%',
+    //       right: '4%',
+    //       bottom: '3%',
+    //       containLabel: true
+    //     },
+    //     xAxis: {
+    //       type: 'category',
+    //       data: this.departmentCountsList.map(item => item.managementDepartment),
+    //     },
+    //     yAxis: {
+    //       type: 'value',
+    //     },
+    //     series: [
+    //       {
+    //         name: '指标总数',
+    //         type: 'bar',
+    //         data: this.departmentCountsList.map(item => item.counts),
+    //         itemStyle: {
+    //           color: '#409EFF',
+    //         },
+    //       },
+    //     ],
+    //   };
+    //
+    //   chart.setOption(option);
+    // },
 
     //问题模块
     // 查询当月问题数量
@@ -108,7 +109,8 @@ export default {
           console.log('数据转换中......' ,this.issueStats)
           this.renderIssueChart(); // 渲染图表
         } else {
-          this.issueStats = {创建: 0, 持续: 0, 未完成: 0, 已完成: 0, 结项: 0}; // 默认值
+          this.issueStats = { 持续: 0, 未完成: 0, 已完成: 0, 结项: 0}; // 默认值
+          // this.issueStats = {创建: 0, 持续: 0, 未完成: 0, 已完成: 0, 结项: 0};
         }
       });
     },
@@ -145,7 +147,7 @@ export default {
             name: '数量',
             type: 'bar',
             data: [
-              this.issueStats['创建'] || 0,
+              // this.issueStats['创建'] || 0,
               this.issueStats['持续'] || 0,
               this.issueStats['未完成'] || 0,
               this.issueStats['已完成'] || 0,

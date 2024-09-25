@@ -163,7 +163,9 @@
 <!--    <el-form-item label="创建时长" prop="creationDuration">-->
 <!--      <el-input v-model="dataForm.creationDuration" placeholder="创建时长"></el-input>-->
 <!--    </el-form-item>-->
-
+            <el-form-item label="整改验证情况" prop="rectificationVerificationStatus">
+              <el-input v-model="dataForm.rectificationVerificationStatus" placeholder="整改验证情况"></el-input>
+            </el-form-item>
       <el-form-item label="验证结论" prop="verificationConclusion">
         <el-select
           v-model="dataForm.verificationConclusions" multiple placeholder="请选择验证结论" @change="handleSelectChange">

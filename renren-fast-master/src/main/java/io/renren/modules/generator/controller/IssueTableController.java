@@ -1,15 +1,18 @@
 package io.renren.modules.generator.controller;
 
+import io.minio.*;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.entity.IssueUtils;
 import io.renren.modules.generator.service.IssueTableService;
+import io.renren.modules.generator.service.MinioService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +36,9 @@ import java.util.stream.Collectors;
 public class IssueTableController {
     @Autowired
     private IssueTableService issueTableService;
+
+//    @Resource
+//    MinioClient minioClient;
 
 
     SimpleDateFormat saf = new SimpleDateFormat("/yyyy/MM/dd");
@@ -67,6 +73,46 @@ public class IssueTableController {
 //        return R.ok();
     }
 
+//    @PostMapping("/minioimage")
+//    @RequiresPermissions("generator:issuetable:update")
+//    public R uploadImageMinio(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+//        try {
+//            // 检查存储桶是否存在
+//            String bucketName = "your-bucket-name";  // 替换为你的存储桶名称
+//            boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+//
+//            if (!isBucketExists) {
+//                // 如果存储桶不存在，可以选择创建一个新的存储桶
+//                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+//            }
+//
+//            // 生成唯一的文件名
+//            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+//
+//            // 上传文件到 MinIO
+//            minioClient.putObject(PutObjectArgs.builder()
+//                    .bucket(bucketName)  // 设置存储桶名称
+//                    .object(fileName)    // 设置上传的对象名称
+//                    .stream(file.getInputStream(), file.getSize(), -1) // 文件流
+//                    .contentType(file.getContentType()) // 文件类型
+//                    .build());
+//
+//            // 构造文件的访问链接
+//            String fileUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+//                            .bucket(bucketName)
+//                            .object(fileName)
+//                            .build()
+//                    );
+//            System.out.println("获得图片的路径为;" +fileUrl);
+//            // 返回成功响应
+//            return R.ok().put("fileUrl", fileUrl);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return R.error("文件上传失败: " + e.getMessage());
+//        }
+//    }
+
+
     /**
      * Excel上传
      */
@@ -91,6 +137,18 @@ public class IssueTableController {
         return issueTableService.closeRelatedTasks(issueId); // 直接调用服务层方法
     }
 
+    /**
+     * 获取当月问题统计
+     */
+    @RequestMapping("/currentMonth")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getCurrentMonthVerificationConclusionStatistics() {
+        Map<String, Integer> stats = issueTableService.getCurrentMonthVerificationConclusionStatistics();
+        // 打印返回给前端的数据
+        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
 
 
 

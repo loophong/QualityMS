@@ -17,6 +17,17 @@ import io.renren.modules.qcManagement.service.QcStepService;
 public class QcStepServiceImpl extends ServiceImpl<QcStepDao, QcStepEntity> implements QcStepService {
 
     @Override
+    public PageUtils getListById(Map<String, Object> params) {
+        IPage<QcStepEntity> page = this.page(
+                new Query<QcStepEntity>().getPage(params),
+                new QueryWrapper<QcStepEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+
+    @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<QcStepEntity> page = this.page(
                 new Query<QcStepEntity>().getPage(params),

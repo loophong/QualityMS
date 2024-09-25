@@ -29,9 +29,12 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
     R closeRelatedTasks(Long issueId);
 
+    R uploadExcelFile(MultipartFile file) throws IOException;
+
     /**
      * 统计当月各类问题数量
      */
     Map<String, Integer> getCurrentMonthVerificationConclusionStatistics();
+
 }
 

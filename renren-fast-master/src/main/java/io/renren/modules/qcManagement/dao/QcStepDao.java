@@ -3,6 +3,9 @@ package io.renren.modules.qcManagement.dao;
 import io.renren.modules.qcManagement.entity.QcStepEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  *
@@ -14,5 +17,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface QcStepDao extends BaseMapper<QcStepEntity> {
 
-
+    @Select("select * from qc_step where step_subject_id = #{stepSubjectId}")
+    List<QcStepEntity> getStepListById(Integer stepSubjectId);
 }

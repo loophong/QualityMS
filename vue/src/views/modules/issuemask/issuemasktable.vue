@@ -28,12 +28,12 @@
 <!--        align="center"-->
 <!--        label="">-->
 <!--      </el-table-column>-->
-      <el-table-column
-        prop="serialNumber"
-        header-align="center"
-        align="center"
-        label="序号">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="serialNumber"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="序号">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="issueNumber"
         header-align="center"

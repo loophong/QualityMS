@@ -38,7 +38,7 @@
                 v-model="dataForm.inspectionDate"
                 type="date"
                 value-format="yyyy-MM-dd HH:mm:ss"
-                placeholder="请选择上传日期">
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
       <el-form-item label="问题类别" prop="issueCategoryId">
@@ -97,7 +97,7 @@
           v-model="dataForm.requiredCompletionTime"
           type="date"
           value-format="yyyy-MM-dd HH:mm:ss"
-          placeholder="请选择上传日期">
+          placeholder="请选择日期">
         </el-date-picker>
       </el-form-item>
 <!--    <el-form-item label="责任科室" prop="responsibleDepartment">-->
@@ -363,7 +363,7 @@
         // formData.append('issueId', this.dataForm.issueId)
 
         this.$http({
-          url: this.$http.adornUrl('/test/upload'),
+          url: this.$http.adornUrl('/generator/issuetypetable/minioimage'),
           method: 'post',
           data: formData,
           headers: {
@@ -667,12 +667,12 @@
                   'associatedIssueAddition': this.dataForm.associatedIssueIds.join(','), // 将数组转换为逗号分隔的字符串
                   'creationDuration': this.dataForm.creationDuration,
                   'causeAnalysis': this.dataForm.causeAnalysis,
-                  'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
+                  'rectificationVerificationStatus':this.dataForm.rectificationVerificationStatus,
                   'verificationConclusion': this.dataForm.verificationConclusion,
                   'verifier': this.dataForm.verifier,
                   'reviewers': this.dataForm.reviewers,
                   'level': this.dataForm.level,
-                  'state': '未完成',
+                  'state': this.dataForm.state,
                   'formula': this.dataForm.formula
                 })
               }).then(({data}) => {

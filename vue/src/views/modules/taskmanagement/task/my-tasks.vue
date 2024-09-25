@@ -104,8 +104,8 @@
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <!-- <el-button type="text" size="small" @click="finishTask(scope.row.taskId)">完成</el-button> -->
-              <el-button type="text" size="small" 
-                @click="taskDetailPage(scope.row.taskId)">任务分解</el-button>
+              <el-button type="text" size="small"
+                @click="taskUpdatePage(scope.row.taskId)">任务分解</el-button>
               <el-button type="text" size="small" v-if="scope.row.taskCurrentState === 'IN_PROGRESS'"
                 @click="showApproverDialog(scope.row)">提交审批</el-button>
               <el-button type="text" size="small" v-if="scope.row.taskCurrentState === 'APPROVAL_IN_PROGRESS'"
@@ -465,7 +465,7 @@
 </template>
 
 
-  
+
 <script>
 import AddOrUpdate from './task-update'
 
@@ -844,7 +844,7 @@ export default {
       })
     },
 
-    taskDetailPage(taskId){
+    taskUpdatePage(taskId){
       this.$router.push({
         // path: '/taskmanagement/task/task-detail-page',
         name: 'task-update-page',
@@ -869,4 +869,3 @@ export default {
 
 }
 </script>
-  

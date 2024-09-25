@@ -12,7 +12,7 @@
               </el-form-item>
               <el-form-item label="开始日期" prop="taskStartDate">
                 <el-date-picker v-model="rootTask.taskStartDate" disabled type="date" placeholder="选择开始日期"
-                  style="width: 100%;"></el-date-picker>
+                                style="width: 100%;"></el-date-picker>
               </el-form-item>
               <el-form-item label="任务天数" prop="taskScheduleDays">
                 <el-input :value="rootTask.taskScheduleDays" disabled placeholder="任务天数"></el-input>
@@ -35,8 +35,9 @@
               </el-form-item>
 
               <el-form-item label="预计完成日期" prop="taskScheduleCompletionDate">
-                <el-date-picker v-model="rootTask.taskScheduleCompletionDate" disabled type="date" placeholder="选择任务完成日期"
-                  style="width: 100%;"></el-date-picker>
+                <el-date-picker v-model="rootTask.taskScheduleCompletionDate" disabled type="date"
+                                placeholder="选择任务完成日期"
+                                style="width: 100%;"></el-date-picker>
               </el-form-item>
 
               <el-form-item label="审核人" prop="taskAuditor">
@@ -62,15 +63,14 @@
 
           <el-form-item label="任务内容" prop="taskContent">
             <el-input type="textarea" :autosize="{ minRows: 5, maxRows: 5 }" placeholder="请输入任务内容"
-              v-model="rootTask.taskContent" disabled maxlength="1000">
+                      v-model="rootTask.taskContent" disabled maxlength="1000">
             </el-input>
           </el-form-item>
 
 
-
           <!-- 任务列表 -->
           <div v-for="(task, index) in tasks" :key="index" style="background-color:#EEEEEE;" class="task-list-item">
-            <el-form :model="task" :rules="taskRule" ref="taskForm" label-width="120px">
+            <el-form :model="task" :rules="dataRule" ref="taskForm" label-width="120px">
 
               <el-row :gutter="20">
                 <el-col :span="12">
@@ -79,7 +79,7 @@
                 <el-col :span="12" class="button-col">
                   <!-- <i class="el-icon-close" @click="removeTask(index)" aria-hidden="true"></i> -->
                   <el-button type="text" icon="el-icon-close" size="large" @click="removeTask(index)"
-                    class="remove-task-button"></el-button>
+                             class="remove-task-button"></el-button>
                 </el-col>
               </el-row>
               <el-row :gutter="20">
@@ -89,7 +89,7 @@
                   </el-form-item>
                   <el-form-item label="开始日期" prop="taskStartDate">
                     <el-date-picker v-model="task.taskStartDate" type="date" placeholder="选择开始日期"
-                      style="width: 100%;"></el-date-picker>
+                                    style="width: 100%;"></el-date-picker>
                   </el-form-item>
                   <el-form-item label="任务天数" prop="taskScheduleDays">
                     <el-input :value="task.taskScheduleDays" placeholder="任务天数" disabled></el-input>
@@ -99,7 +99,7 @@
                     <el-select v-model="task.taskPrincipal" filterable placeholder="请选择负责人">
                       <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                          :value="item.value">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -114,14 +114,14 @@
 
                   <el-form-item label="预计完成日期" prop="taskScheduleCompletionDate">
                     <el-date-picker v-model="task.taskScheduleCompletionDate" type="date" placeholder="选择任务完成日期"
-                      style="width: 100%;"></el-date-picker>
+                                    style="width: 100%;"></el-date-picker>
                   </el-form-item>
 
                   <el-form-item label="审核人" prop="taskAuditor">
                     <el-select v-model="task.taskAuditor" filterable placeholder="请选择审核人">
                       <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                          :value="item.value">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -131,7 +131,7 @@
                     <el-select v-model="task.taskExecutor" multiple filterable placeholder="执行人">
                       <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                          :value="item.value">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -141,7 +141,7 @@
 
               <el-form-item label="任务内容" prop="taskContent">
                 <el-input type="textarea" :autosize="{ minRows: 5, maxRows: 5 }" placeholder="请输入任务内容"
-                  v-model="task.taskContent" maxlength="1000">
+                          v-model="task.taskContent" maxlength="1000">
                 </el-input>
               </el-form-item>
 
@@ -162,8 +162,6 @@
     </el-container>
   </div>
 </template>
-
-
 
 
 <script>
@@ -282,51 +280,42 @@ export default {
       tasks: [], // 初始化成员列表
 
 
-      taskRule: {
-        taskId: [
-          { required: true, message: '任务编号不能为空', trigger: 'blur' },
-          { validator: this.validateTaskId, trigger: 'blur' }
-        ],
-
-
-      },
-
-
-      // plan校验规则
-      // dataRule: {
-      //   planId: [
-      //     { required: true, message: '计划编号不能为空', trigger: 'blur' },
-      //     { validator: this.validatePlanId, trigger: 'blur' }
+      // taskRule: {
+      //   taskId: [
+      //     {required: true, message: '任务编号不能为空', trigger: 'blur'},
+      //     {validator: this.validateTaskId, trigger: 'blur'}
       //   ],
-      //   planName: [
-      //     { required: true, message: '计划名不能为空', trigger: 'blur' }
-      //   ],
-      //   planContent: [
-      //     { required: true, message: '任务内容不能为空', trigger: 'blur' }
-      //   ],
-      //   planStartDate: [
-      //     { required: true, message: '开始日期不能为空', trigger: 'blur' }
-      //   ],
-      //   planScheduleCompletionDate: [
-      //     {
-      //       required: true,
-      //       validator: (rule, value, callback) => this.dateValidate(rule, value, callback),
-      //       trigger: 'blur'
-      //     }
-      //   ],
-      //   planPrincipal: [
-      //     { required: true, message: '负责人不能为空', trigger: ['change', 'blur'] }
-      //   ],
-      //   planExecutor: [
-      //     { required: true, message: '执行人不能为空', trigger: 'blur' }
-      //   ],
-      //   planAuditor: [
-      //     { required: true, message: '审核人不能为空', trigger: 'blur' }
-      //   ],
-      //   // planAssociatedTasksId: [
-      //   //     { required: true, message: '关联指标编号不能为空', trigger: 'blur' }
-      //   // ],
+      //
+      //
       // },
+
+      dataRule: {
+        taskId: [
+          {required: true, message: '任务编号不能为空', trigger: 'blur'},
+          {validator: this.validateTaskId, trigger: 'blur'}
+        ],
+        taskName: [
+          {required: true, message: '任务名不能为空', trigger: 'blur'}
+        ],
+        taskContent: [
+          {required: true, message: '任务内容不能为空', trigger: 'blur'}
+        ],
+        taskStartDate: [
+          {required: true, message: '任务开始日期不能为空', trigger: 'blur'}
+        ],
+        taskScheduleCompletionDate: [
+          {required: true, message: '任务预计完成日期不能为空', trigger: 'blur'}
+        ],
+        taskPrincipal: [
+          {required: true, message: '负责人不能为空', trigger: ['change', 'blur']}
+        ],
+        taskExecutor: [
+          {required: true, message: '执行人不能为空', trigger: ['change', 'blur']}
+        ],
+        taskAuditor: [
+          {required: true, message: '审核人不能为空', trigger: ['change', 'blur']}
+        ],
+      },
 
       // statusOptions: [
       //   { value: 0, label: '未开始' },
@@ -335,8 +324,8 @@ export default {
       // ],
 
       isStatus: [
-        { value: 0, label: '否' },
-        { value: 1, label: '是' },
+        {value: 0, label: '否'},
+        {value: 1, label: '是'},
       ],
 
       //员工列表
@@ -351,7 +340,7 @@ export default {
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
-    }).then(({ data }) => {
+    }).then(({data}) => {
       this.options = data;
       console.log("员工数据" + data);
     });
@@ -386,7 +375,7 @@ export default {
             url: this.$http.adornUrl(`/taskmanagement/task/getTaskDetailInfo?taskId=${routerPlanId}`),
             method: 'get',
             params: this.$http.adornParams()
-          }).then(({ data }) => {
+          }).then(({data}) => {
             if (data) {
               console.log("任务详情" + data);
               this.rootTask = data.taskDetail.rootTask
@@ -477,7 +466,7 @@ export default {
               // },
               'tasks': tasksData
             })
-          }).then(({ data }) => {
+          }).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',
@@ -495,8 +484,6 @@ export default {
         }
       })
     },
-
-
 
 
     addTask() {
@@ -577,22 +564,23 @@ export default {
     },
 
     // 验证任务编号是否使用
-    validateTaskId(rule, value, callback) {
-      // 这里可以添加自定义的验证逻辑
-      this.checkTaskIdUsed(value);
+    async validateTaskId(rule, value, callback) {
       if (value === '' || value === null || value === undefined) {
         callback(new Error('请输入任务编号'));
       } else {
-        // 检查任务编号是否已存在
-        console.log(this.taskIdUsed);
-        callback(new Error('此任务编号已被使用，请更换!'));
+        await this.checkTaskIdUsed(value);
+        if (this.taskIdUsed) {
+          callback(new Error('此任务编号已被使用，请更换!'));
+        } else {
+          callback();
+        }
+        this.taskIdUsed = false;
       }
-      this.taskIdUsed = false
     },
-    
-    checkTaskIdUsed(taskId) {
+
+    async checkTaskIdUsed(taskId) {
       if (taskId) {
-        this.$http({
+        await this.$http({
           url: this.$http.adornUrl(`/taskmanagement/task/checkTaskId`),
           method: 'get',
           params: {
@@ -601,13 +589,11 @@ export default {
         }).then(response => {
           if (response.data) {
             this.taskIdUsed = true;
-            this.$message.error('任务编号已被使用111');
+            // this.$message.error('任务编号已被使用111');
           }
         })
       }
     },
-
-
 
 
   },
@@ -645,8 +631,6 @@ export default {
       immediate: true
     },
   },
-
-
 
 
 }

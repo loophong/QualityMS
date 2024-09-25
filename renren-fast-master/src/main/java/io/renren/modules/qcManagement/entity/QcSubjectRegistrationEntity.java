@@ -98,6 +98,11 @@ public class QcSubjectRegistrationEntity implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date activityPlan;
 	/**
+	 * 活动计划结束日期(细分日期)
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date activityPlanEnd;
+	/**
 	 * 课题关键字tag
 	 */
 	private String keywords;

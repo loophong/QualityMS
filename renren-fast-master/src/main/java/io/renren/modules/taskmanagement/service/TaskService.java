@@ -2,9 +2,9 @@ package io.renren.modules.taskmanagement.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
-import io.renren.modules.taskmanagement.entity.PlanEntity;
 import io.renren.modules.taskmanagement.entity.TaskDetailDTO;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
+import io.renren.modules.taskmanagement.entity.TaskStatisticsDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +39,12 @@ public interface TaskService extends IService<TaskEntity> {
     int saveDecompositionTasks(List<TaskEntity> tasks);
 
     boolean isTaskIdUsed(String taskId);
+
+    TaskStatisticsDTO taskStatistics(String planId);
+
+    PageUtils queryPageSelectTasksByPlanId(Map<String, Object> params, String planId);
+
+    List<Map<String, Integer>> home();
 
 
 //    void selectAllTasksByPlanId(String planId);

@@ -20,9 +20,8 @@ public class TaskScheduledTasks {
     private TaskService taskService;
 
 
-
 //    @Scheduled(cron = "0 0 4 * * *")
-//@Scheduled(cron = "0,30 * * * * *")
+//    @Scheduled(cron = "0,30 * * * * *")
     public void taskScheduledTasks() {
         log.info("定时任务执行了");
         checkPlanIsCanStart();

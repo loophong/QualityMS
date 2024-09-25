@@ -108,12 +108,12 @@
           user: [
             { required: true, message: '使用人不能为空', trigger: 'blur' }
           ],
-          calibrationDate: [
-            { required: true, message: '检校日期不能为空', trigger: 'blur' }
-          ],
-          calibrationValidity: [
-            { required: true, message: '检校有效期不能为空', trigger: 'blur' }
-          ],
+       //   calibrationDate: [
+       //     { required: true, message: '检校日期不能为空', trigger: 'blur' }
+        //  ],
+     //     calibrationValidity: [
+      //      { required: true, message: '检校有效期不能为空', trigger: 'blur' }
+     //     ],
           calibrationUnit: [
             { required: true, message: '检校单位不能为空', trigger: 'blur' }
           ],
@@ -129,9 +129,9 @@
           flag: [
             { required: true, message: '逻辑删除字段不能为空', trigger: 'blur' }
           ],
-          creatTime: [
-            { required: true, message: '创建日期不能为空', trigger: 'blur' }
-          ]
+         // creatTime: [
+       //     { required: true, message: '创建日期不能为空', trigger: 'blur' }
+       //   ]
         }
       }
     },
@@ -143,7 +143,7 @@
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/taskmanagement/instrumentledger/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/publicmanagement/instrumentledger/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
@@ -174,7 +174,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/taskmanagement/instrumentledger/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/publicmanagement/instrumentledger/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,

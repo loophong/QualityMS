@@ -35,7 +35,7 @@ public class InstrumentLedgerController {
      * 列表
      */
     @RequestMapping("/list")
-//    @RequiresPermissions("publicmanagement:instrumentledger:list")
+    @RequiresPermissions("publicmanagement:instrumentledger:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = instrumentLedgerService.queryPage(params);
 
@@ -47,7 +47,7 @@ public class InstrumentLedgerController {
      * 信息
      */
     @RequestMapping("/info/{id}")
-//    @RequiresPermissions("taskmanagement:instrumentledger:info")
+//    @RequiresPermissions("publicmanagement:instrumentledger:info")
     public R info(@PathVariable("id") Integer id){
 		InstrumentLedgerEntity instrumentLedger = instrumentLedgerService.getById(id);
 
@@ -58,7 +58,7 @@ public class InstrumentLedgerController {
      * 保存
      */
     @RequestMapping("/save")
-    @RequiresPermissions("taskmanagement:instrumentledger:save")
+    @RequiresPermissions("publicmanagement:instrumentledger:save")
     public R save(@RequestBody InstrumentLedgerEntity instrumentLedger){
 		instrumentLedgerService.save(instrumentLedger);
 
@@ -69,7 +69,7 @@ public class InstrumentLedgerController {
      * 修改
      */
     @RequestMapping("/update")
-    @RequiresPermissions("taskmanagement:instrumentledger:update")
+    @RequiresPermissions("publicmanagement:instrumentledger:update")
     public R update(@RequestBody InstrumentLedgerEntity instrumentLedger){
 		instrumentLedgerService.updateById(instrumentLedger);
 
@@ -80,7 +80,7 @@ public class InstrumentLedgerController {
      * 删除
      */
     @RequestMapping("/delete")
-    @RequiresPermissions("taskmanagement:instrumentledger:delete")
+    @RequiresPermissions("publicmanagement:instrumentledger:delete")
     public R delete(@RequestBody Integer[] ids){
 		instrumentLedgerService.removeByIds(Arrays.asList(ids));
 

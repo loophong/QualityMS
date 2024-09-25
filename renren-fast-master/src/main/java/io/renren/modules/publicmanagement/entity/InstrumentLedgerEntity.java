@@ -59,11 +59,11 @@ public class InstrumentLedgerEntity implements Serializable {
 	/**
 	 * 检校日期
 	 */
-	private Date calibrationDate;
+	private String calibrationDate;
 	/**
 	 * 检校有效期
 	 */
-	private Date calibrationValidity;
+	private String calibrationValidity;
 	/**
 	 * 检校单位
 	 */
@@ -87,6 +87,6 @@ public class InstrumentLedgerEntity implements Serializable {
 	/**
 	 * 创建日期
 	 */
-	private Date creatTime;
+	private String creatTime;
 
 }

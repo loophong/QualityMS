@@ -36,4 +36,9 @@
             or  plan_executor LIKE concat( '%"', #{userId}, '"%' )
     </select>
 
+    <select id="getPlanLabel" resultType="io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto">
+        SELECT plan_name as label, plan_id as value
+        FROM task_management_plan
+    </select>
+
 </mapper>

@@ -2,6 +2,7 @@ package io.renren.modules.taskmanagement.dao;
 
 import io.renren.modules.taskmanagement.entity.PlanEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -22,5 +23,6 @@ public interface PlanDao extends BaseMapper<PlanEntity> {
     int countByPlanNumber(@Param("planId") String planId);
 
     List<PlanEntity> getPlansByUserId(@Param("userId") String userId);
-	
+
+    List<PlanStatisticsLabelDto> getPlanLabel();
 }

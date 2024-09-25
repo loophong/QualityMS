@@ -58,7 +58,7 @@ export default {
   components: {
     qcChart
   },
-  mounted() {
+
   async mounted() {
     console.log('组件已经挂载');
     // this.getIndicatorCounts()

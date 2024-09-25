@@ -21,13 +21,14 @@
     <el-dialog title="成果认定" :visible.sync="showDialog2">
       <el-form :model="form2">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
-          <el-select v-model="form2.result" placeholder="">
+          <el-select v-model="form2.result" placeholder="" :disabled="!isAuth('qcSubject:registration:save')">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
-          <el-input type="textarea" v-model="form2.comment" autocomplete="off"></el-input>
+          <el-input type="textarea" v-model="form2.comment" autocomplete="off"
+            :disabled="!isAuth('qcSubject:registration:save')"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -38,7 +39,7 @@
     <el-dialog title="相关方审核" :visible.sync="showDialog3">
       <el-form :model="form3">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
-          <el-select v-model="form3.result" placeholder="">
+          <el-select v-model="form3.result" placeholder="" :disabled="!isAuth('qcSubject:registration:save')">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
@@ -49,7 +50,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog3 = false">取 消</el-button>
-        <el-button type="primary" @click="showDialog3 = false">确 定</el-button>
+        <el-button type="primary" @click="dataFormSubmitEx(form3.id)">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog title="成果初评" :visible.sync="showDialog4" width="60%">
@@ -148,6 +149,9 @@
           </tbody>
         </table>
         <br>
+        <el-form-item>
+
+        </el-form-item>
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form4.result" placeholder="">
             <el-option label="通过" value="1"></el-option>
@@ -413,7 +417,7 @@ export default {
       dataFormEx: [{
         qcExamineId: 0,
         qcExamineSubject: '',
-        qcExamineStatus: '',
+        qcExamineCurrent: '',
         qcStatusOne: '',
         qcStatusTwo: '',
         qcStatusThree: '',
@@ -436,17 +440,25 @@ export default {
   mounted() {
     this.initRouterParam()
     this.getStatusList()
+    // console.log(this.isAuth('qcSubject:registration:save') + '-+-+-+-+-+-+-')
   },
   methods: {
     //处理跳转参数
     initRouterParam() {
-      this.routerParam = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', topicType: '', resultType: '', examineId: '' };
-      console.log(this.routerParam[0].resultType)
-      console.log(this.routerParam[0].resultType.includes('其他'))
+      try {
+        this.routerParam = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', topicType: '', resultType: '', examineId: '' };
+        // console.log(this.routerParam[0].resultType, '++++++++++++')
+        // console.log(this.routerParam[0].resultType)
+        // console.log('qcsrId:' + this.routerParam[0].qcsrId)
+        // console.log(this.routerParam[0].resultType.includes('其他'))
+      } catch (e) {
+        console.log('处理跳转参数失败')
+        console.log(e)
+      }
     },
 
-    getStatusList() {
-      this.$http({
+    async getStatusList() {
+      await this.$http({
         url: this.$http.adornUrl('/qcManagement/examineStatus/list'),
         method: 'get',
         params: this.$http.adornParams({
@@ -457,7 +469,7 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.dataFormEx = data.page.list
-          console.log(this.dataFormEx[0].qcExamineStatus, '00000')
+          console.log(this.dataFormEx[0].qcExamineCurrent, '00000')
           this.totalPage = data.page.totalCount
           this.renderTree()
         } else {
@@ -525,6 +537,8 @@ export default {
         this.dataList[4].status = 'C'
         this.dataList[5].status = 'C'
       }
+
+
     },
     renderTree() {
       // this.$http({
@@ -545,8 +559,8 @@ export default {
         status: this.routerParam[0].resultType ? 'C' : 'A',
       };
       console.log(this.dataFormEx[0])
-      // const statusId = this.dataFormEx[0].qcExamineStatus
-      this.initStatus(this.dataFormEx[0].qcExamineStatus) // 初始化状态
+      // const statusId = this.dataFormEx[0].qcExamineCurrent
+      this.initStatus(this.dataFormEx[0].qcExamineCurrent) // 初始化状态
       // 更新状态
       let foundA = false;
       this.dataList.forEach(item => {
@@ -709,7 +723,7 @@ export default {
           data: this.$http.adornData({
             'qcExamineId': this.routerParam[0].examineId || undefined,
             'qcExamineSubject': this.routerParam[0].qcsrId,
-            'qcExamineStatus': this.form2.result === '1' ? '2' : '1',
+            'qcExamineCurrent': this.form2.result === '1' ? '2' : '1',
             'qcStatusTwo': this.form2.result,
             'qcTwoContent': this.form2.comment,
           })
@@ -742,7 +756,7 @@ export default {
           data: this.$http.adornData({
             'qcExamineId': this.routerParam[0].examineId || undefined,
             'qcExamineSubject': this.routerParam[0].qcsrId,
-            'qcExamineStatus': this.form3.result === '1' ? '3' : '1',
+            'qcExamineCurrent': this.form3.result === '1' ? '3' : '1',
             'qcStatusThree': this.form3.result,
             'qcThreeContent': this.form3.comment,
           })
@@ -768,7 +782,7 @@ export default {
           data: this.$http.adornData({
             'qcExamineId': this.routerParam[0].examineId || undefined,
             'qcExamineSubject': this.routerParam[0].qcsrId,
-            'qcExamineStatus': this.form4.result === '1' ? '4' : '1',
+            'qcExamineCurrent': this.form4.result === '1' ? '4' : '1',
             'qcFirstScore': `${this.tableData}`,
             'qcStatusFour': this.form4.result,
             'qcFourContent': this.form4.comment,
@@ -795,7 +809,7 @@ export default {
           data: this.$http.adornData({
             'qcExamineId': this.routerParam[0].examineId || undefined,
             'qcExamineSubject': this.routerParam[0].qcsrId,
-            'qcExamineStatus': this.form5.result === '1' ? (this.dataFormEx[0].qcStatusSix === '1' ? '5' : '4.1') : '4',
+            'qcExamineCurrent': this.form5.result === '1' ? (this.dataFormEx[0].qcStatusSix === '1' ? '5' : '4.1') : '4',
             'qcStatusFive': this.form5.result,
             'qcFiveContent': this.form5.comment,
             'qcSecondScore': `${this.finalData}`,
@@ -822,7 +836,7 @@ export default {
           data: this.$http.adornData({
             'qcExamineId': this.routerParam[0].examineId || undefined,
             'qcExamineSubject': this.routerParam[0].qcsrId,
-            'qcExamineStatus': this.form5.result === '1' ? (this.dataFormEx[0].qcStatusFive === '1' ? '5' : '4.2') : '1',
+            'qcExamineCurrent': this.form5.result === '1' ? (this.dataFormEx[0].qcStatusFive === '1' ? '5' : '4.2') : '1',
             'qcStatusSix': this.form6.result,
             'qcSixContent': this.form6.comment,
           })
@@ -847,7 +861,7 @@ export default {
           data: this.$http.adornData({
             'qcExamineId': this.routerParam[0].examineId || undefined,
             'qcExamineSubject': this.routerParam[0].qcsrId,
-            'qcExamineStatus': this.form7.result === '1' ? '完成' : '1',
+            'qcExamineCurrent': this.form7.result === '1' ? '完成' : '1',
             'qcStatusSeven': this.form7.result,
             'qcSevenContent': this.form7.comment,
           })

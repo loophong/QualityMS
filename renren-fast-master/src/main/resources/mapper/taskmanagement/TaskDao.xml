@@ -36,4 +36,14 @@
             or  task_executor LIKE concat( '%"', #{userId}, '"%' )
     </select>
 
+    <select id="taskLineDisplay" resultType="io.renren.modules.taskmanagement.entity.TaskLineChartDTO">
+        SELECT task_id as taskId ,task_schedule_days as taskScheduleDays, task_actual_days as taskActualDays
+        FROM task_management_task
+        where task_associated_plan_id = #{planId}
+    </select>
+<!--    private String taskId;-->
+
+<!--    private Integer taskStartTime;-->
+
+<!--    private Integer taskEndTime;-->
 </mapper>

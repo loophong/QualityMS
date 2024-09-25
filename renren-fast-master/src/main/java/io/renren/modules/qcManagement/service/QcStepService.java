@@ -14,7 +14,8 @@ import java.util.Map;
  * @date 2024-08-25 14:45:45
  */
 public interface QcStepService extends IService<QcStepEntity> {
-
+    //根据课题id获取参数
+    PageUtils getListById(Map<String, Object> params);
     PageUtils queryPage(Map<String, Object> params);
 }
 

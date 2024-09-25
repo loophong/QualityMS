@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.taskmanagement.entity.TaskDetailDTO;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
+import io.renren.modules.taskmanagement.entity.TaskLineChartDTO;
 import io.renren.modules.taskmanagement.entity.TaskStatisticsDTO;
 
 import java.util.List;
@@ -43,6 +44,10 @@ public interface TaskService extends IService<TaskEntity> {
     TaskStatisticsDTO taskStatistics(String planId);
 
     PageUtils queryPageSelectTasksByPlanId(Map<String, Object> params, String planId);
+
+    List<Map<String, Integer>> home();
+
+    List<TaskLineChartDTO> taskLineDisplay(String planId);
 
 
 //    void selectAllTasksByPlanId(String planId);

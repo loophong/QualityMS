@@ -42,6 +42,19 @@ public class TaskController {
     private ApprovalService approvalService;
 
     /**
+     * @description: 任务折线图展示
+     * @author: hong
+     * @date: 2024/9/25 16:52
+     * @version: 1.0
+     */
+    @GetMapping("/taskLineDisplay")
+    public List<TaskLineChartDTO> taskLineDisplay(String planId) {
+        List<TaskLineChartDTO> taskLineChartDTOS = taskService.taskLineDisplay(planId);
+        log.info("taskLineChartDTOS"+taskLineChartDTOS);
+        return taskLineChartDTOS;
+    }
+
+    /**
      * @description: 任务统计
      * @author: hong
      * @date: 2024/9/23 17:50

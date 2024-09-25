@@ -8,12 +8,19 @@
     </div>
     <div id="task" class="box">区域2</div>
     <div id="issue" class="box">区域3</div>
-    <div id="QC" class="box">区域4</div>
+    <div id="QC" class="box">
+      区域4
+      <!-- QC图表 -->
+      <div>
+        <qc-chart ref="qcChart"></qc-chart>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import * as echarts from "echarts";
+import qcChart from "../modules/QCmanagement/qcChart/qcChart.vue";
 
 export default {
   name: 'home',
@@ -25,6 +32,9 @@ export default {
       departmentCountsList: [], //查询返回list
       departmentList: ["质量科", "市场科", "企业管理科"], //部门列表
     };
+  },
+  components: {
+    qcChart
   },
   mounted() {
     this.getIndicatorCounts();
@@ -83,6 +93,8 @@ export default {
 
       chart.setOption(option);
     },
+
+
   }
 };
 </script>
@@ -90,21 +102,35 @@ export default {
 <style>
 .mod-home {
   display: flex;
-  flex-wrap: wrap; /* 自动换行 */
-  gap: 20px; /* 每个区域之间的间距 */
+  flex-wrap: wrap;
+  /* 自动换行 */
+  gap: 20px;
+  /* 每个区域之间的间距 */
 }
 
 .box {
-  font-size: 24px; /* 设置字体大小 */
-  flex: 1 1 40%; /* 每个区域占 30% 宽度 */
+  font-size: 24px;
+  /* 设置字体大小 */
+  flex: 1 1 40%;
+  /* 每个区域占 30% 宽度 */
   text-align: center;
   padding: 20px;
   border-radius: 4px;
-  min-width: 200px; /* 设置最小宽度，防止过小 */
-  height: 400px; /* 设置每个容器的高度为父容器的百分比 */
+  min-width: 200px;
+  /* 设置最小宽度，防止过小 */
+  height: 400px;
+  /* 设置每个容器的高度为父容器的百分比 */
 }
+
 #indicatorChart {
   width: 100%;
-  height: 100%; /* 确保图表容器高度为 100% */
+  height: 100%;
+  /* 确保图表容器高度为 100% */
+}
+
+#QC {
+  width: 100%;
+  height: 100%;
+  /* 确保图表容器高度为 100% */
 }
 </style>

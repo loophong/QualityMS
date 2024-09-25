@@ -19,12 +19,16 @@ import java.util.Map;
 
 @Service("qcSubjectRegistrationService")
 public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegistrationDao, QcSubjectRegistrationEntity> implements QcSubjectRegistrationService {
+    @Autowired
+    private QcSubjectRegistrationDao  qcSubjectRegistrationDao;
 
     @Override
     public List<QcGroupMemberEntity> getMembersOfGroup(String groupName) {
-        System.out.println("根据组名获得的成员" + baseMapper.getMembersOfGroup(groupName));
+//        System.out.println("根据组名获得的成员" + baseMapper.getMembersOfGroup(groupName));
          return baseMapper.getMembersOfGroup(groupName);
     }
+
+
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -32,8 +36,18 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 new Query<QcSubjectRegistrationEntity>().getPage(params),
                 new QueryWrapper<QcSubjectRegistrationEntity>()
         );
+        try {
+            // 模糊查询
+            List<QcSubjectRegistrationEntity> result = qcSubjectRegistrationDao.fuzzyQueryList((String) params.get("topicName"), (String) params.get("keywords"));
+            page.setRecords(result);
+            page.setTotal(result.size());
+        } catch (Exception e) {
+            System.err.println("自定义查询出错: " + e.getMessage());
+            page.setTotal(0);
+        }
 
         return new PageUtils(page);
     }
+
 
 }

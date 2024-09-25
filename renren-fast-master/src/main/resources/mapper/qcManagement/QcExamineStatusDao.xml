@@ -7,7 +7,7 @@
     <resultMap type="io.renren.modules.qcManagement.entity.QcExamineStatusEntity" id="qcExamineStatusMap">
         <result property="qcExamineId" column="qc_examine_id"/>
         <result property="qcExamineSubject" column="qc_examine_subject"/>
-        <result property="qcExamineStatus" column="qc_examine_status"/>
+        <result property="qcExamineCurrent" column="qc_examine_current"/>
         <result property="qcStatusOne" column="qc_status_one"/>
         <result property="qcStatusTwo" column="qc_status_two"/>
         <result property="qcStatusThree" column="qc_status_three"/>

@@ -1,27 +1,18 @@
 <template>
-  <div>
-    <!-- <div class="block">
-      <span class="DataSelect" style="margin-right:10px">日期选择</span>
-      <el-date-picker v-model="selectedDate" type="monthrange" unlink-panels range-separator="至"
-        start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions" @change="handleDateChange">
-      </el-date-picker>
-    </div> -->
-    <div>
-      <div id="today" ref="today"></div>
-    </div>
-    <div id="main" ref="main"></div>
+  <div style="display: flex;">
+    <div id="barChart" ref="barChart" style="width: 50%; height: 300px;"></div>
+    <div id="pieChart" ref="pieChart" style="width: 50%; height: 300px;"></div>
   </div>
 </template>
 
 <script>
 import * as echarts from 'echarts';
 import moment from 'moment';
-// import { getOutputPercapitavalueData } from '@/api/safety/chartAPI'
 
 export default {
   data() {
     return {
-      loading: false,
+      chartLoading: false,
       data: [],
       timeData: {
         startTime: new Date(),
@@ -33,87 +24,57 @@ export default {
       myChart: {},
       myChart2: {},
       chartData: [], // 存放格式化后的数据
-      parsedData: {}
+      parsedData: {},
+      activityData: {},
+      activityDataResult: '',
+      countData: {},
     }
   },
   computed: {},
-  mounted() {
-    // this.defaultMonth()
-    this.myChart = echarts.init(document.getElementById('main'))
-    // this.initData()
-    this.todayChart()
+  async mounted() {
+    await this.initData();
+    this.myChart = echarts.init(document.getElementById('barChart'))
     this.updateChart()
-
+    this.myChart2 = echarts.init(document.getElementById('pieChart'))
+    this.pieChart()
   },
   methods: {
-    // async initData() {
-    //   this.timeData.startTime = this.selectedDate[0],
-    //     this.timeData.endTime = this.selectedDate[1]
-    //   try {
-    //     this.loading = true
-    //     const res = await getOutputPercapitavalueData(this.timeData);
-    //     this.data = res
-    //     this.loading = false
-    //     this.formatData()
-    //     this.updateChart()
-    //   } catch (error) {
-    //     this.loading = false
-    //   }
-    // },
-    // handleDateChange(value) {
-    //   if (value && value[1]) {
-    //     let endDate = new Date(value[1]);
-    //     endDate.setMonth(endDate.getMonth() + 1);
-    //     endDate.setDate(0);
-    //     this.selectedDate[1] = endDate;
-    //   }
-    //   this.initData()
-    // },
-    todayChart() {
-      var chartDom = document.getElementById('today');
-      var myChart = echarts.init(chartDom);
-      var option;
-
-      option = {
-        title: {
-          text: '今日点检统计',
-          // subtext: 'Fake Data',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left'
-        },
-        series: [
-          {
-            name: '点检统计表',
-            type: 'pie',
-            radius: '50%',
-            data: [
-              { value: 72, name: '活跃度', itemStyle: { color: '#f56c6c' } },
-              { value: 75, name: '参与度', itemStyle: { color: '#4bae4f' } },
-              { value: 89, name: '完成度', itemStyle: { color: '#5db2f1' } },
-            ],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            }
+    async initData() {
+      this.chartLoading = true
+      await this.$http({
+        url: this.$http.adornUrl('/qcMembers/qcGroupMember/activityRate'),
+        method: 'get',
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.activityData = data.result
+          if (data.result.registrationNumbers === 0) {
+            this.activityDataResult = 0;
+          } else {
+            this.activityDataResult = (data.result.haveRegistrationNumbers / data.result.registrationNumbers * 100).toFixed(2)
           }
-        ]
-      };
-      option && myChart.setOption(option);
+        } else {
+          this.activityData = {}
+        }
+        this.chartLoading = false
+      })
+      await this.$http({
+        url: this.$http.adornUrl('/qcSubject/registration/count'),
+        method: 'get',
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.countData = data.count
+        } else {
+          this.countData = {}
+        }
+        this.chartLoading = false
+      })
     },
+
 
     updateChart() {
       var app = {};
 
-      var chartDom = document.getElementById('main');
+      var chartDom = document.getElementById('barChart');
       var myChart = echarts.init(chartDom);
       var option;
 
@@ -209,7 +170,7 @@ export default {
       };
       option = {
         title: {
-          text: '点检统计'
+          text: ''
         },
         tooltip: {
           trigger: 'axis',
@@ -218,10 +179,10 @@ export default {
           }
         },
         legend: {
-          data: ['参与度', '活跃度', '完成度']
+          data: ['普及率', '活动率', '成果率']
         },
         toolbox: {
-          show: true,
+          show: false,
           orient: 'vertical',
           left: 'right',
           top: 'center',
@@ -237,7 +198,7 @@ export default {
           {
             type: 'category',
             axisTick: { show: false },
-            data: ['7-16', '7-17', '7-18']
+            data: ['点检统计']
           }
         ],
         yAxis: [
@@ -247,32 +208,32 @@ export default {
         ],
         series: [
           {
-            name: '参与度',
+            name: '普及率',
             type: 'bar',
             barGap: 0,
             label: labelOption,
             emphasis: {
               focus: 'series'
             },
-            data: [82, 56, 91]
+            data: [82]
           },
           {
-            name: '活跃度',
+            name: '活动率',
             type: 'bar',
             label: labelOption,
             emphasis: {
               focus: 'series'
             },
-            data: [76, 54, 93]
+            data: [this.activityDataResult]
           },
           {
-            name: '完成度',
+            name: '成果率',
             type: 'bar',
             label: labelOption,
             emphasis: {
               focus: 'series'
             },
-            data: [71, 52, 95]
+            data: [71]
           },
 
         ]
@@ -280,29 +241,60 @@ export default {
 
       option && myChart.setOption(option);
     },
-    // defaultMonth() {
-    //   const currentDate = new Date();
-    //   const currentYear = currentDate.getFullYear();
-    //   const currentMonth = currentDate.getMonth() + 1;
-    //   const startDate = new Date(currentYear, 0, 1);
-    //   const endDate = new Date(currentYear, currentMonth, 0);
-    //   this.selectedDate = [startDate, endDate];
-    // },
-    // formatData() {
-    //   this.chartData = this.data.rows.map(rows => {
-    //     const month = rows.Year_And_Month;
-    //     const resultData = rows.resultData.split(',');
-    //     return {
-    //       month,
-    //       mechanical: parseInt(resultData[0].split(':')[1]),
-    //       pneumatic: parseInt(resultData[1].split(':')[1]),
-    //       hydraulic: parseInt(resultData[2].split(':')[1]),
-    //       electrical: parseInt(resultData[3].split(':')[1]),
-    //     };
 
-    //   });
-    // }
+    pieChart() {
+      console.log(this.countData)
+      var chartDom = document.getElementById('pieChart');
+      var myChart = echarts.init(chartDom);
+      var option;
 
+      option = {
+        title: {
+          text: '课题状态分布',
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: "{a} <br/>{b}: {c} ({d}%)"
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left'
+        },
+        series: [
+          {
+            name: '课题状态',
+            type: 'pie',
+            radius: '50%',
+            center: ['50%', '50%'], // 饼图位置
+            data: [
+              { value: this.countData.countRegistration - this.countData.countSubmitted, name: '进行中' },
+              { value: this.countData.countWithoutExamined, name: '审核中' },
+              { value: this.countData.countExamined, name: '已完成' },
+              { value: this.countData.countRegistration, name: '已注册' },
+            ],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            },
+            label: {
+              show: true,
+              position: 'outside', // 标签位置,inside、outside、top、bottom、left、right
+              formatter: '{b}: {c} ({d}%)'
+            },
+            labelLine: {
+              show: true,
+              smooth: 0.2,
+            }
+          }
+        ]
+      };
+
+      option && myChart.setOption(option);
+    }
   },
 
 
@@ -316,15 +308,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#today {
-  width: 1000px;
-  height: 600px;
-  margin: 40px auto;
-}
-
-
-
-#main {
+#barChart {
   width: 1000px;
   height: 600px;
   margin: 40px auto;
@@ -334,5 +318,11 @@ export default {
 .block {
   margin-top: 50px;
   text-align: center;
+}
+
+#pieChart {
+  width: 1000px;
+  height: 600px;
+  margin: 40px auto;
 }
 </style>

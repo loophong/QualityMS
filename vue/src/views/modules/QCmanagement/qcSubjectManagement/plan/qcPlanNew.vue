@@ -17,7 +17,6 @@
       </el-steps>
       <br>
       <br>
-      <!-- TODO form. -->
       <el-card class="formZone" shadow="hover">
         <div v-if="active1 === 1">
           <el-form>
@@ -42,12 +41,28 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="选择课题描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="选择课题描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" ref="upload" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :auto-upload="false" :on-remove="handleRemove"
+                  :before-remove="beforeRemove" multiple :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button slot="trigger" size="small" type="primary">添加文件</el-button>
+                  <el-button style="margin-left: 10px;" size="small" type="success"
+                    @click="submitUpload">上传文件</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -83,12 +98,27 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="现状调查描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="现状调查描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :auto-upload="false" :on-remove="handleRemove"
+                  :before-remove="beforeRemove" multiple :limit="3" :on-exceed="handleExceed" :file-list="fileList"
+                  list-type="picture-card">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -125,12 +155,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="设定目标描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="设定目标描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary" @click="submitUpload">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -166,12 +210,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="原因分析描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="原因分析描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -207,12 +265,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="要因确定描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="要因确定描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -247,12 +319,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="制定对策描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="制定对策描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -287,12 +373,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="对策实施描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="对策实施描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -327,18 +427,32 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="活动前现状" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="活动前现状" prop="stageBefore">
+              <el-input v-model="form.stageBefore" placeholder="活动前现状"></el-input>
             </el-form-item>
-            <el-form-item label="活动后现状" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="活动后现状" prop="stageAfter">
+              <el-input v-model="form.stageAfter" placeholder="活动后现状"></el-input>
             </el-form-item>
-            <el-form-item label="效果检查描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="效果检查描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="效果检查描述"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -373,12 +487,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="巩固措施描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="巩固措施描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -413,12 +541,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="总结和下一步打算描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="总结和下一步打算描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -431,7 +573,7 @@
         </div>
       </el-card>
     </div>
-    <div class="plan2" v-if="value === '问题解决型(指令型目标)'">
+    <div class="plan2" v-if="value === '问题解决型(指令型)'">
       <br>
       <el-steps :active="active2" align-center>
         <el-step v-for="item in filteredDataList2" :key="item.dictId" :title="`${item.phase}阶段`"
@@ -463,12 +605,27 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="选择课题描述" prop="topicName">
+            <el-form-item label="选择课题描述" prop="stageDescribe">
               <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :on-change="handleUpChange" :file-list="fileList">
+                  <el-button style="margin-left: 10px;" size="small" type="success"
+                    @click="submitUpload">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
             </el-form-item>
@@ -503,12 +660,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="设定目标描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="设定目标描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -543,12 +714,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="可靠性分析描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="可靠性分析描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -583,12 +768,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="原因分析描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="原因分析描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -623,12 +822,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="要因确定描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="要因确定描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -663,12 +876,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="制定对策描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="制定对策描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -703,12 +930,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="对策实施描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="对策实施描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -743,18 +984,32 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="活动前现状" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="活动前现状" prop="stageBefore">
+              <el-input v-model="form.stageBefore" placeholder="活动前现状"></el-input>
             </el-form-item>
-            <el-form-item label="活动后现状" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="活动后现状" prop="stageAfter">
+              <el-input v-model="form.stageAfter" placeholder="活动后现状"></el-input>
             </el-form-item>
-            <el-form-item label="效果检查描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="效果检查描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -789,12 +1044,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="巩固措施描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="巩固措施描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -829,12 +1098,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="总结和下一步打算描述" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="总结和下一步打算描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="总结和下一步打算描述"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
@@ -879,12 +1162,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="选择课题描述" prop="topicName">
+            <el-form-item label="选择课题描述" prop="stageDescribe">
               <el-input v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
             </el-form-item>
@@ -919,12 +1216,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="设定目标描述" prop="topicName">
+            <el-form-item label="设定目标描述" prop="stageDescribe">
               <el-input v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
             </el-form-item>
@@ -961,12 +1272,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="提出方案确定最佳方案描述" prop="topicName">
+            <el-form-item label="提出方案确定最佳方案描述" prop="stageDescribe">
               <el-input v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
             </el-form-item>
@@ -1002,12 +1327,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="制定对策描述" prop="topicName">
+            <el-form-item label="制定对策描述" prop="stageDescribe">
               <el-input v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
             </el-form-item>
@@ -1043,12 +1382,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="对策实施描述" prop="topicName">
+            <el-form-item label="对策实施描述" prop="stageDescribe">
               <el-input v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
             </el-form-item>
@@ -1093,9 +1446,23 @@
             <el-form-item label="效果检查描述" prop="stageDescribe">
               <el-input v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
             </el-form-item>
@@ -1131,12 +1498,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="标准化描述" prop="topicName">
+            <el-form-item label="标准化描述" prop="stageDescribe">
               <el-input v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
             </el-form-item>
@@ -1172,12 +1553,26 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="总结与下一步打算描述" prop="topicName">
+            <el-form-item label="总结与下一步打算描述" prop="stageDescribe">
               <el-input v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-button type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <span>QC工具： </span>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
             </el-form-item>
+
+            <el-form-item>
+              <div style="display: flex; align-items: center;">
+                <span>上传附件：</span>
+                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
+                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
             </el-form-item>
@@ -1185,7 +1580,6 @@
               <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
-              <el-button type="primary" @click="onSubmitFinal">提交</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -1208,6 +1602,7 @@ import * as echarts from 'echarts';
 export default {
   data() {
     return {
+      fileList: [],
       dataForm: {
         stepId: 0,
         stepSubjectId: '',
@@ -1254,7 +1649,7 @@ export default {
       ],
 
       value: '问题解决型',
-      fileList: [],
+      // fileList: [],
       planStepList: [],
       dictWorkFlow: [],
       routerParam: {
@@ -1273,6 +1668,7 @@ export default {
     this.initRouterParam()
     this.getDictWorkFlowList()
     this.getPlanStepDataList()
+
   },
   computed: {
     lastDisabled1() {
@@ -1305,24 +1701,24 @@ export default {
   },
   methods: {
     // 获取数据列表
-    getPlanStepDataList() {
-      this.$http({
-        url: this.$http.adornUrl('/qcPlan/step/list'),
+    async getPlanStepDataList() {
+      await this.$http({
+        url: this.$http.adornUrl('/qcPlan/step/idList'),
         method: 'get',
         params: this.$http.adornParams({
-          'page': 10,
-          'limit': 1000,
-          'key': this.dataForm.key
+          'page': 1,
+          'limit': 100,
+          'key': this.routerParam[0].qcsrId
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.planStepList = data.page.list
-          this.totalPage = data.page.totalCount
+          this.planStepList = data.idList
+          this.findMatchingItem(1)
+          // this.totalPage = data.page.totalCount
         } else {
           this.planStepList = []
-          this.totalPage = 0
+          // this.totalPage = 0
         }
-        this.dataListLoading = false
       })
     },
     initRouterParam() {
@@ -1335,6 +1731,21 @@ export default {
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
       })
+    },
+
+    findMatchingItem(id) {
+      this.initForm()
+      for (let item of this.planStepList) {
+        if (item.stepProcess === id) {
+          this.form = item;
+          this.form.planDate = [item.stagePlanStart, item.stagePlanEnd]
+          this.form.actualDate = [item.stageActualStart, item.stageActualEnd]
+          if (item.stagePeople) {
+            this.form.stagePeople = this.form.stagePeople.split(',').map(participant => participant.trim());
+          }
+          break;
+        }
+      }
     },
     getDictWorkFlowList() {
       this.$http({
@@ -1355,15 +1766,27 @@ export default {
         }
       })
     },
-    handleChange(file, fileList) {
+    handleUpChange(file, fileList) {
+      console.log('++++++++++++++++++++++++++++')
+      console.log(file)
+      console.log(fileList)
+      console.log('++++++++++++++++++++++++++++')
       this.fileList = fileList;
-    },
-    handlePreview(file) {
-      console.log('预览文件:', file);
     },
     handleRemove(file, fileList) {
-      console.log('移除文件:', file);
-      this.fileList = fileList;
+      console.log(file, fileList);
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+    submitUpload() {
+      this.$refs.upload.submit();
     },
     onSubmit() {
       console.log('提交表单，上传文件:', this.fileList);
@@ -1385,6 +1808,7 @@ export default {
       if (this.active1 > 1) {
         this.active1--;
       }
+      this.findMatchingItem(this.active1)
     },
     nextStep1() {
       if (this.active1 < 10) {
@@ -1405,12 +1829,20 @@ export default {
       if (this.active3 > 1) {
         this.active3--;
       }
+      console.log(this.active3)
+      console.log(this.planStepList)
+      this.findMatchingItem(this.active3)
+      console.log(this.active3)
     },
     nextStep3() {
       if (this.active3 < 8) {
         this.active3++;
-        this.initForm()
       }
+      console.log(this.active3)
+      console.log(this.planStepList)
+      console.log(this.form)
+      this.findMatchingItem(this.active3)
+      console.log(this.active3)
     },
     initChart() {
       if (!this.$refs.main) {

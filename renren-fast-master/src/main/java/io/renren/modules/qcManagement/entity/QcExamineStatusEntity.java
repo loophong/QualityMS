@@ -31,7 +31,7 @@ public class QcExamineStatusEntity implements Serializable {
 	/**
 	 * 审核进行步骤
 	 */
-	private String qcExamineStatus;
+	private String qcExamineCurrent;
 	/**
 	 * 课题提交状态
 	 */

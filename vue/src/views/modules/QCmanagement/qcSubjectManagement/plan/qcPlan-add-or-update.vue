@@ -69,7 +69,7 @@ export default {
       dataFormEx: {
         qcExamineId: 0,
         qcExamineSubject: '',
-        qcExamineStatus: '',
+        qcExamineCurrent: '',
         qcStatusOne: '',
         qcStatusTwo: '',
         qcStatusThree: '',
@@ -145,7 +145,7 @@ export default {
                 data: this.$http.adornData({
                   'qcExamineId': this.dataFormEx.qcExamineId || undefined,
                   'qcExamineSubject': this.dataForm.qcsrId,
-                  'qcExamineStatus': '1',
+                  'qcExamineCurrent': '1',
                   'qcStatusOne': '1',
                 })
               }).then(({ data }) => {

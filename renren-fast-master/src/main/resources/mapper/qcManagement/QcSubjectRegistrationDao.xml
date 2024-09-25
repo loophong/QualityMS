@@ -14,13 +14,12 @@
         <result property="creator" column="creator"/>
         <result property="modificationDate" column="modification_date"/>
         <result property="modifier" column="modifier"/>
-        <result property="startDate" column="start_date"/>
-        <result property="endDate" column="end_date"/>
         <result property="topicReviewStatus" column="topic_review_status"/>
         <result property="topicDescription" column="topic_description"/>
         <result property="topicType" column="topic_type"/>
         <result property="activityCharacteristics" column="activity_characteristics"/>
         <result property="activityPlan" column="activity_plan"/>
+        <result property="activityPlanEnd" column="activity_plan_end"/>
         <result property="keywords" column="keywords"/>
         <result property="topicActivityStatus" column="topic_activity_status"/>
         <result property="topicActivityResult" column="topic_activity_result"/>
@@ -30,7 +29,23 @@
         <result property="examineId" column="examine_id"/>
     </resultMap>
 
-<!--    <select id="getMembersOfGroup" resultType="QcGroupMemberEntity">-->
+    <!--    根据输入动态模糊查询-->
+    <select id="fuzzyQueryList"
+            resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity">
+        SELECT *
+        FROM qc_subject_registration
+        <where>
+            <if test="topicName != null and topicName != ''">
+                topic_name like concat('%',#{topicName},'%')
+            </if>
+            <if test="keywords != null and keywords != ''">
+                AND keywords like concat('%',#{keywords},'%')
+            </if>
+        </where>
+
+    </select>
+
+    <!--    <select id="getMembersOfGroup" resultType="QcGroupMemberEntity">-->
 <!--        SELECT *-->
 <!--        FROM qc_group_member-->
 <!--        WHERE group_name = #{groupName}-->

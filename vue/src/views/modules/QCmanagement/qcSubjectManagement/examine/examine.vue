@@ -8,6 +8,7 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getDataList()">查询</el-button>
+            <el-button type="danger" @click="toIssue()">问题添加</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
             <!-- <el-button v-if="isAuth('qcSubject:registration:delete')" type="danger" @click="deleteHandle()"
@@ -155,6 +156,15 @@ export default {
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
       })
+    },
+    toIssue() {
+      this.$router.push(
+        {
+          name: 'otherToIssue',
+          // query: {
+          //   data: JSON.stringify(filteredArray)
+          // }
+        });
     },
     // 删除
     deleteHandle(id) {

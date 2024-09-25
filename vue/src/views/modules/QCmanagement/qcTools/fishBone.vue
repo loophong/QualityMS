@@ -72,7 +72,7 @@ export default {
                 {"children": [], "id": "1008034501", "fid": "1008", "name": "巡检1[100]", fontColor: "", lineColor: "", link: ""},
                 {"children": [], "id": "1008034502", "fid": "1008", "name": "巡检2[100]", fontColor: "", lineColor: "", link: ""}
               ], "id": "1008", "fid": "1", "name": "巡检[100]", fontColor: "", lineColor: "", link: ""}
-          ], "id": "1", "fid": "0", "name": "健康度[93]", fontColor: "", lineColor: "", link: ""}
+          ], "id": "1", "fid": "0", "name": "质量问题", fontColor: "", lineColor: "", link: ""}
       ],
       editDialogVisible: false, // 控制弹出框的可见性
       editableNode: { // 用于存储可编辑的节点信息

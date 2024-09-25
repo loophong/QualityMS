@@ -1,13 +1,16 @@
 package io.renren.modules.indicator.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
+import io.renren.modules.indicator.entity.IndicatorResponseByClassificationEntity;
 import io.renren.modules.indicator.entity.IndicatorResponseByDepartmentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -95,6 +98,35 @@ public class IndicatorDictionaryServiceImpl extends ServiceImpl<IndicatorDiction
     @Override
     public List<IndicatorResponseByDepartmentEntity> countsByDepartmant(IndicatorResponseByDepartmentEntity indicatorResponseByDepartmentEntity) {
         return indicatorDictionaryDao.countsByDepartmant(indicatorResponseByDepartmentEntity);
+    }
+
+    // 根据指标分类统计指标数量
+    @Override
+    public List<IndicatorResponseByClassificationEntity> countsByClassification(IndicatorResponseByClassificationEntity indicatorResponseByClassificationEntity) {
+        List<IndicatorResponseByClassificationEntity> list = indicatorDictionaryDao.countsByClassification(indicatorResponseByClassificationEntity);
+
+        // 定义一个比较器
+        Comparator<IndicatorResponseByClassificationEntity> classificationComparator = Comparator.comparing(
+                entity -> {
+                    switch (entity.getIndicatorClassification()) {
+                        case "A":
+                            return 1;
+                        case "B":
+                            return 2;
+                        case "C":
+                            return 3;
+                        default:
+                            return 4;
+                    }
+                }
+        );
+
+        // 使用比较器对列表进行排序
+        List<IndicatorResponseByClassificationEntity> sortedList = list.stream()
+                .sorted(classificationComparator)
+                .collect(Collectors.toList());
+
+        return sortedList;
     }
 
 }

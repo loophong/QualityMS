@@ -31,6 +31,13 @@
         from indicator_dictionary
         group by management_department
     </select>
+    
+    <select id="countsByClassification" resultType="IndicatorResponseByClassificationEntity">
+        select indicator_classification as indicatorClassification,
+            count(1) as counts
+        from indicator_dictionary
+        group by indicator_classification
+    </select>
 
 
 </mapper>

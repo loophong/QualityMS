@@ -38,7 +38,6 @@ public class QcDictWorkflowController {
     @RequiresPermissions("qcManagement:dictWorkFlow:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = qcDictWorkflowService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 

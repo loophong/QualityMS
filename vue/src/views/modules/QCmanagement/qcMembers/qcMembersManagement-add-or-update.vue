@@ -8,7 +8,13 @@
             <el-input v-model="dataForm.groupName" placeholder="请输入小组名称"></el-input>
           </el-form-item>
           <el-form-item prop="mainName" label="姓名">
-            <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input>
+            <!-- <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input> -->
+            <el-select v-model="dataForm.mainName" placeholder="请选择角色">
+              <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
+                <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
+                </el-option>
+              </el-option-group>
+            </el-select>
           </el-form-item>
           <el-form-item prop="number" label="员工编号">
             <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
@@ -42,7 +48,13 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="姓名" prop="name">
-                <el-input v-model="member.name" placeholder="请输入姓名"></el-input>
+                <!-- <el-input v-model="member.name" placeholder="请输入姓名"></el-input> -->
+                <el-select v-model="member.name" placeholder="请选择角色">
+                  <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
+                    <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
+                    </el-option>
+                  </el-option-group>
+                </el-select>
               </el-form-item>
               <el-form-item label="员工编号" prop="number">
                 <el-input v-model="member.number" placeholder="请输入员工编号"></el-input>
@@ -79,6 +91,7 @@
 export default {
   data() {
     return {
+      membersOptions: [],
       isAddMember: false,
       parentFlag: '',
       visible: false,
@@ -115,9 +128,9 @@ export default {
         name: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
-        number: [
-          { required: true, message: '员工编号不能为空', trigger: 'blur' }
-        ],
+        // number: [
+        //   { required: true, message: '员工编号不能为空', trigger: 'blur' }
+        // ],
         participationDate: [
           { required: true, message: '参加时间不能为空', trigger: 'blur' }
         ],
@@ -144,6 +157,7 @@ export default {
       this.dataForm.members.joinDate = currentDate;
     },
     init(id) {
+      console.log(this.membersOptions)
       this.dataForm.qcgmId = id || 0;
       this.visible = true;
       this.$nextTick(() => {
@@ -193,8 +207,8 @@ export default {
               'team': this.dataForm.team,
               'participationDate': this.dataForm.participationDate,
               'topic': this.dataForm.topic,
-              'roleInTopic': this.dataForm.roleInTopic,
-              'deleteFlag': this.dataForm.deleteFlag,
+              'roleInTopic': '管理员',
+              'deleteFlag': 0,
               'groupName': this.dataForm.groupName
             })
           }).then(({ data }) => {
@@ -225,8 +239,9 @@ export default {
                     'number': member.number,
                     'participationDate': member.participationDate,
                     'roleInTopic': member.roleInTopic,
-                    'deleteFlag': member.deleteFlag,
+                    // 'deleteFlag': member.deleteFlag,
                     'parentId': member.parentId,
+                    'deleteFlag': 0,
                     'groupName': this.dataForm.groupName
                   })
                 });
@@ -255,8 +270,9 @@ export default {
             'number': member.number,
             'participationDate': member.participationDate,
             'roleInTopic': member.roleInTopic,
-            'deleteFlag': member.deleteFlag,
+            // 'deleteFlag': member.deleteFlag,
             'parentId': this.dataForm.qcgmId,
+            'deleteFlag': 0,
             'groupName': this.dataForm.groupName
           })
         });

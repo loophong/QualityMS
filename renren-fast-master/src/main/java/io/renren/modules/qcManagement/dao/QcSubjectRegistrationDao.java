@@ -18,6 +18,7 @@ import java.util.List;
  */
 @Mapper
 public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrationEntity> {
+    //根据小组名称查询小组成员
     @Select({
             "SELECT *",
             "FROM qc_group_member",
@@ -25,4 +26,24 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
             "AND role_in_topic = '成员'"
     })
     List<QcGroupMemberEntity> getMembersOfGroup(@Param("groupName") String groupName);
+
+    //模糊查询
+    public List<QcSubjectRegistrationEntity> fuzzyQueryList(@Param("topicName") String topicName, @Param("keywords") String keywords);
+
+    //统计已注册课题数
+    @Select({
+            "SELECT COUNT(*)",
+            "FROM qc_subject_registration",
+    })
+    Integer countRegistration();
+
+    //统计已提交课题数
+    @Select({
+            "SELECT COUNT(*)",
+            "FROM qc_subject_registration",
+            "WHERE result_type  != null|| result_type != ''",
+    })
+    Integer countSubmitted();
+
+
 }

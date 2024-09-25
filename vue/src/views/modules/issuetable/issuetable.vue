@@ -218,18 +218,18 @@
         align="center"
         label="审核人">
       </el-table-column>
-      <el-table-column
-        prop="level"
-        header-align="center"
-        align="center"
-        label="问题等级">
-      </el-table-column>
-      <el-table-column
-        prop="state"
-        header-align="center"
-        align="center"
-        label="问题状态">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="level"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题等级">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="state"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题状态">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="formula"
         header-align="center"

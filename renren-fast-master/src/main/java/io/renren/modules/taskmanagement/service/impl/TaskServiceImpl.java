@@ -1,13 +1,14 @@
 package io.renren.modules.taskmanagement.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.renren.modules.taskmanagement.entity.ApprovalEntity;
-import io.renren.modules.taskmanagement.entity.TaskDetailDTO;
-import io.renren.modules.taskmanagement.entity.TaskStatus;
+import io.renren.common.utils.DateUtils;
+import io.renren.modules.taskmanagement.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,6 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 
 import io.renren.modules.taskmanagement.dao.TaskDao;
-import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.service.TaskService;
 
 
@@ -80,9 +80,17 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
         IPage<TaskEntity> page = this.page(
                 new Query<TaskEntity>().getPage(params),
                 new QueryWrapper<TaskEntity>()
-                        .and(w -> w.notIn("task_current_state", TaskStatus.COMPLETED))
-                        .and(w -> w.eq("task_principal", userId))
-                        .or(w -> w.like("task_executor", executorIdLike))
+                        // 第一个条件必须成立
+                        .notIn("task_current_state", TaskStatus.COMPLETED)
+                        // 后两个条件为“或”的关系，并且这组条件必须成立
+                        .and(w ->
+                                w.eq("task_principal", userId)
+                                        .or().like("task_executor", executorIdLike)
+                        )
+//                new QueryWrapper<TaskEntity>()
+//                        .and(w -> w.notIn("task_current_state", TaskStatus.COMPLETED))
+//                        .and(w -> w.eq("task_principal", userId))
+//                        .or(w -> w.like("task_executor", executorIdLike))
         );
 
         return new PageUtils(page);
@@ -106,14 +114,45 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
     }
 
     @Override
+    public PageUtils queryPageSelectTasksByPlanId(Map<String, Object> params, String planId) {
+        IPage<TaskEntity> page = this.page(
+                new Query<TaskEntity>().getPage(params),
+                new QueryWrapper<TaskEntity>().eq("task_associated_plan_id", planId)
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public List<Map<String, Integer>> home() {
+        int year = DateUtils.getZeroTime().getYear()+1900;
+        log.info("year" + year);
+
+        // 查询当年的任务数量,计划开始时间年份模糊匹配 year
+        int taskNum = taskDao.selectList(new QueryWrapper<TaskEntity>().like("task_start_date", year)).size();
+        // 查询当年 已完成 任务数量,计划开始时间年份模糊匹配 year
+        int completedTaskNum = taskDao.selectList(new QueryWrapper<TaskEntity>().eq("task_current_state", TaskStatus.COMPLETED).like("task_start_date", year)).size();
+
+        List<Map<String, Integer>> maps = new ArrayList<>();
+        Map<String, Integer> taskNumMap = new HashMap<>();
+        taskNumMap.put("taskNum", taskNum);
+        maps.add(taskNumMap);
+
+        Map<String, Integer> completedTaskNumMap = new HashMap<>();
+        completedTaskNumMap.put("completedTaskNum", completedTaskNum);
+        maps.add(completedTaskNumMap);
+
+        return maps;
+    }
+
+    @Override
     public TaskDetailDTO getTaskDetailInfo(String taskId) {
         TaskEntity task = taskDao.selectOne(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskId, taskId));
 
         // taskParentNode = taskId 查询列表
         List<TaskEntity> tasks = taskDao.selectList(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskParentNode, taskId));
 
-        log.info("rootNode"+task);
-        log.info("tasks"+tasks);
+        log.info("rootNode" + task);
+        log.info("tasks" + tasks);
 
         TaskDetailDTO taskDetailDTO = new TaskDetailDTO();
 
@@ -133,8 +172,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
 
             for (TaskEntity task : tasks) {
                 TaskEntity task1 = taskDao.selectById(task.getTmTid());
-                log.info("当前task为"+task.getTaskId());
-                log.info("当前task是否存在"+task1);
+                log.info("当前task为" + task.getTaskId());
+                log.info("当前task是否存在" + task1);
                 if (task1 != null) {
                     // 更新
                     taskDao.updateById(task);
@@ -155,6 +194,61 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
     public boolean isTaskIdUsed(String taskId) {
 //        return planDao.countByPlanNumber(planId) > 0;
         return taskDao.selectList(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskId, taskId)).size() > 0;
+    }
+
+    @Override
+    public TaskStatisticsDTO taskStatistics(String planId) {
+        TaskStatisticsDTO taskStatistics = new TaskStatisticsDTO();
+        // 任务列表
+        List<TaskEntity> tasks = taskDao.selectList(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, planId));
+        // 已完成任务
+        List<TaskEntity> completedTasks = taskDao.selectList(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, planId).eq(TaskEntity::getTaskCurrentState, TaskStatus.COMPLETED));
+
+        log.info("planId" + planId);
+        log.info("tasks" + tasks);
+        log.info("completedTasks" + completedTasks);
+
+        int taskAheadOfTimeNum = 0;
+        int taskOnTimeNum = 0;
+        int taskBehindScheduleNum = 0;
+
+        // 遍历tasks
+        for (TaskEntity task : completedTasks) {
+            if (task.getTaskCurrentState() == TaskStatus.COMPLETED) {
+                // 计算时间差
+                long dif = task.getTaskActualCompletionDate().getTime() - task.getTaskScheduleCompletionDate().getTime();
+
+                if (dif > 0) {
+                    taskBehindScheduleNum++;
+                } else if (dif == 0) {
+                    taskOnTimeNum++;
+                } else {
+                    taskAheadOfTimeNum++;
+                }
+            }
+        }
+
+        // 任务总数
+        taskStatistics.setTaskTotal(tasks.size());
+        // 已完成任务数
+        taskStatistics.setTaskCompleted(completedTasks.size());
+        // 未完成任务数
+        taskStatistics.setTaskUncompleted(tasks.size() - completedTasks.size());
+        // 提前完成
+        taskStatistics.setTaskAheadOfTime(taskAheadOfTimeNum);
+        // 提前完成率
+        taskStatistics.setTaskAheadOfTimeRate(taskAheadOfTimeNum * 100.0 / tasks.size());
+        // 滞后完成
+        taskStatistics.setTaskBehindSchedule(taskBehindScheduleNum);
+        // 按时完成
+        taskStatistics.setTaskOnTime(taskOnTimeNum);
+        // 按时完成率
+        taskStatistics.setTaskOnTimeRate(taskOnTimeNum * 100.0 / tasks.size());
+        // 任务列表
+        taskStatistics.setTaskList(tasks);
+
+
+        return taskStatistics;
     }
 
 

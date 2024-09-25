@@ -5,8 +5,8 @@
       <el-form-item label="审核关联课题" prop="qcExamineSubject">
         <el-input v-model="dataForm.qcExamineSubject" placeholder="审核关联课题"></el-input>
       </el-form-item>
-      <el-form-item label="审核进行步骤" prop="qcExamineStatus">
-        <el-input v-model="dataForm.qcExamineStatus" placeholder="审核进行步骤"></el-input>
+      <el-form-item label="审核进行步骤" prop="qcExamineCurrent">
+        <el-input v-model="dataForm.qcExamineCurrent" placeholder="审核进行步骤"></el-input>
       </el-form-item>
       <el-form-item label="课题提交状态" prop="qcStatusOne">
         <el-input v-model="dataForm.qcStatusOne" placeholder="课题提交状态"></el-input>
@@ -72,7 +72,7 @@ export default {
       dataForm: {
         qcExamineId: 0,
         qcExamineSubject: '',
-        qcExamineStatus: '',
+        qcExamineCurrent: '',
         qcStatusOne: '',
         qcStatusTwo: '',
         qcStatusThree: '',
@@ -94,7 +94,7 @@ export default {
         qcExamineSubject: [
           { required: true, message: '审核关联课题不能为空', trigger: 'blur' }
         ],
-        qcExamineStatus: [
+        qcExamineCurrent: [
           { required: true, message: '审核进行步骤不能为空', trigger: 'blur' }
         ],
         qcStatusOne: [
@@ -162,7 +162,7 @@ export default {
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.dataForm.qcExamineSubject = data.qcExamineStatus.qcExamineSubject
-              this.dataForm.qcExamineStatus = data.qcExamineStatus.qcExamineStatus
+              this.dataForm.qcExamineCurrent = data.qcExamineStatus.qcExamineCurrent
               this.dataForm.qcStatusOne = data.qcExamineStatus.qcStatusOne
               this.dataForm.qcStatusTwo = data.qcExamineStatus.qcStatusTwo
               this.dataForm.qcStatusThree = data.qcExamineStatus.qcStatusThree
@@ -194,7 +194,7 @@ export default {
             data: this.$http.adornData({
               'qcExamineId': this.dataForm.qcExamineId || undefined,
               'qcExamineSubject': this.dataForm.qcExamineSubject,
-              'qcExamineStatus': this.dataForm.qcExamineStatus,
+              'qcExamineCurrent': this.dataForm.qcExamineCurrent,
               'qcStatusOne': this.dataForm.qcStatusOne,
               'qcStatusTwo': this.dataForm.qcStatusTwo,
               'qcStatusThree': this.dataForm.qcStatusThree,

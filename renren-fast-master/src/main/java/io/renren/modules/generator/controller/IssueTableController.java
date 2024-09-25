@@ -1,19 +1,26 @@
 package io.renren.modules.generator.controller;
 
+import io.minio.*;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.entity.IssueUtils;
 import io.renren.modules.generator.service.IssueTableService;
+import io.renren.modules.generator.service.MinioService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -30,31 +37,93 @@ public class IssueTableController {
     @Autowired
     private IssueTableService issueTableService;
 
+//    @Resource
+//    MinioClient minioClient;
+
+
+    SimpleDateFormat saf = new SimpleDateFormat("/yyyy/MM/dd");
+
+    private final String uploadDir = "C:/uploads"; // 请确保这个路径已存在或可写
+
     /**
      * 上传图片
      */
 //    @Value("${file.upload-dir}")
     @PostMapping("/upload")
     @RequiresPermissions("generator:issuetable:update")
-    public R uploadImage(@RequestParam("file") MultipartFile file) {
-        System.out.println("文件上传开始-------------");
-        if (file.isEmpty()) {
-            return R.error("上传的文件为空");
+    @CrossOrigin(origins = "http://localhost:8001") // 只允许这个源
+    public R uploadImage(@RequestParam("file") MultipartFile file , HttpServletRequest request) {
+        String originName = file.getOriginalFilename();
+        String format = saf.format(new Date());
+        String realPath = request.getServletContext().getRealPath("/") + format;
+        File floder = new File(realPath);
+        if (!floder.exists()){
+            floder.mkdirs();
         }
+        String newName = UUID.randomUUID().toString()+".jpg";
         try {
-            // 调用服务层方法来处理文件上传逻辑
-            String filePath = issueTableService.saveUploadedFile(file);
-            System.out.println("+++" + filePath + "+++图片路径");
+            file.transferTo(new File(floder,newName));
+            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() +"/renren-fast" + format+"/" + newName;
+            System.out.println("获取的url"+url);
+//            R.ok().put("data",url);
+            return R.ok().put("data",url);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+//        return R.ok();
+    }
 
-            // 更新 issuePhoto 字段（如果需要）
-            // issueTableService.updateIssuePhoto(filePath);
+//    @PostMapping("/minioimage")
+//    @RequiresPermissions("generator:issuetable:update")
+//    public R uploadImageMinio(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+//        try {
+//            // 检查存储桶是否存在
+//            String bucketName = "your-bucket-name";  // 替换为你的存储桶名称
+//            boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+//
+//            if (!isBucketExists) {
+//                // 如果存储桶不存在，可以选择创建一个新的存储桶
+//                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+//            }
+//
+//            // 生成唯一的文件名
+//            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+//
+//            // 上传文件到 MinIO
+//            minioClient.putObject(PutObjectArgs.builder()
+//                    .bucket(bucketName)  // 设置存储桶名称
+//                    .object(fileName)    // 设置上传的对象名称
+//                    .stream(file.getInputStream(), file.getSize(), -1) // 文件流
+//                    .contentType(file.getContentType()) // 文件类型
+//                    .build());
+//
+//            // 构造文件的访问链接
+//            String fileUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+//                            .bucket(bucketName)
+//                            .object(fileName)
+//                            .build()
+//                    );
+//            System.out.println("获得图片的路径为;" +fileUrl);
+//            // 返回成功响应
+//            return R.ok().put("fileUrl", fileUrl);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return R.error("文件上传失败: " + e.getMessage());
+//        }
+//    }
 
-            System.out.println("文件上传成功-------------");
-            return R.ok().put("data", filePath);
-        } catch (Exception e) {
-            System.out.println("文件上传失败-------------");
-            e.printStackTrace(); // 打印完整的异常堆栈信息
-            return R.error("文件上传失败: " + e.getMessage());
+
+    /**
+     * Excel上传
+     */
+    @PostMapping("/uploadExcel")
+    @RequiresPermissions("generator:issuetable:update")
+    public R uploadExcel(@RequestParam("file") MultipartFile file) {
+        try {
+            System.out.println("接收到的文件名: " + file.getOriginalFilename());
+            return issueTableService.uploadExcelFile(file);
+        } catch (IOException e) {
+            return R.error("文件上传时发生错误: " + e.getMessage());
         }
     }
 
@@ -68,6 +137,18 @@ public class IssueTableController {
         return issueTableService.closeRelatedTasks(issueId); // 直接调用服务层方法
     }
 
+    /**
+     * 获取当月问题统计
+     */
+    @RequestMapping("/currentMonth")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getCurrentMonthVerificationConclusionStatistics() {
+        Map<String, Integer> stats = issueTableService.getCurrentMonthVerificationConclusionStatistics();
+        // 打印返回给前端的数据
+        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
 
 
 

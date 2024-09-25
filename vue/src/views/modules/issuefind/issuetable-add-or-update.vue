@@ -38,7 +38,7 @@
                 v-model="dataForm.inspectionDate"
                 type="date"
                 value-format="yyyy-MM-dd HH:mm:ss"
-                placeholder="请选择上传日期">
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
       <el-form-item label="问题类别" prop="issueCategoryId">
@@ -97,7 +97,7 @@
           v-model="dataForm.requiredCompletionTime"
           type="date"
           value-format="yyyy-MM-dd HH:mm:ss"
-          placeholder="请选择上传日期">
+          placeholder="请选择日期">
         </el-date-picker>
       </el-form-item>
 <!--    <el-form-item label="责任科室" prop="responsibleDepartment">-->
@@ -363,44 +363,48 @@
         // formData.append('issueId', this.dataForm.issueId)
 
         this.$http({
-          url: this.$http.adornUrl('/generator/issuetable/upload'),
+          url: this.$http.adornUrl('/generator/issuetypetable/minioimage'),
           method: 'post',
           data: formData,
           headers: {
             'Content-Type': 'multipart/form-data'
           }
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '文件上传成功',
-              type: 'success'
-            })
-            // 处理上传成功后的逻辑
-            // 例如，更新本地状态或执行其他操作
-            const iamgenewURL = data.data
-            this.dataForm.issuePhoto = iamgenewURL
-          } else {
-            this.$message.error('文件上传失败: ' + (data.message || '未知错误'))
-          }
-        }).catch(error => {
-          console.error('文件上传失败:', error)
-          if (error.response) {
-            // 请求已发出，但服务器响应了状态码
-            // 服务器响应的完整数据
-            console.error('服务器响应数据:', error.response.data)
-            console.error('服务器响应状态码:', error.response.status)
-            console.error('服务器响应头:', error.response.headers)
-          } else if (error.request) {
-            // 请求已发出，但没有收到响应
-            // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
-            // 在 Node.js 中是 http.ClientRequest 的实例
-            console.error('请求未收到响应:', error.request)
-          } else {
-            // 其他错误
-            console.error('设置请求时出错:', error.message)
-          }
-          this.$message.error('文件上传失败: ' + (error.message || '未知错误'))
         })
+        /**
+         * then(({ data }) => {
+         *           if (data && data.code === 0) {
+         *             this.$message({
+         *               message: '文件上传成功',
+         *               type: 'success'
+         *             })
+         *             // 处理上传成功后的逻辑
+         *             // 例如，更新本地状态或执行其他操作
+         *             const iamgenewURL = data.data
+         *             console.log('获得URL成功' ,data)
+         *             this.dataForm.issuePhoto = iamgenewURL
+         *           } else {
+         *             this.$message.error('文件上传失败: ' + (data.message || '未知错误'))
+         *           }
+         *         }).catch(error => {
+         *           console.error('文件上传失败:', error)
+         *           if (error.response) {
+         *             // 请求已发出，但服务器响应了状态码
+         *             // 服务器响应的完整数据
+         *             console.error('服务器响应数据:', error.response.data)
+         *             console.error('服务器响应状态码:', error.response.status)
+         *             console.error('服务器响应头:', error.response.headers)
+         *           } else if (error.request) {
+         *             // 请求已发出，但没有收到响应
+         *             // `error.request` 在浏览器中是 XMLHttpRequest 的实例，
+         *             // 在 Node.js 中是 http.ClientRequest 的实例
+         *             console.error('请求未收到响应:', error.request)
+         *           } else {
+         *             // 其他错误
+         *             console.error('设置请求时出错:', error.message)
+         *           }
+         *           this.$message.error('文件上传失败: ' + (error.message || '未知错误'))
+         *         })
+         */
       },
       handleFileChange (file) {
         // this.file = file
@@ -663,12 +667,12 @@
                   'associatedIssueAddition': this.dataForm.associatedIssueIds.join(','), // 将数组转换为逗号分隔的字符串
                   'creationDuration': this.dataForm.creationDuration,
                   'causeAnalysis': this.dataForm.causeAnalysis,
-                  'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
+                  'rectificationVerificationStatus':this.dataForm.rectificationVerificationStatus,
                   'verificationConclusion': this.dataForm.verificationConclusion,
                   'verifier': this.dataForm.verifier,
                   'reviewers': this.dataForm.reviewers,
                   'level': this.dataForm.level,
-                  'state': '未完成',
+                  'state': this.dataForm.state,
                   'formula': this.dataForm.formula
                 })
               }).then(({data}) => {

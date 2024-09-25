@@ -110,7 +110,6 @@ export default {
         note: ''
       },
       dataRule: {
-
         topicReviewStatus: [
           { required: true, message: '课题审核状态不能为空', trigger: 'blur' }
         ],

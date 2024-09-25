@@ -163,13 +163,20 @@
 <!--    <el-form-item label="创建时长" prop="creationDuration">-->
 <!--      <el-input v-model="dataForm.creationDuration" placeholder="创建时长"></el-input>-->
 <!--    </el-form-item>-->
-
-    <el-form-item label="整改验证情况" prop="rectificationVerificationStatus">
-      <el-input v-model="dataForm.rectificationVerificationStatus" placeholder="整改验证情况"></el-input>
-    </el-form-item>
-    <el-form-item label="验证结论" prop="verificationConclusion">
-      <el-input v-model="dataForm.verificationConclusion" placeholder="验证结论"></el-input>
-    </el-form-item>
+            <el-form-item label="整改验证情况" prop="rectificationVerificationStatus">
+              <el-input v-model="dataForm.rectificationVerificationStatus" placeholder="整改验证情况"></el-input>
+            </el-form-item>
+      <el-form-item label="验证结论" prop="verificationConclusion">
+        <el-select
+          v-model="dataForm.verificationConclusions" multiple placeholder="请选择验证结论" @change="handleSelectChange">
+          <el-option
+            v-for="option in verificationOptions"
+            :key="option.value"
+            :label="option.label"
+            :value="option.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
 <!--    <el-form-item label="验证人" prop="verifier">-->
 <!--      <el-input v-model="dataForm.verifier" placeholder="验证人"></el-input>-->
 <!--    </el-form-item>-->
@@ -288,13 +295,20 @@
           creationDuration: '',
           causeAnalysis: '',
           rectificationVerificationStatus: '',
-          verificationConclusion: '',
+          verificationConclusion:'',
+          verificationConclusions: [], // 初始化为数组
           verifier: '',
           reviewers: '',
           level: '',
           state: '',
           formula: ''
         },
+        verificationOptions: [
+          { label: '未完成', value: '未完成' },
+          { label: '已完成', value: '已完成' },
+          { label: '持续', value: '持续' },
+          { label: '结项', value: '结项' },
+        ],
         vehicleTypeOptions: [],
         issueCategoryOptions: [],
         selectedIssue: '',
@@ -342,6 +356,21 @@
 
     },
     methods: {
+      handleSelectChange(selectedValues) {
+        // 将选中的值转化为一个 Set 以便检查
+        const selectedSet = new Set(selectedValues);
+
+        // 逻辑判断
+        if (selectedSet.has('已完成') && selectedSet.has('未完成')) {
+          // 如果同时选择了"已完成"和"未完成"，则清除其中一个
+          this.dataForm.verificationConclusion = [...selectedSet].filter(item => item !== '未完成');
+        }
+
+        if (selectedSet.has('结项')) {
+          // 如果选择了"结项"，则清除其他所有选项
+          this.dataForm.verificationConclusion = ['结项'];
+        }
+      },
       handlePictureCardPreview (file) {
         this.dialogImageUrl = file.url
         console.log('图片路径：', file.url)
@@ -614,6 +643,8 @@
       dataFormSubmit () {
         console.log('Successfully 获得 vehicle:', this.dataForm.vehicles)
         console.log('Successfully fetched photo2:', this.imageurl)
+
+
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             // 检查是否上传了图片
@@ -631,6 +662,7 @@
             }
             // 将数组转换为逗号分隔的字符串
             const issueCategoryIdString = this.dataForm.issueCategoryId.join(',')
+            // const verificationConclusionString = this.dataForm.verificationConclusion.join(',');
               this.$http({
                 url: this.$http.adornUrl(`/generator/issuetable/${!this.dataForm.issueId ? 'save' : 'update'}`),
                 method: 'post',
@@ -663,7 +695,7 @@
                   // 'creationDuration': this.dataForm.creationDuration,
                   // 'causeAnalysis': this.dataForm.causeAnalysis,
                   'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
-                  'verificationConclusion': this.dataForm.verificationConclusion,
+                  'verificationConclusion': this.dataForm.verificationConclusions.join(','),
                   'verifier': this.dataForm.verifier,
                   // 'reviewers': this.dataForm.reviewers,
                   // 'level': this.dataForm.level,

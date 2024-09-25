@@ -60,8 +60,9 @@
     <el-dialog
       :title="'是否确认完成'"
       :close-on-click-modal="false"
-      :visible.sync="visible2">
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+      :visible.sync="visible2"
+      :width="'400px'"> <!-- 设置对话框宽度 -->
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="40px">
       </el-form>
       <span slot="footer" class="dialog-footer">
       <el-button @click="visible2 = false">取消</el-button>
@@ -94,9 +95,10 @@
 <!--      </span>-->
 <!--    </el-dialog>-->
     <el-dialog
-      :title="!dataForm.issuemaskId ? '新增' : '修改'"
+      :title="!dataForm.issuemaskId ? '新增' : '派发'"
       :close-on-click-modal="false"
-      :visible.sync="visible1">
+      :visible.sync="visible1"
+      :width="'400px'">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
         <el-form-item label="接收人" prop="recipients">
                     <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">

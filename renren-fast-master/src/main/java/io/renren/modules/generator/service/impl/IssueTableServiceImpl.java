@@ -13,6 +13,8 @@ import io.renren.modules.generator.dao.IssueTableDao;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,9 +69,9 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
     @Override
     public String saveUploadedFile(MultipartFile file) throws IOException {
-        if (uploadPath == null) {
-            throw new IllegalStateException("Upload path is not configured.");
-        }
+//        if (uploadPath == null) {
+//            throw new IllegalStateException("Upload path is not configured.");
+//        }
 
         // 创建目标文件路径
         String originalFilename = file.getOriginalFilename();
@@ -189,6 +193,220 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         }
     }
 
+    @Override
+    public R uploadExcelFile(MultipartFile file) throws IOException {
+        if (file.isEmpty() || !file.getOriginalFilename().endsWith(".xlsx")) {
+            return R.error("请上传有效的Excel文件");
+        }
+
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0); // 读取第一个sheet
+            List<IssueTableEntity> issueList = new ArrayList<>();
+
+            for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+
+                // 跳过第一行（标题行）
+                if (rowIndex == 0) {
+                    continue; // 继续到下一循环，不处理这一行
+                }
+
+                IssueTableEntity issue = new IssueTableEntity();
+
+                // 读取序列号
+                issue.setSerialNumber(getCellValueAsString(row.getCell(0)));
+
+                // 读取问题编号
+                issue.setIssueNumber(getCellValueAsString(row.getCell(1)));
+
+                // 读取检查部门
+                issue.setInspectionDepartment(getCellValueAsString(row.getCell(2)));
+
+                // 日期
+                Cell dateCell = row.getCell(3);
+                if (dateCell != null && dateCell.getCellType() == CellType.NUMERIC
+                        && DateUtil.isCellDateFormatted(dateCell)) {
+                    Date inspectionDate = dateCell.getDateCellValue();
+                    issue.setInspectionDate(inspectionDate);
+                } else {
+                    issue.setInspectionDate(null);
+                }
+
+                // 读取问题分类ID
+                issue.setIssueCategoryId(getCellValueAsString(row.getCell(4)));
+
+                // 读取车辆类型ID
+                issue.setVehicleTypeId(getCellValueAsString(row.getCell(5)));
+
+                // 读取车辆号码ID
+                issue.setVehicleNumberId(getCellValueAsString(row.getCell(6)));
+
+                // 读取问题描述
+                issue.setIssueDescription(getCellValueAsString(row.getCell(7)));
+
+                // 读取整改要求
+                issue.setRectificationRequirement(getCellValueAsString(row.getCell(8)));
+
+                // 读取要求完成时间
+                Cell requiredCompletionTimeCell = row.getCell(9);
+                if (requiredCompletionTimeCell != null && requiredCompletionTimeCell.getCellType() == CellType.NUMERIC
+                        && DateUtil.isCellDateFormatted(requiredCompletionTimeCell)) {
+                    Date requiredCompletionTime = requiredCompletionTimeCell.getDateCellValue();
+                    issue.setRequiredCompletionTime(requiredCompletionTime);
+                } else {
+                    issue.setRequiredCompletionTime(null);
+                }
+
+                // 读取责任部门
+                issue.setResponsibleDepartment(getCellValueAsString(row.getCell(10)));
+
+                // 读取整改状态
+                issue.setRectificationStatus(getCellValueAsString(row.getCell(11)));
+
+                // 读取实际完成时间
+                Cell actualCompletionTimeCell = row.getCell(12);
+                if (actualCompletionTimeCell != null && actualCompletionTimeCell.getCellType() == CellType.NUMERIC
+                        && DateUtil.isCellDateFormatted(actualCompletionTimeCell)) {
+                    Date actualCompletionTime = actualCompletionTimeCell.getDateCellValue();
+                    issue.setActualCompletionTime(actualCompletionTime);
+                } else {
+                    issue.setActualCompletionTime(null);
+                }
+
+                // 读取整改责任人
+                issue.setRectificationResponsiblePerson(getCellValueAsString(row.getCell(13)));
+
+                // 读取要求二次整改时间
+                Cell requiredSecondRectificationTimeCell = row.getCell(14);
+                if (requiredSecondRectificationTimeCell != null && requiredSecondRectificationTimeCell.getCellType() == CellType.NUMERIC
+                        && DateUtil.isCellDateFormatted(requiredSecondRectificationTimeCell)) {
+                    Date requiredSecondRectificationTime = requiredSecondRectificationTimeCell.getDateCellValue();
+                    issue.setRequiredSecondRectificationTime(requiredSecondRectificationTime);
+                } else {
+                    issue.setRequiredSecondRectificationTime(null);
+                }
+
+                // 读取备注
+                issue.setRemark(getCellValueAsString(row.getCell(15)));
+
+                // 读取创建人
+                issue.setCreator(getCellValueAsString(row.getCell(16)));
+
+                // 读取创建时间
+                Cell creationTimeCell = row.getCell(17);
+                if (creationTimeCell != null && creationTimeCell.getCellType() == CellType.NUMERIC
+                        && DateUtil.isCellDateFormatted(creationTimeCell)) {
+                    Date creationTime = creationTimeCell.getDateCellValue();
+                    issue.setCreationTime(creationTime);
+                } else {
+                    issue.setCreationTime(null);
+                }
+
+                // 读取最后修改人
+                issue.setLastModifier(getCellValueAsString(row.getCell(18)));
+
+                // 读取最后修改时间
+                Cell lastModificationTimeCell = row.getCell(19);
+                if (lastModificationTimeCell != null && lastModificationTimeCell.getCellType() == CellType.NUMERIC
+                        && DateUtil.isCellDateFormatted(lastModificationTimeCell)) {
+                    Date lastModificationTime = lastModificationTimeCell.getDateCellValue();
+                    issue.setLastModificationTime(lastModificationTime);
+                } else {
+                    issue.setLastModificationTime(null);
+                }
+
+                // 读取关联整改记录
+                issue.setAssociatedRectificationRecords(getCellValueAsString(row.getCell(20)));
+
+                // 读取关联问题编号
+                issue.setAssociatedIssueAddition(getCellValueAsString(row.getCell(21)));
+
+                // 读取创建时长
+                issue.setCreationDuration(getCellValueAsString(row.getCell(22)));
+
+                // 读取原因分析
+                issue.setCauseAnalysis(getCellValueAsString(row.getCell(23)));
+
+                // 读取整改验证状态
+                issue.setRectificationVerificationStatus(getCellValueAsString(row.getCell(24)));
+
+                // 读取验证结论
+                issue.setVerificationConclusion(getCellValueAsString(row.getCell(25)));
+
+                // 读取验证人
+                issue.setVerifier(getCellValueAsString(row.getCell(26)));
+
+                // 读取公式
+                issue.setFormula(getCellValueAsString(row.getCell(27)));
+
+                // 将 issue 对象添加到列表中
+                issueList.add(issue);
+            }
+
+
+            // 保存到数据库
+            this.saveBatch(issueList); // 批量保存
+            System.out.println("上传--------------结束");
+            return R.ok().put("message", "上传成功，已保存 " + issueList.size() + " 条数据");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return R.error("上传失败");
+        }
+    }
+
+    @Override
+    public Map<String, Integer> getCurrentMonthVerificationConclusionStatistics() {
+        Map<String, Integer> statistics = new HashMap<>();
+
+        // 定义可能的验证结论状态
+        List<String> verificationConclusions = Arrays.asList("持续", "未完成", "已完成", "结项");
+
+        // 获取当前月份起止日期
+        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
+        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
+//        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+
+        // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
+        statistics.put("创建", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
+
+        // 对其他验证结论进行统计
+        for (String conclusion : verificationConclusions) {
+            statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion, currentMonthStart, nextMonthFirstDayString));
+        }
+
+        return statistics;
+    }
+
+    // 统计“创建”的条件
+    private Integer countIssuesByCreationCondition(String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.and(wrapper ->
+                        wrapper.isNull("verification_conclusion")
+                                .or().eq("verification_conclusion", "")
+                )
+                .ge("creation_time", startDate)
+                .le("creation_time", endDate);
+
+        return this.count(queryWrapper);
+    }
+
+    // 根据 verification_conclusion 统计数量，处理包含多个状态的组合
+    private Integer countIssuesByVerificationConclusion(String conclusion, String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 使用 FIND_IN_SET() 函数判断字段中是否包含该状态
+        queryWrapper.ge("creation_time", startDate)
+                .le("creation_time", endDate)
+                .like("verification_conclusion", conclusion); // 使用 LIKE 查询
+
+        return this.count(queryWrapper);
+    }
+
+
+
+
+
     // 解析方法
     private List<String> parseRelatedIssueIds(String relatedIssueIds) {
         if (relatedIssueIds != null && !relatedIssueIds.trim().isEmpty()) {
@@ -197,6 +415,28 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                     .collect(Collectors.toList());
         }
         return new ArrayList<>(); // 如果没有记录，则返回空列表
+    }
+
+
+
+    private String getCellValueAsString(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            case BLANK:
+                return "";
+            default:
+                return null;
+        }
     }
 
 

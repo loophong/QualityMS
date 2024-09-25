@@ -8,6 +8,12 @@
       <el-form-item label="课题编号" prop="topicNumber">
         <el-input v-model="dataForm.topicNumber" placeholder="课题编号"></el-input>
       </el-form-item>
+      <el-form-item label="小组名称" prop="groupName">
+        <el-select v-model="dataForm.groupName" placeholder="请选择小组名称" @change="updateOptions">
+          <el-option v-for="item in groupNameOptions" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <!-- <el-form-item label="课题组长" prop="topicLeader">
         <el-input v-model="dataForm.topicLeader" placeholder="课题组长"></el-input>
       </el-form-item> -->
@@ -15,7 +21,7 @@
         <el-input v-model="dataForm.topicConsultant" placeholder="课题顾问"></el-input>
       </el-form-item> -->
       <el-form-item label="课题顾问" prop="topicConsultant">
-        <el-select v-model="dataForm.topicConsultant" multiple placeholder="请选择课题顾问">
+        <el-select v-model="dataForm.topicConsultant" placeholder="请选择课题顾问">
           <el-option v-for="item in consultantOptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
@@ -59,8 +65,8 @@
           start-placeholder="开始日期" end-placeholder="结束日期" placeholder="活动计划">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="课题关键字tag" prop="keywords">
-        <el-input v-model="dataForm.keywords" placeholder="课题关键字tag"></el-input>
+      <el-form-item label="课题关键字" prop="keywords">
+        <el-input v-model="dataForm.keywords" placeholder="课题关键字"></el-input>
       </el-form-item>
       <el-form-item label="课题活动状态" prop="topicActivityStatus">
         <el-input v-model="dataForm.topicActivityStatus" placeholder="课题活动状态"></el-input>
@@ -87,6 +93,7 @@
 export default {
   data() {
     return {
+      groupMemberList: [],
       flag: 1,
       visible: false,
       dataForm: {
@@ -95,7 +102,7 @@ export default {
         topicNumber: '',
         topicLeader: '',
         topicConsultant: '',
-        teamNumberIds: '',
+        teamNumberIds: [],
         createDate: '',
         creator: '',
         modificationDate: '',
@@ -111,52 +118,40 @@ export default {
         keywords: '',
         topicActivityStatus: '',
         topicActivityResult: '',
+        groupName: '',
         deleteFlag: '',
         note: ''
       },
       dataList: [],
-      consultantOptions: [
-        { value: 'consultant1', label: '顾问1' },
-        { value: 'consultant2', label: '顾问2' },
-        // 其他顾问选项
-      ],
-      membersSelect: [
-        { value: 'member1', label: '成员1' },
-        { value: 'member2', label: '成员2' },
-        { value: 'member3', label: '成员3' },
-        { value: 'member4', label: '成员4' },
-        { value: 'member5', label: '成员5' },
-        // 其他顾问选项
-      ],
+      //小组名称选择
+      groupNameOptions: [],
+      //顾问选择
+      consultantOptions: [],
+      //成员选择
+      membersSelect: [],
 
       dataRule: {
         topicName: [
           { required: true, message: '课题名称不能为空', trigger: 'blur' }
         ],
-        topicNumber: [
-          { required: true, message: '课题编号不能为空', trigger: 'blur' }
-        ],
-        topicLeader: [
-          { required: true, message: '课题组长不能为空', trigger: 'blur' }
-        ],
-        topicConsultant: [
-          { required: true, message: '课题顾问不能为空', trigger: 'blur' }
-        ],
-        teamNumberIds: [
-          { required: true, message: '小组成员ids不能为空', trigger: 'blur' }
-        ],
-        createDate: [
-          { required: true, message: '创建日期不能为空', trigger: 'blur' }
-        ],
-        startDate: [
-          { required: true, message: '开始日期不能为空', trigger: 'blur' }
-        ],
-        endDate: [
-          { required: true, message: '结束日期不能为空', trigger: 'blur' }
-        ],
-        topicDescription: [
-          { required: true, message: '课题描述/摘要不能为空', trigger: 'blur' }
-        ],
+        // topicConsultant: [
+        //   { required: true, message: '课题顾问不能为空', trigger: 'blur' }
+        // ],
+        // teamNumberIds: [
+        //   { required: true, message: '小组成员ids不能为空', trigger: 'blur' }
+        // ],
+        // createDate: [
+        //   { required: true, message: '创建日期不能为空', trigger: 'blur' }
+        // ],
+        // startDate: [
+        //   { required: true, message: '开始日期不能为空', trigger: 'blur' }
+        // ],
+        // endDate: [
+        //   { required: true, message: '结束日期不能为空', trigger: 'blur' }
+        // ],
+        // topicDescription: [
+        //   { required: true, message: '课题描述/摘要不能为空', trigger: 'blur' }
+        // ],
         topicType: [
           { required: true, message: '课题类型不能为空', trigger: 'blur' }
         ],
@@ -166,21 +161,66 @@ export default {
         activityPlan: [
           { required: true, message: '活动计划不能为空', trigger: 'blur' }
         ],
-        keywords: [
-          { required: true, message: '课题关键字tag不能为空', trigger: 'blur' }
-        ],
-        topicActivityStatus: [
-          { required: true, message: '课题活动状态不能为空', trigger: 'blur' }
-        ],
-
+        // keywords: [
+        //   { required: true, message: '课题关键字tag不能为空', trigger: 'blur' }
+        // ],
+        // topicActivityStatus: [
+        //   { required: true, message: '课题活动状态不能为空', trigger: 'blur' }
+        // ],
       }
     }
   },
-  mounted: {
-
-  },
   methods: {
+    updateOptions() {
+      // 首先找到匹配的组名的项
+      this.dataForm.topicConsultant = '';
+      this.dataForm.teamNumberIds = '';
+      // console.log(this.dataForm.groupName)
+      // console.log(this.dataForm.topicConsultant)
+      // console.log(this.dataForm.teamNumberIds)
+      const matchedItem = Object.values(this.groupMemberList).find(item => {
+        return item.groupName === this.dataForm.groupName;
+      });
+
+
+      if (matchedItem) {
+        // 更新顾问选项
+        this.consultantOptions = matchedItem.children.filter(member => member.roleInTopic === '顾问').map(member => ({
+          value: member.name,
+          label: member.name
+        }));
+
+        // 更新成员选项
+        this.membersSelect = matchedItem.children.filter(member => member.roleInTopic === '成员').map(member => ({
+          value: member.name,
+          label: member.name
+        }));
+      } else {
+        // 如果没有找到匹配项，可以清空选项
+        this.consultantOptions = [];
+        this.membersSelect = [];
+      }
+    },
+
     init(id) {
+      // this.initOptions();
+      console.log(this.groupMemberList)
+      if (this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList)) {
+        // 遍历对象
+        this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
+          return {
+            value: this.groupMemberList[key].groupName,
+            label: this.groupMemberList[key].groupName
+          };
+        });
+      } else if (Array.isArray(this.groupMemberList)) {
+        this.groupNameOptions = this.groupMemberList.map(item => ({
+          value: item.groupName,
+          label: item.groupName
+        }));
+      } else {
+        console.error('this.groupMemberList is neither an array nor an object');
+      }
       this.dataForm.qcsrId = id || 0
       this.visible = true
       this.$nextTick(() => {
@@ -192,19 +232,17 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 0) {
-
-
               this.dataForm.topicName = data.qcSubjectRegistration.topicName
               this.dataForm.topicNumber = data.qcSubjectRegistration.topicNumber
               this.dataForm.topicLeader = data.qcSubjectRegistration.topicLeader
               this.dataForm.topicConsultant = data.qcSubjectRegistration.topicConsultant
               this.dataForm.teamNumberIds = data.qcSubjectRegistration.teamNumberIds
-              this.dataForm.createDate = data.qcSubjectRegistration.createDate
-              this.dataForm.creator = data.qcSubjectRegistration.creator
-              this.dataForm.modificationDate = data.qcSubjectRegistration.modificationDate
-              this.dataForm.modifier = data.qcSubjectRegistration.modifier
-              this.dataForm.startDate = data.qcSubjectRegistration.startDate
-              this.dataForm.endDate = data.qcSubjectRegistration.endDate
+              // this.dataForm.createDate = data.qcSubjectRegistration.createDate
+              // this.dataForm.creator = data.qcSubjectRegistration.creator
+              // this.dataForm.modificationDate = data.qcSubjectRegistration.modificationDate
+              // this.dataForm.modifier = data.qcSubjectRegistration.modifier
+              // this.dataForm.startDate = data.qcSubjectRegistration.activityPlan
+              // this.dataForm.endDate = data.qcSubjectRegistration.activityPlanEnd
               this.dataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus
               this.dataForm.topicDescription = data.qcSubjectRegistration.topicDescription
               this.dataForm.topicType = data.qcSubjectRegistration.topicType
@@ -227,6 +265,21 @@ export default {
         this.flag = 1;
       }
     },
+    //TODO: 课题组长和课题顾问的下拉框
+    // handleFormEdit() {
+    //   this.groupMemberList.filter(item => {
+    //     if (item.groupName === this.dataForm.groupName) {
+    //       this.consultantOptions = item.children.map(member => {
+    //         if (member.roleInTopic === '顾问') {
+    //           return {
+    //             value: member.name,
+    //             label: member.name
+    //           }
+    //         }
+    //       });
+    //     }
+    //   });
+    // },
     // 表单提交
     dataFormSubmit() {
       if (this.flag && this.dataForm.qcsrId && this.dataForm.topicReviewStatus === 3) {
@@ -250,7 +303,6 @@ export default {
             startDatePlan.setHours(startDatePlan.getHours() + 13);
             endDatePlan.setHours(endDatePlan.getHours() + 13);
 
-
             this.$http({
               url: this.$http.adornUrl(`/qcSubject/registration/${!this.dataForm.qcsrId ? 'save' : 'update'}`),
               method: 'post',
@@ -259,14 +311,14 @@ export default {
                 'topicName': this.dataForm.topicName,
                 'topicNumber': this.dataForm.topicNumber,
                 'topicLeader': this.dataForm.topicLeader,
-                'topicConsultant': this.dataForm.topicConsultant,
-                'teamNumberIds': this.dataForm.teamNumberIds,
-                'createDate': this.dataForm.createDate,
-                'creator': this.dataForm.creator,
-                'modificationDate': this.dataForm.modificationDate,
-                'modifier': this.dataForm.modifier,
-                'startDate': this.dataForm.startDate,
-                'endDate': this.dataForm.endDate,
+                'topicConsultant': `${this.dataForm.topicConsultant}`,
+                'teamNumberIds': `${this.dataForm.teamNumberIds}`,
+                // 'createDate': this.dataForm.createDate,
+                // 'creator': this.dataForm.creator,
+                // 'modificationDate': this.dataForm.modificationDate,
+                // 'modifier': this.dataForm.modifier,
+                // 'startDate': this.dataForm.startDate,
+                // 'endDate': this.dataForm.endDate,
                 'topicReviewStatus': this.dataForm.topicReviewStatus,
                 'topicDescription': this.dataForm.topicDescription,
                 'topicType': this.dataForm.topicType,
@@ -297,26 +349,6 @@ export default {
           }
         })
       }
-    },
-    getDataList() {
-      this.$http({
-        url: this.$http.adornUrl('/qcMembers/qcGroupMember/list'),
-        method: 'get',
-        params: this.$http.adornParams({
-          'page': this.pageIndex,
-          'limit': this.pageSize,
-          'key': this.dataForm.key
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.page.list
-          this.totalPage = data.page.totalCount
-        } else {
-          this.dataList = []
-          this.totalPage = 0
-        }
-      })
-
     },
   }
 }

@@ -23,6 +23,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -187,6 +189,55 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
             e.printStackTrace(); // 输出异常信息
             return R.error("关闭任务失败: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Map<String, Integer> getCurrentMonthVerificationConclusionStatistics() {
+        Map<String, Integer> statistics = new HashMap<>();
+
+        // 定义可能的验证结论状态
+        List<String> verificationConclusions = Arrays.asList("持续", "未完成", "已完成", "结项");
+
+        // 获取当前月份起止日期
+        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
+        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
+//        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+
+        // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
+        statistics.put("创建", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
+
+        // 对其他验证结论进行统计
+        for (String conclusion : verificationConclusions) {
+            statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion, currentMonthStart, nextMonthFirstDayString));
+        }
+
+        return statistics;
+    }
+
+    // 统计“创建”的条件
+    private Integer countIssuesByCreationCondition(String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.and(wrapper ->
+                        wrapper.isNull("verification_conclusion")
+                                .or().eq("verification_conclusion", "")
+                )
+                .ge("creation_time", startDate)
+                .le("creation_time", endDate);
+
+        return this.count(queryWrapper);
+    }
+
+    // 根据 verification_conclusion 统计数量，处理包含多个状态的组合
+    private Integer countIssuesByVerificationConclusion(String conclusion, String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 使用 FIND_IN_SET() 函数判断字段中是否包含该状态
+        queryWrapper.ge("creation_time", startDate)
+                .le("creation_time", endDate)
+                .like("verification_conclusion", conclusion); // 使用 LIKE 查询
+
+        return this.count(queryWrapper);
     }
 
     // 解析方法

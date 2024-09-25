@@ -28,5 +28,10 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     String getuserinfo();
 
     R closeRelatedTasks(Long issueId);
+
+    /**
+     * 统计当月各类问题数量
+     */
+    Map<String, Integer> getCurrentMonthVerificationConclusionStatistics();
 }
 

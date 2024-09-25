@@ -77,6 +77,19 @@ public class IssueTableController {
         return issueTableService.closeRelatedTasks(issueId); // 直接调用服务层方法
     }
 
+    /**
+     * 获取当月问题统计
+     */
+    @RequestMapping("/currentMonth")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getCurrentMonthVerificationConclusionStatistics() {
+        Map<String, Integer> stats = issueTableService.getCurrentMonthVerificationConclusionStatistics();
+        // 打印返回给前端的数据
+        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
 
 
 

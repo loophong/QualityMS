@@ -23,5 +23,7 @@ public interface PlanService extends IService<PlanEntity> {
     PlanEntity getPlanByPlanName(String planId);
 
     List<PlanEntity> getPlansByUserId(String userId);
+
+    List<Map<String, Integer>> home();
 }
 

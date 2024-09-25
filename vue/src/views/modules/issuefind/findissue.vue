@@ -12,12 +12,13 @@
       <el-form-item>
         <el-upload
           class="upload-demo"
-          action="上传接口URL"
-        :before-upload="beforeUpload"
-        :on-success="handleUploadSuccess"
-        show-file-list="false">
-        <el-button size="small" type="primary">点击上传 Excel</el-button>
+          :before-upload="beforeUpload"
+          :show-file-list="false"
+          :on-success="handleUploadSuccess"
+          :on-error="handleUploadError">
+          <el-button size="small" type="primary">点击上传 Excel</el-button>
         </el-upload>
+
       </el-form-item>
 
     </el-form>
@@ -305,12 +306,41 @@ export default {
 
       if (!isExcel) {
         this.$message.error('上传文件只能是 Excel 文件!');
+        return false; // 返回 false，阻止上传
       }
+
       if (!isLt2M) {
         this.$message.error('上传文件大小不能超过 2MB!');
+        return false; // 返回 false，阻止上传
       }
-      return isExcel && isLt2M; // 返回true表示允许上传
-    },
+
+      // 使用 FormData 创建上传文件数据
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // 开始上传请求
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuetable/uploadExcel'),
+        method: 'post',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data' // 重要：设置请求头
+        }
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message.success('文件上传成功！');
+          this.getDataList(); // 上传成功后可以重新获取数据
+        } else {
+          this.$message.error('文件上传失败：' + data.msg);
+        }
+      }).catch(error => {
+        this.$message.error('文件上传错误：' + error.message);
+      });
+
+      return false; // 返回 false，阻止 el-upload 的自动上传
+    }
+,
+
 
     // 上传成功的处理
     handleUploadSuccess(response, file) {
@@ -321,6 +351,11 @@ export default {
         this.$message.error('文件上传失败：' + response.msg);
       }
     },
+    handleUploadError(error) {
+      console.error('上传错误:', error);  // 打印错误对象
+      this.$message.error('文件上传失败：' + (error.response ? error.response.data.message : error.message)); // 提供更详细的错误信息
+    },
+
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true

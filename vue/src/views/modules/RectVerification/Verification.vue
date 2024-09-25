@@ -282,13 +282,7 @@ export default {
   methods: {
     // 检查state并处理
     checkStateAndHandle (row) {
-      if (row.state === '持续') {
         this.addOrUpdateHandle(row.issueId)
-      } else if (row.state === '未完成') {
-        this.$message.error('问题未完成')
-      } else {
-        this.$message.error('未知状态')
-      }
     },
     // 获取数据列表
     getDataList () {

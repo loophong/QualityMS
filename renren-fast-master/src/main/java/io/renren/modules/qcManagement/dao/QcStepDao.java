@@ -19,4 +19,6 @@ public interface QcStepDao extends BaseMapper<QcStepEntity> {
 
     @Select("select * from qc_step where step_subject_id = #{stepSubjectId}")
     List<QcStepEntity> getStepListById(Integer stepSubjectId);
+
+
 }

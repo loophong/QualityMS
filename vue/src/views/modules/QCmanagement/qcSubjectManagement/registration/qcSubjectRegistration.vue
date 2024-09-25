@@ -11,8 +11,8 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
           @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="addOrUpdateHandle()"
-          :disabled="dataListSelections.length > 1">课题重用</el-button>
+        <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
+          :disabled="dataListSelections.length != 1">课题重用</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -92,7 +92,8 @@ export default {
       myQueryParam: {
         topicName: '',
         keywords: '',
-      }
+      },
+      reuseStepId: ''
     }
   },
   components: {
@@ -114,12 +115,15 @@ export default {
       this.dataListLoading = true
       await this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/list'),
+        // url: this.$http.adornUrl('/qcPlan/step/reuse'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
           'limit': this.pageSize,
           'topicName': this.myQueryParam.topicName,
           'keywords': this.myQueryParam.keywords
+          // 'key': 1,
+          // 'reuseStepId': 5
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -274,7 +278,116 @@ export default {
           }
         })
       })
-    }
+    },
+    // 课题重用
+    async reuseHandle() {
+      var ids = this.dataListSelections.map(item => {
+        return item.qcsrId
+      })
+      const newDataForm = {
+        qcsrId: 0,
+        topicName: '',
+        topicNumber: '',
+        topicLeader: '',
+        topicConsultant: '',
+        teamNumberIds: [],
+        createDate: '',
+        creator: '',
+        modificationDate: '',
+        modifier: '',
+        startDate: '',
+        endDate: '',
+        topicReviewStatus: '',
+        topicDescription: '',
+        topicType: '',
+        activityCharacteristics: '',
+        activityPlan: [],
+        activityPlanEnd: '',
+        keywords: '',
+        topicActivityStatus: '',
+        topicActivityResult: '',
+        groupName: '',
+        deleteFlag: '',
+        note: ''
+      }
+      if (ids) {
+
+        await this.$http({
+          url: this.$http.adornUrl(`/qcSubject/registration/info/${ids}`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            newDataForm.topicName = data.qcSubjectRegistration.topicName
+            newDataForm.topicNumber = data.qcSubjectRegistration.topicNumber
+            newDataForm.topicLeader = data.qcSubjectRegistration.topicLeader
+            newDataForm.topicConsultant = data.qcSubjectRegistration.topicConsultant
+            newDataForm.teamNumberIds = data.qcSubjectRegistration.teamNumberIds
+            newDataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus
+            newDataForm.topicDescription = data.qcSubjectRegistration.topicDescription
+            newDataForm.topicType = data.qcSubjectRegistration.topicType
+            newDataForm.activityCharacteristics = data.qcSubjectRegistration.activityCharacteristics
+            newDataForm.activityPlan = [new Date(data.qcSubjectRegistration.activityPlan), new Date(data.qcSubjectRegistration.activityPlanEnd)]
+            newDataForm.keywords = data.qcSubjectRegistration.keywords
+            newDataForm.topicActivityStatus = data.qcSubjectRegistration.topicActivityStatus
+            newDataForm.topicActivityResult = data.qcSubjectRegistration.topicActivityResult
+            newDataForm.deleteFlag = 0
+            newDataForm.note = data.qcSubjectRegistration.note
+          }
+        })
+
+        await this.$http({
+          url: this.$http.adornUrl(`/qcSubject/registration/save`),
+          method: 'post',
+          data: this.$http.adornData({
+            'qcsrId': this.dataForm.qcsrId || undefined,
+            'topicName': `${newDataForm.topicName}(重用)`,
+            'topicNumber': newDataForm.topicNumber,
+            'topicLeader': newDataForm.topicLeader,
+            'topicConsultant': newDataForm.topicConsultant,
+            'teamNumberIds': newDataForm.teamNumberIds,
+            'topicReviewStatus': '1',
+            'topicDescription': newDataForm.topicDescription,
+            'topicType': newDataForm.topicType,
+            'activityCharacteristics': newDataForm.activityCharacteristics,
+            'activityPlan': newDataForm.activityPlan[0],
+            'activityPlanEnd': newDataForm.activityPlan[1],
+            'keywords': newDataForm.keywords,
+            'topicActivityStatus': '',
+            'topicActivityResult': '',
+            'deleteFlag': 0,
+            'note': newDataForm.note
+          })
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '课题重用成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+            console.log(data)
+            this.reuseStepId = data.id
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+
+        await this.$http({
+          url: this.$http.adornUrl('/qcPlan/step/reuse'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': 1,
+            'limit': 10000,
+            'key': '',
+            'subjectID': ids[0],
+            'reuseStepId': this.reuseStepId
+          })
+        })
+      }
+    },
   }
 }
 </script>

@@ -98,7 +98,7 @@ public class QcSubjectRegistrationController {
     @RequiresPermissions("qcSubject:registration:save")
     public R save(@RequestBody QcSubjectRegistrationEntity qcSubjectRegistration){
 		qcSubjectRegistrationService.save(qcSubjectRegistration);
-        return R.ok();
+        return R.ok().put("id", qcSubjectRegistration.getQcsrId());
     }
 
     /**

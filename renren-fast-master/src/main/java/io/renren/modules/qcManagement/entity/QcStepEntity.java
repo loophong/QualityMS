@@ -90,5 +90,9 @@ public class QcStepEntity implements Serializable {
 	 * 巩固措施
 	 */
 	private String stageConsolidate;
+	/**
+	 * 是否为重用步骤
+	 */
+	private String ifReuse;
 
 }

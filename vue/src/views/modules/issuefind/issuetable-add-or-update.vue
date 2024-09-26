@@ -48,20 +48,35 @@
       </el-form-item>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
         <div v-for="(vehicle, index) in dataForm.vehicles" :key="vehicle.key">
-          <el-form-item :label="'车型 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleTypeId'" :rules="{ required: true, message: '请选择车型', trigger: 'change' }">
-            <el-select v-model="vehicle.vehicleTypeId" placeholder="请选择车型">
-              <el-option
-                v-for="item in vehicleTypeOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
+<!--          <el-form-item :label="'车型 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleTypeId'" :rules="{ required: true, message: '请选择车型', trigger: 'change' }">-->
+<!--            <el-select v-model="vehicle.vehicleTypeId" placeholder="请选择车型">-->
+<!--              <el-option-->
+<!--                v-for="item in vehicleTypeOptions"-->
+<!--                :key="item.value"-->
+<!--                :label="item.label"-->
+<!--                :value="item.value">-->
+<!--              </el-option>-->
+<!--            </el-select>-->
+<!--          </el-form-item>-->
+          <el-form-item :label="'车型 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleTypeId'" :rules="{ required: true, message: '请选择车型', trigger: 'change' }" label-width="140px">
+            <div style="display: flex; align-items: center; margin-left: 10px;">
+              <el-select v-model="vehicle.vehicleTypeId" placeholder="请选择车型" style="flex: 1;">
+                <el-option
+                  v-for="item in vehicleTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+              <el-button type="danger" @click.prevent="removeVehicle(vehicle)" style="margin-left: 10px;">删除</el-button>
+            </div>
           </el-form-item>
-          <el-form-item :label="'车号 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleNumber'" :rules="{ required: true, message: '请输入车号', trigger: 'blur' }">
-            <el-input v-model="vehicle.vehicleNumber" placeholder="请输入车号"></el-input>
+
+          <el-form-item :label="'车号 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleNumber'" :rules="{ required: true, message: '请输入车号', trigger: 'blur' }" label-width="140px">
+            <el-input v-model="vehicle.vehicleNumber" placeholder="请输入车号" style="margin-left: 10px;"></el-input>
           </el-form-item>
-          <el-button @click.prevent="removeVehicle(vehicle)">删除</el-button>
+
+          <!--          <el-button @click.prevent="removeVehicle(vehicle)">删除</el-button>-->
         </div>
         <el-form-item>
           <el-button type="primary" @click="addVehicle">新增一组车型和车号</el-button>
@@ -279,19 +294,35 @@
       successHandle(response, file, fileList) {
         this.fileList = fileList;
         this.successNum++;
+        // if (response && response.code === 0) {
+        //   console.log('获取图片的返回' ,response)
+        //   console.log('获取图片的返回' ,response.code)
+        //   this.dataForm.issuePhoto = response.url; // 假设返回的数据中包含图片地址
+        //   if (this.num === this.successNum) {
+        //     this.$confirm('操作成功, 是否继续操作?', '提示', {
+        //       confirmButtonText: '确定',
+        //       cancelButtonText: '取消',
+        //       type: 'warning'
+        //     }).catch(() => {
+        //       this.visibleUpload = false; // 关闭上传对话框
+        //     });
+        //   }
+        // } else {
+        //   this.$message.error(response.msg);
+        // }
         if (response && response.code === 0) {
-          console.log('获取图片的返回' ,response)
-          console.log('获取图片的返回' ,response.code)
+          console.log('获取图片的返回', response);
+          console.log('获取图片的返回', response.code);
           this.dataForm.issuePhoto = response.url; // 假设返回的数据中包含图片地址
-          if (this.num === this.successNum) {
-            this.$confirm('操作成功, 是否继续操作?', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).catch(() => {
-              this.visibleUpload = false; // 关闭上传对话框
-            });
-          }
+
+          // 显示操作成功的消息
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500 // 提示的持续时间（毫秒）
+          });
+          // 直接关闭上传对话框
+          this.visibleUpload = false; // 关闭上传对话框
         } else {
           this.$message.error(response.msg);
         }
@@ -413,6 +444,9 @@
       },
       init (id) {
         this.fetchuserinform() //获取用户名
+        this.fetchIssueCategories()
+        this.fetchVehicleTypes()
+        this.fetchIssueOptions() // 获取所有问题编号选项
         this.dataForm.issueId = id || 0
         this.visible = true
         // console.log("成功获取用户名：" ,this.dataForm.userinfo)

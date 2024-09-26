@@ -368,7 +368,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 //        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
 
         // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
-        statistics.put("创建", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
+        statistics.put("未完成", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
 
         // 对其他验证结论进行统计
         for (String conclusion : verificationConclusions) {

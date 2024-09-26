@@ -19,16 +19,24 @@
           placeholder="请选择实际完成时间">
         </el-date-picker>
       </el-form-item>
+<!--      <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
+<!--        <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择验证人">-->
+<!--          <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
+<!--            <el-option v-for="item in group.options" :key="item.value" :label="item.label"-->
+<!--                       :value="item.label">-->
+<!--            </el-option>-->
+<!--          </el-option-group>-->
+<!--        </el-select>-->
+<!--      </el-form-item>-->
       <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
-        <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择验证人">
+        <el-select v-model="selectedResponsiblePersons" filterable multiple placeholder="请选择整改责任人">
           <el-option-group v-for="group in options" :key="group.label" :label="group.label">
-            <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                       :value="item.label">
+            <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
             </el-option>
           </el-option-group>
         </el-select>
       </el-form-item>
-<!--      <el-form-item label="整改图片/交付物" prop="image">-->
+      <!--      <el-form-item label="整改图片/交付物" prop="image">-->
 <!--        <el-upload-->
 <!--          action="#"-->
 <!--          list-type="picture-card"-->
@@ -81,7 +89,7 @@
               </el-option>
             </el-option-group>
           </el-select>
-          <el-form-item label="上级任务" prop="superiorMask">
+          <el-form-item label="" prop="superiorMask">
             <el-select v-model="subtask.parentTask" placeholder="请选择上级任务">
               <el-option
                 key="question"
@@ -97,12 +105,13 @@
             </el-select>
           </el-form-item>
           <el-button @click.prevent="removeSubtask(subtask)">删除</el-button>
+          <el-button type="primary" @click="addSubtask">增加子任务</el-button>
+
         </el-form-item>
 
-        <el-form-item>
-          <el-button type="primary" @click="addSubtask">增加子任务</el-button>
-          <el-button @click="resetForm('dataForm')">重置</el-button>
-        </el-form-item>
+<!--        <el-form-item>-->
+<!--          <el-button @click="resetForm('dataForm')">重置</el-button>-->
+<!--        </el-form-item>-->
         <el-form-item label="要求完成日期" prop="requiredCompletionTime">
           <el-date-picker
             v-model="dataForm.requiredCompletionTime"
@@ -149,6 +158,8 @@
   export default {
     data () {
       return {
+        // 新增数组来存放选择的整改责任人ID
+        selectedResponsiblePersons: [], // 存放选中的责任人ID
         bloburl: '',
         imageurl: '',
         visible: false,
@@ -679,6 +690,9 @@
             // 创建 vehicleTypeIds 数组
             this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
             this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
+            // 将选中的责任人ID数组转换为字符串
+            this.dataForm.rectificationResponsiblePerson = this.selectedResponsiblePersons.join(',');
+            console.log('整改责任人:', this.dataForm.rectificationResponsiblePerson);
             console.log('Successfully 获得 vehicle:', this.dataForm.vehicleTypeIds)
             // 确保 issueCategoryId 是一个数组
             if (!Array.isArray(this.dataForm.issueCategoryId)) {

@@ -1,11 +1,13 @@
 <template>
   <div class="container">
+
     <div v-if="this.routerParam">
       <ul>
         <li v-for="item in this.routerParam" :key="item.qcsrId">
           {{ item.topicName }}
           {{ item.topicType }}
         </li>
+        <!-- <el-button type="danger" @click="toIssue()" style="justify-content: flex-end;">问题添加</el-button> -->
       </ul>
     </div>
 
@@ -21,21 +23,21 @@
         <div v-if="active1 === 1">
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -48,6 +50,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -67,10 +70,11 @@
               <el-input type="textarea" v-model="form.desc"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">提交</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
+
             </el-form-item>
           </el-form>
         </div>
@@ -78,21 +82,21 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -105,6 +109,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -134,22 +139,22 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -162,6 +167,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -190,21 +196,21 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -217,6 +223,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -245,21 +252,21 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -272,6 +279,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -299,21 +307,21 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -326,6 +334,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -353,21 +362,21 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -380,6 +389,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -407,21 +417,21 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -440,6 +450,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -467,21 +478,21 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -494,6 +505,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -521,21 +533,21 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker clearable v-model="form.participationDate" type="daterange" range-separator="-"
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
                 start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -548,6 +560,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -612,6 +625,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -640,8 +654,8 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -667,6 +681,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -694,8 +709,8 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -721,6 +736,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -748,8 +764,8 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -775,6 +791,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -802,8 +819,8 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -829,6 +846,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -856,8 +874,8 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -883,6 +901,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -910,8 +929,8 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -937,6 +956,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -964,8 +984,8 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -997,6 +1017,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1024,8 +1045,8 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1051,6 +1072,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1078,8 +1100,8 @@
           <br>
           <el-form>
             <br>
-            <el-form-item label="阶段名称" prop="topicName">
-              <el-input v-model="form.topicName" placeholder="课题名称"></el-input>
+            <el-form-item label="阶段名称" prop="stageName">
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1105,6 +1127,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1169,6 +1192,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1223,6 +1247,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1279,6 +1304,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1334,6 +1360,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1389,6 +1416,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1450,6 +1478,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1505,6 +1534,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1560,6 +1590,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1594,12 +1625,25 @@
         </span>
       </div>
     </el-dialog>
+    <el-dialog title="控制图" :visible.sync="dialogVisibleControl" :close-on-click-modal="false" width="80%">
+      <div style="width: 100%; height: 100%;">
+        <control ref="qcChart"></control>
+      </div>
+      <el-button @click="dialogVisibleControl = false">取 消</el-button>
+      <el-button type="primary" @click="dialogVisibleControl = false">确 定</el-button>
+
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 import * as echarts from 'echarts';
+import control from '@/views/modules/QCmanagement/qcTools/control.vue';
 export default {
+  components: {
+    control
+  },
   data() {
     return {
       fileList: [],
@@ -1622,6 +1666,7 @@ export default {
         key: ''
       },
       dialogVisible: false,
+      dialogVisibleControl: false,
       active1: 1,
       active2: 1,
       active3: 1,
@@ -1633,16 +1678,18 @@ export default {
       planStyle2: false,
       planStyle3: false,
       form: {
+        stepId: 0,
         stageName: '',
         planDate: [],
         actualDate: [],
-        stagePeople: [],
+        stagePeople: '',
         stageDescribe: '',
         stageBefore: '',
         stageAfter: '',
         stageExtra: '',
         stageConsolidate: '',
       },
+
       participantOptions: [
         { value: 'participant1', label: '参与人员1' },
         { value: 'participant2', label: '参与人员2' },
@@ -1713,6 +1760,7 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.planStepList = data.idList
+          console.log(this.planStepList)
           this.findMatchingItem(1)
           // this.totalPage = data.page.totalCount
         } else {
@@ -1724,6 +1772,12 @@ export default {
     initRouterParam() {
       const res = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', teamNumberIds: '', topicLeader: '', topicType: '' };
       this.routerParam = res
+      console.log(this.routerParam)
+      const tmp = this.routerParam[0].teamNumberIds.split(',');
+      this.participantOptions = tmp.map(id => ({
+        value: id.trim(),
+        label: id.trim()
+      }));
       this.value = this.routerParam[0].topicType;
     },
     chart(id) {
@@ -1737,7 +1791,9 @@ export default {
       this.initForm()
       for (let item of this.planStepList) {
         if (item.stepProcess === id) {
+          this.form.stepId = item.stepId
           this.form = item;
+          this.form
           this.form.planDate = [item.stagePlanStart, item.stagePlanEnd]
           this.form.actualDate = [item.stageActualStart, item.stageActualEnd]
           if (item.stagePeople) {
@@ -1796,6 +1852,9 @@ export default {
       this.$nextTick(() => {
         this.initChart();
       });
+    },
+    toggleControl() {
+      this.dialogVisibleControl = !this.dialogVisibleControl;
     },
     handleClose(done) {
       this.$confirm('确认关闭？')
@@ -2060,11 +2119,12 @@ export default {
     dataFormSubmit(id) {
       // this.$refs['dataForm'].validate((valid) => {
       //   if (valid) {
+
       this.$http({
-        url: this.$http.adornUrl(`/qcPlan/step/${!this.dataForm.stepId ? 'save' : 'update'}`),
+        url: this.$http.adornUrl(`/qcPlan/step/${!this.form.stepId ? 'save' : 'update'}`),
         method: 'post',
         data: this.$http.adornData({
-          'stepId': this.dataForm.stepId || undefined,
+          'stepId': this.form.stepId || undefined,
           'stepSubjectId': this.routerParam[0].qcsrId,
           'stepType': this.routerParam[0].topicType,
           'stepProcess': id,
@@ -2088,9 +2148,20 @@ export default {
             duration: 1500,
             onClose: () => {
               this.visible = false
-              this.$emit('refreshDataList')
+              // this.$emit('refreshDataList')
             }
           })
+          if (this.routerParam[0].qcsrId) {
+            this.$http({
+              url: this.$http.adornUrl(`/qcSubject/registration/update`),
+              method: 'post',
+              data: this.$http.adornData({
+                'qcsrId': this.routerParam[0].qcsrId,
+                'topicReviewStatus': 3,
+                'topicActivityStatus': id,
+              })
+            })
+          }
         } else {
           this.$message.error(data.msg)
         }

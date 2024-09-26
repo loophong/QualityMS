@@ -8,6 +8,7 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
           @click="addOrUpdateHandle()">新增小组</el-button>
+        <el-button type="danger" @click="toIssue()">问题添加</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="tableData" stripe border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -122,7 +123,10 @@ export default {
           if (data && data.code === 0) {
             this.dataList = data.page.list;
             this.totalPage = data.page.totalCount;
-            groupList = this.dataList;
+            groupList = this.dataList.filter(function (item) {
+              return item.deleteFlag !== 1;
+            });
+            console.log(groupList);
             // 分组
             this.tableData = []; // 清空 tableData
             const map = {};
@@ -187,6 +191,15 @@ export default {
     selectionChangeHandle(val) {
       this.dataListSelections = val
     },
+    toIssue() {
+      this.$router.push(
+        {
+          name: 'otherToIssue',
+          // query: {
+          //   data: JSON.stringify(filteredArray)
+          // }
+        });
+    },
     // 新增 / 修改
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
@@ -205,6 +218,37 @@ export default {
       })
     },
     // 删除
+    //   deleteHandle(id) {
+    //     var ids = id ? [id] : this.dataListSelections.map(item => {
+    //       return item.qcgmId
+    //     })
+    //     this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+    //       confirmButtonText: '确定',
+    //       cancelButtonText: '取消',
+    //       type: 'warning'
+    //     }).then(() => {
+    //       this.$http({
+    //         url: this.$http.adornUrl('/qcMembers/qcGroupMember/delete'),
+    //         method: 'post',
+    //         data: this.$http.adornData(ids, false)
+    //       }).then(({ data }) => {
+    //         if (data && data.code === 0) {
+    //           this.$message({
+    //             message: '操作成功',
+    //             type: 'success',
+    //             duration: 1500,
+    //             onClose: () => {
+    //               this.getDataList()
+    //             }
+    //           })
+    //         } else {
+    //           this.$message.error(data.msg)
+    //         }
+    //       })
+    //     })
+    //   }
+    // }
+    //删除
     deleteHandle(id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {
         return item.qcgmId
@@ -215,9 +259,12 @@ export default {
         type: 'warning'
       }).then(() => {
         this.$http({
-          url: this.$http.adornUrl('/qcMembers/qcGroupMember/delete'),
+          url: this.$http.adornUrl(`/qcMembers/qcGroupMember/update`),
           method: 'post',
-          data: this.$http.adornData(ids, false)
+          data: this.$http.adornData({
+            'qcgmId': id || undefined,
+            'deleteFlag': 1,
+          })
         }).then(({ data }) => {
           if (data && data.code === 0) {
             this.$message({
@@ -237,3 +284,34 @@ export default {
   }
 }
 </script>
+
+<!-- this.$http({
+  url: this.$http.adornUrl(`/qcMembers/qcGroupMember/${!this.dataForm.qcgmId ? 'save' : 'update'}`),
+  method: 'post',
+  data: this.$http.adornData({
+    'qcgmId': this.dataForm.qcgmId || undefined,
+    'name': this.dataForm.mainName,
+    'gender': this.dataForm.gender,
+    'telNumber': this.dataForm.telNumber,
+    'number': this.dataForm.number,
+    'education': this.dataForm.education,
+    'department': this.dataForm.department,
+    'position': this.dataForm.position,
+    'team': this.dataForm.team,
+    'participationDate': this.dataForm.participationDate,
+    'topic': this.dataForm.topic,
+    'roleInTopic': '管理员',
+    'deleteFlag': 0,
+    'groupName': this.dataForm.groupName
+  })
+}).then(({ data }) => {
+  if (data && data.code === 0) {
+    this.$message({
+      message: '操作成功',
+      type: 'success',
+      duration: 1500,
+      onClose: () => {
+        this.visible = false;
+        this.$emit('refreshDataList');
+      }
+    }); -->

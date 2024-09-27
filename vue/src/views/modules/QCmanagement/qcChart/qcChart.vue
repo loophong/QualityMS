@@ -233,7 +233,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: [71]
+            data: [this.countData.countExamined / this.countData.countSubmitted]
           },
 
         ]

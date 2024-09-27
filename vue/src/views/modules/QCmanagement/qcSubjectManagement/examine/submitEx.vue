@@ -4,7 +4,7 @@
     <el-dialog title="课题提交" :visible.sync="showDialog1">
       <el-form :model="form1">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
-          <el-select v-model="form1.result" placeholder="">
+          <el-select v-model="form1.result" placeholder="" :disabled="!isAuth('qcSubject:plan:submit')">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
@@ -22,14 +22,14 @@
       <el-form :model="form2">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form2.result" placeholder=""
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[0].status != 'B'">
+            :disabled="!isAuth('qcExamine:Achievement:recognition') || dataList[0].status != 'B'">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form2.comment" autocomplete="off"
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[0].status != 'B'"></el-input>
+            :disabled="!isAuth('qcExamine:Achievement:recognition') || dataList[0].status != 'B'"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -41,14 +41,14 @@
       <el-form :model="form3">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form3.result" placeholder=""
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[1].status != 'B'">
+            :disabled="!isAuth('qcExamine:interested:party') || dataList[1].status != 'B' || ifSelected">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form3.comment" autocomplete="off"
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[1].status != 'B'"></el-input>
+            :disabled="!isAuth('qcExamine:interested:party') || dataList[1].status != 'B' || ifSelected"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -99,7 +99,7 @@
               </td>
               <td>
                 <el-input v-model="tableData[0]"
-                  :disabled="!isAuth('qcSubject:registration:save') || dataList[2].status != 'B'">
+                  :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
                   <template slot="append">分</template>
                 </el-input>
               </td>
@@ -120,7 +120,7 @@
               </td>
               <td>
                 <el-input v-model="tableData[1]"
-                  :disabled="!isAuth('qcSubject:registration:save') || dataList[2].status != 'B'">
+                  :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
                   <template slot="append">分</template>
                 </el-input>
               </td>
@@ -131,7 +131,7 @@
               <td>正确且适宜应用超过4种QC新老七种工具(每种工具5分，错用不得分);</td>
               <td>
                 <el-input v-model="tableData[2]"
-                  :disabled="!isAuth('qcSubject:registration:save') || dataList[2].status != 'B'">
+                  :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
                   <template slot="append">分</template>
                 </el-input>
               </td>
@@ -148,7 +148,7 @@
               </td>
               <td>
                 <el-input v-model="tableData[3]"
-                  :disabled="!isAuth('qcSubject:registration:save') || dataList[2].status != 'B'">
+                  :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
                   <template slot="append">分</template>
                 </el-input>
               </td>
@@ -158,7 +158,7 @@
         <br>
         <el-form-item label="初评等级" :label-width="formLabelWidth">
           <el-select v-model="form4.level" placeholder=""
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[2].status != 'B'">
+            :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
             <el-option label="A" value="A"></el-option>
             <el-option label="B" value="B"></el-option>
             <el-option label="C" value="C"></el-option>
@@ -167,14 +167,14 @@
         </el-form-item>
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form4.result" placeholder=""
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[2].status != 'B'">
+            :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form4.comment" autocomplete="off"
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[2].status != 'B'"></el-input>
+            :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -211,7 +211,7 @@
             </td>
             <td>
               <el-input v-model="finalData[0]"
-                :disabled="!isAuth('qcSubject:registration:save') || dataList[3].status != 'B'">
+                :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
                 <template slot="append">分</template>
               </el-input>
             </td>
@@ -229,7 +229,7 @@
             </td>
             <td>
               <el-input v-model="finalData[1]"
-                :disabled="!isAuth('qcSubject:registration:save') || dataList[3].status != 'B'">
+                :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
                 <template slot="append">分</template>
               </el-input>
             </td>
@@ -247,7 +247,7 @@
             </td>
             <td>
               <el-input v-model="finalData[2]"
-                :disabled="!isAuth('qcSubject:registration:save') || dataList[3].status != 'B'">
+                :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
                 <template slot="append">分</template>
               </el-input>
             </td>
@@ -266,7 +266,7 @@
             </td>
             <td>
               <el-input v-model="finalData[3]"
-                :disabled="!isAuth('qcSubject:registration:save') || dataList[3].status != 'B'">
+                :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
                 <template slot="append">分</template>
               </el-input>
             </td>
@@ -278,7 +278,7 @@
       <el-form :model="form5">
         <el-form-item label="复评等级" :label-width="formLabelWidth">
           <el-select v-model="form5.level" placeholder=""
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[3].status != 'B'">
+            :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
             <el-option label="A" value="A"></el-option>
             <el-option label="B" value="B"></el-option>
             <el-option label="C" value="C"></el-option>
@@ -287,14 +287,14 @@
         </el-form-item>
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form5.result" placeholder=""
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[3].status != 'B'">
+            :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form5.comment" autocomplete="off"
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[3].status != 'B'"></el-input>
+            :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -307,14 +307,14 @@
       <el-form :model="form6">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form6.result" placeholder=""
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[4].status != 'B'">
+            :disabled="!isAuth('qcExamine:finance:department') || dataList[4].status != 'B'">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form6.comment" autocomplete="off"
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[4].status != 'B'"></el-input>
+            :disabled="!isAuth('qcExamine:finance:department') || dataList[4].status != 'B'"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -328,14 +328,14 @@
       <el-form :model="form7">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form7.result" placeholder=""
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[5].status != 'B'">
+            :disabled="!isAuth('qcExamine:final:submit') || dataList[5].status != 'B'">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form7.comment" autocomplete="off"
-            :disabled="!isAuth('qcSubject:registration:save') || dataList[5].status != 'B'"></el-input>
+            :disabled="!isAuth('qcExamine:final:submit') || dataList[5].status != 'B'"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -352,6 +352,7 @@ export default {
 
   data() {
     return {
+      ifSelected: false,
       tableData: [20, 40, 20, 20],
       finalData: [20, 40, 20, 20],
       formLabelWidth: '120px',
@@ -451,7 +452,7 @@ export default {
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
-      dataFormEx: [{
+      dataFormEx: {
         qcExamineId: 0,
         qcExamineSubject: '',
         qcExamineCurrent: '',
@@ -470,69 +471,87 @@ export default {
         qcFirstScore: '',
         qcThreeContent: '',
         qcTwoContent: '',
-        qcOneContent: ''
-      }],
+        qcOneContent: '',
+      },
     };
   },
+
   mounted() {
     this.initRouterParam()
     this.getStatusList()
-    // console.log(this.isAuth('qcSubject:registration:save') + '-+-+-+-+-+-+-')
+    const tmp = this.ifSelectedPart()
+    console.log(tmp)
+  },
+  computed: {
+
   },
   methods: {
+
     //处理跳转参数
     initRouterParam() {
       try {
         this.routerParam = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', topicType: '', resultType: '', examineId: '' };
-        // console.log(this.routerParam[0].resultType, '++++++++++++')
-        // console.log(this.routerParam[0].resultType)
-        // console.log('qcsrId:' + this.routerParam[0].qcsrId)
-        // console.log(this.routerParam[0].resultType.includes('其他'))
+        this.ifSelected = this.ifSelectedPart()
+        // console.log(this.routerParam, '++++++++++++')
       } catch (e) {
         console.log('处理跳转参数失败')
         console.log(e)
       }
     },
-
+    //是否是选择的相关方
+    ifSelectedPart() {
+      if ((this.routerParam[0].resultType.includes('安全') && this.isAuth('qcExamine:interested:safety'))) {
+        return true
+      } else if ((this.routerParam[0].resultType.includes('设备') && this.isAuth('qcExamine:interested:instrument'))) {
+        return true
+      } else if ((this.routerParam[0].resultType.includes('质量') && this.isAuth('qcExamine:interested:quality'))) {
+        return true
+      } else if ((this.routerParam[0].resultType.includes('生产') && this.isAuth('qcExamine:interested:production'))) {
+        return true
+      } else if ((this.routerParam[0].resultType.includes('技术') && this.isAuth('qcExamine:interested:technology'))) {
+        return true
+      } else {
+        return false
+      }
+    },
     async getStatusList() {
       await this.$http({
-        url: this.$http.adornUrl('/qcManagement/examineStatus/list'),
+        // url: this.$http.adornUrl('/qcManagement/examineStatus/list'),
+        url: this.$http.adornUrl(`/qcManagement/examineStatus/info/${this.routerParam[0].examineId}`),
         method: 'get',
-        params: this.$http.adornParams({
-          'page': this.pageIndex,
-          'limit': 100,
-          'key': ''
-        })
+        params: this.$http.adornParams()
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.dataFormEx = data.page.list
-          this.totalPage = data.page.totalCount
+          this.dataFormEx = data.qcExamineStatus
           this.renderTree()
-          this.tableData = this.dataFormEx[0].qcFirstScore.split(',')
-          console.log(this.tableData)
-          this.finalData = this.dataFormEx[0].qcSecondScore.split(',')
-          this.form2.result = this.dataFormEx[0].qcStatusTwo
-          this.form3.result = this.dataFormEx[0].qcStatusThree
-          this.form4.result = this.dataFormEx[0].qcStatusFour
-          this.form4.level = this.dataFormEx[0].qcFirstLevel
-          this.form5.level = this.dataFormEx[0].qcSecondLevel
-          this.form5.result = this.dataFormEx[0].qcStatusFive
-          this.form6.result = this.dataFormEx[0].qcStatusSix
-          this.form7.result = this.dataFormEx[0].qcStatusSeven
-          this.form2.comment = this.dataFormEx[0].qcTwoContent
-          this.form3.comment = this.dataFormEx[0].qcThreeContent
-          this.form4.comment = this.dataFormEx[0].qcFourContent
-          this.form5.comment = this.dataFormEx[0].qcFiveContent
-          this.form6.comment = this.dataFormEx[0].qcSixContent
-          this.form7.comment = this.dataFormEx[0].qcSevenContent
+          // this.tableData = this.dataFormEx.qcFirstScore.split(',')
+          this.tableData = this.dataFormEx.qcFirstScore ? this.dataFormEx.qcFirstScore.split(',') : []
+          // this.finalData = this.dataFormEx.qcSecondScore.split(',')
+          this.tableData = this.dataFormEx.qcSecondScore ? this.dataFormEx.qcSecondScore.split(',') : []
+          this.form2.result = this.dataFormEx.qcStatusTwo
+          this.form3.result = this.dataFormEx.qcStatusThree
+          this.form4.result = this.dataFormEx.qcStatusFour
+          this.form4.level = this.dataFormEx.qcFirstLevel
+          this.form5.level = this.dataFormEx.qcSecondLevel
+          this.form5.result = this.dataFormEx.qcStatusFive
+          this.form6.result = this.dataFormEx.qcStatusSix
+          this.form7.result = this.dataFormEx.qcStatusSeven
+          this.form2.comment = this.dataFormEx.qcTwoContent
+          this.form3.comment = this.dataFormEx.qcThreeContent
+          this.form4.comment = this.dataFormEx.qcFourContent
+          this.form5.comment = this.dataFormEx.qcFiveContent
+          this.form6.comment = this.dataFormEx.qcSixContent
+          this.form7.comment = this.dataFormEx.qcSevenContent
         } else {
-          this.dataFormEx = []
+          this.dataFormEx = {}
+          console.log('获取数据失败')
           this.totalPage = 0
         }
       })
     },
+    //初始化节点状态
     initStatus(statusId) {
-      console.log(statusId, '+++++++++++')
+
       if (statusId === '1') {
         this.dataList[0].status = 'B'
         this.dataList[1].status = 'A'
@@ -593,6 +612,7 @@ export default {
 
 
     },
+    //渲染审核流程树
     renderTree() {
 
       // 创建根节点
@@ -603,9 +623,9 @@ export default {
         url: '',
         status: this.routerParam[0].resultType ? 'C' : 'A',
       };
-      console.log(this.dataFormEx[0])
+      // console.log(this.dataFormEx[0])
       // const statusId = this.dataFormEx[0].qcExamineCurrent
-      this.initStatus(this.dataFormEx[0].qcExamineCurrent) // 初始化状态
+      this.initStatus(this.dataFormEx.qcExamineCurrent) // 初始化状态
       // 更新状态
       let foundA = false;
       this.dataList.forEach(item => {
@@ -684,48 +704,48 @@ export default {
           console.log('Clicked on1:', d); // 打印节点数据
           if (d.data.name === '课题提交') {
             this.showDialog1 = true;
-            console.log('++++++++++');
+            // console.log('++++++++++');
           } else if (d.data.name === '成果认定') {
             if (d.data.status === 'A') {
-              this.$message.error('请先等待上一步');
+              this.$message.warning('请先等待上一步');
               return;
             } else {
               this.showDialog2 = true;
             }
           } else if (d.data.name === '相关方审核') {
             if (d.data.status === 'A') {
-              this.$message.error('请先等待上一步');
+              this.$message.warning('请先等待上一步');
               return;
             } else if (d.data.status === 'E') {
-              this.$message.error('无该过程审核');
+              this.$message.warning('无该过程审核');
               return;
             } else {
               this.showDialog3 = true;
             }
           } else if (d.data.name === '成果初评') {
             if (d.data.status === 'A') {
-              this.$message.error('请先等待上一步');
+              this.$message.warning('请先等待上一步');
               return;
             } else {
               this.showDialog4 = true;
             }
           } else if (d.data.name === '成果复评') {
             if (d.data.status === 'A') {
-              this.$message.error('请先等待上一步');
+              this.$message.warning('请先等待上一步');
               return;
             } else {
               this.showDialog5 = true;
             }
           } else if (d.data.name === '财务部审核') {
             if (d.data.status === 'A') {
-              this.$message.error('请先等待上一步');
+              this.$message.warning('请先等待上一步');
               return;
             } else {
               this.showDialog6 = true;
             }
           } else if (d.data.name === '终评提交') {
             if (d.data.status === 'A') {
-              this.$message.error('请先等待上一步');
+              this.$message.warning('请先等待上一步');
               return;
             } else {
               this.showDialog7 = true;
@@ -759,7 +779,6 @@ export default {
         }));
     },
     // 表单提交
-
     dataFormSubmitEx(formId) {
       if (formId === 2) {
         this.$http({
@@ -781,11 +800,11 @@ export default {
               onClose: () => {
                 this.renderTree()
                 this.showDialog2 = false
-                console.log('++++++++++');
-                console.log(this.routerParam[0].examineId);
-                console.log(this.routerParam[0].qcsrId);
-                console.log(this.form2.result);
-                console.log(this.form2.comment);
+                // console.log('++++++++++');
+                // console.log(this.routerParam[0].examineId);
+                // console.log(this.routerParam[0].qcsrId);
+                // console.log(this.form2.result);
+                // console.log(this.form2.comment);
               }
             })
           } else {
@@ -854,9 +873,9 @@ export default {
             url: this.$http.adornUrl(`/qcManagement/examineStatus/update`),
             method: 'post',
             data: this.$http.adornData({
-              'qcExamineId': this.routerParam[0].examineId || undefined,
-              'qcExamineSubject': this.routerParam[0].qcsrId,
-              'qcExamineCurrent': this.dataFormEx[0].qcStatusSix === '1' ? '5' : '4.1',
+              'qcExamineId': this.routerParam.examineId || undefined,
+              'qcExamineSubject': this.routerParam.qcsrId,
+              'qcExamineCurrent': this.dataFormEx.qcStatusSix === '1' ? '5' : '4.1',
               'qcStatusFive': this.form5.result,
               'qcSecondLevel': this.form5.level,
               'qcFiveContent': this.form5.comment,
@@ -913,9 +932,9 @@ export default {
             url: this.$http.adornUrl(`/qcManagement/examineStatus/update`),
             method: 'post',
             data: this.$http.adornData({
-              'qcExamineId': this.routerParam[0].examineId || undefined,
-              'qcExamineSubject': this.routerParam[0].qcsrId,
-              'qcExamineCurrent': this.dataFormEx[0].qcStatusFive === '1' ? '5' : '4.2',
+              'qcExamineId': this.routerParam.examineId || undefined,
+              'qcExamineSubject': this.routerParam.qcsrId,
+              'qcExamineCurrent': this.dataFormEx.qcStatusFive === '1' ? '5' : '4.2',
               'qcStatusSix': this.form6.result,
               'qcSixContent': this.form6.comment,
             })

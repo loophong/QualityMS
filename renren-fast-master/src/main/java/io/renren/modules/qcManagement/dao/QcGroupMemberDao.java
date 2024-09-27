@@ -2,6 +2,7 @@ package io.renren.modules.qcManagement.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
+import io.renren.modules.qcManagement.entity.QcStepEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -47,5 +48,6 @@ public interface QcGroupMemberDao extends BaseMapper<QcGroupMemberEntity> {
     })
     Integer countMembersUnique();
 
-
+    @Select("select * from qc_group_members where parent_id = #{parentId}")
+    List<QcGroupMemberEntity> getChildrenListById(Integer parentId);
 }

@@ -7,6 +7,7 @@ import io.renren.modules.qcManagement.dao.QcStepDao;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
 import io.renren.modules.qcManagement.entity.QcStepEntity;
 import io.renren.modules.qcManagement.service.QcGroupMemberService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import java.util.Map;
  * @email sunlightcs@gmail.com
  * @date 2024-07-19 10:16:22
  */
+@Slf4j
 @RestController
 @RequestMapping("qcMembers/qcGroupMember")
 public class QcGroupMemberController {
@@ -70,7 +72,6 @@ public class QcGroupMemberController {
     @RequiresPermissions("qcMembers:qcGroupMember:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = qcGroupMemberService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 
@@ -102,8 +103,23 @@ public class QcGroupMemberController {
     @RequestMapping("/update")
     @RequiresPermissions("qcMembers:qcGroupMember:update")
     public R update(@RequestBody QcGroupMemberEntity qcGroupMember){
-		qcGroupMemberService.updateById(qcGroupMember);
-
+        if(qcGroupMember.getParentId() == null){
+            log.info("删除父节点：" + qcGroupMember.getQcgmId());
+            log.info("getQcgmId：" + qcGroupMember.getQcgmId().intValue());
+            List<QcGroupMemberEntity> qcChildrenList = qcGroupMemberDao.getChildrenListById(qcGroupMember.getQcgmId().intValue());
+            try{
+                for (QcGroupMemberEntity qcGroupMemberEntity : qcChildrenList) {
+                    qcGroupMemberEntity.setDeleteFlag(1);
+                    qcGroupMemberService.updateById(qcGroupMemberEntity);
+                }
+            }catch (Exception e){
+                log.error("删除子节点失败：" + e.getMessage());
+            }
+            qcGroupMemberService.updateById(qcGroupMember);
+        }else{
+            log.info("删除子节点：" + qcGroupMember.getQcgmId());
+            qcGroupMemberService.updateById(qcGroupMember);
+        }
         return R.ok();
     }
 
@@ -114,8 +130,6 @@ public class QcGroupMemberController {
     @RequiresPermissions("qcMembers:qcGroupMember:delete")
     public R delete(@RequestBody Long[] qcgmIds){
 		qcGroupMemberService.removeByIds(Arrays.asList(qcgmIds));
-
         return R.ok();
     }
-
 }

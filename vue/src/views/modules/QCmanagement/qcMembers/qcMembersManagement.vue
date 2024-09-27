@@ -26,12 +26,15 @@
       </el-table-column>
       <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="280">
       </el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" label="操作">
+      <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center" align="center"
+        label="操作">
         <template slot-scope="scope">
-          <el-button v-if="!scope.row.parentId" type="text" size="small"
+          <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
             @click="addMemberHandle(scope.row.id)">新增成员</el-button>
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:save')"
+            @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:save')"
+            @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

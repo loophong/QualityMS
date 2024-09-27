@@ -41,14 +41,14 @@
       <el-form :model="form3">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form3.result" placeholder=""
-            :disabled="!isAuth('qcExamine:interested:party') || dataList[1].status != 'B' || ifSelected">
+            :disabled="!isAuth('qcExamine:interested:party') || dataList[1].status != 'B' || !ifSelected">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form3.comment" autocomplete="off"
-            :disabled="!isAuth('qcExamine:interested:party') || dataList[1].status != 'B' || ifSelected"></el-input>
+            :disabled="!isAuth('qcExamine:interested:party') || dataList[1].status != 'B' || !ifSelected"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -476,11 +476,12 @@ export default {
     };
   },
 
-  mounted() {
+  async mounted() {
     this.initRouterParam()
-    this.getStatusList()
+    await this.getStatusList()
     const tmp = this.ifSelectedPart()
     console.log(tmp)
+    console.log(this.dataFormEx)
   },
   computed: {
 
@@ -523,11 +524,14 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.dataFormEx = data.qcExamineStatus
+          // console.log(this.dataFormEx)
           this.renderTree()
           // this.tableData = this.dataFormEx.qcFirstScore.split(',')
           this.tableData = this.dataFormEx.qcFirstScore ? this.dataFormEx.qcFirstScore.split(',') : []
+          this.tableData = this.tableData.map(item => Number(item))
           // this.finalData = this.dataFormEx.qcSecondScore.split(',')
-          this.tableData = this.dataFormEx.qcSecondScore ? this.dataFormEx.qcSecondScore.split(',') : []
+          this.finalData = this.dataFormEx.qcSecondScore ? this.dataFormEx.qcSecondScore.split(',') : []
+          this.finalData = this.finalData.map(item => Number(item))
           this.form2.result = this.dataFormEx.qcStatusTwo
           this.form3.result = this.dataFormEx.qcStatusThree
           this.form4.result = this.dataFormEx.qcStatusFour
@@ -609,8 +613,6 @@ export default {
         this.dataList[4].status = 'C'
         this.dataList[5].status = 'C'
       }
-
-
     },
     //渲染审核流程树
     renderTree() {
@@ -869,12 +871,13 @@ export default {
 
       } else if (formId === 5) {
         if (this.form5.result === '1') {
+          console.log(this.form5.result)
           this.$http({
             url: this.$http.adornUrl(`/qcManagement/examineStatus/update`),
             method: 'post',
             data: this.$http.adornData({
-              'qcExamineId': this.routerParam.examineId || undefined,
-              'qcExamineSubject': this.routerParam.qcsrId,
+              'qcExamineId': this.routerParam[0].examineId || undefined,
+              'qcExamineSubject': this.routerParam[0].qcsrId,
               'qcExamineCurrent': this.dataFormEx.qcStatusSix === '1' ? '5' : '4.1',
               'qcStatusFive': this.form5.result,
               'qcSecondLevel': this.form5.level,
@@ -925,15 +928,14 @@ export default {
           })
         }
 
-
       } else if (formId === 6) {
         if (this.form6.result === '1') {
           this.$http({
             url: this.$http.adornUrl(`/qcManagement/examineStatus/update`),
             method: 'post',
             data: this.$http.adornData({
-              'qcExamineId': this.routerParam.examineId || undefined,
-              'qcExamineSubject': this.routerParam.qcsrId,
+              'qcExamineId': this.routerParam[0].examineId || undefined,
+              'qcExamineSubject': this.routerParam[0].qcsrId,
               'qcExamineCurrent': this.dataFormEx.qcStatusFive === '1' ? '5' : '4.2',
               'qcStatusSix': this.form6.result,
               'qcSixContent': this.form6.comment,

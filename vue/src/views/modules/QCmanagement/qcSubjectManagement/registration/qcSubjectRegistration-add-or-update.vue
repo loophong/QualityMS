@@ -68,9 +68,9 @@
       <el-form-item label="课题关键字" prop="keywords">
         <el-input v-model="dataForm.keywords" placeholder="课题关键字"></el-input>
       </el-form-item>
-      <el-form-item label="课题活动状态" prop="topicActivityStatus">
+      <!-- <el-form-item label="课题活动状态" prop="topicActivityStatus">
         <el-input v-model="dataForm.topicActivityStatus" placeholder="课题活动状态"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <!-- <el-form-item label="课题活动评分结果" prop="topicActivityResult">
         <el-input v-model="dataForm.topicActivityResult" placeholder="课题活动评分结果"></el-input>
       </el-form-item> -->

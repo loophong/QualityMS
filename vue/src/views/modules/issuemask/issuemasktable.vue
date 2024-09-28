@@ -34,11 +34,22 @@
 <!--        align="center"-->
 <!--        label="序号">-->
 <!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="issueNumber"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题编号(所属问题)">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="issueNumber"
         header-align="center"
         align="center"
         label="问题编号(所属问题)">
+        <template slot-scope="scope">
+    <span @click="handleIssueClick(scope.row.issueNumber)" style="cursor: pointer; color: blue; text-decoration: underline;">
+      {{ scope.row.issueNumber }}
+    </span>
+        </template>
       </el-table-column>
       <el-table-column
         prop="reviewers"
@@ -76,11 +87,31 @@
         align="center"
         label="要求完成时间">
       </el-table-column>
-      <el-table-column
-        prop="state"
-        header-align="center"
-        align="center"
-        label="状态">
+<!--      <el-table-column-->
+<!--        prop="state"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="状态">-->
+<!--      </el-table-column>-->
+      <el-table-column prop="state" header-align="center" align="center" label="状态">
+        <template slot-scope="scope">
+    <span v-if="scope.row.state === '审核中'">
+      <el-tag type="info" disable-transitions>审核中</el-tag>
+    </span>
+          <span v-else-if="scope.row.state === '执行中'">
+      <el-tag type="primary" disable-transitions>执行中</el-tag>
+    </span>
+          <span v-else-if="scope.row.state === '未通过审核'">
+      <el-tag type="danger" disable-transitions>未通过审核</el-tag>
+    </span>
+          <span v-else-if="scope.row.state === '已派发'">
+      <el-tag type="warning" disable-transitions>已派发</el-tag>
+    </span>
+          <span v-else-if="scope.row.state === '已完成'">
+      <el-tag type="success" disable-transitions>已完成</el-tag>
+    </span>
+          <span v-else>-</span> <!-- 处理未知状态 -->
+        </template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -107,6 +138,7 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="recigetDataList"></add-or-update>
+    <add-or-updateD v-if="addOrUpdateVisibleD" ref="addOrUpdateD" @refreshDataList="recigetDataList"></add-or-updateD>
     <add-or-update v-if="assertOrUpdateVisible" ref="assetOrUpdate" @refreshDataList="recigetDataList"></add-or-update>
     <add-or-update v-if="completeVisible" ref="comleted" @refreshDataList="recigetDataList"></add-or-update>
 
@@ -115,6 +147,7 @@
 
 <script>
   import AddOrUpdate from './issuemasktable-add-or-update'
+  import AddOrUpdateD from '../issuetable/issuetable-add-or-update.vue'
   export default {
     data () {
       return {
@@ -131,16 +164,24 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
+        addOrUpdateVisibleD: false,
         completeVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      AddOrUpdateD
     },
     activated () {
       this.recigetDataList()
     },
     methods: {
+      handleIssueClick(issueNumber){
+        this.addOrUpdateVisibleD = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdateD.showDataByIssueNumber(issueNumber)
+        })
+      },
       // 任务派发
       dispatchHandle (id ,row) {
         // 派发操作的逻辑
@@ -150,6 +191,10 @@
           this.$message.error('任务审核中！')
           else if (row.state === '已派发')
           this.$message.error('任务已派发！')
+        else if (row.state === '已完成')
+          this.$message.error('任务已完成！')
+        else if (row.state === '审核未通过')
+          this.$message.error('任务审核未通过！')
         else {
           this.$nextTick(() => {
             this.$refs.assetOrUpdate.init1(id)
@@ -205,6 +250,10 @@
           this.$message.error('任务审核中！')
         else if(row.state === '已派发')
           this.$message.error('任务已派发！')
+        else if (row.state === '已完成')
+          this.$message.error('任务已完成！')
+        else if (row.state === '审核未通过')
+          this.$message.error('任务审核未通过！')
         else {
           this.assertOrUpdateVisible = true
           this.$nextTick(() => {

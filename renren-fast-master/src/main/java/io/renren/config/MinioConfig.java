@@ -13,7 +13,7 @@ public class MinioConfig {
     public MinioClient minioClient(){
         //构建MinioClient对象
         return MinioClient.builder()
-                .endpoint("http://192.168.1.102:9000")
+                .endpoint("http://192.168.1.104:9000")
                 .credentials("minioadmin","minioadmin")
                 .build();
 

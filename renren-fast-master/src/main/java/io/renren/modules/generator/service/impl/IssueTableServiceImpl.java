@@ -9,7 +9,9 @@ import io.renren.common.utils.Query;
 import io.renren.common.utils.R;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.config.FileUploadProperties;
+import io.renren.modules.generator.dao.IssueMaskTableDao;
 import io.renren.modules.generator.dao.IssueTableDao;
+import io.renren.modules.generator.entity.IssueMaskTableEntity;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
@@ -29,6 +31,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Service("issueTableService")
 public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTableEntity> implements IssueTableService {
@@ -50,6 +53,9 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     public IssueTableServiceImpl(FileUploadProperties fileUploadProperties) {
         this.uploadDir = fileUploadProperties.getUploadDir();
     }
+
+    @Autowired
+    private IssueMaskTableDao issueMaskTableDao; // 新增的 DAO
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -376,6 +382,62 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         }
 
         return statistics;
+    }
+
+    @Override
+    public IssueTableEntity getByissueNumber(String issueNumber) {
+        // 使用 QueryWrapper 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("issue_number", issueNumber); // 根据问题编号查询
+
+        // 调用 MyBatis-Plus 的方法查找对应的实体
+        return this.getOne(queryWrapper, false); // 这里的 false 表示如果没有找到记录不会抛出异常
+    }
+
+    @Override
+    public Map<String, Integer> getTaskDetails(String issueNumber) {
+        // 初始化统计信息的 Map
+        Map<String, Integer> stats = new HashMap<>();
+
+
+        stats.put("totalCount", 0);
+        stats.put("completedCount", 0);
+        stats.put("inProgressCount", 0);
+        stats.put("reviewingCount", 0);
+
+        // 创建 QueryWrapper 并配置查询条件
+        QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("issue_number", issueNumber); // 根据 issueNumber 进行筛选
+        // 查询与 issueNumber 匹配的所有任务实体
+        List<IssueMaskTableEntity> taskList = issueMaskTableDao.selectList(queryWrapper); // 通过 issueMaskTableDao 查询
+
+
+
+
+        // 遍历任务列表，根据状态进行分类统计
+        for (IssueMaskTableEntity task : taskList) {
+            switch (task.getState()) {
+                case "已完成":
+                    stats.put("completedCount", stats.get("completedCount") + 1);
+                    break;
+                case "执行中":
+                    stats.put("inProgressCount", stats.get("inProgressCount") + 1);
+                    break;
+                case "审核中":
+                    stats.put("reviewingCount", stats.get("reviewingCount") + 1);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // 计算总任务数量
+        int totalCount = stats.get("completedCount") + stats.get("inProgressCount") + stats.get("reviewingCount");
+        stats.put("totalCount", totalCount); // 更新总任务数量
+
+        // 返回统计信息
+        return stats;
+
     }
 
     // 统计“创建”的条件

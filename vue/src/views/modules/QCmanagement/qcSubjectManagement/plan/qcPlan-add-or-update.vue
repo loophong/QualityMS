@@ -114,7 +114,7 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             let resultTypeString = data.qcSubjectRegistration.resultType;
-            let resultArray = resultTypeString.split("，");
+            let resultArray = resultTypeString.split(",");
             if (data && data.code === 0) {
 
               this.dataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus

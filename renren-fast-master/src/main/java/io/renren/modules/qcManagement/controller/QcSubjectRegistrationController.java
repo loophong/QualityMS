@@ -39,7 +39,7 @@ public class QcSubjectRegistrationController {
      * 点检统计
      */
     @RequestMapping("/count")
-    @RequiresPermissions("qcMembers:qcGroupMember:list")
+    @RequiresPermissions("qcSubject:registration:list")
     public R activityRateList(){
         //已注册课题数
         Integer countRegistration = qcSubjectRegistrationDao.countRegistration();

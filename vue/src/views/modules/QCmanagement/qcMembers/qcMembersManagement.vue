@@ -26,12 +26,15 @@
       </el-table-column>
       <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="280">
       </el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" label="操作">
+      <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center" align="center"
+        label="操作">
         <template slot-scope="scope">
-          <el-button v-if="!scope.row.parentId" type="text" size="small"
+          <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
             @click="addMemberHandle(scope.row.id)">新增成员</el-button>
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:save')"
+            @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:save')"
+            @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -175,7 +178,6 @@ export default {
     parseTime(time) {
       return new Date(time).toLocaleString();
     },
-
     // 每页数
     sizeChangeHandle(val) {
       this.pageSize = val
@@ -248,7 +250,7 @@ export default {
     //     })
     //   }
     // }
-    //删除
+    // 逻辑删除
     deleteHandle(id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {
         return item.qcgmId
@@ -284,34 +286,3 @@ export default {
   }
 }
 </script>
-
-<!-- this.$http({
-  url: this.$http.adornUrl(`/qcMembers/qcGroupMember/${!this.dataForm.qcgmId ? 'save' : 'update'}`),
-  method: 'post',
-  data: this.$http.adornData({
-    'qcgmId': this.dataForm.qcgmId || undefined,
-    'name': this.dataForm.mainName,
-    'gender': this.dataForm.gender,
-    'telNumber': this.dataForm.telNumber,
-    'number': this.dataForm.number,
-    'education': this.dataForm.education,
-    'department': this.dataForm.department,
-    'position': this.dataForm.position,
-    'team': this.dataForm.team,
-    'participationDate': this.dataForm.participationDate,
-    'topic': this.dataForm.topic,
-    'roleInTopic': '管理员',
-    'deleteFlag': 0,
-    'groupName': this.dataForm.groupName
-  })
-}).then(({ data }) => {
-  if (data && data.code === 0) {
-    this.$message({
-      message: '操作成功',
-      type: 'success',
-      duration: 1500,
-      onClose: () => {
-        this.visible = false;
-        this.$emit('refreshDataList');
-      }
-    }); -->

@@ -138,7 +138,6 @@ public class QcStepController {
     @RequiresPermissions("qcPlan:step:update")
     public R update(@RequestBody QcStepEntity qcStep){
 		qcStepService.updateById(qcStep);
-
         return R.ok();
     }
 
@@ -149,7 +148,6 @@ public class QcStepController {
     @RequiresPermissions("qcPlan:step:delete")
     public R delete(@RequestBody Integer[] stepIds){
 		qcStepService.removeByIds(Arrays.asList(stepIds));
-
         return R.ok();
     }
 

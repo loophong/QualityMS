@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -92,5 +93,14 @@ public class IndicatorDictionaryEntity implements Serializable {
 	 * 指标子节点
 	 */
 	private String indicatorChildNode;
+
+	/**
+	 * 指标值上界
+	 */
+	private BigDecimal indicatorValueUpperBound;
+	/**
+	 * 指标值下界
+	 */
+	private BigDecimal indicatorValueLowerBound;
 
 }

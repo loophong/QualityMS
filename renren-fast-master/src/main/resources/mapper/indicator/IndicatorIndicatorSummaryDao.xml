@@ -26,9 +26,6 @@
         <result property="yearMonth" column="year_month"/>
         <result property="indicatorState" column="indicator_state"/>
         <result property="indicatorChildNode" column="indicator_child_node"/>
-        <result property="indicatorUpEdge" column="indicator_up_edge"/>
-        <result property="indicatorLowEdge" column="indicator_low_edge"/>
-        <result property="indicatorWeight" column="indicator_weight"/>
     </resultMap>
 
 

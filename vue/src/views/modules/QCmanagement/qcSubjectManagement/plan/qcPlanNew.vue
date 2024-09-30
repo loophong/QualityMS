@@ -1692,6 +1692,10 @@ import { FishBones } from '@/components/fishbone/FishBone'
 import fishBone from "../../qcTools/fishBone.vue";
 import control from '@/views/modules/QCmanagement/qcTools/control.vue';
 export default {
+  components: {
+    fishBone,
+      control
+  },
   data() {
     return {
       fileList: [],
@@ -1757,10 +1761,7 @@ export default {
       },
     }
   },
-  components() {
-    fishBone,
-      control
-  },
+
   mounted() {
 
   },

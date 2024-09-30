@@ -8,7 +8,7 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('indicator:indicatorkeyindicators:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('indicator:indicatorkeyindicators:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('indicator:indicatorkeyindicators:save')" type="danger" @click="issueHandle()">异常跳转</el-button>
+        <el-button v-if="isAuth('indicator:indicatorkeyindicators:save')" type="danger" @click="issueHandle()">问题添加</el-button>
       </el-form-item>
     </el-form>
     <el-table

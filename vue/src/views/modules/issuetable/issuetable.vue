@@ -10,6 +10,16 @@
 <!--        <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
       </el-form-item>
     </el-form>
+    <el-dialog :visible.sync="taskDetailVisible" title="问题详情">
+      <div>
+        <span style="font-weight: bold; font-size: 16px; margin-right: 10px;">总任务数量：{{ taskDetails.totalCount }}</span>
+        <span style="font-weight: bold; font-size: 16px;">已完成数量：{{ taskDetails.completedCount }}</span>
+      </div>
+      <div id="task-chart" style="width: 100%; height: 400px;"></div> <!-- 用于echarts图表 -->
+      <div slot="footer">
+        <el-button @click="taskDetailVisible = false">关闭</el-button>
+      </div>
+    </el-dialog>
     <el-table
       :data="dataList"
       border
@@ -218,12 +228,32 @@
         align="center"
         label="整改验证情况">
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="verificationConclusion"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="验证结论">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="verificationConclusion"
         header-align="center"
         align="center"
         label="验证结论">
+        <template slot-scope="scope">
+          <div>
+            <span v-for="(state, index) in getStates(scope.row.verificationConclusion)" :key="index">
+                <el-tag v-if="state === '未完成'" type="danger" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '持续'" type="info" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '结项'" type="warning" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '未完成，持续'" type="danger" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '持续，未完成'" type="info" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+            </span>
+          </div>
+        </template>
       </el-table-column>
+
       <el-table-column
         prop="verifier"
         header-align="center"
@@ -262,6 +292,7 @@
         label="操作">
         <template slot-scope="scope">
 <!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.issueId)">修改</el-button>-->
+          <el-button type="text" size="small" @click="showTaskDetails(scope.row.issueNumber)">问题详情</el-button>
           <el-button type="text" size="small" @click="closeRelatedTasks(scope.row.issueId)">问题关闭</el-button>
         </template>
       </el-table-column>
@@ -297,8 +328,16 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        taskDetailVisible: false, // 控制弹窗可见性
+        taskDetails: {
+          totalCount: 0,
+          completedCount: 0,
+          inProgressCount: 0,
+          reviewingCount: 0,
+        },
       }
+
     },
     components: {
       AddOrUpdate
@@ -308,6 +347,73 @@
       this.fetchData()
     },
     methods: {
+      getStates(verificationConclusion) {
+        if (!verificationConclusion) return [];
+        // 按照逗号分隔，并去除多余的空格
+        return verificationConclusion.split(',').map(state => state.trim());
+      },
+      showTaskDetails(issueNumber) {
+        this.fetchTaskDetails(issueNumber);
+        this.taskDetailVisible = true; // 显示弹窗
+      },
+      fetchTaskDetails(issueNumber) {
+        this.$http({
+          url: this.$http.adornUrl(`/generator/issuetable/taskDetails/${issueNumber}`), // 请求后端API
+          method: 'get'
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.taskDetails.totalCount = data.result.totalCount; // 总任务数量
+            this.taskDetails.completedCount = data.result.completedCount; // 已完成数量
+            this.taskDetails.inProgressCount = data.result.inProgressCount; // 执行中任务数量
+            this.taskDetails.reviewingCount = data.result.reviewingCount; // 审核中任务数量
+
+            // 调用方法绘制ECharts图表
+            this.initECharts();
+          } else {
+            this.$message.error(data.msg);
+          }
+        });
+      },
+      initECharts() {
+        // 使用ECharts初始化环形图
+        const chartDom = document.getElementById('task-chart');
+        const myChart = echarts.init(chartDom);
+
+        // 判断任务状态数量，如果没有数据，则默认显示一个绿色环
+        const hasData = this.taskDetails.completedCount > 0 || this.taskDetails.inProgressCount > 0 || this.taskDetails.reviewingCount > 0;
+
+        const option = {
+          series: [
+            {
+              name: '任务状态',
+              type: 'pie',
+              radius: ['50%', '70%'],
+              avoidLabelOverlap: false,
+              label: {
+                show: false, // 不显示文字
+              },
+              emphasis: {
+                label: {
+                  show: false, // 不显示文字
+                },
+              },
+              labelLine: {
+                show: false, // 不显示文字连接线
+              },
+              data: hasData ? [ // 根据是否有数据选择数据
+                { value: this.taskDetails.completedCount, name: '已完成' },
+                { value: this.taskDetails.inProgressCount, name: '执行中' },
+                { value: this.taskDetails.reviewingCount, name: '审核中' },
+              ] : [
+                { value: 1, name: '无任务', itemStyle: { color: 'green' } } // 默认显示一个绿色的环
+              ]
+            }
+          ]
+        };
+
+        myChart.setOption(option);
+      }
+      ,
       previewImage (imageUrl) {
         console.log("cur imageUrl====>" + imageUrl);
         window.open(imageUrl);
@@ -501,6 +607,7 @@
 .row-odd {
   background-color: #0BB2D4 !important; /* 灰色 */
 }
+
 </style>
 
 

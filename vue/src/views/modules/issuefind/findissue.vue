@@ -1,282 +1,738 @@
+<!--<template>-->
+<!--  <div class="mod-config">-->
+<!--    <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">-->
+<!--      <el-form-item>-->
+<!--        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item>-->
+<!--        <el-button @click="getDataList()">查询</el-button>-->
+<!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+<!--        <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item>-->
+<!--        <el-upload-->
+<!--          class="upload-demo"-->
+<!--          :before-upload="beforeUpload"-->
+<!--          :show-file-list="false"-->
+<!--          :on-success="handleUploadSuccess"-->
+<!--          :on-error="handleUploadError">-->
+<!--          <el-button size="small" type="primary">点击上传 Excel</el-button>-->
+<!--        </el-upload>-->
+
+<!--      </el-form-item>-->
+
+<!--    </el-form>-->
+<!--    <el-table-->
+<!--      v-if="showForm"-->
+<!--      :data="dataList"-->
+<!--      border-->
+<!--      v-loading="dataListLoading"-->
+<!--      @selection-change="selectionChangeHandle"-->
+<!--      style="width: 100%;">-->
+<!--      <el-table-column-->
+<!--        type="selection"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        width="50">-->
+<!--      </el-table-column>-->
+<!--      &lt;!&ndash;      <el-table-column&ndash;&gt;-->
+<!--      &lt;!&ndash;        prop="issueId"&ndash;&gt;-->
+<!--      &lt;!&ndash;        header-align="center"&ndash;&gt;-->
+<!--      &lt;!&ndash;        align="center"&ndash;&gt;-->
+<!--      &lt;!&ndash;        label="">&ndash;&gt;-->
+<!--      &lt;!&ndash;      </el-table-column>&ndash;&gt;-->
+<!--&lt;!&ndash;      <el-table-column&ndash;&gt;-->
+<!--&lt;!&ndash;        prop="serialNumber"&ndash;&gt;-->
+<!--&lt;!&ndash;        header-align="center"&ndash;&gt;-->
+<!--&lt;!&ndash;        align="center"&ndash;&gt;-->
+<!--&lt;!&ndash;        label="序号">&ndash;&gt;-->
+<!--&lt;!&ndash;      </el-table-column>&ndash;&gt;-->
+<!--      <el-table-column-->
+<!--        prop="issueNumber"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题编号">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="inspectionDepartment"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="检查科室">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="inspectionDate"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="检查日期">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="issueCategoryId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题类别">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="vehicleTypeId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="车型">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="vehicleNumberId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="车号">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="issueDescription"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题描述">-->
+<!--      </el-table-column>-->
+
+<!--&lt;!&ndash;      <el-table-column&ndash;&gt;-->
+<!--&lt;!&ndash;        prop="issuePhoto"&ndash;&gt;-->
+<!--&lt;!&ndash;        header-align="center"&ndash;&gt;-->
+<!--&lt;!&ndash;        align="center"&ndash;&gt;-->
+<!--&lt;!&ndash;        label="问题照片">&ndash;&gt;-->
+<!--&lt;!&ndash;        <template slot-scope="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;      </el-table-column>&ndash;&gt;-->
+<!--      <el-table-column-->
+<!--        prop="issuePhoto"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题照片">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--&lt;!&ndash;      <el-table-column&ndash;&gt;-->
+<!--&lt;!&ndash;        prop="issuePhoto"&ndash;&gt;-->
+<!--&lt;!&ndash;        header-align="center"&ndash;&gt;-->
+<!--&lt;!&ndash;        align="center"&ndash;&gt;-->
+<!--&lt;!&ndash;        label="问题照片">&ndash;&gt;-->
+<!--&lt;!&ndash;        <template slot-scope="scope">&ndash;&gt;-->
+<!--&lt;!&ndash;          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>&ndash;&gt;-->
+<!--&lt;!&ndash;          <el-upload&ndash;&gt;-->
+<!--&lt;!&ndash;            class="upload-demo"&ndash;&gt;-->
+<!--&lt;!&ndash;            :before-upload="beforeUpload"&ndash;&gt;-->
+<!--&lt;!&ndash;            :show-file-list="false"&ndash;&gt;-->
+<!--&lt;!&ndash;            :on-success="handleUploadSuccess"&ndash;&gt;-->
+<!--&lt;!&ndash;            :on-error="handleUploadError"&ndash;&gt;-->
+<!--&lt;!&ndash;            :data="{ issueId: scope.row.issueId }"> &lt;!&ndash; 传递当前行的 issueId &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <el-button type="text" size="small">上传</el-button>&ndash;&gt;-->
+<!--&lt;!&ndash;          </el-upload>&ndash;&gt;-->
+<!--&lt;!&ndash;        </template>&ndash;&gt;-->
+<!--&lt;!&ndash;      </el-table-column>&ndash;&gt;-->
+
+<!--      <el-table-column-->
+<!--        prop="rectificationRequirement"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="整改要求">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="requiredCompletionTime"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="要求完成时间">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="responsibleDepartment"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="责任科室">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        fixed="right"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        width="150"-->
+<!--        label="操作">-->
+<!--        <template slot-scope="scope">-->
+<!--&lt;!&ndash;          <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId)">问题分析</el-button>&ndash;&gt;-->
+<!--          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--    </el-table>-->
+<!--    <el-pagination-->
+<!--      @size-change="sizeChangeHandle"-->
+<!--      @current-change="currentChangeHandle"-->
+<!--      :current-page="pageIndex"-->
+<!--      :page-sizes="[10, 20, 50, 100]"-->
+<!--      :page-size="pageSize"-->
+<!--      :total="totalPage"-->
+<!--      layout="total, sizes, prev, pager, next, jumper">-->
+<!--    </el-pagination>-->
+<!--    &lt;!&ndash; 弹窗, 新增 / 修改 &ndash;&gt;-->
+<!--    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>-->
+<!--    <add-or-update v-if="assertOrUpdateVisible" ref="assetOrUpdate" @refreshDataList="getDataList"></add-or-update>-->
+<!--    &lt;!&ndash; 图片预览对话框 &ndash;&gt;-->
+<!--    <el-dialog :visible.sync="imagePreviewVisible" :title="imagePreviewTitle">-->
+<!--      <img :src="imagePreviewUrl" style="width: 100%;">-->
+<!--    </el-dialog>-->
+<!--  </div>-->
+<!--</template>-->
+
 <template>
   <div class="mod-config">
-    <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-upload
-          class="upload-demo"
-          :before-upload="beforeUpload"
-          :show-file-list="false"
-          :on-success="handleUploadSuccess"
-          :on-error="handleUploadError">
-          <el-button size="small" type="primary">点击上传 Excel</el-button>
-        </el-upload>
+    <el-tabs type="border-card">
 
-      </el-form-item>
+      <!-- 问题添加 Tab Pane -->
+      <el-tab-pane label="问题添加">
+        <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+          <el-form-item>
+            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="getDataList()">查询</el-button>
+            <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+            <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-upload
+              class="upload-demo"
+              :before-upload="beforeUpload"
+              :show-file-list="false"
+              :on-success="handleUploadSuccess"
+              :on-error="handleUploadError">
+              <el-button size="small" type="primary">点击上传 Excel</el-button>
+            </el-upload>
+          </el-form-item>
+        </el-form>
 
-    </el-form>
-    <el-table
-      v-if="showForm"
-      :data="dataList"
-      border
-      v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
-      style="width: 100%;">
-      <el-table-column
-        type="selection"
-        header-align="center"
-        align="center"
-        width="50">
-      </el-table-column>
-      <!--      <el-table-column-->
-      <!--        prop="issueId"-->
-      <!--        header-align="center"-->
-      <!--        align="center"-->
-      <!--        label="">-->
-      <!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="serialNumber"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="序号">-->
-<!--      </el-table-column>-->
-      <el-table-column
-        prop="issueNumber"
-        header-align="center"
-        align="center"
-        label="问题编号">
-      </el-table-column>
-      <el-table-column
-        prop="inspectionDepartment"
-        header-align="center"
-        align="center"
-        label="检查科室">
-      </el-table-column>
-      <el-table-column
-        prop="inspectionDate"
-        header-align="center"
-        align="center"
-        label="检查日期">
-      </el-table-column>
-      <el-table-column
-        prop="issueCategoryId"
-        header-align="center"
-        align="center"
-        label="问题类别">
-      </el-table-column>
-      <el-table-column
-        prop="vehicleTypeId"
-        header-align="center"
-        align="center"
-        label="车型">
-      </el-table-column>
-      <el-table-column
-        prop="vehicleNumberId"
-        header-align="center"
-        align="center"
-        label="车号">
-      </el-table-column>
-      <el-table-column
-        prop="issueDescription"
-        header-align="center"
-        align="center"
-        label="问题描述">
-      </el-table-column>
+        <el-table
+          v-if="showForm"
+          :data="dataList"
+          border
+          v-loading="dataListLoading"
+          @selection-change="selectionChangeHandle"
+          style="width: 100%;">
+          <el-table-column
+            type="selection"
+            header-align="center"
+            align="center"
+            width="50">
+          </el-table-column>
+          <el-table-column
+            prop="issueNumber"
+            header-align="center"
+            align="center"
+            label="问题编号">
+          </el-table-column>
+          <el-table-column
+            prop="inspectionDepartment"
+            header-align="center"
+            align="center"
+            label="检查科室">
+          </el-table-column>
+          <el-table-column
+            prop="inspectionDate"
+            header-align="center"
+            align="center"
+            label="检查日期">
+          </el-table-column>
+          <el-table-column
+            prop="issueCategoryId"
+            header-align="center"
+            align="center"
+            label="问题类别">
+          </el-table-column>
+          <el-table-column
+            prop="vehicleTypeId"
+            header-align="center"
+            align="center"
+            label="车型">
+          </el-table-column>
+          <el-table-column
+            prop="vehicleNumberId"
+            header-align="center"
+            align="center"
+            label="车号">
+          </el-table-column>
+          <el-table-column
+            prop="issueDescription"
+            header-align="center"
+            align="center"
+            label="问题描述">
+          </el-table-column>
+          <el-table-column
+            prop="issuePhoto"
+            header-align="center"
+            align="center"
+            label="问题照片">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="rectificationRequirement"
+            header-align="center"
+            align="center"
+            label="整改要求">
+          </el-table-column>
+          <el-table-column
+            prop="requiredCompletionTime"
+            header-align="center"
+            align="center"
+            label="要求完成时间">
+          </el-table-column>
+          <el-table-column
+            prop="responsibleDepartment"
+            header-align="center"
+            align="center"
+            label="责任科室">
+          </el-table-column>
+          <el-table-column
+            fixed="right"
+            header-align="center"
+            align="center"
+            width="150"
+            label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
 
-<!--      <el-table-column-->
-<!--        prop="issuePhoto"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题照片">-->
-<!--        <template slot-scope="scope">-->
-<!--          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-      <el-table-column
-        prop="issuePhoto"
-        header-align="center"
-        align="center"
-        label="问题照片">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
-        </template>
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="issuePhoto"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题照片">-->
-<!--        <template slot-scope="scope">-->
-<!--          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>-->
-<!--          <el-upload-->
-<!--            class="upload-demo"-->
-<!--            :before-upload="beforeUpload"-->
-<!--            :show-file-list="false"-->
-<!--            :on-success="handleUploadSuccess"-->
-<!--            :on-error="handleUploadError"-->
-<!--            :data="{ issueId: scope.row.issueId }"> &lt;!&ndash; 传递当前行的 issueId &ndash;&gt;-->
-<!--            <el-button type="text" size="small">上传</el-button>-->
-<!--          </el-upload>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
+        <el-pagination
+          @size-change="sizeChangeHandle"
+          @current-change="currentChangeHandle"
+          :current-page="pageIndex"
+          :page-sizes="[10, 20, 50, 100]"
+          :page-size="pageSize"
+          :total="totalPage"
+          layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination>
+      </el-tab-pane>
 
-      <el-table-column
-        prop="rectificationRequirement"
-        header-align="center"
-        align="center"
-        label="整改要求">
-      </el-table-column>
-      <el-table-column
-        prop="requiredCompletionTime"
-        header-align="center"
-        align="center"
-        label="要求完成时间">
-      </el-table-column>
-      <el-table-column
-        prop="responsibleDepartment"
-        header-align="center"
-        align="center"
-        label="责任科室">
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="rectificationStatus"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改情况">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="actualCompletionTime"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="实际完成时间">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="rectificationPhotoDeliverable"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改照片交付物">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="rectificationResponsiblePerson"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改责任人">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="requiredSecondRectificationTime"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="要求二次整改时间">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="remark"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="备注">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="creator"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="创建人">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="creationTime"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="创建时间">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="lastModifier"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="最后修改人">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="lastModificationTime"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="最后修改时间">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="associatedRectificationRecords"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="关联问题整改记录">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="associatedIssueAddition"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="关联问题添加">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="creationDuration"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="创建时长">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="causeAnalysis"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="原因分析">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="rectificationVerificationStatus"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改验证情况">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="verificationConclusion"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="验证结论">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="verifier"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="验证人">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="formula"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="公式">-->
-<!--      </el-table-column>-->
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="150"
-        label="操作">
-        <template slot-scope="scope">
-<!--          <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId)">问题分析</el-button>-->
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination
-      @size-change="sizeChangeHandle"
-      @current-change="currentChangeHandle"
-      :current-page="pageIndex"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="pageSize"
-      :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper">
-    </el-pagination>
-    <!-- 弹窗, 新增 / 修改 -->
+      <!-- 整改记录 Tab Pane -->
+      <el-tab-pane label="整改记录">
+        <div class="mod-config">
+          <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+            <el-form-item>
+              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button @click="getDataList()">查询</el-button>
+              <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+              <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+            </el-form-item>
+          </el-form>
+          <el-table
+            v-if="showForm"
+            :data="dataList"
+            border
+            v-loading="dataListLoading"
+            @selection-change="selectionChangeHandle"
+            style="width: 100%;">
+            <el-table-column
+              type="selection"
+              header-align="center"
+              align="center"
+              width="50">
+            </el-table-column>
+            <el-table-column
+              prop="issueNumber"
+              header-align="center"
+              align="center"
+              label="问题编号">
+            </el-table-column>
+            <el-table-column
+              prop="inspectionDepartment"
+              header-align="center"
+              align="center"
+              label="检查科室">
+            </el-table-column>
+            <el-table-column
+              prop="inspectionDate"
+              header-align="center"
+              align="center"
+              label="检查日期">
+            </el-table-column>
+            <el-table-column
+              prop="issueCategoryId"
+              header-align="center"
+              align="center"
+              label="问题类别">
+            </el-table-column>
+            <el-table-column
+              prop="vehicleTypeId"
+              header-align="center"
+              align="center"
+              label="车型">
+            </el-table-column>
+            <el-table-column
+              prop="vehicleNumberId"
+              header-align="center"
+              align="center"
+              label="车号">
+            </el-table-column>
+            <el-table-column
+              prop="issueDescription"
+              header-align="center"
+              align="center"
+              label="问题描述">
+            </el-table-column>
+
+            <el-table-column
+              prop="issuePhoto"
+              header-align="center"
+              align="center"
+              label="问题照片">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="rectificationRequirement"
+              header-align="center"
+              align="center"
+              label="整改要求">
+            </el-table-column>
+            <el-table-column
+              prop="requiredCompletionTime"
+              header-align="center"
+              align="center"
+              label="要求完成时间">
+            </el-table-column>
+            <el-table-column
+              prop="responsibleDepartment"
+              header-align="center"
+              align="center"
+              label="责任科室">
+            </el-table-column>
+            <el-table-column
+              prop="causeAnalysis"
+              header-align="center"
+              align="center"
+              label="原因分析">
+            </el-table-column>
+            <el-table-column
+              prop="rectificationStatus"
+              header-align="center"
+              align="center"
+              label="整改情况">
+            </el-table-column>
+            <el-table-column
+              prop="actualCompletionTime"
+              header-align="center"
+              align="center"
+              label="实际完成时间">
+            </el-table-column>
+            <el-table-column
+              prop="rectificationPhotoDeliverable"
+              header-align="center"
+              align="center"
+              label="整改照片交付物">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">下载</el-button>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="rectificationResponsiblePerson"
+              header-align="center"
+              align="center"
+              label="整改责任人">
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              header-align="center"
+              align="center"
+              width="150"
+              label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" @click="handleRectificationRecords(scope.row.issueNumber,scope.row.issueId)">整改记录</el-button>
+                <!--          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>-->
+                <el-button type="text" size="small" @click="assetOrUpdateHandle(scope.row.issueId,scope.row.issueNumber)">任务发起</el-button>
+                <el-button type="text" size="small" @click="openflow(scope.row.issueId,scope.row.issueNumber)">任务流程</el-button>
+                <el-button type="text" size="small" @click="openNewPage(scope.row.issueId,scope.row.issueNumber)">任务列表</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="sizeChangeHandle"
+            @current-change="currentChangeHandle"
+            :current-page="pageIndex"
+            :page-sizes="[10, 20, 50, 100]"
+            :page-size="pageSize"
+            :total="totalPage"
+            layout="total, sizes, prev, pager, next, jumper">
+          </el-pagination>
+        </div>
+      </el-tab-pane>
+
+      <!-- 问题验证 Tab Pane -->
+      <el-tab-pane label="问题验证">
+        <div class="mod-config">
+          <el-form v-if="showForm1" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+            <el-form-item>
+              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button @click="getDataList()">查询</el-button>
+              <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+              <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+            </el-form-item>
+          </el-form>
+          <el-table
+            v-if="showForm"
+            :data="dataList"
+            border
+            v-loading="dataListLoading"
+            @selection-change="selectionChangeHandle"
+            style="width: 100%;">
+            <el-table-column
+              type="selection"
+              header-align="center"
+              align="center"
+              width="50">
+            </el-table-column>
+            <!--      <el-table-column-->
+            <!--        prop="issueId"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="">-->
+            <!--      </el-table-column>-->
+            <!--      <el-table-column-->
+            <!--        prop="serialNumber"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="序号">-->
+            <!--      </el-table-column>-->
+            <el-table-column
+              prop="issueNumber"
+              header-align="center"
+              align="center"
+              label="问题编号">
+            </el-table-column>
+            <el-table-column
+              prop="inspectionDepartment"
+              header-align="center"
+              align="center"
+              label="检查科室">
+            </el-table-column>
+            <el-table-column
+              prop="inspectionDate"
+              header-align="center"
+              align="center"
+              label="检查日期">
+            </el-table-column>
+            <el-table-column
+              prop="issueCategoryId"
+              header-align="center"
+              align="center"
+              label="问题类别">
+            </el-table-column>
+            <el-table-column
+              prop="vehicleTypeId"
+              header-align="center"
+              align="center"
+              label="车型">
+            </el-table-column>
+            <el-table-column
+              prop="vehicleNumberId"
+              header-align="center"
+              align="center"
+              label="车号">
+            </el-table-column>
+            <el-table-column
+              prop="issueDescription"
+              header-align="center"
+              align="center"
+              label="问题描述">
+            </el-table-column>
+
+            <el-table-column
+              prop="issuePhoto"
+              header-align="center"
+              align="center"
+              label="问题照片">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
+              </template>
+            </el-table-column>
+            <!--      <el-table-column-->
+            <!--        prop="issuePhoto"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="问题照片">-->
+            <!--      </el-table-column>-->
+            <el-table-column
+              prop="rectificationRequirement"
+              header-align="center"
+              align="center"
+              label="整改要求">
+            </el-table-column>
+            <el-table-column
+              prop="requiredCompletionTime"
+              header-align="center"
+              align="center"
+              label="要求完成时间">
+            </el-table-column>
+            <el-table-column
+              prop="responsibleDepartment"
+              header-align="center"
+              align="center"
+              label="责任科室">
+            </el-table-column>
+            <el-table-column
+              prop="causeAnalysis"
+              header-align="center"
+              align="center"
+              label="原因分析">
+            </el-table-column>
+            <el-table-column
+              prop="rectificationStatus"
+              header-align="center"
+              align="center"
+              label="整改情况">
+            </el-table-column>
+            <el-table-column
+              prop="actualCompletionTime"
+              header-align="center"
+              align="center"
+              label="实际完成时间">
+            </el-table-column>
+            <el-table-column
+              prop="rectificationPhotoDeliverable"
+              header-align="center"
+              align="center"
+              label="整改照片交付物">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">下载</el-button>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="rectificationResponsiblePerson"
+              header-align="center"
+              align="center"
+              label="整改责任人">
+            </el-table-column>
+            <!--      <el-table-column-->
+            <!--        prop="requiredSecondRectificationTime"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="要求二次整改时间">-->
+            <!--      </el-table-column>-->
+            <!--      <el-table-column-->
+            <!--        prop="remark"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="备注">-->
+            <!--      </el-table-column>-->
+            <!--      <el-table-column-->
+            <!--        prop="creator"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="创建人">-->
+            <!--      </el-table-column>-->
+            <!--      <el-table-column-->
+            <!--        prop="creationTime"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="创建时间">-->
+            <!--      </el-table-column>-->
+            <!--      <el-table-column-->
+            <!--        prop="lastModifier"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="最后修改人">-->
+            <!--      </el-table-column>-->
+            <!--      <el-table-column-->
+            <!--        prop="lastModificationTime"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="最后修改时间">-->
+            <!--      </el-table-column>-->
+            <el-table-column
+              prop="associatedIssueAddition"
+              header-align="center"
+              align="center"
+              label="关联问题整改记录">
+            </el-table-column>
+            <!--      <el-table-column-->
+            <!--        prop="associatedIssueAddition"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="关联问题添加">-->
+            <!--      </el-table-column>-->
+            <!--      <el-table-column-->
+            <!--        prop="creationDuration"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="创建时长">-->
+            <!--      </el-table-column>-->
+            <el-table-column
+              prop="rectificationVerificationStatus"
+              header-align="center"
+              align="center"
+              label="整改验证情况">
+            </el-table-column>
+            <el-table-column
+              prop="verificationConclusion"
+              header-align="center"
+              align="center"
+              label="验证结论">
+              <template slot-scope="scope">
+                <div>
+            <span v-for="(state, index) in getStates(scope.row.verificationConclusion)" :key="index">
+                <el-tag v-if="state === '未完成'" type="danger" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '持续'" type="info" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '结项'" type="warning" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '未完成，持续'" type="danger" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '持续，未完成'" type="info" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+            </span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="verifier"
+              header-align="center"
+              align="center"
+              label="验证人">
+            </el-table-column>
+            <!--      <el-table-column-->
+            <!--        prop="formula"-->
+            <!--        header-align="center"-->
+            <!--        align="center"-->
+            <!--        label="公式">-->
+            <!--      </el-table-column>-->
+            <el-table-column
+              fixed="right"
+              header-align="center"
+              align="center"
+              width="150"
+              label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" @click="checkStateAndHandle(scope.row)">验证记录</el-button>
+                <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="sizeChangeHandle"
+            @current-change="currentChangeHandle"
+            :current-page="pageIndex"
+            :page-sizes="[10, 20, 50, 100]"
+            :page-size="pageSize"
+            :total="totalPage"
+            layout="total, sizes, prev, pager, next, jumper">
+          </el-pagination>
+        </div>
+      </el-tab-pane>
+
+    </el-tabs>
+
+    <!-- 弹窗, 新增/修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <add-or-update v-if="assertOrUpdateVisible" ref="assetOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-updateT v-if="addOrUpdateVisibleT" ref="addOrUpdateT" @refreshDataList="getDataList"></add-or-updateT>
+    <add-or-updateV v-if="addOrUpdateVisibleV" ref="addOrUpdateV" @refreshDataList="getDataList"></add-or-updateV>
+
     <!-- 图片预览对话框 -->
     <el-dialog :visible.sync="imagePreviewVisible" :title="imagePreviewTitle">
       <img :src="imagePreviewUrl" style="width: 100%;">
@@ -286,6 +742,8 @@
 
 <script>
 import AddOrUpdate from './issuetable-add-or-update.vue'
+import AddOrUpdateT from '../issueRectification/issuetable-add-or-update.vue'
+import AddOrUpdateV from '../RectVerification/issuetable-add-or-update.vue'
 
 
 //如果新打开的页面是另外一个项目(前提是另一个项目也是自己的)的话可以在请求拦截request.interceptors.js中获取
@@ -298,6 +756,7 @@ export default {
   data () {
     return {
       showForm: true, // 控制表单显示的变量
+      showForm1: true, // 控制表单显示的变量
       dataForm: {
         key: ''
       },
@@ -308,6 +767,8 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
+      addOrUpdateVisibleT: false,
+      addOrUpdateVisibleV: false,
       assertOrUpdateVisible: false,
       imagePreviewVisible: false, // 图片预览对话框显示控制
       imagePreviewUrl: '', // 图片预览URL
@@ -315,12 +776,49 @@ export default {
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    AddOrUpdateT,
+    AddOrUpdateV
   },
   activated () {
     this.getDataList()
   },
   methods: {
+    getStates(verificationConclusion) {
+      if (!verificationConclusion) return [];
+      // 按照逗号分隔，并去除多余的空格
+      return verificationConclusion.split(',').map(state => state.trim());
+    },
+    checkStateAndHandle (row) {
+      this.addOrUpdateHandlev(row.issueId)
+    },
+    addOrUpdateHandlev (id) {
+      this.addOrUpdateVisibleV = true
+      this.$nextTick(() => {
+        this.$refs.addOrUpdateV.init(id)
+      })
+    },
+    handleRectificationRecords (issueNumber, issueId) {
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuemasktable/records'),
+        method: 'post',
+        params: this.$http.adornParams({ issueNumber: issueNumber })
+      }).then(({data}) => {
+        console.log("返回数据：" ,data)
+        if (data && data.msg === 'success') {
+          console.log('整改得到的id为' , issueId)
+          // 操作成功后触发addOrUpdateHandle
+          this.addOrUpdateHandleR(issueId)
+        }else if (data && data.msg === 'error') {
+          this.$message.error('任务未全部完成')
+        } else {
+          this.$message.error('操作失败')
+        }
+      }).catch(() => {
+        this.$message.error('请求失败')
+      })
+
+    },
     // 在上传前的检查
     beforeUpload(file) {
       const isExcel = file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -422,11 +920,18 @@ export default {
         this.$refs.addOrUpdate.init(id)
       })
     },
-    // 问题分析
-    assetOrUpdateHandle (id) {
-      this.assertOrUpdateVisible = true
+    // 新增 / 修改整改
+    addOrUpdateHandleR (id) {
+      this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.assetOrUpdate.init1(id)
+        this.$refs.addOrUpdate.initR(id)
+      })
+    },
+    // 任务发起
+    assetOrUpdateHandle (id,issueNumber) {
+      this.addOrUpdateVisibleT = true
+      this.$nextTick(() => {
+        this.$refs.addOrUpdateT.init1(id,issueNumber)
       })
     },
     //图片预览
@@ -460,7 +965,24 @@ export default {
     //   console.log(file);
     //   window.open(file);
     // },
-
+    openflow (issueId, issueNumber) {
+      this.$router.push({
+        name: 'issue-issueflow',
+        params: {
+          issueId: issueId,
+          issueNumber: issueNumber
+        }
+      })
+    },
+    openNewPage (issueId, issueNumber) {
+      this.$router.push({
+        name: 'issue-issuemask',
+        params: {
+          issueId: issueId,
+          issueNumber: issueNumber
+        }
+      })
+    },
 
     // 删除
     deleteHandle (id) {

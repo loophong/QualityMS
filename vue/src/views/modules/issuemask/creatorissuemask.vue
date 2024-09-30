@@ -22,17 +22,17 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
-        prop="issuemaskId"
-        header-align="center"
-        align="center"
-        label="">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="issuemaskId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="serialNumber"
         header-align="center"
         align="center"
-        label="序号">
+        label="任务编号">
       </el-table-column>
       <el-table-column
         prop="issueNumber"
@@ -76,11 +76,31 @@
         align="center"
         label="要求完成时间">
       </el-table-column>
-      <el-table-column
-        prop="state"
-        header-align="center"
-        align="center"
-        label="状态">
+<!--      <el-table-column-->
+<!--        prop="state"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="状态">-->
+<!--      </el-table-column>-->
+      <el-table-column prop="state" header-align="center" align="center" label="状态">
+        <template slot-scope="scope">
+    <span v-if="scope.row.state === '审核中'">
+      <el-tag type="info" disable-transitions>审核中</el-tag>
+    </span>
+          <span v-else-if="scope.row.state === '执行中'">
+      <el-tag type="primary" disable-transitions>执行中</el-tag>
+    </span>
+          <span v-else-if="scope.row.state === '未通过审核'">
+      <el-tag type="danger" disable-transitions>未通过审核</el-tag>
+    </span>
+          <span v-else-if="scope.row.state === '已派发'">
+      <el-tag type="warning" disable-transitions>已派发</el-tag>
+    </span>
+          <span v-else-if="scope.row.state === '已完成'">
+      <el-tag type="success" disable-transitions>已完成</el-tag>
+    </span>
+          <span v-else>-</span> <!-- 处理未知状态 -->
+        </template>
       </el-table-column>
       <el-table-column
         fixed="right"

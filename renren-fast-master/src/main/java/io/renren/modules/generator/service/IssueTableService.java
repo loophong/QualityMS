@@ -36,5 +36,8 @@ public interface IssueTableService extends IService<IssueTableEntity> {
      */
     Map<String, Integer> getCurrentMonthVerificationConclusionStatistics();
 
+    IssueTableEntity getByissueNumber(String issueNumber);
+
+    Map<String, Integer> getTaskDetails(String issueNumber);
 }
 

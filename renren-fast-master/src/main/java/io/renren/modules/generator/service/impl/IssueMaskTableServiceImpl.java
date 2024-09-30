@@ -69,7 +69,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         List<IssueMaskTableEntity> list1 = this.list();
         return list1.stream()
 //                .filter(issue -> issue.getIssueNumber().equals(issueNumber))
-                .filter(issue -> issue.getIssueNumber().equals(issueNumber) && !"已派发".equals(issue.getState()))
+                .filter(issue -> issue.getIssueNumber().equals(issueNumber) && !"已派发".equals(issue.getState()) && !"未通过审核".equals(issue.getState()))
                 .collect(Collectors.toList());
     }
 
@@ -78,7 +78,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         List<IssueMaskTableEntity> list1 = this.list();
         boolean allCompleted = list1.stream()
                 .filter(issue -> issue.getIssueNumber().equals(issueNumber))
-                .allMatch(issue -> "已完成".equals(issue.getState()) || "已派发".equals(issue.getState()));
+                .allMatch(issue -> "已完成".equals(issue.getState()) || "已派发".equals(issue.getState()) || "未通过审核".equals(issue.getState()) );
 
         if (allCompleted) {
             return "success";

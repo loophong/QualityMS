@@ -51,7 +51,9 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
+
 
             <el-form-item>
               <div style="display: flex; align-items: center;">
@@ -109,6 +111,7 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
             </el-form-item>
 
@@ -168,6 +171,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -224,6 +228,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -280,6 +285,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -335,6 +341,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -390,6 +397,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -451,6 +459,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -506,6 +515,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -561,6 +571,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -626,6 +637,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -682,6 +694,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -737,6 +750,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -792,6 +806,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -847,6 +862,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -902,6 +918,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -957,6 +974,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1018,6 +1036,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1073,6 +1092,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1128,6 +1148,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1193,6 +1214,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1248,6 +1270,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1305,6 +1328,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1361,6 +1385,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1417,6 +1442,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1479,6 +1505,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1535,6 +1562,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1591,6 +1619,7 @@
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
             </el-form-item>
 
             <el-form-item>
@@ -1625,6 +1654,26 @@
         </span>
       </div>
     </el-dialog>
+<!--    <el-dialog title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible">-->
+<!--      <div id="main" ref="main" style="width: 100%; height: 400px;"></div>-->
+<!--      <div>-->
+<!--        <span slot="footer" class="dialog-footer">-->
+<!--          <el-button @click="fishBonedialogVisible = false">取 消</el-button>-->
+<!--          <el-button type="primary" @click="fishBonedialogVisible = false">确 定</el-button>-->
+<!--        </span>-->
+<!--      </div>-->
+<!--    </el-dialog>-->
+    <el-dialog  title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible" width="80%">
+      <div>
+        <fish-bone  ref="fishBone" ></fish-bone>
+      </div>
+      <div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="fishBonedialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="fishBonedialogVisible = false">确 定</el-button>
+        </span>
+      </div>
+    </el-dialog>
     <el-dialog title="控制图" :visible.sync="dialogVisibleControl" :close-on-click-modal="false" width="80%">
       <div style="width: 100%; height: 100%;">
         <control ref="qcChart"></control>
@@ -1639,10 +1688,13 @@
 
 <script>
 import * as echarts from 'echarts';
+import { FishBones } from '@/components/fishbone/FishBone'
+import fishBone from "../../qcTools/fishBone.vue";
 import control from '@/views/modules/QCmanagement/qcTools/control.vue';
 export default {
   components: {
-    control
+    fishBone,
+      control
   },
   data() {
     return {
@@ -1667,6 +1719,7 @@ export default {
       },
       dialogVisible: false,
       dialogVisibleControl: false,
+      fishBonedialogVisible: false,  //鱼骨图弹窗
       active1: 1,
       active2: 1,
       active3: 1,
@@ -1708,6 +1761,7 @@ export default {
       },
     }
   },
+
   mounted() {
 
   },
@@ -1852,6 +1906,11 @@ export default {
       this.$nextTick(() => {
         this.initChart();
       });
+    },
+    // 鱼骨图弹窗
+    fishBonetoggleLineAndBar() {
+      this.fishBonedialogVisible = !this.fishBonedialogVisible;
+
     },
     toggleControl() {
       this.dialogVisibleControl = !this.dialogVisibleControl;
@@ -2071,6 +2130,17 @@ export default {
         }]
       };
       option && myChart.setOption(option);
+    },
+    //初始化鱼骨图
+    initFishBoneChart() {
+      console.log('initFishBone')
+      new FishBones({
+        id: 'fishBone',
+        jsonData: this.testFishData,
+        canvasSize: [document.body.scrollWidth, document.body.scrollHeight],
+        clickNodeFunction: (node, event) => {
+        },
+      }).init()
     },
     initForm() {
       this.form = {

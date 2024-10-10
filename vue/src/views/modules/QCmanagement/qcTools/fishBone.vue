@@ -72,7 +72,7 @@ export default {
                 {"children": [], "id": "1008034501", "fid": "1008", "name": "巡检1[100]", fontColor: "", lineColor: "", link: ""},
                 {"children": [], "id": "1008034502", "fid": "1008", "name": "巡检2[100]", fontColor: "", lineColor: "", link: ""}
               ], "id": "1008", "fid": "1", "name": "巡检[100]", fontColor: "", lineColor: "", link: ""}
-          ], "id": "1", "fid": "0", "name": "健康度[93]", fontColor: "", lineColor: "", link: ""}
+          ], "id": "1", "fid": "0", "name": "质量问题", fontColor: "", lineColor: "", link: ""}
       ],
       editDialogVisible: false, // 控制弹出框的可见性
       editableNode: { // 用于存储可编辑的节点信息
@@ -97,39 +97,36 @@ export default {
         },
       }).init()
     },
-    editNode(node) {
-      this.currentNode = node // 保存当前点击的节点
-      this.editableNode = { ...node } // 将节点信息复制到可编辑的对象中
-      this.editDialogVisible = true // 打开编辑框
-    },
-    saveChanges() {
-      // 查找当前被编辑的节点在 testFishData 中的位置
-      const updateNode = (nodeList, updatedNode) => {
-        for (let i = 0; i < nodeList.length; i++) {
-          if (nodeList[i].id === updatedNode.id) {
-            nodeList[i] = { ...updatedNode }
-            return true
-          } else if (nodeList[i].children && nodeList[i].children.length > 0) {
-            const found = updateNode(nodeList[i].children, updatedNode)
-            if (found) {
-              return true
-            }
-          }
-        }
-        return false
-      }
-
-      updateNode(this.testFishData, this.editableNode)
-
-      // 打印修改后的节点信息
-      console.log('保存的节点信息:', this.editableNode)
-
-      // 重新初始化鱼骨图，以反映更新后的数据
-      this.initFishBone()
-
-      // 关闭编辑框
-      this.editDialogVisible = false
-    }
+    // editNode(node) {
+    //   this.currentNode = node // 保存当前点击的节点
+    //   this.editableNode = { ...node } // 将节点信息复制到可编辑的对象中
+    //   this.editDialogVisible = true // 打开编辑框
+    // },
+    // saveChanges() {
+    //   // 查找当前被编辑的节点在 testFishData 中的位置
+    //   const updateNode = (nodeList, updatedNode) => {
+    //     for (let i = 0; i < nodeList.length; i++) {
+    //       if (nodeList[i].id === updatedNode.id) {
+    //         nodeList[i] = { ...updatedNode }
+    //         return true
+    //       } else if (nodeList[i].children && nodeList[i].children.length > 0) {
+    //         const found = updateNode(nodeList[i].children, updatedNode)
+    //         if (found) {
+    //           return true
+    //         }
+    //       }
+    //     }
+    //     return false
+    //   }
+    //
+    //   updateNode(this.testFishData, this.editableNode)
+    //   // 打印修改后的节点信息
+    //   console.log('保存的节点信息:', this.editableNode)
+    //   // 重新初始化鱼骨图，以反映更新后的数据
+    //   this.initFishBone()
+    //   // 关闭编辑框
+    //   this.editDialogVisible = false
+    // }
   },
 }
 </script>

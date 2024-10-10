@@ -3,17 +3,17 @@
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
       label-width="80px">
       <el-form-item label="指标名称" prop="indicatorName">
-        <el-input v-model="dataForm.indicatorName" placeholder="指标名称"></el-input>
+        <el-input v-model="dataForm.indicatorName" placeholder="请输入指标名称"></el-input>
       </el-form-item>
       <el-form-item label="考核部门" prop="assessmentDepartment">
-        <el-input v-model="dataForm.assessmentDepartment" placeholder="考核部门"></el-input>
+        <el-input v-model="dataForm.assessmentDepartment" placeholder="请输入考核部门"></el-input>
       </el-form-item>
       <el-form-item label="管理部门" prop="managementDepartment">
-        <el-input v-model="dataForm.managementDepartment" placeholder="管理部门"></el-input>
+        <el-input v-model="dataForm.managementDepartment" placeholder="请输入管理部门"></el-input>
       </el-form-item>
 
       <el-form-item label="指标公式" prop="indicatorDefinition">
-        <el-select v-model="selectedFormula" @change="onFormulaChange">
+        <el-select v-model="selectedFormula" @change="onFormulaChange" placeholder="请选择指标公式">
           <el-option v-for="formula in formulas" :key="formula.id" :value="formula.template">
             {{ formula.name }}
           </el-option>
@@ -73,6 +73,12 @@
             {{ field.indicatorName }}
           </el-option>
         </el-select>
+      </el-form-item>
+      <el-form-item label="指标值下界" prop="indicatorValueLowerBound" >
+        <el-input v-model="dataForm.indicatorValueLowerBound" placeholder="请输入指标值下界"></el-input>
+      </el-form-item>
+      <el-form-item label="指标值上界" prop="indicatorValueUpperBound"  >
+        <el-input v-model="dataForm.indicatorValueUpperBound" placeholder="请输入指标值上界"></el-input>
       </el-form-item>
       <el-form-item label="指标创建时间" prop="indicatorCreatTime">
         <el-date-picker
@@ -138,7 +144,9 @@ export default {
         indicatorParentNode: '',
         indicatorCreatTime: '',
         indicatorState: '',
-        indicatorChildNode: ''
+        indicatorChildNode: '',
+        indicatorValueUpperBound: '',
+        indicatorValueLowerBound: ''
       },
       dataDictionaryForm: {},  // 指标数据字典表
       dataRule: {
@@ -212,6 +220,9 @@ export default {
     //新增指标时验证是否有同名指标
     validateIndicatorName(rule, value, callback) {
       if (!value) {
+        return callback();
+      }
+      if (this.dataForm.indicatorId) {
         return callback();
       }
       this.$http({
@@ -304,6 +315,8 @@ export default {
               this.dataForm.indicatorCreatTime = data.indicatorDictionary.indicatorCreatTime
               this.dataForm.indicatorState = data.indicatorDictionary.indicatorState
               this.dataForm.indicatorChildNode = data.indicatorDictionary.indicatorChildNode
+              this.dataForm.indicatorValueLowerBound = data.indicatorDictionary.indicatorValueLowerBound
+              this.dataForm.indicatorValueUpperBound = data.indicatorDictionary.indicatorValueUpperBound
             }
           })
         }
@@ -333,7 +346,9 @@ export default {
               'indicatorParentNode': this.dataForm.indicatorParentNode,
               'indicatorCreatTime': this.dataForm.indicatorCreatTime,
               'indicatorState': this.dataForm.indicatorState,
-              'indicatorChildNode': this.dataForm.indicatorChildNode
+              'indicatorChildNode': this.dataForm.indicatorChildNode,
+              'indicatorValueLowerBound': this.dataForm.indicatorValueLowerBound,
+              'indicatorValueUpperBound': this.dataForm.indicatorValueUpperBound
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {

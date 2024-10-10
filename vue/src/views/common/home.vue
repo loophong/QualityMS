@@ -1,32 +1,31 @@
 <template>
   <div class="mod-home">
     <div id="indicator" class="box">
-      <div>
-        指标总数：{{ indicatorCounts }}
-      </div>
-      <div id="indicatorChart" ref="indicatorChart"></div>
+      <div style="height: 10%">指标总数：{{indicatorCounts}}</div>
+      <div id="indicatorChart1" ref="indicatorChart1"></div>
+      <div id="indicatorChart2" ref="indicatorChart2"></div>
+    </div>
+
+
+    <div id="issue" class="box">
+      <div style="height: 10%"></div>
+      <div id="issueChart"></div>
     </div>
 
     <div id="task" class="box">
       <div id="task" class="box">
         <div class="flex-container">
-          <div class="flex-item" style="width: 48%; height: 96%;">
+          <div class="flex-item" style="width: 50%; height: 96%;">
             <div class="picture" ref="onTimePieChart" style="width: 96%; height: 96%;"></div>
           </div>
-          <div class="flex-item" style="width: 48%; height: 96%;">
+          <div class="flex-item" style="width: 50%; height: 96%;">
             <div class="picture" ref="earlyCompletionPieChart" style="width: 96%; height: 96%;"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="issue" class="box">
-      <div>当月问题数量统计</div>
-      <div id="issueChart"></div>
-    </div>
-
     <div id="QC" class="box">
-      区域4
       <!-- QC图表 -->
       <div>
         <qc-chart ref="qcChart"></qc-chart>
@@ -45,9 +44,8 @@ export default {
     return {
       //----------------指标模块-----------------
       indicatorCounts: 0,
-      myIndicatorChart1: {}, //指标柱状图
-      departmentCountsList: [], //查询返回list
-      departmentList: ["质量科", "市场科", "企业管理科"], //部门列表
+      departmentCountsList: [], //按部门查询返回list
+      classificationCountList: [],  //按指标分级查询返回list
 
       //----------------任务模块-----------------
       taskData: {},
@@ -81,19 +79,33 @@ export default {
         method: 'get',
         params: this.$http.adornParams({})
       }).then(({data}) => {
-        console.log('data123:', data);
+        console.log('data111:', data);
         this.departmentCountsList = data;
         console.log('departmentCountsList:', this.departmentCountsList);
         this.indicatorCounts = data.reduce((total, item) => total + item.counts, 0);
         console.log('indicatorCounts:', this.indicatorCounts);
-        this.renderChart();
+        this.renderChart1();
+      });
+
+      this.$http({
+        url: this.$http.adornUrl('/indicator/indicatordictionary/countsByClassification'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({data}) => {
+        console.log('data222:', data);
+        this.classificationCountList = data;
+        console.log('classificationCountList:', this.classificationCountList);
+        this.renderChart2();
       });
     },
-
-    renderChart() {
-      const chart = echarts.init(this.$refs.indicatorChart);
+    renderChart1() {
+      const chart = echarts.init(this.$refs.indicatorChart1);
 
       const option = {
+        title: {
+          text: '盘锦企管系统部门指标统计',
+          left: 'center'
+        },
         tooltip: {
           trigger: 'axis',
           axisPointer: {
@@ -118,6 +130,47 @@ export default {
             name: '指标总数',
             type: 'bar',
             data: this.departmentCountsList.map(item => item.counts),
+            itemStyle: {
+              color: '#409EFF',
+            },
+          },
+        ],
+      };
+
+      chart.setOption(option);
+    },
+    renderChart2() {
+      const chart = echarts.init(this.$refs.indicatorChart2);
+
+      const option = {
+        title: {
+          text: '盘锦企管系统指标分级统计',
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: this.classificationCountList.map(item => item.indicatorClassification),
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: [
+          {
+            name: '指标总数',
+            type: 'bar',
+            data: this.classificationCountList.map(item => item.counts),
             itemStyle: {
               color: '#409EFF',
             },
@@ -244,7 +297,7 @@ export default {
       this.chartInstance.setOption(option);
     },
 
-    //----------------任务模块-----------------
+    //----------------问题模块-----------------
     // 查询当月问题数量
     getIssueStats() {
       this.$http({
@@ -271,6 +324,7 @@ export default {
       const option = {
         title: {
           text: "当月问题数量统计",
+          left: 'center'
         },
         tooltip: {
           trigger: 'axis',
@@ -313,6 +367,8 @@ export default {
     },
 
 
+
+
   }
 };
 </script>
@@ -334,10 +390,13 @@ export default {
   height: 400px; /* 设置每个容器的高度为父容器的百分比 */
 }
 
-#indicatorChart {
+#indicatorChart1 {
   width: 100%;
-  height: 100%;
-  /* 确保图表容器高度为 100% */
+  height: 50%;
+}
+#indicatorChart2 {
+  width: 100%;
+  height: 50%;
 }
 
 #QC {

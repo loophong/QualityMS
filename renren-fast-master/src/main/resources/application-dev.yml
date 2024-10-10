@@ -6,6 +6,7 @@ spring:
 #            在本点新建数据库，数据库名称为renren-fast，字符设置为utf8
 #            然后新建查询，执行/db/mysql.sql即可
             url: jdbc:mysql://172.17.101.85:3308/renren_fast?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+#            url: jdbc:mysql://8.153.37.12:3306/renren_fast?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
 #            本机MySQL的用户名和密码
             username: root
             password: qualityMS

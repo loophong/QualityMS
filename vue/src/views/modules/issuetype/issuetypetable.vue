@@ -6,14 +6,14 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-upload
-          class="upload-button"
-          :show-file-list="false"
-          :before-upload="beforeUpload"
-          :on-change="handleFileChange"
-        >
-          <el-button type="primary">上传图片</el-button>
-        </el-upload>
+<!--        <el-upload-->
+<!--          class="upload-button"-->
+<!--          :show-file-list="false"-->
+<!--          :before-upload="beforeUpload"-->
+<!--          :on-change="handleFileChange"-->
+<!--        >-->
+<!--          <el-button type="primary">上传图片</el-button>-->
+<!--        </el-upload>-->
         <el-button v-if="isAuth('generator:issuetypetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('generator:issuetypetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>

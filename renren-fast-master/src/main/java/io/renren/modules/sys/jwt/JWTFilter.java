@@ -16,6 +16,8 @@ import org.apache.http.HttpStatus;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletRequest;
@@ -31,10 +33,21 @@ import java.io.IOException;
  */
 public class JWTFilter extends AuthenticatingFilter {
 
+    // 使用SLF4J Logger
+    private static final Logger logger = LoggerFactory.getLogger(JWTFilter.class);
     @Override
     protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) throws Exception {
         //获取请求token
         String token = getRequestToken((HttpServletRequest) request);
+
+
+        // 打印日志，查看请求的URI和Token
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String requestUri = httpRequest.getRequestURI();
+        logger.info("Processing request: {} with token: {}", requestUri, token);
+        // 获取请求token
+        logger.info("Request token: {}", token); // 打印请求中的 token
+
 
         if(StringUtils.isBlank(token)){
             return null;
@@ -56,6 +69,13 @@ public class JWTFilter extends AuthenticatingFilter {
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         //获取请求token，如果token不存在，直接返回401
         String token = getRequestToken((HttpServletRequest) request);
+
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String requestUri = httpRequest.getRequestURI();
+
+        // 打印日志，查看请求被拒绝时的路径和Token状态
+        logger.info("Access denied for request: {} with token: {}", requestUri, token);
+
         if(StringUtils.isBlank(token)){
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.setHeader("Access-Control-Allow-Credentials", "true");

@@ -11,20 +11,45 @@
         <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="auditHandle()" :disabled="dataListSelections.length <= 0">审核</el-button>
       </el-form-item>
     </el-form>
+<!--    <el-dialog-->
+<!--      title="审核"-->
+<!--      :visible.sync="auditDialogVisible"-->
+<!--      width="30%">-->
+<!--      <span>请选择审核结果：</span>-->
+<!--      <el-radio-group v-model="auditResult">-->
+<!--        <el-radio label="approved">审核通过</el-radio>-->
+<!--        <el-radio label="rejected">审核不通过</el-radio>-->
+<!--      </el-radio-group>-->
+<!--      <el-form-item label="审核意见" prop="reviewerOpinion">-->
+<!--        <el-input v-model="reviewerOpinion" placeholder="请输入审核意见" clearable></el-input>-->
+<!--      </el-form-item>-->
+<!--      <div slot="footer" class="dialog-footer">-->
+<!--        <el-button @click="auditDialogVisible = false">取 消</el-button>-->
+<!--        <el-button type="primary" @click="confirmAudit">确 定</el-button>-->
+<!--      </div>-->
+<!--    </el-dialog>-->
     <el-dialog
       title="审核"
       :visible.sync="auditDialogVisible"
       width="30%">
-      <span>请选择审核结果：</span>
-      <el-radio-group v-model="auditResult">
-        <el-radio label="approved">审核通过</el-radio>
-        <el-radio label="rejected">审核不通过</el-radio>
-      </el-radio-group>
+      <el-form :model="dataForm">
+        <span>请选择审核结果：</span>
+        <el-radio-group v-model="auditResult">
+          <el-radio label="approved">审核通过</el-radio>
+          <el-radio label="rejected">审核不通过</el-radio>
+        </el-radio-group>
+        <el-form-item label="审核意见" prop="reviewerOpinion">
+          <el-input v-model="reviewerOpinion" placeholder="请输入审核意见" clearable></el-input>
+        </el-form-item>
+      </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="auditDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="confirmAudit">确 定</el-button>
       </div>
     </el-dialog>
+
+
+
     <el-table
       :data="dataList"
       border
@@ -159,6 +184,7 @@ export default {
       showButtons: true,
       showCompleteButton: false,
       assertOrUpdateVisible: false,
+      reviewerOpinion: '',
       dataForm: {
         key: ''
       },
@@ -302,6 +328,7 @@ export default {
         method: 'post',
         params: {
           issuemaskIds: this.auditIds, // 传递逗号分隔的任务 ID
+          reviewerOpinion: this.reviewerOpinion, // 传递审核意见
           result: this.auditResult // 传递审核结果
         }
       }).then(({ data }) => {

@@ -58,6 +58,12 @@
         label="审核人">
       </el-table-column>
       <el-table-column
+        prop="reviewerOpinion"
+        header-align="center"
+        align="center"
+        label="审核意见">
+      </el-table-column>
+      <el-table-column
         prop="recipients"
         header-align="center"
         align="center"
@@ -252,7 +258,7 @@
           this.$message.error('任务已派发！')
         else if (row.state === '已完成')
           this.$message.error('任务已完成！')
-        else if (row.state === '审核未通过')
+        else if (row.state === '未通过审核')
           this.$message.error('任务审核未通过！')
         else {
           this.assertOrUpdateVisible = true

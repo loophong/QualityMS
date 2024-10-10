@@ -145,7 +145,7 @@ export default {
           console.log('d.data 内容:', d.data);
           console.log("即将传递的url:", d.data.url);
           console.log("即将传递的参数:", d.data.name);
-          this.$router.push({ name: 'issue-issueRectification' }); // 直接跳转到指定路由
+          this.$router.push({ name: 'otherToIssue' }); // 直接跳转到指定路由
         });
 
       // 在矩形左上角添加小圆圈

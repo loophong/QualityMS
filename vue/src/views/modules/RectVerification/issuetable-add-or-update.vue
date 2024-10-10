@@ -150,16 +150,17 @@
 <!--      <el-input v-model="dataForm.associatedRectificationRecords" placeholder="关联问题整改记录"></el-input>-->
 <!--    </el-form-item>-->
       <!-- 新增关联问题多选框 -->
-      <el-form-item label="关联问题整改记录" prop="associatedRectificationRecords">
-        <el-select v-model="dataForm.associatedIssueIds" multiple placeholder="请选择关联问题整改记录">
-          <el-option
-            v-for="item in issueOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
+<!--      <el-form-item label="关联问题整改记录" prop="associatedRectificationRecords">-->
+<!--        <el-select v-model="dataForm.associatedIssueIds" multiple placeholder="请选择关联问题整改记录">-->
+<!--          <el-option-->
+<!--            v-for="item in issueOptions"-->
+<!--            :key="item.value"-->
+<!--            :label="item.label"-->
+<!--            :value="item.value">-->
+<!--          </el-option>-->
+<!--        </el-select>-->
+<!--      </el-form-item>-->
+
 <!--    <el-form-item label="创建时长" prop="creationDuration">-->
 <!--      <el-input v-model="dataForm.creationDuration" placeholder="创建时长"></el-input>-->
 <!--    </el-form-item>-->
@@ -176,6 +177,12 @@
             :value="option.value">
           </el-option>
         </el-select>
+      </el-form-item>
+      <el-form-item label="关联相关问题" prop="isRelatedIssue">
+        <el-radio-group v-model="dataForm.isRelatedIssue">
+          <el-radio label="是">是</el-radio>
+          <el-radio label="否">否</el-radio>
+        </el-radio-group>
       </el-form-item>
 <!--    <el-form-item label="验证人" prop="verifier">-->
 <!--      <el-input v-model="dataForm.verifier" placeholder="验证人"></el-input>-->
@@ -301,7 +308,8 @@
           reviewers: '',
           level: '',
           state: '',
-          formula: ''
+          formula: '',
+          isRelatedIssue: '否',  // 添加此行以初始化
         },
         verificationOptions: [
           { label: '未完成', value: '未完成' },
@@ -713,6 +721,23 @@
                       this.$emit('refreshDataList')
                     }
                   })
+                  // 检查是否关联相关问题
+                  if (this.dataForm.isRelatedIssue === '是') {
+                    // 发起新的请求
+                    this.$http({
+                      url: this.$http.adornUrl(`/generator/issuetable/connection`),  // 请替换为实际请求的 URL
+                      method: 'post',
+                      data: {
+                        'issueId' : this.dataForm.issueId, // 根据需要传递的参数
+                        // ...其他所需数据
+                      }
+                    }).then(({ data }) => {
+                      if (data && data.code === 0) {
+                      } else {
+                        this.$message.error(data.msg);
+                      }
+                    });
+                  }
                 } else {
                   this.$message.error(data.msg)
                 }

@@ -37,7 +37,7 @@
               </el-date-picker>
             </el-form-item>
       <el-form-item label="问题类别" prop="issueCategoryId">
-        <el-select v-model="dataForm.issueCategoryId" placeholder="请选择问题类别">
+        <el-select v-model="dataForm.issueCategoryId" filterable placeholder="请选择问题类别">
           <el-option
             v-for="item in issueCategoryOptions"
             :key="item.value"
@@ -60,7 +60,7 @@
 <!--          </el-form-item>-->
           <el-form-item :label="'车型 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleTypeId'" :rules="{ required: true, message: '请选择车型', trigger: 'change' }" label-width="140px">
             <div style="display: flex; align-items: center; margin-left: 10px;">
-              <el-select v-model="vehicle.vehicleTypeId" placeholder="请选择车型" style="flex: 1;">
+              <el-select v-model="vehicle.vehicleTypeId" filterable placeholder="请选择车型" style="flex: 1;">
                 <el-option
                   v-for="item in vehicleTypeOptions"
                   :key="item.value"
@@ -123,9 +123,14 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="" prop="issuePhoto">
-        <el-button @click="imageload()">上传图片</el-button>
-      </el-form-item>
+      <el-upload
+        class="upload-button"
+        :show-file-list="false"
+        :before-upload="beforeUpload"
+        :on-change="handleFileChange"
+      >
+        <el-button type="primary">上传图片</el-button>
+      </el-upload>
 
 
     </el-form>
@@ -135,7 +140,7 @@
       </span>
   </el-dialog>
     <el-dialog
-      :title="!dataForm.issueId ? '新增' : '修改'"
+      :title="'整改记录'"
       :close-on-click-modal="false"
       :visible.sync="visibleR">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmitR()" label-width="150px">
@@ -153,15 +158,6 @@
             placeholder="请选择实际完成时间">
           </el-date-picker>
         </el-form-item>
-        <!--      <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
-        <!--        <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择验证人">-->
-        <!--          <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
-        <!--            <el-option v-for="item in group.options" :key="item.value" :label="item.label"-->
-        <!--                       :value="item.label">-->
-        <!--            </el-option>-->
-        <!--          </el-option-group>-->
-        <!--        </el-select>-->
-        <!--      </el-form-item>-->
         <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
           <el-select v-model="selectedResponsiblePersons" filterable multiple placeholder="请选择整改责任人">
             <el-option-group v-for="group in options" :key="group.label" :label="group.label">
@@ -170,47 +166,26 @@
             </el-option-group>
           </el-select>
         </el-form-item>
-        <!--      <el-form-item label="整改图片/交付物" prop="image">-->
-        <!--        <el-upload-->
-        <!--          action="#"-->
-        <!--          list-type="picture-card"-->
-        <!--          :on-preview="handlePictureCardPreview"-->
-        <!--          :on-remove="handleRemove"-->
-        <!--          :on-change="handleFileChange"-->
-        <!--          :file-list="imageList"-->
-        <!--          :auto-upload="false">-->
-        <!--          <i class="el-icon-plus"></i>-->
-        <!--        </el-upload>-->
-        <!--        <el-dialog :visible.sync="dialogVisible">-->
-        <!--          <img width="100%" :src="dialogImageUrl" alt="">-->
-        <!--        </el-dialog>-->
-        <!--      </el-form-item>-->
-        <el-form-item label="" prop="rectificationPhotoDeliverable">
-          <el-button @click="imageload()">上传图片</el-button>
+        <el-form-item label="关联相关问题" prop="isRelatedIssue">
+          <el-radio-group v-model="dataForm.isRelatedIssue">
+            <el-radio label="是">是</el-radio>
+            <el-radio label="否">否</el-radio>
+          </el-radio-group>
         </el-form-item>
+        <el-upload
+          class="upload-button"
+          :show-file-list="false"
+          :before-upload="beforeUpload"
+          :on-change="handleFileChange1"
+        >
+          <el-button type="primary">上传图片</el-button>
+        </el-upload>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancel()">取消</el-button>
         <el-button type="primary" @click="dataFormSubmitR()">确定</el-button>
       </span>
     </el-dialog>
-<!--  <el-dialog-->
-<!--    :title="'问题分析'"-->
-<!--    :close-on-click-modal="false"-->
-<!--    :visible.sync="visible1">-->
-<!--    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">-->
-<!--          <el-form-item label="原因分析" prop="causeAnalysis">-->
-<!--            <el-input v-model="dataForm.causeAnalysis" placeholder="原因分析"></el-input>-->
-<!--          </el-form-item>-->
-<!--      <el-form-item label="分析人" prop="lastModifier">-->
-<!--        <el-input v-model="dataForm.lastModifier" placeholder="分析人"></el-input>-->
-<!--      </el-form-item>-->
-<!--    </el-form>-->
-<!--    <span slot="footer" class="dialog-footer">-->
-<!--      <el-button @click="visible1 = false">取消</el-button>-->
-<!--      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>-->
-<!--    </span>-->
-<!--  </el-dialog>-->
     <el-dialog
       :title="'任务发起'"
       :close-on-click-modal="false"
@@ -386,7 +361,8 @@
           reviewert: '',
           level: '',
           state: '',
-          formula: ''
+          formula: '',
+          isRelatedIssue: '否',  // 添加此行以初始化
         },
         vehicleTypeOptions: [],
         issueCategoryOptions: [],
@@ -403,6 +379,7 @@
           { value: '企管科', label: '企管科' }
           // 其他科室选项
         ],
+
         dataRule: {
         },
         options: ''
@@ -429,6 +406,75 @@
 
     },
     methods: {
+      uploadFile(file) {
+        const formData = new FormData();
+        formData.append('file', file); // 将文件添加到 FormData
+
+        this.$http({
+          url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+          method: 'post',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data' // 指定为文件上传
+          }
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            // 保存后端返回的url到变量中
+            this.dataForm.issuePhoto = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+            console.log('获得的文件地址 ：' ,data.uploadurl)
+            this.$message.success('文件上传成功');
+            // 处理成功后的逻辑，例如更新状态
+          } else {
+            this.$message.error(data.msg);
+          }
+        }).catch(error => {
+          this.$message.error('上传失败');
+          console.error(error);
+        });
+      },
+      beforeUpload(file) {
+        const isImage = file.type.startsWith('image/');
+        if (!isImage) {
+          this.$message.error('上传图片只能是图片格式!');
+        }
+        return isImage; // 返回 true 继续上传，返回 false 不上传
+      },
+      handleFileChange(file) {
+        // 存储待上传的文件
+        this.uploadingFile = file.raw; // 获取 File 对象
+        this.uploadFile(file.raw); // 调用上传方法
+      },
+      uploadFile1(file) {
+        const formData = new FormData();
+        formData.append('file', file); // 将文件添加到 FormData
+
+        this.$http({
+          url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+          method: 'post',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data' // 指定为文件上传
+          }
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            // 保存后端返回的url到变量中
+            this.dataForm.rectificationPhotoDeliverable = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+            console.log('获得的文件地址 ：' ,data.uploadurl)
+            this.$message.success('文件上传成功');
+            // 处理成功后的逻辑，例如更新状态
+          } else {
+            this.$message.error(data.msg);
+          }
+        }).catch(error => {
+          this.$message.error('上传失败');
+          console.error(error);
+        });
+      },
+      handleFileChange1(file) {
+        // 存储待上传的文件
+        this.uploadingFile = file.raw; // 获取 File 对象
+        this.uploadFile1(file.raw); // 调用上传方法
+      },
       imageload() {
         this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`);
         this.visibleUpload = true; // 打开上传对话框
@@ -985,6 +1031,23 @@
                     this.$emit('refreshDataList')
                   }
                 })
+                // 检查是否关联相关问题
+                if (this.dataForm.isRelatedIssue === '是') {
+                  // 发起新的请求
+                  this.$http({
+                    url: this.$http.adornUrl(`/generator/issuetable/connection`),  // 请替换为实际请求的 URL
+                    method: 'post',
+                    data: {
+                      'issueId' : this.dataForm.issueId, // 根据需要传递的参数
+                      // ...其他所需数据
+                    }
+                  }).then(({ data }) => {
+                    if (data && data.code === 0) {
+                    } else {
+                      this.$message.error(data.msg);
+                    }
+                  });
+                }
               } else {
                 this.$message.error(data.msg)
               }

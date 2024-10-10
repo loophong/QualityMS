@@ -172,7 +172,7 @@ public class IssueMaskTableController {
      */
     @RequestMapping("/audit")
     @RequiresPermissions("generator:issuemasktable:delete")
-    public R audit(@RequestParam("issuemaskIds") String issuemaskIds, @RequestParam("result") String result) {
+    public R audit(@RequestParam("issuemaskIds") String issuemaskIds,@RequestParam("reviewerOpinion") String reviewerOpinion, @RequestParam("result") String result) {
         // 将以逗号分隔的字符串转换为 Integer 数组
         String[] idStrings = issuemaskIds.split(",");
         for (String idString : idStrings) {
@@ -187,6 +187,7 @@ public class IssueMaskTableController {
                 } else {
                     issueMaskTable.setState("未通过审核"); // 审核不通过
                 }
+                issueMaskTable.setReviewerOpinion(reviewerOpinion);
 
                 // 更新数据库中的记录
                 issueMaskTableService.updateById(issueMaskTable);

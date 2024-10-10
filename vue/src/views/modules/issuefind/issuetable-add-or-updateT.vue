@@ -1,7 +1,7 @@
 <template>
   <div>
   <el-dialog
-    :title="!dataForm.issueId ? '新增' : '修改'"
+    :title="'整改情况'"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="150px">
@@ -61,7 +61,7 @@
       </span>
   </el-dialog>
     <el-dialog
-      :title="'任务发起'"
+      :title="''"
       :close-on-click-modal="false"
       :visible.sync="visible1">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">

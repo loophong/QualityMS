@@ -1,13 +1,48 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+<!--      <el-form-item>-->
+<!--        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="问题类别" prop="issueCategoryId">-->
+<!--        <el-input v-model="queryParams.issueCategoryId" filterable placeholder="请输入问题类别"></el-input>-->
+<!--      </el-form-item>-->
+      <el-form-item label="问题类别" prop="issueCategoryId">
+        <el-select v-model="queryParams.issueCategoryId" filterable placeholder="请选择问题类别">
+          <el-option
+            v-for="item in issueCategoryOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="车型" prop="vehicleTypeId">
+        <el-select v-model="queryParams.vehicleTypeId" filterable placeholder="请选择车型">
+          <el-option
+            v-for="item in vehicleTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="责任科室" prop="responsibleDepartment">
+        <el-select v-model="queryParams.responsibleDepartment" placeholder="请选择责任科室">
+          <el-option
+            v-for="department in departmentOptions"
+            :key="department.value"
+            :label="department.label"
+            :value="department.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-<!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
-<!--        <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
+        <el-button @click="getQueryList()">查询</el-button>
+        <el-button @click="resetQuery()">重置</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="downloadTemplate()">下载模板</el-button>
       </el-form-item>
     </el-form>
     <el-dialog :visible.sync="taskDetailVisible" title="问题详情">
@@ -19,6 +54,24 @@
       <div slot="footer">
         <el-button @click="taskDetailVisible = false">关闭</el-button>
       </div>
+    </el-dialog>
+    <el-dialog
+      title="整改情况"
+      :visible.sync="dialogVisible"
+      width="400px">
+      <p>{{ fullDescription }}</p>
+    </el-dialog>
+    <el-dialog
+      title="原因分析"
+      :visible.sync="dialogVisible1"
+      width="400px">
+      <p>{{ fullCause }}</p>
+    </el-dialog>
+    <el-dialog
+      title="验证整改情况"
+      :visible.sync="dialogVisible2"
+      width="400px">
+      <p>{{ fullRetStates }}</p>
     </el-dialog>
     <el-table
       :data="dataList"
@@ -67,21 +120,36 @@
         prop="issueCategoryId"
         header-align="center"
         align="center"
-        label="问题类别ID">
+        label="问题类别">
       </el-table-column>
       <el-table-column
         prop="vehicleTypeId"
         header-align="center"
         align="center"
-        label="车型ID">
+        label="车型">
       </el-table-column>
       <el-table-column
         prop="vehicleNumberId"
         header-align="center"
         align="center"
-        label="车号ID">
+        label="车号">
       </el-table-column>
-      <el-table-column
+<!--      <el-table-column-->
+<!--        prop="issueDescription"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题描述">-->
+<!--        <template slot-scope="scope">-->
+<!--          <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullDescription(scope.row.issueDescription)">-->
+<!--            {{ truncateDescription(scope.row.issueDescription) }}-->
+<!--            <span v-if="scope.row.issueDescription.length > 8">-->
+<!--        <strong>...</strong> &lt;!&ndash; 将省略号加粗 &ndash;&gt;-->
+<!--      </span>-->
+<!--          </div>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+
+            <el-table-column
         prop="issueDescription"
         header-align="center"
         align="center"
@@ -108,7 +176,7 @@
         align="center"
         label="问题照片">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
+          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -129,11 +197,25 @@
         align="center"
         label="责任科室">
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="rectificationStatus"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="整改情况">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="rectificationStatus"
         header-align="center"
         align="center"
         label="整改情况">
+        <template slot-scope="scope">
+          <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullDescription(scope.row.rectificationStatus)">
+            {{ truncateDescription(scope.row.rectificationStatus) }}
+            <span v-if="scope.row.rectificationStatus.length > 20">
+        <strong>...</strong> <!-- 将省略号加粗 -->
+      </span>
+          </div>
+        </template>
       </el-table-column>
       <el-table-column
         prop="actualCompletionTime"
@@ -216,18 +298,51 @@
         align="center"
         label="创建时长">
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="causeAnalysis"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="原因分析">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="causeAnalysis"
         header-align="center"
         align="center"
         label="原因分析">
+        <template slot-scope="scope">
+          <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
+      <span v-if="scope.row.causeAnalysis.length > 8">
+        {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+      </span>
+            <span v-else>
+        {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+      </span>
+          </div>
+        </template>
       </el-table-column>
       <el-table-column
         prop="rectificationVerificationStatus"
         header-align="center"
         align="center"
         label="整改验证情况">
+        <template slot-scope="scope">
+          <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">
+      <span v-if="scope.row.rectificationVerificationStatus.length > 50">
+        {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+      </span>
+            <span v-else>
+        {{ scope.row.rectificationVerificationStatus }} <!-- 显示完整描述 -->
+      </span>
+          </div>
+        </template>
       </el-table-column>
+
+      <!--      <el-table-column-->
+<!--        prop="rectificationVerificationStatus"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="整改验证情况">-->
+<!--      </el-table-column>-->
 <!--      <el-table-column-->
 <!--        prop="verificationConclusion"-->
 <!--        header-align="center"-->
@@ -318,6 +433,24 @@
   export default {
     data () {
       return {
+        //查询参数
+        queryParams:{
+          issueCategoryId: '',
+          vehicleTypeId: '',
+          responsibleDepartment: '',
+        },
+        issueCategoryOptions: [],
+        vehicleTypeOptions: [],
+        departmentOptions: [
+          { value: '财务科', label: '财务科' },
+          { value: '市场科', label: '市场科' },
+          { value: '安环科', label: '安环科' },
+          { value: '生产科', label: '生产科' },
+          { value: '供应科', label: '供应科' },
+          { value: '技术科', label: '技术科' },
+          { value: '企管科', label: '企管科' }
+          // 其他科室选项
+        ],
         tableData: [],
         dataForm: {
           key: ''
@@ -336,6 +469,12 @@
           inProgressCount: 0,
           reviewingCount: 0,
         },
+        dialogVisible: false, // 控制对话框显示
+        fullDescription: '' ,   // 用于存储完整描述
+        dialogVisible1: false, // 控制对话框显示
+        fullCause: '',    // 用于存储完整描述
+        dialogVisible2: false,
+        fullRetStates:'',
       }
 
     },
@@ -343,6 +482,8 @@
       AddOrUpdate
     },
     activated () {
+      this.fetchIssueCategories()
+      this.fetchVehicleTypes()
       this.getDataList()
       this.fetchData()
     },
@@ -414,10 +555,30 @@
         myChart.setOption(option);
       }
       ,
-      previewImage (imageUrl) {
-        console.log("cur imageUrl====>" + imageUrl);
-        window.open(imageUrl);
-        console.log("图片地址：" ,imageUrl)
+      // previewImage (imageUrl) {
+      //   const token = localStorage.getItem('token');
+      //   console.log("cur imageUrl====>" + imageUrl);
+      //   window.open(imageUrl + '?token' + '03fa820c47519bd3e2f845b9f720fa96');
+      //   console.log("图片地址：" ,imageUrl)
+      // },
+      previewImage(imageUrl) {
+        // 获取当前的 token，假设它存储在 localStorage 中
+        const token = this.$cookie.get('token');
+        if (token) {
+          console.log('Token found:', token);
+        } else {
+          console.error('Token not found!');
+        }
+
+        // 将 token 作为参数添加到 URL
+        const imageUrlWithToken = `${imageUrl}?token=${token}`;
+
+        console.log("cur imageUrl====>", imageUrlWithToken);
+
+        // 打开包含 token 的图片地址
+        window.open(imageUrlWithToken);
+
+        console.log("图片地址：", imageUrlWithToken);
       },
       getRowClassName({ row, rowIndex }) {
         console.log(`Row index: ${rowIndex}, Class: ${rowIndex % 2 === 0 ? 'row-even' : 'row-odd'}`);
@@ -539,6 +700,51 @@
           this.dataListLoading = false
         })
       },
+      getQueryList () {
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/Querylist'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'issueCategoryId': this.queryParams.issueCategoryId,
+            'vehicleTypeId': this.queryParams.vehicleTypeId,
+            'responsibleDepartment': this.queryParams.responsibleDepartment,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList = data.page.list.map(item => {
+              // 确保图片路径有效
+              if (!item.issuePhoto || !this.isValidImageUrl(item.issuePhoto)) {
+                item.issuePhoto = '默认图片路径' // 设置默认图片路径
+              }
+              return item
+            })
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
+      },
+      //重置
+      resetQuery() {
+        this.queryParams = {
+          indicatorName: null,
+          indicatorValue: null,
+          yearMonth: null,
+          indicatorValueUpperBound: null,
+          indicatorValueLowerBound: null,
+          assessmentDepartment: null,
+          managementDepartment: null,
+          indicatorDefinition: null,
+          indicatorClassification: null,
+          managementContentCurrentAnalysis: null,
+        }
+        this.getDataList()
+      },
       isValidImageUrl (url) {
         // 简单的URL验证，可以根据需要扩展
         return url && (url.startsWith('http://') || url.startsWith('https://'))
@@ -594,7 +800,82 @@
             }
           })
         })
-      }
+      },
+      truncateDescription(description) {
+        if (!description) return '';
+        return description.length > 20 ? description.slice(0, 20) : description;
+      },
+
+      showFullDescription(description) {
+        this.fullDescription = description; // 存储完整描述
+        this.dialogVisible = true; // 显示对话框
+      },
+      // 新增的完整原因分析显示方法
+      showFullCauseAnalysis(causeAnalysis) {
+        this.fullCause = causeAnalysis; // 存储原因分析完整描述
+        this.dialogVisible1 = true; // 显示对话框
+      },
+      // 新增显示整改验证情况的完整方法
+      showFullRectificationStatus(rectificationVerificationStatus) {
+        this.fullRetStates = rectificationVerificationStatus; // 存储整改验证情况完整描述
+        this.dialogVisible2 = true; // 显示对话框
+      },
+      fetchIssueCategories () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetypetable/issuestype'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // console.log('Successfully fetched issue categories:', data.category)
+            this.issueCategoryOptions = data.category.map(category => ({
+              value: category.concreteIssueCategory,
+              label: category.concreteIssueCategory
+            }))
+          } else {
+            console.error('Failed to fetch issue categories:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the issue categories!', error)
+        })
+      },
+      fetchVehicleTypes () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuecartypetable/carname'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // console.log('Successfully fetched vehicle types:', data.carType)
+            this.vehicleTypeOptions = data.carType.map(carType => ({
+              value: carType.concreteVehicleType,
+              label: carType.concreteVehicleType
+            }))
+          } else {
+            console.error('Failed to fetch vehicle types:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the vehicle types!', error)
+        })
+      },
+      downloadTemplate() {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/generateTemplate'), // 替换为实际的下载模板API
+          method: 'get',
+          responseType: 'blob', // 设置响应类型为blob以便下载文件
+        }).then(response => {
+          const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }); // 设置blob类型
+          const link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob); // 创建Object URL
+          link.setAttribute('download', 'template.xlsx'); // 设置下载文件名
+          document.body.appendChild(link);
+          link.click(); // 触发下载
+          document.body.removeChild(link); // 下载后移除链接
+        }).catch(error => {
+          this.$message.error('下载模板失败，请重试！');
+          console.error(error);
+        });
+      },
     }
   }
 </script>

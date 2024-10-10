@@ -178,6 +178,24 @@
 
 <template>
   <div class="mod-config">
+    <el-dialog
+      title="整改情况"
+      :visible.sync="dialogVisible"
+      width="400px">
+      <p>{{ fullDescription }}</p>
+    </el-dialog>
+    <el-dialog
+      title="原因分析"
+      :visible.sync="dialogVisible1"
+      width="400px">
+      <p>{{ fullCause }}</p>
+    </el-dialog>
+    <el-dialog
+      title="验证整改情况"
+      :visible.sync="dialogVisible2"
+      width="400px">
+      <p>{{ fullRetStates }}</p>
+    </el-dialog>
     <el-tabs type="border-card">
 
       <!-- 问题添加 Tab Pane -->
@@ -264,7 +282,7 @@
             align="center"
             label="问题照片">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
+              <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
             </template>
           </el-table-column>
           <el-table-column
@@ -383,7 +401,7 @@
               align="center"
               label="问题照片">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
+                <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
               </template>
             </el-table-column>
             <el-table-column
@@ -404,17 +422,47 @@
               align="center"
               label="责任科室">
             </el-table-column>
+<!--            <el-table-column-->
+<!--              prop="causeAnalysis"-->
+<!--              header-align="center"-->
+<!--              align="center"-->
+<!--              label="原因分析">-->
+<!--            </el-table-column>-->
             <el-table-column
               prop="causeAnalysis"
               header-align="center"
               align="center"
               label="原因分析">
+              <template slot-scope="scope">
+                <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
+      <span v-if="scope.row.causeAnalysis.length > 8">
+        {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+      </span>
+                  <span v-else>
+        {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+      </span>
+                </div>
+              </template>
             </el-table-column>
+<!--            <el-table-column-->
+<!--              prop="rectificationStatus"-->
+<!--              header-align="center"-->
+<!--              align="center"-->
+<!--              label="整改情况">-->
+<!--            </el-table-column>-->
             <el-table-column
               prop="rectificationStatus"
               header-align="center"
               align="center"
               label="整改情况">
+              <template slot-scope="scope">
+                <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullDescription(scope.row.rectificationStatus)">
+                  {{ truncateDescription(scope.row.rectificationStatus) }}
+                  <span v-if="scope.row.rectificationStatus.length > 20">
+        <strong>...</strong> <!-- 将省略号加粗 -->
+      </span>
+                </div>
+              </template>
             </el-table-column>
             <el-table-column
               prop="actualCompletionTime"
@@ -428,7 +476,7 @@
               align="center"
               label="整改照片交付物">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">下载</el-button>
+                <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">预览</el-button>
               </template>
             </el-table-column>
             <el-table-column
@@ -551,7 +599,7 @@
               align="center"
               label="问题照片">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">下载</el-button>
+                <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
               </template>
             </el-table-column>
             <!--      <el-table-column-->
@@ -578,17 +626,47 @@
               align="center"
               label="责任科室">
             </el-table-column>
+<!--            <el-table-column-->
+<!--              prop="causeAnalysis"-->
+<!--              header-align="center"-->
+<!--              align="center"-->
+<!--              label="原因分析">-->
+<!--            </el-table-column>-->
             <el-table-column
               prop="causeAnalysis"
               header-align="center"
               align="center"
               label="原因分析">
+              <template slot-scope="scope">
+                <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
+      <span v-if="scope.row.causeAnalysis.length > 8">
+        {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+      </span>
+                  <span v-else>
+        {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+      </span>
+                </div>
+              </template>
             </el-table-column>
+<!--            <el-table-column-->
+<!--              prop="rectificationStatus"-->
+<!--              header-align="center"-->
+<!--              align="center"-->
+<!--              label="整改情况">-->
+<!--            </el-table-column>-->
             <el-table-column
               prop="rectificationStatus"
               header-align="center"
               align="center"
               label="整改情况">
+              <template slot-scope="scope">
+                <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullDescription(scope.row.rectificationStatus)">
+                  {{ truncateDescription(scope.row.rectificationStatus) }}
+                  <span v-if="scope.row.rectificationStatus.length > 20">
+        <strong>...</strong> <!-- 将省略号加粗 -->
+      </span>
+                </div>
+              </template>
             </el-table-column>
             <el-table-column
               prop="actualCompletionTime"
@@ -602,7 +680,7 @@
               align="center"
               label="整改照片交付物">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">下载</el-button>
+                <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">预览</el-button>
               </template>
             </el-table-column>
             <el-table-column
@@ -665,11 +743,27 @@
             <!--        align="center"-->
             <!--        label="创建时长">-->
             <!--      </el-table-column>-->
+<!--            <el-table-column-->
+<!--              prop="rectificationVerificationStatus"-->
+<!--              header-align="center"-->
+<!--              align="center"-->
+<!--              label="整改验证情况">-->
+<!--            </el-table-column>-->
             <el-table-column
               prop="rectificationVerificationStatus"
               header-align="center"
               align="center"
               label="整改验证情况">
+              <template slot-scope="scope">
+                <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">
+      <span v-if="scope.row.rectificationVerificationStatus.length > 50">
+        {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+      </span>
+                  <span v-else>
+        {{ scope.row.rectificationVerificationStatus }} <!-- 显示完整描述 -->
+      </span>
+                </div>
+              </template>
             </el-table-column>
             <el-table-column
               prop="verificationConclusion"
@@ -772,7 +866,13 @@ export default {
       assertOrUpdateVisible: false,
       imagePreviewVisible: false, // 图片预览对话框显示控制
       imagePreviewUrl: '', // 图片预览URL
-      imagePreviewTitle: '' // 图片预览标题
+      imagePreviewTitle: '', // 图片预览标题
+      dialogVisible: false, // 控制对话框显示
+      fullDescription: '' ,   // 用于存储完整描述
+      dialogVisible1: false, // 控制对话框显示
+      fullCause: '',    // 用于存储完整描述
+      dialogVisible2: false,
+      fullRetStates:'',
     }
   },
   components: {
@@ -935,10 +1035,24 @@ export default {
       })
     },
     //图片预览
-    previewImage (imageUrl) {
-      console.log("cur imageUrl====>" + imageUrl);
-      window.open(imageUrl);
-      console.log("图片地址：" ,imageUrl)
+    previewImage(imageUrl) {
+      // 获取当前的 token，假设它存储在 localStorage 中
+      const token = this.$cookie.get('token');
+      if (token) {
+        console.log('Token found:', token);
+      } else {
+        console.error('Token not found!');
+      }
+
+      // 将 token 作为参数添加到 URL
+      const imageUrlWithToken = `${imageUrl}?token=${token}`;
+
+      console.log("cur imageUrl====>", imageUrlWithToken);
+
+      // 打开包含 token 的图片地址
+      window.open(imageUrlWithToken);
+
+      console.log("图片地址：", imageUrlWithToken);
     },
     // previewImage(imageUrl) {
     //   console.log("cur imageUrl====>", imageUrl);
@@ -1013,6 +1127,25 @@ export default {
           }
         })
       })
+    },
+    truncateDescription(description) {
+      if (!description) return '';
+      return description.length > 20 ? description.slice(0, 20) : description;
+    },
+
+    showFullDescription(description) {
+      this.fullDescription = description; // 存储完整描述
+      this.dialogVisible = true; // 显示对话框
+    },
+    // 新增的完整原因分析显示方法
+    showFullCauseAnalysis(causeAnalysis) {
+      this.fullCause = causeAnalysis; // 存储原因分析完整描述
+      this.dialogVisible1 = true; // 显示对话框
+    },
+    // 新增显示整改验证情况的完整方法
+    showFullRectificationStatus(rectificationVerificationStatus) {
+      this.fullRetStates = rectificationVerificationStatus; // 存储整改验证情况完整描述
+      this.dialogVisible2 = true; // 显示对话框
     }
   }
 }

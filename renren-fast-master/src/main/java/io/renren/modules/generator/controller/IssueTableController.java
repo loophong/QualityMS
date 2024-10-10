@@ -7,6 +7,7 @@ import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.entity.IssueUtils;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.generator.service.MinioService;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -147,6 +149,47 @@ public class IssueTableController {
     }
 
     /**
+     * Excel模板下载
+     */
+    @GetMapping("/generateTemplate")
+    @RequiresPermissions("generator:issuetable:list")
+    public void generateTemplate(HttpServletResponse response) {
+        try {
+            Workbook workbook = issueTableService.generateTemplate(); // 调用服务层生成模板
+
+            // 设置响应头
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=IssueTableTemplate.xlsx");
+
+            // 写入Excel到响应
+            ServletOutputStream outputStream = response.getOutputStream();
+            workbook.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+            workbook.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+    /**
+     * 关联相关任务
+     */
+    @RequestMapping("/connection")
+    @RequiresPermissions("generator:issuetable:list")
+    public R connectionIssue(@RequestBody Map<String, Long> params) {
+        Long issueId = params.get("issueId");
+        if (issueId == null) {
+            return R.error("缺少参数: issueId");
+        }
+        System.out.println("获取的issueId ："+issueId);
+        issueTableService.connectionIssue(issueId);
+        return R.ok();
+
+    }
+
+    /**
      * 关闭相关任务
      */
     // 关闭相关任务
@@ -220,7 +263,15 @@ public class IssueTableController {
             return R.error("未找到相关任务信息");
         }
     }
-
+    /**
+     * 查询列表
+     */
+    @RequestMapping("/Querylist")
+    @RequiresPermissions("generator:issuetable:list")
+    public R Querylist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueTableService.QueryPage(params);
+        return R.ok().put("page", page);
+    }
 
     /**
      * 列表

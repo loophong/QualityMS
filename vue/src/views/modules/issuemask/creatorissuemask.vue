@@ -47,6 +47,12 @@
         label="审核人">
       </el-table-column>
       <el-table-column
+        prop="reviewerOpinion"
+        header-align="center"
+        align="center"
+        label="审核意见">
+      </el-table-column>
+      <el-table-column
         prop="recipients"
         header-align="center"
         align="center"

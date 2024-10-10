@@ -599,6 +599,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         fieldDescriptionMap.put("rectificationVerificationStatus", "整改验证情况");
         fieldDescriptionMap.put("verificationConclusion", "验证结论");
         fieldDescriptionMap.put("verifier", "验证人");
+        fieldDescriptionMap.put("formula", "公式");
 
         // 只写入需要的字段
         for (Field field : fields) {

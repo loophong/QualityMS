@@ -336,6 +336,7 @@ public class IssueTableController {
     @RequestMapping("/delete")
     @RequiresPermissions("generator:issuetable:delete")
     public R delete(@RequestBody Integer[] issueIds){
+        issueTableService.removeAll(issueIds);
 		issueTableService.removeByIds(Arrays.asList(issueIds));
 
         return R.ok();

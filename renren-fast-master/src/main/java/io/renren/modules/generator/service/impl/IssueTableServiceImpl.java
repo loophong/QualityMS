@@ -612,8 +612,10 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                     fieldName.equals("rectificationPhotoDeliverable") ||
                     fieldName.equals("reviewers") ||
                     fieldName.equals("level") ||
-                    fieldName.equals("state") ||
-                    fieldName.equals("formula")) {
+                    fieldName.equals("state")
+//                    ||
+//                    fieldName.equals("formula")
+            ) {
                 continue; // 不写入这些字段的标题
             }
 
@@ -624,6 +626,37 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         }
 
         return workbook; // 返回生成的工作簿
+    }
+
+    @Override
+    public void removeAll(Integer[] issueIds) {
+        // 1. 查询所有关联的问题编号
+        List<String> issueNumbers = new ArrayList<>();
+
+        // 根据 issueIds 获取所有对应的 IssueTableEntity
+        List<IssueTableEntity> issues = this.listByIds(Arrays.asList(issueIds));
+        for (IssueTableEntity issue : issues) {
+            issueNumbers.add(issue.getIssueNumber());
+        }
+        // 2. 根据问题编号查找任务表
+        // 创建查询条件
+        QueryWrapper<IssueMaskTableEntity> taskQueryWrapper = new QueryWrapper<>();
+        taskQueryWrapper.in("issue_number", issueNumbers); // 根据问题编号查询
+
+        // 获取任务列表
+        List<IssueMaskTableEntity> tasksToDelete = issueMaskTableDao.selectList(taskQueryWrapper);
+        // 3. 删除任务
+        if (!tasksToDelete.isEmpty()) {
+            List<Integer> taskIdsToDelete = tasksToDelete.stream()  // 将 List<Long> 修改为 List<Integer>
+                    .map(IssueMaskTableEntity::getIssuemaskId) // 使用 getIssuemaskId() 方法获取任务 ID
+                    .collect(Collectors.toList());
+            issueMaskTableDao.deleteBatchIds(taskIdsToDelete); // 批量删除任务
+            System.out.println("已成功删除任务 ID: " + taskIdsToDelete);
+        } else {
+            System.out.println("没有找到与给定问题编号关联的任务");
+        }
+
+
     }
 
 

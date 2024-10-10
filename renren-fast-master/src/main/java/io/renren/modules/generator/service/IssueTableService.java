@@ -45,5 +45,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     void connectionIssue(Long issueId);
 
     Workbook generateTemplate(); // 声明生成模板的方法
+
+    void removeAll(Integer[] issueIds);
 }
 

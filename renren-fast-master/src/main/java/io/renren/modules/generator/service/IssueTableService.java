@@ -21,6 +21,7 @@ import java.util.Map;
 public interface IssueTableService extends IService<IssueTableEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+    PageUtils queryPagecreator(Map<String, Object> params);
     PageUtils QueryPage(Map<String, Object> params);
     List<IssueTableEntity> listAll();
     String saveUploadedFile(MultipartFile file) throws IOException;

@@ -35,6 +35,27 @@ public class UploadController {
     @PostMapping("/upload")
     public Map<String,Object> fileupload(MultipartFile file, HttpServletRequest req) {
         Map<String, Object> result = new HashMap<>();
+//        // 使用项目内部路径
+//        String uploadPath = "C:\\Users\\uploads\\"; // 请根据实际路径调节
+//        // 或者使用用户目录
+//        // String uploadPath = "C:\\Users\\YourUsername\\uploads\\";
+//        // 或公共文件夹
+//        // String uploadPath = "C:\\Users\\Public\\uploads\\";
+//
+//        SimpleDateFormat sdf = new SimpleDateFormat("/yyyy/MM/dd/");
+//        String format = sdf.format(new Date());
+//        String realPath = uploadPath + format;
+//
+//        File folder = new File(realPath);
+//        if (!folder.exists()) {
+//            boolean isCreated = folder.mkdirs(); // 创建目录
+//            if (isCreated) {
+//                System.out.println("文件夹创建成功: " + realPath);
+//            } else {
+//                System.out.println("文件夹创建失败: " + realPath);
+//                return R.error("文件夹创建失败，请检查路径权限");
+//            }
+//        }
         String format = sdf.format(new Date());
         String realPath = req.getServletContext().getRealPath("/") + format;
         System.out.println("cur /test/upload real path===》" + realPath);
@@ -42,10 +63,7 @@ public class UploadController {
         if (!folder.exists()) {
             folder.mkdirs();
         }
-//        File folder = new File(uploadPath);
-//        if (!folder.exists()) {
-//            folder.mkdirs();
-//        }
+
         String oldName = file.getOriginalFilename();
         String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
         try {

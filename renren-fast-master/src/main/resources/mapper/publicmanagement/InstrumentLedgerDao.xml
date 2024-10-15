@@ -24,5 +24,44 @@
         <result property="creatTime" column="creat_time"/>
     </resultMap>
 
+    <insert id="insertinstrumentLedger" parameterType="io.renren.modules.publicmanagement.entity.InstrumentLedgerEntity">
 
-</mapper>
+        INSERT INTO instrument_ledger (
+    company_id,
+    level,
+    calibration_cycle,
+    calibration_status,
+    usage_status,
+    location,
+    responsible_department,
+    user,
+    calibration_date,
+    calibration_validity,
+    calibration_unit,
+    certificate_number,
+    remark,
+    quantity,
+    flag,
+    creat_time
+    ) VALUES (
+    #{companyId},
+    #{level},
+    #{calibrationCycle},
+    #{calibrationStatus},
+    #{usageStatus},
+    #{location},
+    #{responsibleDepartment},
+    #{user},
+    #{calibrationDate},
+    #{calibrationValidity},
+    #{calibrationUnit},
+    #{certificateNumber},
+    #{remark},
+    #{quantity},
+    #{flag},
+    #{creatTime}
+    )
+</insert>
+
+
+        </mapper>

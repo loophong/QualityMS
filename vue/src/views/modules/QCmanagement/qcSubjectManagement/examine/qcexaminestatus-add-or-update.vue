@@ -1,61 +1,66 @@
 <template>
   <el-dialog :title="!dataForm.qcExamineId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
-      label-width="80px">
-      <el-form-item label="审核关联课题" prop="qcExamineSubject">
+      label-width="100px">
+      <!-- <el-form-item label="审核关联课题" prop="qcExamineSubject">
         <el-input v-model="dataForm.qcExamineSubject" placeholder="审核关联课题"></el-input>
-      </el-form-item>
-      <el-form-item label="审核进行步骤" prop="qcExamineCurrent">
-        <el-input v-model="dataForm.qcExamineCurrent" placeholder="审核进行步骤"></el-input>
-      </el-form-item>
-      <el-form-item label="课题提交状态" prop="qcStatusOne">
+      </el-form-item> -->
+      <!-- <el-form-item label="当前待审核步骤" prop="qcExamineCurrent">
+        <el-input v-model="dataForm.qcExamineCurrent" placeholder="当前待审核步骤"></el-input>
+      </el-form-item> -->
+      <!-- <el-form-item label="课题提交状态" prop="qcStatusOne">
         <el-input v-model="dataForm.qcStatusOne" placeholder="课题提交状态"></el-input>
-      </el-form-item>
-      <el-form-item label="成果认定状态" prop="qcStatusTwo">
+      </el-form-item> -->
+      <!-- <el-form-item label="成果认定状态" prop="qcStatusTwo">
         <el-input v-model="dataForm.qcStatusTwo" placeholder="成果认定状态"></el-input>
-      </el-form-item>
-      <el-form-item label="相关方审核状态" prop="qcStatusThree">
+      </el-form-item> -->
+      <!-- <el-form-item label="相关方审核状态" prop="qcStatusThree">
         <el-input v-model="dataForm.qcStatusThree" placeholder="相关方审核状态"></el-input>
-      </el-form-item>
-      <el-form-item label="成果初评状态" prop="qcStatusFour">
+      </el-form-item> -->
+      <!-- <el-form-item label="成果初评状态" prop="qcStatusFour">
         <el-input v-model="dataForm.qcStatusFour" placeholder="成果初评状态"></el-input>
-      </el-form-item>
-      <el-form-item label="成果复评状态" prop="qcStatusFive">
+      </el-form-item> -->
+      <!-- <el-form-item label="成果复评状态" prop="qcStatusFive">
         <el-input v-model="dataForm.qcStatusFive" placeholder="成果复评状态"></el-input>
-      </el-form-item>
-      <el-form-item label="财务部审核状态" prop="qcStatusSix">
+      </el-form-item> -->
+      <!-- <el-form-item label="财务部审核状态" prop="qcStatusSix">
         <el-input v-model="dataForm.qcStatusSix" placeholder="财务部审核状态"></el-input>
-      </el-form-item>
-      <el-form-item label="终评提交状态" prop="qcStatusSeven">
+      </el-form-item> -->
+      <!-- <el-form-item label="终评提交状态" prop="qcStatusSeven">
         <el-input v-model="dataForm.qcStatusSeven" placeholder="终评提交状态"></el-input>
-      </el-form-item>
-      <el-form-item label="" prop="qcSevenContent">
-        <el-input v-model="dataForm.qcSevenContent" placeholder=""></el-input>
-      </el-form-item>
-      <el-form-item label="" prop="qcSixContent">
-        <el-input v-model="dataForm.qcSixContent" placeholder=""></el-input>
-      </el-form-item>
-      <el-form-item label="" prop="qcFiveContent">
-        <el-input v-model="dataForm.qcFiveContent" placeholder=""></el-input>
-      </el-form-item>
-      <el-form-item label="成果复评分数" prop="qcSecondScore">
-        <el-input v-model="dataForm.qcSecondScore" placeholder="成果复评分数"></el-input>
-      </el-form-item>
-      <el-form-item label="" prop="qcFourContent">
-        <el-input v-model="dataForm.qcFourContent" placeholder=""></el-input>
-      </el-form-item>
+      </el-form-item> -->
+      <!-- <el-form-item label="终评审核意见" prop="qcSevenContent">
+        <el-input v-model="dataForm.qcSevenContent" placeholder="终评审核意见"></el-input>
+      </el-form-item> -->
+      <!-- <el-form-item label="财务部审核意见" prop="qcSixContent">
+        <el-input v-model="dataForm.qcSixContent" placeholder="财务部审核意见"></el-input>
+      </el-form-item> -->
+      <!-- <el-form-item label="成果复评审核意见" prop="qcFiveContent">
+        <el-input v-model="dataForm.qcFiveContent" placeholder="成果复评审核意见"></el-input>
+      </el-form-item> -->
+      <div style="color:#ce9178;">
+        请直接修改数字，不要修改格式
+      </div>
+      <br>
       <el-form-item label="成果初评分数" prop="qcFirstScore">
         <el-input v-model="dataForm.qcFirstScore" placeholder="成果初评分数"></el-input>
       </el-form-item>
-      <el-form-item label="" prop="qcThreeContent">
-        <el-input v-model="dataForm.qcThreeContent" placeholder=""></el-input>
+      <!-- <el-form-item label="成果初评审核意见" prop="qcFourContent">
+        <el-input v-model="dataForm.qcFourContent" placeholder="成果初评审核意见"></el-input>
+      </el-form-item> -->
+      <el-form-item label="成果复评分数" prop="qcSecondScore">
+        <el-input v-model="dataForm.qcSecondScore" placeholder="成果复评分数"></el-input>
       </el-form-item>
-      <el-form-item label="" prop="qcTwoContent">
-        <el-input v-model="dataForm.qcTwoContent" placeholder=""></el-input>
-      </el-form-item>
-      <el-form-item label="成果认定审核意见" prop="qcOneContent">
+
+      <!-- <el-form-item label="相关方审核意见" prop="qcThreeContent">
+        <el-input v-model="dataForm.qcThreeContent" placeholder="相关方审核意见"></el-input>
+      </el-form-item> -->
+      <!-- <el-form-item label="成果认定审核意见" prop="qcTwoContent">
+        <el-input v-model="dataForm.qcTwoContent" placeholder="成果初评审核意见"></el-input>
+      </el-form-item> -->
+      <!-- <el-form-item label="成果认定审核意见" prop="qcOneContent">
         <el-input v-model="dataForm.qcOneContent" placeholder="成果认定审核意见"></el-input>
-      </el-form-item>
+      </el-form-item> -->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -91,60 +96,7 @@ export default {
         qcOneContent: ''
       },
       dataRule: {
-        qcExamineSubject: [
-          { required: true, message: '审核关联课题不能为空', trigger: 'blur' }
-        ],
-        qcExamineCurrent: [
-          { required: true, message: '审核进行步骤不能为空', trigger: 'blur' }
-        ],
-        qcStatusOne: [
-          { required: true, message: '课题提交状态不能为空', trigger: 'blur' }
-        ],
-        qcStatusTwo: [
-          { required: true, message: '成果认定状态不能为空', trigger: 'blur' }
-        ],
-        qcStatusThree: [
-          { required: true, message: '相关方审核状态不能为空', trigger: 'blur' }
-        ],
-        qcStatusFour: [
-          { required: true, message: '成果初评状态不能为空', trigger: 'blur' }
-        ],
-        qcStatusFive: [
-          { required: true, message: '成果复评状态不能为空', trigger: 'blur' }
-        ],
-        qcStatusSix: [
-          { required: true, message: '财务部审核状态不能为空', trigger: 'blur' }
-        ],
-        qcStatusSeven: [
-          { required: true, message: '终评提交状态不能为空', trigger: 'blur' }
-        ],
-        qcSevenContent: [
-          { required: true, message: '不能为空', trigger: 'blur' }
-        ],
-        qcSixContent: [
-          { required: true, message: '不能为空', trigger: 'blur' }
-        ],
-        qcFiveContent: [
-          { required: true, message: '不能为空', trigger: 'blur' }
-        ],
-        qcSecondScore: [
-          { required: true, message: '成果复评分数不能为空', trigger: 'blur' }
-        ],
-        qcFourContent: [
-          { required: true, message: '不能为空', trigger: 'blur' }
-        ],
-        qcFirstScore: [
-          { required: true, message: '成果初评分数不能为空', trigger: 'blur' }
-        ],
-        qcThreeContent: [
-          { required: true, message: '不能为空', trigger: 'blur' }
-        ],
-        qcTwoContent: [
-          { required: true, message: '不能为空', trigger: 'blur' }
-        ],
-        qcOneContent: [
-          { required: true, message: '成果认定审核意见不能为空', trigger: 'blur' }
-        ]
+
       }
     }
   },
@@ -156,7 +108,7 @@ export default {
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.qcExamineId) {
           this.$http({
-            url: this.$http.adornUrl(`/indicator/qcexaminestatus/info/${this.dataForm.qcExamineId}`),
+            url: this.$http.adornUrl(`/qcManagement/examineStatus/info/${this.dataForm.qcExamineId}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
@@ -189,7 +141,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.$http({
-            url: this.$http.adornUrl(`/indicator/qcexaminestatus/${!this.dataForm.qcExamineId ? 'save' : 'update'}`),
+            url: this.$http.adornUrl(`/qcManagement/examineStatus/${!this.dataForm.qcExamineId ? 'save' : 'update'}`),
             method: 'post',
             data: this.$http.adornData({
               'qcExamineId': this.dataForm.qcExamineId || undefined,

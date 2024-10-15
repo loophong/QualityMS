@@ -28,7 +28,7 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
     List<QcGroupMemberEntity> getMembersOfGroup(@Param("groupName") String groupName);
 
     //模糊查询
-    public List<QcSubjectRegistrationEntity> fuzzyQueryList(@Param("topicName") String topicName, @Param("keywords") String keywords);
+    List<QcSubjectRegistrationEntity> fuzzyQueryList(@Param("topicName") String topicName, @Param("keywords") String keywords);
 
     //统计已注册课题数
     @Select({
@@ -44,6 +44,13 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
             "WHERE result_type  != null|| result_type != ''",
     })
     Integer countSubmitted();
-
+    //计算课题活动状态
+//    @Select({
+//            "SELECT *",
+//            "FROM qc_subject_registration",
+//            "WHERE topic_review_status = 3",
+//
+//    })
+//    List<QcSubjectRegistrationEntity>  getActivity(String charId,String type);
 
 }

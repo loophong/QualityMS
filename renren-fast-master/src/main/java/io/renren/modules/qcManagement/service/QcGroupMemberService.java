@@ -3,6 +3,7 @@ package io.renren.modules.qcManagement.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.Map;
 
@@ -16,5 +17,10 @@ import java.util.Map;
 public interface QcGroupMemberService extends IService<QcGroupMemberEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+
+    PageUtils myQueryPage(Map<String, Object> params,String username);
+
+
 }
 

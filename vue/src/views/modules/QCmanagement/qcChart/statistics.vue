@@ -1,14 +1,18 @@
 <template>
-  <div style="display: flex;">
-    <div id="barChart" ref="barChart" style="width: 50%; height: 300px;"></div>
-    <div id="pieChart" ref="pieChart" style="width: 50%; height: 300px;"></div>
+  <div>
+    <qc-all-count @allCount="handleEvent"></qc-all-count>
+    <div style="display: flex;">
+      <div id="barChart" ref="barChart" style="width: 50%; height: 300px;"></div>
+      <div id="pieChart" ref="pieChart" style="width: 50%; height: 300px;"></div>
+      <div id="pieChart2" ref="pieChart2" style="width: 50%; height: 300px;"></div>
+    </div>
   </div>
 </template>
 
 <script>
 import * as echarts from 'echarts';
 import moment from 'moment';
-
+import qcAllCount from './qcAllCount'
 export default {
   data() {
     return {
@@ -26,11 +30,38 @@ export default {
       chartData: [], // 存放格式化后的数据
       parsedData: {},
       activityData: {},
+      stageNumData: {},
       activityDataResult: '',
       countData: {},
+      stepResult: {
+        chooseTopic: 0,
+        currentSituation: 0,
+        setGoals: 0,
+        causeAnalysis: 0,
+        reasonInsure: 0,
+        developCountermeasures: 0,
+        implementationCountermeasures: 0,
+        checkEffectiveness: 0,
+        consolidationMeasures: 0,
+        summary: 0,
+        reliabilityAnalysis: 0,
+        insureBest: 0,
+        standardization: 0,
+      },
+      //获奖情况统计
+      scoreResult: {
+        first: 0,
+        second: 0,
+        third: 0,
+        fourth: 0,
+        fifth: 0,
+      },
       allCount: '',
       currentCount: '',
     }
+  },
+  components: {
+    qcAllCount
   },
   computed: {},
   async mounted() {
@@ -38,11 +69,17 @@ export default {
     this.myChart = echarts.init(document.getElementById('barChart'))
     this.updateChart()
     this.myChart2 = echarts.init(document.getElementById('pieChart'))
-    this.pieChart()
+    this.pieChart() //课题阶段分布
+    this.myChart3 = echarts.init(document.getElementById('pieChart2'))
+    this.pieChart2() //课题获奖分布
   },
   methods: {
+    handleEvent(data) {
+      this.allCount = data
+    },
     async initData() {
       this.chartLoading = true
+      //QC小组活动率
       await this.$http({
         url: this.$http.adornUrl('/qcMembers/qcGroupMember/activityRate'),
         method: 'get',
@@ -79,15 +116,85 @@ export default {
           this.currentCount = data.result.registrationPeopleNumbers
           this.chartLoading = false
         })
-
+      //各阶段个数
       await this.$http({
-        url: this.$http.adornUrl('/qcManagement/qcAllCount/list'),
+        url: this.$http.adornUrl('/qcSubject/registration/list'),
         method: 'get',
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.stageNumData = data.page.list.filter(item => item.topicReviewStatus === 3);
+          this.stageNumData.forEach(item => {
+            if (item.topicActivityStatus == '1') {
+              if (item.topicType == '问题解决型') {
+                this.stepResult.currentSituation++
+              } else {
+                this.stepResult.setGoals++
+              }
+            } else if (item.topicActivityStatus == '2') {
+              if (item.topicType == '创新型') {
+                this.stepResult.insureBest++
+              } else if (item.topicType == '问题解决型') {
+                this.stepResult.setGoals++
+              } else if (item.topicType == '问题解决型(指令型)') {
+                this.stepResult.reliabilityAnalysis++
+              }
+            } else if (item.topicActivityStatus == '3') {
+              if (item.topicType == '创新型') {
+                this.stepResult.developCountermeasures++
+              } else {
+                this.stepResult.causeAnalysis++
+              }
+            } else if (item.topicActivityStatus == '4') {
+              if (item.topicType == '创新型') {
+                this.stepResult.implementationCountermeasures++
+              } else {
+                this.stepResult.reasonInsure++
+              }
+            } else if (item.topicActivityStatus == '5') {
+              if (item.topicType == '创新型') {
+                this.stepResult.checkEffectiveness++
+              } else {
+                this.stepResult.developCountermeasures++
+              }
+            } else if (item.topicActivityStatus == '6') {
+              if (item.topicType == '创新型') {
+                this.stepResult.standardization++
+              } else {
+                this.stepResult.implementationCountermeasures++
+              }
+            } else if (item.topicActivityStatus == '7') {
+              if (item.topicType == '创新型') {
+                this.stepResult.summary++
+              } else {
+                this.stepResult.checkEffectiveness++
+              }
+            } else if (item.topicActivityStatus == '8') {
+              this.stepResult.consolidationMeasures++
+            } else if (item.topicActivityStatus == '9') {
+              this.stepResult.summary++
+            } else {
+              this.stepResult.chooseTopic++
+            }
+
+
+          });
+          this.stageNumData.forEach(item => {
+            if (90 < item.topicActivityResult < 100) {
+              this.scoreResult.first++
+            } else if (80 < item.topicActivityResult <= 90) {
+              this.scoreResult.second++
+            } else if (70 < item.topicActivityResult <= 80) {
+              this.scoreResult.third++
+            }
+            else if (60 < item.topicActivityResult <= 70) {
+              this.scoreResult.fourth++
+            }
+          });
+        } else {
+          this.stageNumData = {}
+        }
+        this.chartLoading = false
       })
-        .then(({ data }) => {
-          this.allCount = data.page.list[0].qcMemberCount
-          this.chartLoading = false
-        })
     },
 
 
@@ -261,16 +368,31 @@ export default {
 
       option && myChart.setOption(option);
     },
-
+    //课题阶段分布饼图
     pieChart() {
       console.log(this.countData)
       var chartDom = document.getElementById('pieChart');
       var myChart = echarts.init(chartDom);
       var option;
-
+      let seriesData = [
+        { value: this.stepResult.chooseTopic, name: '选择课题' },
+        { value: this.stepResult.currentSituation, name: '现状调查' },
+        { value: this.stepResult.setGoals, name: '设定目标' },
+        { value: this.stepResult.causeAnalysis, name: '原因分析' },
+        { value: this.stepResult.reasonInsure, name: '要因确定' },
+        { value: this.stepResult.developCountermeasures, name: '制定对策' },
+        { value: this.stepResult.implementationCountermeasures, name: '对策实施' },
+        { value: this.stepResult.checkEffectiveness, name: '检查效果' },
+        { value: this.stepResult.consolidationMeasures, name: '巩固措施' },
+        { value: this.stepResult.reliabilityAnalysis, name: '可靠性分析' },
+        { value: this.stepResult.insureBest, name: '提出方案确定最佳方案' },
+        { value: this.stepResult.standardization, name: '标准化' },
+        { value: this.stepResult.summary, name: '总结和下一步打算' },
+      ]
+      const filteredSeriesData = seriesData.filter(item => item.value !== 0);
       option = {
         title: {
-          text: '课题状态分布',
+          text: '课题阶段状态',
           left: 'center'
         },
         tooltip: {
@@ -283,16 +405,66 @@ export default {
         },
         series: [
           {
-            name: '课题状态',
+            name: '个数',
             type: 'pie',
             radius: '50%',
             center: ['50%', '50%'], // 饼图位置
-            data: [
-              { value: this.countData.countRegistration - this.countData.countSubmitted, name: '进行中' },
-              { value: this.countData.countWithoutExamined, name: '审核中' },
-              { value: this.countData.countExamined, name: '已完成' },
-              { value: this.countData.countRegistration, name: '已注册' },
-            ],
+            data: filteredSeriesData,
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            },
+            label: {
+              show: true,
+              position: 'outside', // 标签位置,inside、outside、top、bottom、left、right
+              formatter: '{b}: {c} ({d}%)'
+            },
+            labelLine: {
+              show: true,
+              smooth: 0.2,
+            }
+          }
+        ]
+      };
+
+      option && myChart.setOption(option);
+    },
+    //课题获奖情况饼图
+    pieChart2() {
+      var chartDom = document.getElementById('pieChart2');
+      var myChart = echarts.init(chartDom);
+      var option;
+      let seriesData = [
+        { value: this.scoreResult.first, name: '一等奖' },
+        { value: this.scoreResult.second, name: '二等奖' },
+        { value: this.scoreResult.third, name: '三等奖' },
+        { value: this.scoreResult.fourth, name: '四等奖' },
+        { value: this.scoreResult.fifth, name: '五等奖' },
+      ]
+      const filteredSeriesData = seriesData.filter(item => item.value !== 0);
+      option = {
+        title: {
+          text: '课题获奖情况',
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: "{a} <br/>{b}: {c} ({d}%)"
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left'
+        },
+        series: [
+          {
+            name: '个数',
+            type: 'pie',
+            radius: '50%',
+            center: ['50%', '50%'], // 饼图位置
+            data: filteredSeriesData,
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -341,6 +513,12 @@ export default {
 }
 
 #pieChart {
+  width: 1000px;
+  height: 600px;
+  margin: 40px auto;
+}
+
+#pieChart2 {
   width: 1000px;
   height: 600px;
   margin: 40px auto;

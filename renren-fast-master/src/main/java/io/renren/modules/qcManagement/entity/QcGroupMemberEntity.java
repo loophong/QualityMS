@@ -47,7 +47,7 @@ public class QcGroupMemberEntity implements Serializable {
 	 */
 	private String education;
 	/**
-	 * 部门
+	 * 单位
 	 */
 	private String department;
 	/**
@@ -55,7 +55,7 @@ public class QcGroupMemberEntity implements Serializable {
 	 */
 	private String position;
 	/**
-	 * 班组
+	 * 小组类型
 	 */
 	private String team;
 	/**
@@ -83,5 +83,13 @@ public class QcGroupMemberEntity implements Serializable {
 	 * 小组名称
 	 */
 	private String groupName;
+	/**
+	 * 注册号
+	 */
+	private String registrationNum;
+	/**
+	 * 小组审核状态
+	 */
+	private String examineStatus;
 
 }

@@ -113,7 +113,7 @@ public class QcSubjectRegistrationEntity implements Serializable {
 	/**
 	 * 课题活动评分结果
 	 */
-	private String topicActivityResult;
+	private Integer topicActivityResult;
 	/**
 	 * 删除标记位
 	 */
@@ -130,5 +130,9 @@ public class QcSubjectRegistrationEntity implements Serializable {
 	 * 关联审核状态id
 	 */
 	private String examineId;
+	/**
+	 * 小组名称
+	 */
+	private String groupName;
 
 }

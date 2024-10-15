@@ -203,28 +203,9 @@ export default {
     },
 
     init(id) {
-      // this.initOptions();
-      console.log(this.groupMemberList)
-      if (this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList)) {
-        // 遍历对象
-        this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
-          return {
-            value: this.groupMemberList[key].groupName,
-            label: this.groupMemberList[key].groupName
-          };
-        });
-      } else if (Array.isArray(this.groupMemberList)) {
-        this.groupNameOptions = this.groupMemberList.map(item => ({
-          value: item.groupName,
-          label: item.groupName
-        }));
-      } else {
-        console.error('this.groupMemberList is neither an array nor an object');
-      }
       this.dataForm.qcsrId = id || 0
       this.visible = true
       this.$nextTick(() => {
-
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.qcsrId) {
           this.$http({
@@ -249,11 +230,49 @@ export default {
               this.dataForm.topicActivityResult = data.qcSubjectRegistration.topicActivityResult
               this.dataForm.deleteFlag = data.qcSubjectRegistration.deleteFlag
               this.dataForm.note = data.qcSubjectRegistration.note
+              this.dataForm.groupName = data.qcSubjectRegistration.groupName
+            }
+            // data.userName
+            console.log(this.groupMemberList)
+            if (this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList)) {
+              // 遍历对象
+              this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
+                if (this.groupMemberList[key].name == data.userName) {
+                  return {
+                    value: this.groupMemberList[key].groupName,
+                    label: this.groupMemberList[key].groupName
+                  };
+                }
+              });
+              const filteredGroupMemberList = Object.entries(this.groupMemberList).reduce((acc, [key, value]) => {
+                if (value.name === data.userName) {
+                  acc[key] = value;
+                }
+                return acc;
+              }, {});
+
+              // 更新 groupNameOptions
+              this.groupNameOptions = Object.keys(filteredGroupMemberList).map(key => ({
+                value: filteredGroupMemberList[key].groupName,
+                label: filteredGroupMemberList[key].groupName
+              }));
+              console.log(this.groupNameOptions)
+            } else if (Array.isArray(this.groupMemberList)) {
+              this.groupNameOptions = this.groupMemberList.map(item => ({
+                value: item.groupName,
+                label: item.groupName
+              }));
+            } else {
+              console.error('this.groupMemberList is neither an array nor an object');
             }
           })
+        } else {
+
         }
       })
+
     },
+
 
     ifUpdate() {
       if (this.dataForm.qcsrId) {
@@ -308,7 +327,7 @@ export default {
                 'topicLeader': this.dataForm.topicLeader,
                 'topicConsultant': `${this.dataForm.topicConsultant}`,
                 'teamNumberIds': `${this.dataForm.teamNumberIds}`,
-                'topicReviewStatus': this.dataForm.topicReviewStatus,
+                'topicReviewStatus': this.dataForm.qcsrId ? this.dataForm.topicReviewStatus : 1,
                 'topicDescription': this.dataForm.topicDescription,
                 'topicType': this.dataForm.topicType,
                 'activityCharacteristics': this.dataForm.activityCharacteristics,
@@ -318,7 +337,8 @@ export default {
                 'topicActivityStatus': this.dataForm.topicActivityStatus,
                 'topicActivityResult': this.dataForm.topicActivityResult,
                 'deleteFlag': this.dataForm.deleteFlag,
-                'note': this.dataForm.note
+                'note': this.dataForm.note,
+                'groupName': this.dataForm.groupName,
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {

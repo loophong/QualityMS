@@ -7,7 +7,7 @@
           <el-form-item v-if="isAdmin" prop="groupName" label="小组名称">
             <el-input v-model="dataForm.groupName" placeholder="请输入小组名称"></el-input>
           </el-form-item>
-          <el-form-item prop="mainName" label="姓名">
+          <el-form-item prop="mainName" label="组长姓名">
             <!-- <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input> -->
             <el-select v-model="dataForm.mainName" placeholder="请选择角色">
               <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
@@ -19,9 +19,19 @@
           <el-form-item prop="number" label="员工编号">
             <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
           </el-form-item>
+          <el-form-item v-if="isAdmin" prop="department" label="单位">
+            <el-input v-model="dataForm.department" placeholder="请输入单位"></el-input>
+          </el-form-item>
+          <el-form-item v-if="isAdmin" prop="team" label="小组类型">
+            <el-select v-model="dataForm.team" placeholder="请选择小组类型">
+              <el-option label="攻关" value="攻关"></el-option>
+              <el-option label="现场" value="现场"></el-option>
+              <el-option label="管理" value="管理"></el-option>
+              <el-option label="服务" value="服务"></el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item v-if="!isAdmin" label="组内角色" prop="roleInTopic">
             <el-select v-model="dataForm.roleInTopic" placeholder="请选择组内角色">
-              <el-option label="组长" value="组长"></el-option>
               <el-option label="成员" value="成员"></el-option>
               <el-option label="顾问" value="顾问"></el-option>
               <el-option label="评审员" value="评审员"></el-option>
@@ -65,7 +75,6 @@
               </el-form-item>
               <el-form-item label="组内角色" prop="roleInTopic">
                 <el-select v-model="member.roleInTopic" placeholder="请选择组内角色">
-                  <el-option label="组长" value="组长"></el-option>
                   <el-option label="成员" value="成员"></el-option>
                   <el-option label="顾问" value="顾问"></el-option>
                   <el-option label="评审员" value="评审员"></el-option>
@@ -84,13 +93,17 @@
       </div>
       <el-form-item>
         <br>
-        <el-button v-if="!dataForm.qcgmId || this.isAddMember" type="primary" @click="addMember">新增成员</el-button>
+
+        <el-button v-if="!dataForm.qcgmId || isAddMember" type="primary" @click="addMember">新增成员</el-button>
       </el-form-item>
     </el-form>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" v-if="!isAddMember" @click="dataFormSubmit()">确定</el-button>
-      <el-button type="primary" v-else @click="dataMembersSubmit()">添加</el-button>
+
+    <span slot="footer">
+      <div v-if="isAddMember" style="color:#e6a23c">点击添加将重置审核状态</div>
+      <br>
+      <el-button class="dialog-footer" @click="visible = false">取消</el-button>
+      <el-button class="dialog-footer" type="primary" v-if="!isAddMember" @click="dataFormSubmit()">确定</el-button>
+      <el-button class="dialog-footer" type="primary" v-else @click="dataMembersSubmit()">添加</el-button>
     </span>
   </el-dialog>
 </template>
@@ -121,6 +134,7 @@ export default {
         groupName: '',
         members: [],
         parentId: '',
+        examineStatus: '',
       },
       editingMember: {
         qcgmId: '',
@@ -192,6 +206,7 @@ export default {
               this.dataForm.groupName = data.qcGroupMember.groupName;
               this.dataForm.parentId = data.qcGroupMember.parentId || '';
               this.dataForm.members = data.qcGroupMember.members || [];
+              this.dataForm.examineStatus = data.qcGroupMember.examineStatus;
             }
           });
         }
@@ -215,9 +230,10 @@ export default {
               'team': this.dataForm.team,
               'participationDate': this.dataForm.participationDate,
               'topic': this.dataForm.topic,
-              'roleInTopic': '管理员',
+              'roleInTopic': '组长',
               'deleteFlag': 0,
-              'groupName': this.dataForm.groupName
+              'groupName': this.dataForm.groupName,
+              'examineStatus': '待审核',
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {
@@ -227,7 +243,11 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false;
-                  this.$emit('refreshDataList');
+                  if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
+                    this.$emit('refreshDataList');
+                  } else {
+                    this.$emit('refreshCommonList');
+                  }
                 }
               });
 
@@ -250,7 +270,8 @@ export default {
                     // 'deleteFlag': member.deleteFlag,
                     'parentId': member.parentId,
                     'deleteFlag': 0,
-                    'groupName': this.dataForm.groupName
+                    'groupName': this.dataForm.groupName,
+                    // 'examineStatus': this.dataForm.qcgmId ? this.dataForm.examineStatus : '待审核',
                   })
                 });
               })).then(responses => {
@@ -267,6 +288,14 @@ export default {
       });
     },
     dataMembersSubmit() {
+      this.$http({
+        url: this.$http.adornUrl(`/qcMembers/qcGroupMember/update`),
+        method: 'post',
+        data: this.$http.adornData({
+          'qcgmId': this.dataForm.qcgmId,
+          'examineStatus': '待审核',
+        })
+      })
       Promise.all(this.dataForm.members.map(member => {
         return this.$http({
           url: this.$http.adornUrl(`/qcMembers/qcGroupMember/${!member.qcgmId ? 'save' : 'update'}`),
@@ -292,7 +321,11 @@ export default {
           duration: 1500,
           onClose: () => {
             this.visible = false;
-            this.$emit('refreshDataList');
+            if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
+              this.$emit('refreshDataList');
+            } else {
+              this.$emit('refreshCommonList');
+            }
           }
         });
       }).catch(error => {

@@ -1,6 +1,6 @@
 <template>
   <el-tabs v-model="activeName" type="border-card">
-    <el-tab-pane label="开题审核" name="1">
+    <el-tab-pane label="开题审核" name="1" v-if="isAuth('qc:first:examine')">
       <div class="mod-config">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
           <el-form-item>
@@ -25,11 +25,11 @@
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
-          <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
-          </el-table-column>
+          <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column> -->
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
           </el-table-column>
-          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员ids">
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
           </el-table-column>
           <el-table-column prop="startDate" header-align="center" align="center" label="开始日期">
           </el-table-column>
@@ -45,12 +45,12 @@
           </el-table-column>
           <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字tag">
           </el-table-column>
-          <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
-          </el-table-column>
-          <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
-          </el-table-column>
+          <!-- <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
+          </el-table-column> -->
+          <!-- <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
+          </el-table-column> -->
           <!-- <el-table-column prop="deleteFlag" header-align="center" align="center" label="删除标记位">
-      </el-table-column> -->
+            </el-table-column> -->
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
           <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
@@ -70,7 +70,7 @@
           </el-table-column>
         </el-table>
         <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-          :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+          :page-sizes="[10, 20, 50, 100]" :page-size="100" :total="totalPage"
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
         <!-- 弹窗, 新增 / 修改 -->
@@ -106,6 +106,7 @@ export default {
   },
   computed: {
     filteredDataList() {
+      this.totalPage = this.dataList.filter(item => item.topicReviewStatus === 2).length
       return this.dataList.filter(item => item.topicReviewStatus === 2);
     }
   },

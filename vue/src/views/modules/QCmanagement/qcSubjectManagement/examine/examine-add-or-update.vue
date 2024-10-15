@@ -57,9 +57,9 @@
       <el-form-item label="课题活动状态" prop="topicActivityStatus">
         <el-input v-model="dataForm.topicActivityStatus" placeholder="课题活动状态" disabled></el-input>
       </el-form-item>
-      <el-form-item label="课题活动评分结果" prop="topicActivityResult">
+      <!-- <el-form-item label="课题活动评分结果" prop="topicActivityResult">
         <el-input v-model="dataForm.topicActivityResult" placeholder="课题活动评分结果"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <!-- <el-form-item label="删除标记位" prop="deleteFlag">
         <el-input v-model="dataForm.deleteFlag" placeholder="删除标记位"></el-input>
       </el-form-item> -->

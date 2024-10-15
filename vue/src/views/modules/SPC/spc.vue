@@ -42,7 +42,7 @@
 
     <div ref="lineChart1" style="width: 1500px;height:300px;"></div>
     <div ref="lineChart2" style="width: 1500px;height:300px;"></div>
-
+    <div ref="lineChart3" style="width: 1500px;height:300px;"></div>
     </div>
   </template>
   
@@ -91,6 +91,7 @@
     mounted() {
     this.initChart1();
     this.initChart2();
+    this.initChart3();
     this.setDefaultChartOptions();
     },
 
@@ -122,8 +123,8 @@
                 series: []
                 });
             }
-            },
-            initChart2() {
+        },
+        initChart2() {
             if (this.$refs.lineChart2) {
                 this.chartInstance2 = echarts.init(this.$refs.lineChart2);
                 this.chartInstance2.setOption({ // 设置默认的图表配置
@@ -140,7 +141,25 @@
                 series: []
                 });
             }
-            },
+        },
+        initChart3() {
+            if (this.$refs.lineChart3) {
+                this.chartInstance3 = echarts.init(this.$refs.lineChart3);
+                this.chartInstance3.setOption({ // 设置默认的图表配置
+                title: {
+                    text: 'P Chart'
+                },
+                tooltip: {},
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: []
+                });
+            }
+        },
 
     /*  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  */
         fileSend() {
@@ -164,6 +183,7 @@
                     // 初始化图表
                     this.updateChart();
                     this.updateChart2();
+                    this.updateChart3();
 
                     // 2秒后关闭上传面板，这里应该根据实际情况来决定是否需要刷新页面
                     setTimeout(() => {
@@ -202,7 +222,7 @@
                     type: 'value'
                 },
                 series: [{
-                    name: '系列1',
+                    name: 'X',
                     data: firstSeriesData,
                     type: 'line'
                 }]
@@ -233,7 +253,7 @@
                 type: 'value'
             },
             series: [{
-                name: '系列2',
+                name: 'R',
                 data: secondSeriesData,
                 type: 'line'
             }]
@@ -244,7 +264,59 @@
         }
         },
 
+        updateChart3() {
 
+            const secondSeriesData3 = this.responseData[3];
+            const secondSeriesData4 = this.responseData[4];
+            const secondSeriesData5 = this.responseData[5];
+            const secondSeriesData6 = this.responseData[6];
+            const xAxisData = Array.from({ length: secondSeriesData3.length }, (_, index) => index);
+            const option = {
+            legend: {
+                data: ['不良率', 'UCL', 'CL', 'LCL'] // 添加图例
+            },
+            title: {
+                text: 'R'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: xAxisData
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                name: '不良率',
+                data: secondSeriesData3,
+                type: 'line'
+            },
+            {
+                name: 'UCL',
+                data: secondSeriesData4,
+                type: 'line'
+            },
+            {
+                name: 'CL',
+                data: secondSeriesData5,
+                type: 'line'
+            },
+            {
+                name: 'LCL',
+                data: secondSeriesData6,
+                type: 'line'
+            }
+            ]
+            };
+            if (this.chartInstance3) {
+                this.chartInstance3.setOption(option);
+            }
+        
+        },
 
 
         handleClose(done) {

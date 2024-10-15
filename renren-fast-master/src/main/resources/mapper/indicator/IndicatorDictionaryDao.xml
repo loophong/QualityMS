@@ -22,6 +22,8 @@
         <result property="indicatorCreatTime" column="indicator_creat_time"/>
         <result property="indicatorState" column="indicator_state"/>
         <result property="indicatorChildNode" column="indicator_child_node"/>
+        <result property="indicatorValueUpperBound" column="indicator_value_upper_bound"/>
+        <result property="indicatorValueLowerBound" column="indicator_value_lower_bound"/>
     </resultMap>
 
 
@@ -30,6 +32,13 @@
             count(1) as counts
         from indicator_dictionary
         group by management_department
+    </select>
+    
+    <select id="countsByClassification" resultType="IndicatorResponseByClassificationEntity">
+        select indicator_classification as indicatorClassification,
+            count(1) as counts
+        from indicator_dictionary
+        group by indicator_classification
     </select>
 
 

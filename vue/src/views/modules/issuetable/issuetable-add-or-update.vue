@@ -1,4 +1,5 @@
 <template>
+  <div>
   <el-dialog
     :title="!dataForm.issueId ? '新增' : '修改'"
     :close-on-click-modal="false"
@@ -100,6 +101,107 @@
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
+  <el-dialog
+    :title="'问题详情'"
+    :close-on-click-modal="false"
+    :visible.sync="visible1">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+<!--      <el-form-item label="序号" prop="serialNumber">-->
+<!--        <el-input v-model="dataForm.serialNumber" readonly></el-input>-->
+<!--      </el-form-item>-->
+      <el-form-item label="问题编号" prop="issueNumber">
+        <el-input v-model="dataForm.issueNumber" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="检查科室" prop="inspectionDepartment">
+        <el-input v-model="dataForm.inspectionDepartment" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="检查日期" prop="inspectionDate">
+        <el-input v-model="dataForm.inspectionDate" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="问题类别" prop="issueCategoryId">
+        <el-input v-model="dataForm.issueCategoryId" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="车型" prop="vehicleTypeId">
+        <el-input v-model="dataForm.vehicleTypeId" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="车号" prop="vehicleNumberId">
+        <el-input v-model="dataForm.vehicleNumberId" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="问题描述" prop="issueDescription">
+        <el-input v-model="dataForm.issueDescription" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="问题照片" prop="issuePhoto">
+        <el-input v-model="dataForm.issuePhoto" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="整改要求" prop="rectificationRequirement">
+        <el-input v-model="dataForm.rectificationRequirement" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="要求完成时间" prop="requiredCompletionTime">
+        <el-input v-model="dataForm.requiredCompletionTime" readonly></el-input>
+      </el-form-item>
+      <el-form-item label="责任科室" prop="responsibleDepartment">
+        <el-input v-model="dataForm.responsibleDepartment" readonly></el-input>
+      </el-form-item>
+<!--      <el-form-item label="整改情况" prop="rectificationStatus">-->
+<!--        <el-input v-model="dataForm.rectificationStatus" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="实际完成时间" prop="actualCompletionTime">-->
+<!--        <el-input v-model="dataForm.actualCompletionTime" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="整改照片交付物" prop="rectificationPhotoDeliverable">-->
+<!--        <el-input v-model="dataForm.rectificationPhotoDeliverable" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
+<!--        <el-input v-model="dataForm.rectificationResponsiblePerson" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="要求二次整改时间" prop="requiredSecondRectificationTime">-->
+<!--        <el-input v-model="dataForm.requiredSecondRectificationTime" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="备注" prop="remark">-->
+<!--        <el-input v-model="dataForm.remark" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="创建人" prop="creator">-->
+<!--        <el-input v-model="dataForm.creator" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="创建时间" prop="creationTime">-->
+<!--        <el-input v-model="dataForm.creationTime" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="最后修改人" prop="lastModifier">-->
+<!--        <el-input v-model="dataForm.lastModifier" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="最后修改时间" prop="lastModificationTime">-->
+<!--        <el-input v-model="dataForm.lastModificationTime" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="关联问题整改记录" prop="associatedRectificationRecords">-->
+<!--        <el-input v-model="dataForm.associatedRectificationRecords" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="关联问题添加" prop="associatedIssueAddition">-->
+<!--        <el-input v-model="dataForm.associatedIssueAddition" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="创建时长" prop="creationDuration">-->
+<!--        <el-input v-model="dataForm.creationDuration" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="原因分析" prop="causeAnalysis">-->
+<!--        <el-input v-model="dataForm.causeAnalysis" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="整改验证情况" prop="rectificationVerificationStatus">-->
+<!--        <el-input v-model="dataForm.rectificationVerificationStatus" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="验证结论" prop="verificationConclusion">-->
+<!--        <el-input v-model="dataForm.verificationConclusion" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="验证人" prop="verifier">-->
+<!--        <el-input v-model="dataForm.verifier" readonly></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="公式" prop="formula">-->
+<!--        <el-input v-model="dataForm.formula" readonly></el-input>-->
+<!--      </el-form-item>-->
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="visible1 = false">关闭</el-button>
+    </span>
+  </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -107,6 +209,7 @@
     data () {
       return {
         visible: false,
+        visible1: false,
         dataForm: {
           issueId: 0,
           serialNumber: '',
@@ -281,6 +384,24 @@
             })
           }
         })
+      },
+      // 新增根据问题编号查询并显示数据的函数
+      showDataByIssueNumber(issueNumber) {
+        this.visible1 = true;
+        this.$nextTick(() => {
+          this.$http({
+            url: this.$http.adornUrl(`/generator/issuetable/infoByIssueNumber/${issueNumber}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              // 将获取的数据填入 dataForm
+              this.dataForm = data.issueTable; // 直接覆盖
+            } else {
+              this.$message.error(data.msg);
+            }
+          });
+        });
       },
       // 表单提交
       dataFormSubmit () {

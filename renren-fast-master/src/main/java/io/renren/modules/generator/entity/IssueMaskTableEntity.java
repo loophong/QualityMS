@@ -37,6 +37,10 @@ public class IssueMaskTableEntity implements Serializable {
 	 */
 	private String reviewers;
 	/**
+	 * 审核意见
+	 */
+	private String reviewerOpinion;
+	/**
 	 * 接收人
 	 */
 	private String recipients;

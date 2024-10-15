@@ -25,6 +25,10 @@
               <el-option label="成员" value="成员"></el-option>
               <el-option label="顾问" value="顾问"></el-option>
               <el-option label="评审员" value="评审员"></el-option>
+              <el-option label="相关方评审员" value="相关方评审员"></el-option>
+              <el-option label="成果初评管理员" value="成果初评管理员"></el-option>
+              <el-option label="财务科评审员" value="财务科评审员"></el-option>
+              <el-option label="成果复评管理员" value="成果复评管理员"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item prop="participationDate" label="参加QC时间">
@@ -65,6 +69,10 @@
                   <el-option label="成员" value="成员"></el-option>
                   <el-option label="顾问" value="顾问"></el-option>
                   <el-option label="评审员" value="评审员"></el-option>
+                  <el-option label="相关方评审员" value="相关方评审员"></el-option>
+                  <el-option label="成果初评管理员" value="成果初评管理员"></el-option>
+                  <el-option label="财务科评审员" value="财务科评审员"></el-option>
+                  <el-option label="成果复评管理员" value="成果复评管理员"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="参加时间" prop="participationDate">

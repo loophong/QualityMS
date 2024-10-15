@@ -28,12 +28,18 @@
         <result property="planLagDays" column="plan_lag_days"/>
         <result property="planLagReasons" column="plan_lag_reasons"/>
         <result property="planAssociatedIndicatorsId" column="plan_associated_Indicators_id"/>
+        <result property="planFile" column="plan_file"/>
     </resultMap>
 
     <select id="getPlansByUserId" resultMap="planMap">
         SELECT * FROM task_management_plan
         WHERE plan_principal = #{userId} or plan_auditor = #{userId}
             or  plan_executor LIKE concat( '%"', #{userId}, '"%' )
+    </select>
+
+    <select id="getPlanLabel" resultType="io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto">
+        SELECT plan_name as label, plan_id as value
+        FROM task_management_plan
     </select>
 
 </mapper>

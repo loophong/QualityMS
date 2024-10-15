@@ -135,6 +135,7 @@
           serialNumber: '',
           issueNumber: '',
           reviewers: '',
+          reviewerOpinion: '',
           recipients: '',
           maskcontent: '',
           creator: '',
@@ -219,6 +220,7 @@
                 // this.dataForm.serialNumber = data.issueMaskTable.serialNumber
                 // this.dataForm.issueNumber = data.issueMaskTable.issueNumber
                 this.dataForm.reviewers = data.issueMaskTable.reviewers
+                this.dataForm.reviewerOpinion = data.issueMaskTable.reviewerOpinion
                 this.dataForm.recipients = data.issueMaskTable.recipients
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
                 // this.dataForm.creator = data.issueMaskTable.creator
@@ -294,6 +296,7 @@
               data: this.$http.adornData({
                 'issuemaskId': this.dataForm.issuemaskId || undefined,
                 'reviewers': this.dataForm.reviewers,
+                'reviewerOpinion': this.dataForm.reviewerOpinion,
                 'recipients': this.dataForm.recipients,
                 'maskcontent': this.dataForm.maskcontent,
                 'requiredCompletionTime': this.dataForm.requiredCompletionTime,
@@ -329,6 +332,7 @@
                 'serialNumber': this.dataForm.serialNumber,
                 'issueNumber': this.dataForm.issueNumber,
                 'reviewers': this.dataForm.reviewers,
+                'reviewerOpinion': this.dataForm.reviewerOpinion,
                 'recipients': this.dataForm.recipients,
                 'maskcontent': this.dataForm.maskcontent,
                 'creator': this.dataForm.creator,
@@ -367,6 +371,7 @@
                 'serialNumber': serialNumber,
                 'issueNumber': this.dataForm.issueNumber,
                 'reviewers': this.dataForm.reviewers,
+                'reviewerOpinion': this.dataForm.reviewerOpinion,
                 'recipients': this.dataForm.recipients,
                 'maskcontent': this.dataForm.maskcontent,
                 'creator': this.dataForm.creator,

@@ -3,6 +3,7 @@ package io.renren.modules.qcManagement.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import io.renren.common.utils.R;
  * @email ${email}
  * @date 2024-08-27 14:22:12
  */
+@Slf4j
 @RestController
 @RequestMapping("qcManagement/examineStatus")
 public class QcExamineStatusController {

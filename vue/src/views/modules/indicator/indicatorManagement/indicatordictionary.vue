@@ -45,6 +45,7 @@
 
     <el-table
       :data="dataList"
+      :row-style="getRowStyle"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -151,6 +152,18 @@
         label="上级指标">
       </el-table-column>
       <el-table-column
+        prop="indicatorValueLowerBound"
+        header-align="center"
+        align="center"
+        label="指标值下界">
+      </el-table-column>
+      <el-table-column
+        prop="indicatorValueUpperBound"
+        header-align="center"
+        align="center"
+        label="指标值上界">
+      </el-table-column>
+      <el-table-column
         prop="indicatorCreatTime"
         header-align="center"
         align="center"
@@ -222,9 +235,12 @@
           indicatorParentNode: '',
           indicatorCreatTime: '',
           indicatorState: '',
-          indicatorChildNode: ''
+          indicatorChildNode: '',
+          indicatorValueUpperBound: '',
+          indicatorValueLowerBound: ''
         },
         dataList: [],
+        indicatorSummaryList: [],    //指标summary列表
         indicatorDictionaryList: [], //指标列表（不分页）
         indicatorDictionaryList1: [],//包括根节点的指标列表
         pageIndex: 1,
@@ -241,12 +257,123 @@
       AddOrUpdate,
       KeyControl
     },
-    activated () {
+    mounted () {
       this.getDataList()
     },
     methods: {
       // 获取数据列表
-      getDataList () {
+      // async getDataList() {
+      //   this.dataListLoading = true; // Set loading state before starting requests
+      //
+      //   try {
+      //     // Create an array of promises
+      //     const promises = [];
+      //
+      //     // Add the first HTTP request to the promises array
+      //     promises.push(
+      //       this.$http({
+      //         url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+      //         method: 'get',
+      //         params: this.$http.adornParams({ 'page': this.pageIndex, 'limit': 10000, 'key': this.queryParams })
+      //       }).then(({data}) => {
+      //         if (data && data.code === 0) {
+      //           this.indicatorSummaryList = data.page.list;
+      //           console.log("this.indicatorSummaryList====>", this.indicatorSummaryList);
+      //         } else {
+      //           this.indicatorSummaryList = [];
+      //         }
+      //       })
+      //     );
+      //
+      //     // Add the second HTTP request to the promises array
+      //     promises.push(
+      //       this.$http({
+      //         url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+      //         method: 'get',
+      //         params: this.$http.adornParams({
+      //           'page': this.pageIndex,
+      //           'limit': this.pageSize,
+      //           'key': this.queryParams
+      //         })
+      //       }).then(({data}) => {
+      //         if (data && data.code === 0) {
+      //           this.dataList = data.page.list;
+      //           this.totalPage = data.page.totalCount;
+      //         } else {
+      //           this.dataList = [];
+      //           this.totalPage = 0;
+      //         }
+      //       })
+      //     );
+      //
+      //     // Add the third HTTP request to the promises array
+      //     promises.push(
+      //       this.$http({
+      //         url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+      //         method: 'get',
+      //         params: this.$http.adornParams({
+      //           'page': this.pageIndex,
+      //           'limit': 10000,
+      //         })
+      //       }).then(({data}) => {
+      //         if (data && data.code === 0) {
+      //           console.log("data2====>", data);
+      //           this.indicatorDictionaryList = data.page.list;
+      //         } else {
+      //           this.indicatorDictionaryList = [];
+      //         }
+      //       })
+      //     );
+      //
+      //     // Add the fourth HTTP request to the promises array
+      //     promises.push(
+      //       this.$http({
+      //         url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
+      //         method: 'get',
+      //         params: this.$http.adornParams({
+      //           'limit': 10000,
+      //         })
+      //       }).then(({ data }) => {
+      //         if (data && data.code === 0) {
+      //           console.log("data=====>", data);
+      //           this.indicatorDictionaryList1 = data.page.list;
+      //           // 在数组最前面添加新的对象
+      //           this.indicatorDictionaryList1.unshift({
+      //             indicatorId: 1,
+      //             indicatorName: '公司质量指标管控体系',
+      //             indicatorParentNode: ''
+      //           });
+      //         }
+      //       })
+      //     );
+      //
+      //     // Wait for all promises to complete
+      //     await Promise.all(promises);
+      //   } catch (error) {
+      //     console.error("An error occurred while fetching data:", error);
+      //   } finally {
+      //     this.dataListLoading = false; // Reset loading state
+      //   }
+      // },
+      async getDataList () {
+        // 查询指标summary列表
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 10000,
+            'key': this.queryParams
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.indicatorSummaryList = data.page.list
+            console.log("this.indicatorSummaryList====>",this.indicatorSummaryList)
+          } else {
+            this.indicatorSummaryList = []
+          }
+        })
+
         this.dataListLoading = true
         this.$http({
           url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
@@ -302,6 +429,7 @@
           }
         })
 
+
       },
       //查询重置
       resetQuery() {
@@ -321,7 +449,9 @@
           indicatorParentNode: null,
           indicatorCreatTime: null,
           indicatorState: null,
-          indicatorChildNode: null
+          indicatorChildNode: null,
+          indicatorValueLowerBound: null,
+          indicatorValueUpperBound: null
         }
         this.getDataList()
       },
@@ -383,7 +513,44 @@
             }
           })
         })
+      },
+      // async handle123() {
+      //   this.$http({
+      //     url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+      //     method: 'get',
+      //     params: this.$http.adornParams({
+      //       'page': this.pageIndex,
+      //       'limit': 10000,
+      //       'key': this.queryParams
+      //     })
+      //   }).then(({data}) => {
+      //     if (data && data.code === 0) {
+      //       this.indicatorSummaryList = data.page.list
+      //       console.log("this.indicatorSummaryList====>",this.indicatorSummaryList)
+      //     } else {
+      //       this.indicatorSummaryList = []
+      //     }
+      //   })
+      // },
+      getRowStyle(row, rowIndex) {
+        console.log("1111111111====>",this.indicatorSummaryList)
+        console.log("2222222====>",this.indicatorDictionaryList)
+        const summaryItems = this.indicatorSummaryList.filter(
+          item => item.indicatorName === row.indicatorName
+        );
+        console.log("summaryItems====>",summaryItems)
+
+        for (const summaryItem of summaryItems) {
+          if (summaryItem.indicatorValue < row.lowerBound || summaryItem.indicatorValue > row.upperBound) {
+            console.log(`Row ${row.indicatorName} is out of bounds`);
+            return { backgroundColor: 'red' };
+          }
+        }
+
+        console.log(`Row ${row.indicatorName} is within bounds`);
+        return {};
       }
+
     }
   }
 </script>

@@ -2,6 +2,8 @@ package io.renren.modules.taskmanagement.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.renren.common.utils.DateUtils;
+import io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto;
+import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.entity.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,6 +76,29 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         maps.add(completedPlanNumMap);
 
         return maps;
+    }
+
+    @Override
+    public List<PlanStatisticsLabelDto> getPlanLabel() {
+        return planDao.getPlanLabel();
+    }
+
+    @Override
+    public PageUtils queryPageUnfinishedPlan(Map<String, Object> params) {
+        IPage<PlanEntity> page = this.page(
+                new Query<PlanEntity>().getPage(params),
+                new QueryWrapper<PlanEntity>().ne("plan_current_state", TaskStatus.COMPLETED)
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryPageFinishedPlan(Map<String, Object> params) {
+        IPage<PlanEntity> page = this.page(
+                new Query<PlanEntity>().getPage(params),
+                new QueryWrapper<PlanEntity>().eq("plan_current_state", TaskStatus.COMPLETED)
+        );
+        return new PageUtils(page);
     }
 
 }

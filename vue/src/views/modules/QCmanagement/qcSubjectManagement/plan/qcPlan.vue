@@ -9,8 +9,9 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
-          @click="addOrUpdateHandle()">新增</el-button>
+        <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+          @click="addOrUpdateHandle()">新增</el-button> -->
+        <el-button type="danger" @click="toIssue()">问题添加</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="filteredDataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -48,7 +49,7 @@
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="newPlanHandle(scope.row.qcsrId)">创建计划</el-button>
-          <el-button type="text" size="small" v-if="isAuth('qcSubject:registration:save')"
+          <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
             @click="addOrUpdateHandle(scope.row.qcsrId)">提交计划</el-button>
           <el-button type="text" size="small"
             @click="examineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
@@ -117,7 +118,8 @@ export default {
     },
     //计划审批跳转
     examineStatus(id, resultType) {
-      // console.log(resultType)
+      console.log(resultType)
+      console.log(id)
       if (resultType === null || resultType === '') {
         this.$message({
           message: '课题计划尚未提交',
@@ -131,8 +133,12 @@ export default {
           if (this.dataList[i].qcsrId === id) {
             // 如果满足条件，将对象添加到新数组中
             filteredArray.push(this.dataList[i]);
+            console.log(filteredArray)
           }
         }
+        // console.log('+-+-+-+-++-+-+--+')
+        // console.log(this.dataList)
+        // console.log('+-+-+-+-++-+-+--+')
         this.$router.push(
           {
             name: 'qcExamineStatus',
@@ -143,7 +149,15 @@ export default {
       }
     },
 
-
+    toIssue() {
+      this.$router.push(
+        {
+          name: 'otherToIssue',
+          // query: {
+          //   data: JSON.stringify(filteredArray)
+          // }
+        });
+    },
 
 
     parseTime(time) {

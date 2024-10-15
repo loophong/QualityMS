@@ -91,7 +91,7 @@ export default {
         .append('g');
 
       const root = d3.hierarchy(treeData[0]);
-      const treeLayout = d3.tree().size([height * 2, width]); // 增加高度比例
+      const treeLayout = d3.tree().size([height * 3, width*2]); // 增加高度比例
       treeLayout(root);
 
       svg.selectAll('line.link')

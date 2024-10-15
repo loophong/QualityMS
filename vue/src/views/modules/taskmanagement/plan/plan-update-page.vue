@@ -4,7 +4,7 @@
       <el-main>
         <h2>{{ title }}</h2>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
-          label-width="120px">
+                 label-width="120px">
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="计划编号" prop="planId">
@@ -12,7 +12,7 @@
               </el-form-item>
               <el-form-item label="开始日期" prop="planStartDate">
                 <el-date-picker v-model="dataForm.planStartDate" type="date" placeholder="选择开始日期"
-                  style="width: 100%;"></el-date-picker>
+                                style="width: 100%;"></el-date-picker>
               </el-form-item>
               <el-form-item label="计划天数" prop="planScheduleDays">
                 <el-input :value="planScheduleDays" disabled placeholder="计划天数"></el-input>
@@ -25,6 +25,15 @@
                   </el-option-group>
                 </el-select>
               </el-form-item>
+              <el-form-item label="发起人" prop="planInitiator">
+                <el-select v-model="dataForm.planInitiator" filterable placeholder="请选择发起人">
+                  <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+                    <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                               :value="item.value">
+                    </el-option>
+                  </el-option-group>
+                </el-select>
+              </el-form-item>
             </el-col>
 
             <el-col :span="12">
@@ -33,7 +42,7 @@
               </el-form-item>
               <el-form-item label="计划完成日期" prop="planScheduleCompletionDate">
                 <el-date-picker v-model="dataForm.planScheduleCompletionDate" type="date" placeholder="选择计划完成日期"
-                  style="width: 100%;"></el-date-picker>
+                                style="width: 100%;"></el-date-picker>
               </el-form-item>
 
               <el-form-item label="关联指标" prop="planAssociatedIndicatorsId">
@@ -64,10 +73,15 @@
 
           <el-form-item label="计划内容" prop="planContent">
             <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" placeholder="请输入计划内容"
-              v-model="dataForm.planContent" maxlength="1000">
+                      v-model="dataForm.planContent" maxlength="1000">
             </el-input>
           </el-form-item>
-
+          <el-form-item label="上传附件" prop="planFile" required>
+            <el-upload ref="file" :file-list="planFileList" :action="uploadUrl"
+                       :on-change="uploadFile" :auto-upload="false">
+              <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
+            </el-upload>
+          </el-form-item>
 
 
           <!-- 任务列表 -->
@@ -86,7 +100,7 @@
                 <el-col :span="12" class="button-col">
                   <!-- <i class="el-icon-close" @click="removeTask(index)" aria-hidden="true"></i> -->
                   <el-button type="text" icon="el-icon-close" size="large" @click="removeTask(index)"
-                    class="remove-task-button"></el-button>
+                             class="remove-task-button"></el-button>
                 </el-col>
               </el-row>
               <el-row :gutter="20">
@@ -96,7 +110,7 @@
                   </el-form-item>
                   <el-form-item label="开始日期" prop="taskStartDate">
                     <el-date-picker v-model="task.taskStartDate" type="date" placeholder="选择开始日期"
-                      style="width: 100%;" value-format="yyyy-MM-dd"></el-date-picker>
+                                    style="width: 100%;" value-format="yyyy-MM-dd"></el-date-picker>
                   </el-form-item>
                   <el-form-item label="任务天数" prop="taskScheduleDays">
                     <el-input :value="task.taskScheduleDays" placeholder="任务天数" disabled></el-input>
@@ -106,7 +120,7 @@
                     <el-select v-model="task.taskPrincipal" filterable placeholder="请选择负责人">
                       <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                          :value="item.value">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -122,14 +136,14 @@
 
                   <el-form-item label="预计完成日期" prop="taskScheduleCompletionDate">
                     <el-date-picker v-model="task.taskScheduleCompletionDate" type="date" placeholder="选择任务完成日期"
-                      style="width: 100%;" value-format="yyyy-MM-dd"></el-date-picker>
+                                    style="width: 100%;" value-format="yyyy-MM-dd"></el-date-picker>
                   </el-form-item>
 
                   <el-form-item label="审核人" prop="taskAuditor">
                     <el-select v-model="task.taskAuditor" filterable placeholder="请选择审核人">
                       <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                          :value="item.value">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -139,7 +153,7 @@
                     <el-select v-model="task.taskExecutor" multiple filterable placeholder="执行人">
                       <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                          :value="item.value">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -150,10 +164,9 @@
 
               <el-form-item label="任务内容" prop="taskContent">
                 <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" placeholder="请输入任务内容"
-                  v-model="task.taskContent" maxlength="1000">
+                          v-model="task.taskContent" maxlength="1000">
                 </el-input>
               </el-form-item>
-
 
 
             </el-form>
@@ -175,8 +188,6 @@
 </template>
 
 
-
-
 <script>
 import axios from 'axios';
 
@@ -186,11 +197,13 @@ export default {
       title: '计划详情',
       routerPlanId: '',
 
+      // 计划附件
+      planFileList: [],
+      uploadUrl: '',
+
 
       planAndTasksDTO: { // 计划和任务
-        plan: {
-
-        },
+        plan: {},
         tasks: []
       },
 
@@ -218,7 +231,8 @@ export default {
         planEarlyCompletionDays: '',
         planLagDays: '',
         planLagReasons: '',
-        planAssociatedIndicatorsId: ''
+        planAssociatedIndicatorsId: '',
+        planFile: ''
 
       },
 
@@ -330,7 +344,6 @@ export default {
       },
 
 
-
       // dataRule: {
       //   // planId: [
       //   //   { required: true, message: '计划编号不能为空', trigger: 'blur' },
@@ -367,16 +380,15 @@ export default {
       // },
 
 
-
       statusOptions: [
-        { value: 0, label: '未开始' },
-        { value: 1, label: '进行中' },
-        { value: 2, label: '已完成' },
+        {value: 0, label: '未开始'},
+        {value: 1, label: '进行中'},
+        {value: 2, label: '已完成'},
       ],
 
       isStatus: [
-        { value: 0, label: '否' },
-        { value: 1, label: '是' },
+        {value: 0, label: '否'},
+        {value: 1, label: '是'},
       ],
 
       //员工列表
@@ -392,7 +404,7 @@ export default {
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
-    }).then(({ data }) => {
+    }).then(({data}) => {
       this.options = data;
       console.log(data);
     });
@@ -433,6 +445,36 @@ export default {
 
   methods: {
 
+    // 上传文件
+    uploadFile(file) {
+      console.log("文件" + file.raw);
+
+      const formData = new FormData();
+      formData.append('file', file.raw); // 将文件添加到 FormData
+
+      this.$http({
+        url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        method: 'post',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data' // 指定为文件上传
+        }
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          // 保存后端返回的url到变量中
+          this.dataForm.planFile = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+          console.log('获得的文件地址 ：', data.uploadurl)
+          this.$message.success('文件上传成功');
+          // 处理成功后的逻辑，例如更新状态
+        } else {
+          this.$message.error(data.msg);
+        }
+      }).catch(error => {
+        this.$message.error('上传失败');
+        console.error(error);
+      });
+    },
+
     init(routerPlanId) {
       // this.dataForm.planId = routerPlanId || 0
       this.$nextTick(() => {
@@ -442,7 +484,7 @@ export default {
             url: this.$http.adornUrl(`/taskmanagement/plan/getPlanAllInfo?planId=${routerPlanId}`),
             method: 'get',
             params: this.$http.adornParams()
-          }).then(({ data }) => {
+          }).then(({data}) => {
             console.log(data);
             if (data) {
               this.dataForm.planId = data.plan.planId
@@ -468,13 +510,13 @@ export default {
               this.dataForm.planLagDays = data.plan.planLagDays
               this.dataForm.planLagReasons = data.plan.planLagReasons
               this.dataForm.planAssociatedIndicatorsId = data.plan.planAssociatedIndicatorsId
+              this.dataForm.planFile = data.plan.planFile
               this.tasks = data.tasks
             }
           })
         }
       })
     },
-
 
 
     //
@@ -496,7 +538,7 @@ export default {
     },
 
     cancel() {
-      this.$router.push({ name: 'TasksList' }); // 假设你有一个名为TasksList的路由
+      this.$router.push({name: 'TasksList'}); // 假设你有一个名为TasksList的路由
     },
 
     dataFormSubmit() {
@@ -514,7 +556,7 @@ export default {
             this.$nextTick(() => { // 确保 DOM 渲染完成
               var taskForm = 'task_' + index;
               const taskFormRef = this.$refs[`task_${index}`][0];
-              console.log("验证 task 表单%o" +taskFormRef);
+              console.log("验证 task 表单%o" + taskFormRef);
               console.log(this.$refs);
               if (taskFormRef) {
                 taskFormRef.validate((validTask) => {
@@ -552,11 +594,12 @@ export default {
               'planPrincipal': this.dataForm.planPrincipal,
               'planExecutor': this.dataForm.planExecutor,
               'planAuditor': this.dataForm.planAuditor,
-              'planCurrentState': 0,
-              'planIsCompleted': 0,
-              'planIsOverdue': 0,
-              'planIsOnTime': 0,
+              'planCurrentState': this.dataForm.planCurrentState,
+              'planIsCompleted': this.dataForm.planIsCompleted,
+              'planIsOverdue': this.dataForm.planIsOverdue,
+              'planIsOnTime': this.dataForm.planIsOnTime,
               'planAssociatedIndicatorsId': this.dataForm.planAssociatedIndicatorsId,
+              'planInitiator': this.dataForm.planInitiator
             };
 
             const tasksData = this.tasks.map(task => ({
@@ -572,10 +615,10 @@ export default {
               taskExecutor: task.taskExecutor,
               taskAuditor: task.taskAuditor,
               taskAssociatedIndicatorsId: this.dataForm.planAssociatedIndicatorsId,
-              taskCurrentState: 0,
-              taskIsCompleted: 0,
-              taskIsOverdue: 0,
-              taskIsOnTime: 0,
+              taskCurrentState: this.dataForm.taskCurrentState !== '' ? this.dataForm.taskCurrentState : 0,
+              taskIsCompleted: this.dataForm.taskIsCompleted !== '' ? this.dataForm.taskIsCompleted : 0,
+              taskIsOverdue: this.dataForm.taskIsOverdue !== '' ? this.dataForm.taskIsOverdue : 0,
+              taskIsOnTime: this.dataForm.taskIsOnTime !== '' ? this.dataForm.taskIsOnTime : 0,
               taskParentNode: this.dataForm.planId
             }));
 
@@ -587,7 +630,7 @@ export default {
                 'plan': plan,
                 'tasks': tasksData
               })
-            }).then(({ data }) => {
+            }).then(({data}) => {
               if (data && data.code === 0) {
                 this.$message({
                   message: '操作成功',
@@ -680,8 +723,6 @@ export default {
     //     }
     //   })
     // },
-
-
 
 
     addTask() {
@@ -806,7 +847,6 @@ export default {
     },
 
 
-
   },
 
   computed: {
@@ -842,8 +882,6 @@ export default {
       immediate: true
     },
   },
-
-
 
 
 }

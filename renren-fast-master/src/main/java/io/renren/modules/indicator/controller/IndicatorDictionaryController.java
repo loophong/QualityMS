@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import io.renren.modules.indicator.entity.IndicatorResponseByClassificationEntity;
 import io.renren.modules.indicator.entity.IndicatorResponseByDepartmentEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +120,12 @@ public class IndicatorDictionaryController {
     public List<IndicatorResponseByDepartmentEntity> getIndicatorDictionaryByDepartmant(IndicatorResponseByDepartmentEntity indicatorResponseByDepartmentEntity){
         System.out.println("返回list=============>" + indicatorDictionaryService.countsByDepartmant(indicatorResponseByDepartmentEntity));
         return indicatorDictionaryService.countsByDepartmant(indicatorResponseByDepartmentEntity);
+    }
+
+    @RequestMapping("/countsByClassification")
+    public List<IndicatorResponseByClassificationEntity> getIndicatorDictionaryByClassification(IndicatorResponseByClassificationEntity indicatorResponseByClassificationEntity){
+        System.out.println("返回list=============>" + indicatorDictionaryService.countsByClassification(indicatorResponseByClassificationEntity));
+        return indicatorDictionaryService.countsByClassification(indicatorResponseByClassificationEntity);
     }
 
 }

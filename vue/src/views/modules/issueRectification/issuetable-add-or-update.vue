@@ -1,7 +1,7 @@
 <template>
   <div>
   <el-dialog
-    :title="!dataForm.issueId ? '新增' : '修改'"
+    :title="'整改记录'"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="150px">
@@ -19,29 +19,40 @@
           placeholder="请选择实际完成时间">
         </el-date-picker>
       </el-form-item>
+<!--      <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
+<!--        <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择验证人">-->
+<!--          <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
+<!--            <el-option v-for="item in group.options" :key="item.value" :label="item.label"-->
+<!--                       :value="item.label">-->
+<!--            </el-option>-->
+<!--          </el-option-group>-->
+<!--        </el-select>-->
+<!--      </el-form-item>-->
       <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
-        <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择验证人">
+        <el-select v-model="selectedResponsiblePersons" filterable multiple placeholder="请选择整改责任人">
           <el-option-group v-for="group in options" :key="group.label" :label="group.label">
-            <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                       :value="item.label">
+            <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
             </el-option>
           </el-option-group>
         </el-select>
       </el-form-item>
-      <el-form-item label="整改图片/交付物" prop="image">
-        <el-upload
-          action="#"
-          list-type="picture-card"
-          :on-preview="handlePictureCardPreview"
-          :on-remove="handleRemove"
-          :on-change="handleFileChange"
-          :file-list="imageList"
-          :auto-upload="false">
-          <i class="el-icon-plus"></i>
-        </el-upload>
-        <el-dialog :visible.sync="dialogVisible">
-          <img width="100%" :src="dialogImageUrl" alt="">
-        </el-dialog>
+      <!--      <el-form-item label="整改图片/交付物" prop="image">-->
+<!--        <el-upload-->
+<!--          action="#"-->
+<!--          list-type="picture-card"-->
+<!--          :on-preview="handlePictureCardPreview"-->
+<!--          :on-remove="handleRemove"-->
+<!--          :on-change="handleFileChange"-->
+<!--          :file-list="imageList"-->
+<!--          :auto-upload="false">-->
+<!--          <i class="el-icon-plus"></i>-->
+<!--        </el-upload>-->
+<!--        <el-dialog :visible.sync="dialogVisible">-->
+<!--          <img width="100%" :src="dialogImageUrl" alt="">-->
+<!--        </el-dialog>-->
+<!--      </el-form-item>-->
+      <el-form-item label="" prop="rectificationPhotoDeliverable">
+        <el-button @click="imageload()">上传图片</el-button>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -78,7 +89,7 @@
               </el-option>
             </el-option-group>
           </el-select>
-          <el-form-item label="上级任务" prop="superiorMask">
+          <el-form-item label="" prop="superiorMask">
             <el-select v-model="subtask.parentTask" placeholder="请选择上级任务">
               <el-option
                 key="question"
@@ -94,12 +105,13 @@
             </el-select>
           </el-form-item>
           <el-button @click.prevent="removeSubtask(subtask)">删除</el-button>
+          <el-button type="primary" @click="addSubtask">增加子任务</el-button>
+
         </el-form-item>
 
-        <el-form-item>
-          <el-button type="primary" @click="addSubtask">增加子任务</el-button>
-          <el-button @click="resetForm('dataForm')">重置</el-button>
-        </el-form-item>
+<!--        <el-form-item>-->
+<!--          <el-button @click="resetForm('dataForm')">重置</el-button>-->
+<!--        </el-form-item>-->
         <el-form-item label="要求完成日期" prop="requiredCompletionTime">
           <el-date-picker
             v-model="dataForm.requiredCompletionTime"
@@ -114,6 +126,25 @@
       <el-button type="primary" @click="submitForm('dataForm')">提交</el-button>
     </span>
     </el-dialog>
+
+    <el-dialog
+      title="上传文件"
+      :close-on-click-modal="false"
+      @close="closeHandle"
+      :visible.sync="visibleUpload">
+      <el-upload
+        drag
+        :action="url"
+        :before-upload="beforeUploadHandle"
+        :on-success="successHandle"
+        multiple
+        :file-list="fileList"
+        style="text-align: center;">
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
+      </el-upload>
+    </el-dialog>
     <!--  </div>-->
     <!--  <div>-->
   </div>
@@ -127,6 +158,8 @@
   export default {
     data () {
       return {
+        // 新增数组来存放选择的整改责任人ID
+        selectedResponsiblePersons: [], // 存放选中的责任人ID
         bloburl: '',
         imageurl: '',
         visible: false,
@@ -135,6 +168,11 @@
         dialogImageUrl: '',
         imageList: [],
         dialogVisible: false,
+        visibleUpload: false, // 上传对话框的可见性
+        url: '',
+        num: 0,
+        successNum: 0,
+        fileList: [],
         dataForm: {
           userinfo: '',
           vehicles: [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }],
@@ -222,6 +260,44 @@
         this.fetchuserinform()
     },
     methods: {
+      imageload() {
+        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`);
+        this.visibleUpload = true; // 打开上传对话框
+      },
+      // 上传之前
+      beforeUploadHandle(file) {
+        if (file.type !== 'image/jpg' && file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
+          this.$message.error('只支持jpg、png、gif格式的图片！');
+          return false;
+        }
+        this.num++;
+      },
+      // 上传成功
+      successHandle(response, file, fileList) {
+        this.fileList = fileList;
+        this.successNum++;
+        if (response && response.code === 0) {
+          console.log('获取图片的返回' ,response)
+          console.log('获取图片的返回' ,response.code)
+          this.dataForm.rectificationPhotoDeliverable = response.url; // 假设返回的数据中包含图片地址
+          if (this.num === this.successNum) {
+            this.$confirm('操作成功, 是否继续操作?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).catch(() => {
+              this.visibleUpload = false; // 关闭上传对话框
+            });
+          }
+        } else {
+          this.$message.error(response.msg);
+        }
+      },
+      // 弹窗关闭时
+      closeHandle() {
+        this.fileList = []; // 清空文件列表
+        this.$emit('refreshDataList'); // 可选：触发数据刷新
+      },
       generateSerialNumber() {
         const now = new Date();
         const year = now.getFullYear();
@@ -229,7 +305,7 @@
         const day = String(now.getDate()).padStart(2, '0');
         const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         console.log('执行随机+++++')
-        return `${year}${month}${day}${random}`;
+        return `ZL-TA-${year}${month}${day}${random}`;
       },
       cancel1 () {
         // 重置 subtasks 数组，只保留一个初始组合
@@ -607,13 +683,16 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             // 检查是否上传了图片
-            if (!this.imageurl) {
-              this.$message.error('请上传图片')
-              return
-            }
+            // if (!this.imageurl) {
+            //   this.$message.error('请上传图片')
+            //   return
+            // }
             // 创建 vehicleTypeIds 数组
             this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
             this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
+            // 将选中的责任人ID数组转换为字符串
+            this.dataForm.rectificationResponsiblePerson = this.selectedResponsiblePersons.join(',');
+            console.log('整改责任人:', this.dataForm.rectificationResponsiblePerson);
             console.log('Successfully 获得 vehicle:', this.dataForm.vehicleTypeIds)
             // 确保 issueCategoryId 是一个数组
             if (!Array.isArray(this.dataForm.issueCategoryId)) {
@@ -640,7 +719,7 @@
                   // 'responsibleDepartment': this.dataForm.responsibleDepartment,
                   'rectificationStatus': this.dataForm.rectificationStatus,
                   'actualCompletionTime': this.dataForm.actualCompletionTime,
-                  'rectificationPhotoDeliverable': this.dataForm.issuePhoto,
+                  'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,
                   'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
                   // 'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
                   // 'remark': this.dataForm.remark,

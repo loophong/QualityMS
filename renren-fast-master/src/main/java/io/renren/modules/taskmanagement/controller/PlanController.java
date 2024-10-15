@@ -8,6 +8,7 @@ import java.util.Map;
 import cn.hutool.log.Log;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.taskmanagement.entity.PlanAndTaskDTO;
+import io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,23 @@ public class PlanController {
     private TaskService taskService;
 
     /**
+     * @description: PlanStatisticsLabelDto
+     * @author: hong
+     * @date: 2024/9/25 15:35
+     * @version: 1.0
+     */
+    @RequestMapping("/getPlanLabel")
+    public List<PlanStatisticsLabelDto> getPlanLabel() {
+
+        // 查询计划名称和计划id
+        List<PlanStatisticsLabelDto> plans = planService.getPlanLabel();
+
+        log.info("计划名称和计划id" + plans.toString());
+
+        return plans;
+    }
+
+    /**
      * @description: 大屏展示计划和任务信息
      * @author: hong
      * @date: 2024/9/25 9:55
@@ -60,6 +78,34 @@ public class PlanController {
         log.info("大屏数据" + plan.toString());
 
         return plan;
+    }
+
+    /**
+     * @description: 查询未完成计划
+     * @author: hong
+     * @date: 2024/10/15 15:11
+     * @version: 1.0
+     */
+    @RequestMapping("/unfinished")
+    @RequiresPermissions("taskmanagement:plan:list")
+    public R unfinishedList(@RequestParam Map<String, Object> params) {
+        PageUtils page = planService.queryPageUnfinishedPlan(params);
+        System.out.println(page.getList().toString());
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * @description: 查询已完成-历史计划
+     * @author: hong
+     * @date: 2024/10/15 15:11
+     * @version: 1.0
+     */
+    @RequestMapping("/finished")
+    @RequiresPermissions("taskmanagement:plan:list")
+    public R finishedList(@RequestParam Map<String, Object> params) {
+        PageUtils page = planService.queryPageFinishedPlan(params);
+        System.out.println(page.getList().toString());
+        return R.ok().put("page", page);
     }
 
 
@@ -94,7 +140,8 @@ public class PlanController {
     @PostMapping("/save")
     @RequiresPermissions("taskmanagement:plan:save")
     public R save(@RequestBody PlanAndTaskDTO planAndTaskDTO) {
-        System.out.println(planAndTaskDTO);
+
+        log.info("新增计划：" + planAndTaskDTO);
 
         planService.save(planAndTaskDTO.getPlan());
 

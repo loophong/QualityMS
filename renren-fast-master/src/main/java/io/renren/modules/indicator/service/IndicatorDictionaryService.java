@@ -3,6 +3,7 @@ package io.renren.modules.indicator.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.indicator.entity.IndicatorDictionaryEntity;
+import io.renren.modules.indicator.entity.IndicatorResponseByClassificationEntity;
 import io.renren.modules.indicator.entity.IndicatorResponseByDepartmentEntity;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public interface IndicatorDictionaryService extends IService<IndicatorDictionary
     public List<IndicatorDictionaryEntity> getDictionaryEntitiesByName(String indicatorName);
 
     public List<IndicatorResponseByDepartmentEntity> countsByDepartmant(IndicatorResponseByDepartmentEntity indicatorResponseByDepartmentEntity);
+
+    public List<IndicatorResponseByClassificationEntity> countsByClassification(IndicatorResponseByClassificationEntity indicatorResponseByClassificationEntity);
 
 }
 

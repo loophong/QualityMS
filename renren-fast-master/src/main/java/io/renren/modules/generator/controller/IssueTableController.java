@@ -7,13 +7,16 @@ import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.entity.IssueUtils;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.generator.service.MinioService;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,13 +40,31 @@ public class IssueTableController {
     @Autowired
     private IssueTableService issueTableService;
 
-//    @Resource
-//    MinioClient minioClient;
+    @Resource
+    MinioClient minioClient;
 
 
     SimpleDateFormat saf = new SimpleDateFormat("/yyyy/MM/dd");
 
     private final String uploadDir = "C:/uploads"; // 请确保这个路径已存在或可写
+
+    /**
+     * 上传图片
+     */
+//    @Value("${file.upload-dir}")
+    @PostMapping("/testio")
+    @RequiresPermissions("generator:issuetable:update")
+    public R testio(@RequestParam("file") MultipartFile file , HttpServletRequest request) throws Exception {
+        System.out.println("文件上传+++++++");
+        ObjectWriteResponse objectWriteResponse = minioClient.putObject(PutObjectArgs.builder()
+                .bucket("myfile")
+                .object("user.jpg")
+                .stream(file.getInputStream(), file.getSize(), -1)
+                .build()
+        );
+        System.out.println(objectWriteResponse);
+        return R.ok();
+    }
 
     /**
      * 上传图片
@@ -128,6 +149,47 @@ public class IssueTableController {
     }
 
     /**
+     * Excel模板下载
+     */
+    @GetMapping("/generateTemplate")
+    @RequiresPermissions("generator:issuetable:list")
+    public void generateTemplate(HttpServletResponse response) {
+        try {
+            Workbook workbook = issueTableService.generateTemplate(); // 调用服务层生成模板
+
+            // 设置响应头
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=IssueTableTemplate.xlsx");
+
+            // 写入Excel到响应
+            ServletOutputStream outputStream = response.getOutputStream();
+            workbook.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+            workbook.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+    /**
+     * 关联相关任务
+     */
+    @RequestMapping("/connection")
+    @RequiresPermissions("generator:issuetable:list")
+    public R connectionIssue(@RequestBody Map<String, Long> params) {
+        Long issueId = params.get("issueId");
+        if (issueId == null) {
+            return R.error("缺少参数: issueId");
+        }
+        System.out.println("获取的issueId ："+issueId);
+        issueTableService.connectionIssue(issueId);
+        return R.ok();
+
+    }
+
+    /**
      * 关闭相关任务
      */
     // 关闭相关任务
@@ -184,18 +246,66 @@ public class IssueTableController {
         System.out.println("=====获取用户信息----结束");
         return R.ok().put("userinfo", userinfo);
     }
-
+    /**
+     * 获取任务详细统计信息
+     */
+    @RequestMapping("/taskDetails/{issueNumber}")
+    @RequiresPermissions("generator:issuetable:list")
+    public R getTaskDetails(@PathVariable("issueNumber") String issueNumber) {
+        System.out.println("开始统计问题相关问题++++++++++");
+        // 调用服务层方法获取相关统计信息
+        Map<String, Integer> stats = issueTableService.getTaskDetails(issueNumber);
+        System.out.println("问题相关任务数据：" + stats);
+        // 检查返回的数据
+        if (stats != null && !stats.isEmpty()) {
+            return R.ok().put("result", stats);
+        } else {
+            return R.error("未找到相关任务信息");
+        }
+    }
+    /**
+     * 查询列表
+     */
+    @RequestMapping("/Querylist")
+    @RequiresPermissions("generator:issuetable:list")
+    public R Querylist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueTableService.QueryPage(params);
+        return R.ok().put("page", page);
+    }
 
     /**
-     * 列表
+     * 问题列表（创建人可见）
+     */
+    @RequestMapping("/listcreator")
+    @RequiresPermissions("generator:issuetable:list")
+    public R listcreator(@RequestParam Map<String, Object> params){
+        PageUtils page = issueTableService.queryPagecreator(params);
+//        PageUtils page = issueTableService.queryPage(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 问题列表完整
      */
     @RequestMapping("/list")
     @RequiresPermissions("generator:issuetable:list")
     public R list(@RequestParam Map<String, Object> params){
+//        PageUtils page = issueTableService.queryPagecreator(params);
         PageUtils page = issueTableService.queryPage(params);
         return R.ok().put("page", page);
     }
 
+    /**
+     * 信息
+     */
+    @RequestMapping("/infoByIssueNumber/{issueNumber}")
+    @RequiresPermissions("generator:issuetable:info")
+    public R infoBynumber(@PathVariable("issueNumber") String issueNumber){
+        System.out.println("开始获取+++++++++++++++++++++++++++++");
+        IssueTableEntity issueTable = issueTableService.getByissueNumber(issueNumber);
+        System.out.println("获取问题为："+issueTable);
+        return R.ok().put("issueTable", issueTable);
+    }
 
     /**
      * 信息
@@ -238,6 +348,7 @@ public class IssueTableController {
     @RequestMapping("/delete")
     @RequiresPermissions("generator:issuetable:delete")
     public R delete(@RequestBody Integer[] issueIds){
+        issueTableService.removeAll(issueIds);
 		issueTableService.removeByIds(Arrays.asList(issueIds));
 
         return R.ok();

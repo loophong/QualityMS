@@ -120,10 +120,12 @@ export default {
 
       // 根据任务状态设置矩形颜色
       const colorScale = {
-        '开始': '#2ecc71' ,// 白色
-        '审核中': '#e74c3c', // 红色
+        '开始': '#2ecc71' ,// 绿色
+        '未通过审核': '#e74c3c', // 红色
         '执行中': '#e67e22', // 橙色
-        '已完成': '#3498db'  // 蓝色
+        '审核中': '#c222e6', // 橙色
+        '已派发': '#3498db', // 蓝色
+        '已完成': '#2ecc71'  // 蓝色
       };
 
       // 添加圆角矩形
@@ -143,7 +145,7 @@ export default {
           console.log('d.data 内容:', d.data);
           console.log("即将传递的url:", d.data.url);
           console.log("即将传递的参数:", d.data.name);
-          this.$router.push({ name: 'issue-issueRectification' }); // 直接跳转到指定路由
+          this.$router.push({ name: 'otherToIssue' }); // 直接跳转到指定路由
         });
 
       // 在矩形左上角添加小圆圈
@@ -179,7 +181,7 @@ export default {
           console.log('d.data 内容:', d.data);
           console.log("即将传递的url:", d.data.url);
           console.log("即将传递的参数:", d.data.name);
-          this.$router.push({ name: 'issue-issueRectification' }); // 直接跳转到指定路由
+          this.$router.push({ name: 'otherToIssue' }); // 直接跳转到指定路由
         });
     },
 

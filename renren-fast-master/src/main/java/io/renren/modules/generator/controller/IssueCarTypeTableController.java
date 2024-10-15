@@ -7,7 +7,9 @@ import io.renren.modules.generator.service.IssueCarTypeTableService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,20 @@ import java.util.Map;
 public class IssueCarTypeTableController {
     @Autowired
     private IssueCarTypeTableService issueCarTypeTableService;
+
+    /**
+     * Excel上传
+     */
+    @PostMapping("/uploadExcel")
+    @RequiresPermissions("generator:issuetable:update")
+    public R uploadExcel(@RequestParam("file") MultipartFile file) {
+        try {
+            System.out.println("接收到的文件名: " + file.getOriginalFilename());
+            return issueCarTypeTableService.uploadExcelFile(file);
+        } catch (IOException e) {
+            return R.error("文件上传时发生错误: " + e.getMessage());
+        }
+    }
     /**
      * 获取车辆信息
      */

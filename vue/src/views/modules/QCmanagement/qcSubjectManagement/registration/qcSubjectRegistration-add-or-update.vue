@@ -68,9 +68,9 @@
       <el-form-item label="课题关键字" prop="keywords">
         <el-input v-model="dataForm.keywords" placeholder="课题关键字"></el-input>
       </el-form-item>
-      <el-form-item label="课题活动状态" prop="topicActivityStatus">
+      <!-- <el-form-item label="课题活动状态" prop="topicActivityStatus">
         <el-input v-model="dataForm.topicActivityStatus" placeholder="课题活动状态"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <!-- <el-form-item label="课题活动评分结果" prop="topicActivityResult">
         <el-input v-model="dataForm.topicActivityResult" placeholder="课题活动评分结果"></el-input>
       </el-form-item> -->
@@ -113,7 +113,7 @@ export default {
         topicDescription: '',
         topicType: '',
         activityCharacteristics: '',
-        activityPlan: '',
+        activityPlan: [],
         activityPlanEnd: '',
         keywords: '',
         topicActivityStatus: '',
@@ -224,6 +224,7 @@ export default {
       this.dataForm.qcsrId = id || 0
       this.visible = true
       this.$nextTick(() => {
+
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.qcsrId) {
           this.$http({
@@ -237,18 +238,12 @@ export default {
               this.dataForm.topicLeader = data.qcSubjectRegistration.topicLeader
               this.dataForm.topicConsultant = data.qcSubjectRegistration.topicConsultant
               this.dataForm.teamNumberIds = data.qcSubjectRegistration.teamNumberIds
-              // this.dataForm.createDate = data.qcSubjectRegistration.createDate
-              // this.dataForm.creator = data.qcSubjectRegistration.creator
-              // this.dataForm.modificationDate = data.qcSubjectRegistration.modificationDate
-              // this.dataForm.modifier = data.qcSubjectRegistration.modifier
-              // this.dataForm.startDate = data.qcSubjectRegistration.activityPlan
-              // this.dataForm.endDate = data.qcSubjectRegistration.activityPlanEnd
               this.dataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus
               this.dataForm.topicDescription = data.qcSubjectRegistration.topicDescription
               this.dataForm.topicType = data.qcSubjectRegistration.topicType
               this.dataForm.activityCharacteristics = data.qcSubjectRegistration.activityCharacteristics
-              this.dataForm.activityPlan = data.qcSubjectRegistration.activityPlan
-              this.dataForm.activityPlanEnd = data.qcSubjectRegistration.activityPlanEnd
+              this.dataForm.activityPlan = [new Date(data.qcSubjectRegistration.activityPlan), new Date(data.qcSubjectRegistration.activityPlanEnd)]
+              // this.dataForm.activityPlan[1] = new Date(data.qcSubjectRegistration.activityPlanEnd)
               this.dataForm.keywords = data.qcSubjectRegistration.keywords
               this.dataForm.topicActivityStatus = data.qcSubjectRegistration.topicActivityStatus
               this.dataForm.topicActivityResult = data.qcSubjectRegistration.topicActivityResult
@@ -313,12 +308,6 @@ export default {
                 'topicLeader': this.dataForm.topicLeader,
                 'topicConsultant': `${this.dataForm.topicConsultant}`,
                 'teamNumberIds': `${this.dataForm.teamNumberIds}`,
-                // 'createDate': this.dataForm.createDate,
-                // 'creator': this.dataForm.creator,
-                // 'modificationDate': this.dataForm.modificationDate,
-                // 'modifier': this.dataForm.modifier,
-                // 'startDate': this.dataForm.startDate,
-                // 'endDate': this.dataForm.endDate,
                 'topicReviewStatus': this.dataForm.topicReviewStatus,
                 'topicDescription': this.dataForm.topicDescription,
                 'topicType': this.dataForm.topicType,

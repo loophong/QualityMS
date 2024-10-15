@@ -2,6 +2,23 @@
 
 
   <div class="mod-config">
+
+    <div>
+      <el-form :inline="true" @keyup.enter.native="getData()">
+        <el-select v-model="planId" placeholder="请选择计划">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+        <el-form-item>
+          <el-button @click="getData()">查询</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+
     <div>
       <el-row type="flex" class="row-bg">
         <el-col :span="12">
@@ -63,17 +80,17 @@
     <div class="flex-container">
 
       <div class="flex-item" style="width: 60%; height: 100%;">
-        <div class="picture" ref="chartContainer" style="width: 99%; height: 99%;"></div>
+        <div class="picture" ref="chartContainer" style="width: 99%; height: 99%; top: 8px;"></div>
       </div>
 
       <div class="flex-item" style="width: 20%; height: 100%;">
         <!-- <div  style="width: 200px; height: 200px; background-color: #fff;"></div> -->
-        <div class="picture" ref="onTimePieChart" style="width: 99%; height: 99%;"></div>
+        <div class="picture" ref="onTimePieChart" style="width: 99%; height: 99%; top: 8px;"></div>
       </div>
 
       <div class="flex-item" style="width: 20%; height: 100%;">
         <!-- <div style="width: 200px; height: 200px; background-color: #ddd;"></div> -->
-        <div class="picture" ref="earlyCompletionPieChart" style="width: 99%; height: 99%;"></div>
+        <div class="picture" ref="earlyCompletionPieChart" style="width: 99%; height: 99%; top: 8px;"></div>
       </div>
 
     </div>
@@ -102,8 +119,8 @@
       </el-table-column>
       <el-table-column prop="taskActualDays" header-align="center" align="center" label="实际天数">
       </el-table-column>
-<!--      <el-table-column prop="taskIsOnTime" header-align="center" align="center" label="是否按时完工">-->
-<!--      </el-table-column>-->
+      <!--      <el-table-column prop="taskIsOnTime" header-align="center" align="center" label="是否按时完工">-->
+      <!--      </el-table-column>-->
       <el-table-column prop="taskIsOnTime" label="是否按时完工" header-align="center" align="center" width="110">
         <template slot-scope="scope">
           <span v-if="scope.row.taskIsOnTime === 0" style="color: gray;">否</span>
@@ -138,7 +155,6 @@ export default {
   //   this.initChart();
   // },
 
-
   data() {
     return {
       dataForm: {
@@ -154,7 +170,31 @@ export default {
 
       totalTasks: 100,
       taskStatistics: {},
-      taskList: []
+      taskList: [],
+      planId: '',
+      taskLineData: {
+        taskId: [],
+        taskScheduleDays: [],
+        taskActualDays: []
+      },
+
+      options: [{
+        value: '选项1',
+        label: '黄金糕'
+      }, {
+        value: '选项2',
+        label: '双皮奶'
+      }, {
+        value: '选项3',
+        label: '蚵仔煎'
+      }, {
+        value: '选项4',
+        label: '龙须面'
+      }, {
+        value: '选项5',
+        label: '北京烤鸭'
+      }],
+      value: ''
     }
   },
 
@@ -165,13 +205,40 @@ export default {
   //   this.getDataList()
   // },
   async mounted() {
+    await this.getPlanLabelList();
     await this.getTasksList();
     await this.getDataList();
+    await this.getTaskLineDisplayData();
     this.initLineChart();
     this.initOnTimePieChart();
     this.initEarlyCompletionPieChart();
   },
   methods: {
+    // 获取plan列表
+    async getPlanLabelList() {
+      this.dataListLoading = true
+      await this.$http({
+        url: this.$http.adornUrl('/taskmanagement/plan/getPlanLabel'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({data}) => {
+        console.log("plan列表" + data)
+        this.options = data
+      })
+      this.dataListLoading = false
+    },
+
+    //获取数据，并渲染表格式
+    async getData() {
+      await this.getDataList();
+      await this.getTasksList();
+      await this.getTaskLineDisplayData();
+      this.initLineChart();
+      this.initOnTimePieChart();
+      this.initEarlyCompletionPieChart();
+    },
+
+
     // 获取数据列表
     async getDataList() {
       this.dataListLoading = true
@@ -179,11 +246,36 @@ export default {
         url: this.$http.adornUrl('/taskmanagement/task/taskStatistics'),
         method: 'get',
         params: this.$http.adornParams({
-          'planId': "2024-100"
+          // 'planId': "2024-100"
+          'planId': this.planId
         })
       }).then(({data}) => {
         console.log(data)
         this.taskStatistics = data
+      })
+    },
+    async getTaskLineDisplayData() {
+      this.dataListLoading = true
+      await this.$http({
+        url: this.$http.adornUrl('/taskmanagement/task/taskLineDisplay'),
+        method: 'get',
+        params: this.$http.adornParams({
+          // 'planId': "2024-100"
+          'planId': this.planId
+        })
+      }).then(({data}) => {
+        console.log("折线图数据" + data)
+        //放入数据之前先初始化
+        this.taskLineData.taskId = []
+        this.taskLineData.taskScheduleDays = []
+        this.taskLineData.taskActualDays = []
+
+        for (let i = 0; i < data.length; i++) {
+          this.taskLineData.taskId.push(data[i].taskId)
+          this.taskLineData.taskScheduleDays.push(data[i].taskScheduleDays)
+          this.taskLineData.taskActualDays.push(data[i].taskActualDays)
+        }
+        console.log("折线图数据" + this.taskLineData)
       })
     },
     async getTasksList() {
@@ -192,13 +284,14 @@ export default {
         url: this.$http.adornUrl('/taskmanagement/task/getAllTasksByPlanId'),
         method: 'get',
         params: this.$http.adornParams({
-          'planId': "2024-100",
+          // 'planId': "2024-100",
+          'planId': this.planId,
           'page': this.pageIndex,
           'limit': this.pageSize,
           'key': this.dataForm.key
         })
-      }).then(({ data }) => {
-        console.log("列表数据"+data)
+      }).then(({data}) => {
+        console.log("列表数据" + data)
         if (data && data.code === 0) {
           this.dataList = data.page.list
           this.totalPage = data.page.totalCount
@@ -260,21 +353,49 @@ export default {
       const option = {
         title: {
           text: '项目计划进度图表',
+          left: 'center'
         },
         tooltip: {},
         xAxis: {
-          data: ["点1", "点2", "点3", "点4", "点5", "点6"]
+          // data: ["点1", "点2", "点3", "点4", "点5", "点6"]
+          data: this.taskLineData.taskId
+        },
+        legend: {
+          data: ['计划时间', '实际时间'],
+          left: "76%"
         },
         yAxis: {},
         series: [{
-          name: '数据',
+          name: '计划时间',
           type: 'line',
-          data: [80, 50, 30, 70, 20, 60]
+          // data: [80, 50, 30, 70, 20, 60]
+          data: this.taskLineData.taskScheduleDays,
+          // label: {
+          //   show: true,
+          //   position: 'top'
+          // },
+          // itemStyle: {
+          //   color: "rgb(69,255,0)",
+          //   borderColor: "rgba(47, 144, 48, 1)",
+          // },
+          // lineStyle: {
+          //   color: "rgba(22,185,245,0.52)"
+          // }
+        }, {
+          name: '实际时间',
+          type: 'line',
+          // data: [40, 10, 50, 70, 40, 20]
+          data: this.taskLineData.taskActualDays,
+          // label: {
+          //   show: true,
+          //   position: 'top'
+          // },
         }]
       };
 
       // 使用刚指定的配置项和数据显示图表。
       chartInstance.setOption(option);
+
     },
 
 
@@ -423,7 +544,7 @@ export default {
   justify-content: center; /* 水平居中 */
   align-items: center; /* 垂直居中 */
   border-radius: 4px;
-  min-height: 36px;
+//min-height: 36px; min-height: 45px; font-size: 18px;
 }
 
 .row-bg {
@@ -439,8 +560,7 @@ export default {
 
 .flex-container {
   display: flex;
-  height: 240px;
-  width: 100%;
+//height: 240px; height: 300px; width: 100%;
 }
 
 

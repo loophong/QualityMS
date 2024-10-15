@@ -9,6 +9,7 @@
         <result property="serialNumber" column="serial_number"/>
         <result property="issueNumber" column="issue_number"/>
         <result property="reviewers" column="Reviewers"/>
+        <result property="reviewerOpinion" column="Reviewer_opinion"/>
         <result property="recipients" column="Recipients"/>
         <result property="maskcontent" column="maskcontent"/>
         <result property="creator" column="creator"/>

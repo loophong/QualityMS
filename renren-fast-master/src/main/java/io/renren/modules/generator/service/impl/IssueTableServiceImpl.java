@@ -9,10 +9,13 @@ import io.renren.common.utils.Query;
 import io.renren.common.utils.R;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.config.FileUploadProperties;
+import io.renren.modules.generator.dao.IssueMaskTableDao;
 import io.renren.modules.generator.dao.IssueTableDao;
+import io.renren.modules.generator.entity.IssueMaskTableEntity;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
+import lombok.var;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +33,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Service("issueTableService")
 public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTableEntity> implements IssueTableService {
@@ -51,6 +56,9 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         this.uploadDir = fileUploadProperties.getUploadDir();
     }
 
+    @Autowired
+    private IssueMaskTableDao issueMaskTableDao; // 新增的 DAO
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<IssueTableEntity> page = this.page(
@@ -60,6 +68,64 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
         return new PageUtils(page);
     }
+
+    @Override
+    public PageUtils queryPagecreator(Map<String, Object> params) {
+        // 获取当前用户信息
+        SysUserEntity role = ShiroUtils.getUserEntity();
+        String rolename = role.getUsername();
+
+        // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        // 添加条件：查询创建人为 rolename 的数据
+        queryWrapper.eq("creator", rolename); // 假设 "creator" 是 IssueTableEntity 中表示创建人的字段名
+
+        // 执行分页查询
+        IPage<IssueTableEntity> page = this.page(
+                new Query<IssueTableEntity>().getPage(params),
+                queryWrapper
+        );
+
+        return new PageUtils(page);
+    }
+
+
+    @Override
+    public PageUtils QueryPage(Map<String, Object> params) {
+        // 提取查询参数
+        String issueCategoryId = (String) params.get("issueCategoryId");
+        String vehicleTypeId = (String) params.get("vehicleTypeId");
+        String responsibleDepartment = (String) params.get("responsibleDepartment");
+
+        // 创建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 如果 issueCategoryId 不为空，则添加模糊查询条件
+        if (issueCategoryId != null && !issueCategoryId.isEmpty()) {
+            queryWrapper.like("issue_category_id", issueCategoryId);
+        }
+
+        // 如果 vehicleTypeId 不为空，则添加模糊查询条件
+        if (vehicleTypeId != null && !vehicleTypeId.isEmpty()) {
+            queryWrapper.like("vehicle_type_id", vehicleTypeId);
+        }
+
+        // 如果 responsibleDepartment 不为空，则添加模糊查询条件
+        if (responsibleDepartment != null && !responsibleDepartment.isEmpty()) {
+            queryWrapper.like("responsible_department", responsibleDepartment);
+        }
+
+        // 执行分页查询并返回结果
+        IPage<IssueTableEntity> page = this.page(
+                new Query<IssueTableEntity>().getPage(params),
+                queryWrapper
+        );
+
+        return new PageUtils(page);
+    }
+
+
+
 
     @Override
     public List<IssueTableEntity> listAll() {
@@ -368,7 +434,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 //        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
 
         // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
-        statistics.put("创建", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
+        statistics.put("未完成", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
 
         // 对其他验证结论进行统计
         for (String conclusion : verificationConclusions) {
@@ -377,6 +443,244 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
         return statistics;
     }
+
+    @Override
+    public IssueTableEntity getByissueNumber(String issueNumber) {
+        // 使用 QueryWrapper 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("issue_number", issueNumber); // 根据问题编号查询
+
+        // 调用 MyBatis-Plus 的方法查找对应的实体
+        return this.getOne(queryWrapper, false); // 这里的 false 表示如果没有找到记录不会抛出异常
+    }
+
+    @Override
+    public Map<String, Integer> getTaskDetails(String issueNumber) {
+        // 初始化统计信息的 Map
+        Map<String, Integer> stats = new HashMap<>();
+
+
+        stats.put("totalCount", 0);
+        stats.put("completedCount", 0);
+        stats.put("inProgressCount", 0);
+        stats.put("reviewingCount", 0);
+
+        // 创建 QueryWrapper 并配置查询条件
+        QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("issue_number", issueNumber); // 根据 issueNumber 进行筛选
+        // 查询与 issueNumber 匹配的所有任务实体
+        List<IssueMaskTableEntity> taskList = issueMaskTableDao.selectList(queryWrapper); // 通过 issueMaskTableDao 查询
+
+
+
+
+        // 遍历任务列表，根据状态进行分类统计
+        for (IssueMaskTableEntity task : taskList) {
+            switch (task.getState()) {
+                case "已完成":
+                    stats.put("completedCount", stats.get("completedCount") + 1);
+                    break;
+                case "执行中":
+                    stats.put("inProgressCount", stats.get("inProgressCount") + 1);
+                    break;
+                case "审核中":
+                    stats.put("reviewingCount", stats.get("reviewingCount") + 1);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // 计算总任务数量
+        int totalCount = stats.get("completedCount") + stats.get("inProgressCount") + stats.get("reviewingCount");
+        stats.put("totalCount", totalCount); // 更新总任务数量
+
+        // 返回统计信息
+        return stats;
+
+    }
+
+    @Override
+    public void connectionIssue(Long issueId) {
+        // 1. 从数据库中获取传入的 issueId 对应的实体
+        IssueTableEntity currentIssue = this.getById(issueId);
+        System.out.println("获取的当前问题: " + currentIssue); // 打印当前问题实体
+
+        if (currentIssue == null) {
+            throw new IllegalArgumentException("未找到该问题");
+        }
+
+        // 2. 获取传入问题的 issueCategoryId 和 issueNumber
+        String issueCategoryId = currentIssue.getIssueCategoryId();
+        String issueNumber = currentIssue.getIssueNumber();
+        System.out.println("当前问题的 issueCategoryId: " + issueCategoryId); // 打印问题分类ID
+        System.out.println("当前问题的 issueNumber: " + issueNumber); // 打印问题编号
+
+        // 3. 查询所有具有相同 issueCategoryId 的记录
+        List<IssueTableEntity> relatedIssues = this.list(
+                Wrappers.<IssueTableEntity>lambdaQuery()
+                        .eq(IssueTableEntity::getIssueCategoryId, issueCategoryId)
+        );
+        System.out.println("找到的相关问题数量: " + relatedIssues.size()); // 打印找到的相关问题数量
+
+        // 4. 创建用于存储所有相同类型问题的车号的集合
+        List<String> relatedVehicleNumbers = new ArrayList<>();
+        StringBuilder associatedRectificationRecordsBuilder = new StringBuilder();
+
+        // 5. 遍历所有相关问题，处理其 associatedRectificationRecords 字段
+        for (IssueTableEntity issue : relatedIssues) {
+            String associatedRecords = issue.getAssociatedRectificationRecords();
+            // 如果 records 不为空，前面加上逗号，并添加问题编号
+            if (associatedRecords != null && !associatedRecords.isEmpty()) {
+                associatedRectificationRecordsBuilder.append(",").append(issueNumber);
+                System.out.println("更新相关问题的关联整改记录: " + associatedRecords + " + " + issueNumber); // 打印更新过程
+            }
+
+            // 收集车号
+            String vehicleNumber = issue.getIssueNumber(); //
+            if (vehicleNumber != null && !vehicleNumber.isEmpty()) {
+                relatedVehicleNumbers.add(vehicleNumber);
+            }
+        }
+
+        // 6. 将当前问题的 associatedRectificationRecords 修改为收集到的所有车号
+        String newAssociatedRecords = String.join(",", relatedVehicleNumbers);
+        currentIssue.setAssociatedRectificationRecords(newAssociatedRecords);
+        System.out.println("更新当前问题的 associatedRectificationRecords: " + currentIssue); // 打印更新后的记录
+
+        // 7. 更新当前问题的实体
+        boolean updateSuccess = this.updateById(currentIssue);
+        System.out.println("当前问题更新操作成功: " + updateSuccess); // 打印更新操作结果
+
+//        // 8. 更新所有相关问题的 associatedRectificationRecords
+//        for (IssueTableEntity issue : relatedIssues) {
+//            String previousRecords = issue.getAssociatedRectificationRecords();
+//            if (previousRecords != null && !previousRecords.isEmpty()) {
+//                issue.setAssociatedRectificationRecords(previousRecords + associatedRectificationRecordsBuilder.toString());
+//                System.out.println("更新相关问题ID: " + issue.getIssueId() + " 的关联整改记录: " + issue.getAssociatedRectificationRecords()); // 打印相关问题的更新
+//            } else {
+//                // 如果之前没有记录就直接设置
+//                issue.setAssociatedRectificationRecords(associatedRectificationRecordsBuilder.toString().replaceFirst(",", ""));
+//                System.out.println("新增相关问题ID: " + issue.getIssueId() + " 的关联整改记录: " + issue.getAssociatedRectificationRecords()); // 打印相关问题的新增
+//            }
+//            // 更新每个相关问题
+//            boolean relatedUpdateSuccess = this.updateById(issue);
+//            System.out.println("相关问题ID: " + issue.getIssueId() + " 更新操作成功: " + relatedUpdateSuccess); // 打印每个相关问题的更新结果
+//        }
+        // 8. 更新所有相关问题的 associatedRectificationRecords
+        for (IssueTableEntity issue : relatedIssues) {
+            // 将每个相关问题的 associatedRectificationRecords 修改为 newAssociatedRecords
+            issue.setAssociatedRectificationRecords(newAssociatedRecords);
+            System.out.println("更新相关问题ID: " + issue.getIssueId() + " 的关联整改记录为: " + newAssociatedRecords); // 打印更新后的记录
+
+            // 更新每个相关问题
+            boolean relatedUpdateSuccess = this.updateById(issue);
+            System.out.println("相关问题ID: " + issue.getIssueId() + " 更新操作成功: " + relatedUpdateSuccess); // 打印每个相关问题的更新结果
+        }
+
+    }
+
+    @Override
+    public Workbook generateTemplate() {
+        // 创建Excel工作簿
+        Workbook workbook = new XSSFWorkbook();
+        var sheet = workbook.createSheet("问题表模板");
+
+        // 创建表头
+        Row headerRow = sheet.createRow(0);
+        Field[] fields = IssueTableEntity.class.getDeclaredFields();
+        int cellIndex = 0;
+
+        // 定义字段名和中文描述的对应关系
+        Map<String, String> fieldDescriptionMap = new HashMap<>();
+        fieldDescriptionMap.put("serialNumber", "序号");
+        fieldDescriptionMap.put("issueNumber", "问题编号");
+        fieldDescriptionMap.put("inspectionDepartment", "检查科室");
+        fieldDescriptionMap.put("inspectionDate", "检查日期");
+        fieldDescriptionMap.put("issueCategoryId", "问题类别");
+        fieldDescriptionMap.put("vehicleTypeId", "车型");
+        fieldDescriptionMap.put("vehicleNumberId", "车号");
+        fieldDescriptionMap.put("issueDescription", "问题描述");
+        fieldDescriptionMap.put("rectificationRequirement", "整改要求");
+        fieldDescriptionMap.put("requiredCompletionTime", "要求完成时间");
+        fieldDescriptionMap.put("responsibleDepartment", "责任科室");
+        fieldDescriptionMap.put("rectificationStatus", "整改情况");
+        fieldDescriptionMap.put("actualCompletionTime", "实际完成时间");
+        fieldDescriptionMap.put("rectificationResponsiblePerson", "整改责任人");
+        fieldDescriptionMap.put("requiredSecondRectificationTime", "要求二次整改时间");
+        fieldDescriptionMap.put("remark", "备注");
+        fieldDescriptionMap.put("creator", "创建人");
+        fieldDescriptionMap.put("creationTime", "创建时间");
+        fieldDescriptionMap.put("lastModifier", "最后修改人");
+        fieldDescriptionMap.put("lastModificationTime", "最后修改时间");
+        fieldDescriptionMap.put("associatedRectificationRecords", "关联问题整改记录");
+        fieldDescriptionMap.put("associatedIssueAddition", "关联问题添加");
+        fieldDescriptionMap.put("creationDuration", "创建时长");
+        fieldDescriptionMap.put("causeAnalysis", "原因分析");
+        fieldDescriptionMap.put("rectificationVerificationStatus", "整改验证情况");
+        fieldDescriptionMap.put("verificationConclusion", "验证结论");
+        fieldDescriptionMap.put("verifier", "验证人");
+        fieldDescriptionMap.put("formula", "公式");
+
+        // 只写入需要的字段
+        for (Field field : fields) {
+            String fieldName = field.getName();
+
+            // 跳过不需要的字段
+            if (fieldName.equals("serialVersionUID") ||
+                    fieldName.equals("issueId") ||
+                    fieldName.equals("indicatorId") ||
+                    fieldName.equals("issuePhoto") ||
+                    fieldName.equals("rectificationPhotoDeliverable") ||
+                    fieldName.equals("reviewers") ||
+                    fieldName.equals("level") ||
+                    fieldName.equals("state")
+//                    ||
+//                    fieldName.equals("formula")
+            ) {
+                continue; // 不写入这些字段的标题
+            }
+
+            String columnTitle = fieldDescriptionMap.getOrDefault(fieldName, fieldName); // 获取中文标题
+            // 创建表头单元格
+            var cell = headerRow.createCell(cellIndex++);
+            cell.setCellValue(columnTitle); // 设置中文标题
+        }
+
+        return workbook; // 返回生成的工作簿
+    }
+
+    @Override
+    public void removeAll(Integer[] issueIds) {
+        // 1. 查询所有关联的问题编号
+        List<String> issueNumbers = new ArrayList<>();
+
+        // 根据 issueIds 获取所有对应的 IssueTableEntity
+        List<IssueTableEntity> issues = this.listByIds(Arrays.asList(issueIds));
+        for (IssueTableEntity issue : issues) {
+            issueNumbers.add(issue.getIssueNumber());
+        }
+        // 2. 根据问题编号查找任务表
+        // 创建查询条件
+        QueryWrapper<IssueMaskTableEntity> taskQueryWrapper = new QueryWrapper<>();
+        taskQueryWrapper.in("issue_number", issueNumbers); // 根据问题编号查询
+
+        // 获取任务列表
+        List<IssueMaskTableEntity> tasksToDelete = issueMaskTableDao.selectList(taskQueryWrapper);
+        // 3. 删除任务
+        if (!tasksToDelete.isEmpty()) {
+            List<Integer> taskIdsToDelete = tasksToDelete.stream()  // 将 List<Long> 修改为 List<Integer>
+                    .map(IssueMaskTableEntity::getIssuemaskId) // 使用 getIssuemaskId() 方法获取任务 ID
+                    .collect(Collectors.toList());
+            issueMaskTableDao.deleteBatchIds(taskIdsToDelete); // 批量删除任务
+            System.out.println("已成功删除任务 ID: " + taskIdsToDelete);
+        } else {
+            System.out.println("没有找到与给定问题编号关联的任务");
+        }
+
+
+    }
+
 
     // 统计“创建”的条件
     private Integer countIssuesByCreationCondition(String startDate, String endDate) {

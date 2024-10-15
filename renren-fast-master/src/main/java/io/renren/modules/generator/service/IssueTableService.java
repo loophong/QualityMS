@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.generator.entity.IssueTableEntity;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,6 +21,8 @@ import java.util.Map;
 public interface IssueTableService extends IService<IssueTableEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+    PageUtils queryPagecreator(Map<String, Object> params);
+    PageUtils QueryPage(Map<String, Object> params);
     List<IssueTableEntity> listAll();
     String saveUploadedFile(MultipartFile file) throws IOException;
 
@@ -36,5 +39,14 @@ public interface IssueTableService extends IService<IssueTableEntity> {
      */
     Map<String, Integer> getCurrentMonthVerificationConclusionStatistics();
 
+    IssueTableEntity getByissueNumber(String issueNumber);
+
+    Map<String, Integer> getTaskDetails(String issueNumber);
+
+    void connectionIssue(Long issueId);
+
+    Workbook generateTemplate(); // 声明生成模板的方法
+
+    void removeAll(Integer[] issueIds);
 }
 

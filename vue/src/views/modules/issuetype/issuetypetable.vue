@@ -6,6 +6,15 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
+<!--        <el-upload-->
+<!--          class="upload-button"-->
+<!--          :show-file-list="false"-->
+<!--          :before-upload="beforeUpload"-->
+<!--          :on-change="handleFileChange"-->
+<!--          :auto-upload="false"-->
+<!--        >-->
+<!--          <el-button type="primary">上传图片</el-button>-->
+<!--        </el-upload>-->
         <el-button v-if="isAuth('generator:issuetypetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('generator:issuetypetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -65,6 +74,7 @@
   export default {
     data () {
       return {
+        uploadingFile: null, // 用于存储待上传文件
         dataForm: {
           key: ''
         },
@@ -84,6 +94,41 @@
       this.getDataList()
     },
     methods: {
+      handleFileChange(file) {
+        // 存储待上传的文件
+        this.uploadingFile = file.raw; // 获取 File 对象
+        this.uploadFile(file.raw); // 调用上传方法
+      },
+      uploadFile(file) {
+        const formData = new FormData();
+        formData.append('file', file); // 将文件添加到 FormData
+
+        this.$http({
+          url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+          method: 'post',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data' // 指定为文件上传
+          }
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message.success('文件上传成功');
+            // 处理成功后的逻辑，例如更新状态
+          } else {
+            this.$message.error(data.msg);
+          }
+        }).catch(error => {
+          this.$message.error('上传失败');
+          console.error(error);
+        });
+      },
+      beforeUpload(file) {
+        const isImage = file.type.startsWith('image/');
+        if (!isImage) {
+          this.$message.error('上传图片只能是图片格式!');
+        }
+        return isImage; // 返回 true 继续上传，返回 false 不上传
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true

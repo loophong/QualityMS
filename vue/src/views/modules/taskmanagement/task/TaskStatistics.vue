@@ -80,17 +80,17 @@
     <div class="flex-container">
 
       <div class="flex-item" style="width: 60%; height: 100%;">
-        <div class="picture" ref="chartContainer" style="width: 99%; height: 99%;"></div>
+        <div class="picture" ref="chartContainer" style="width: 99%; height: 99%; top: 8px;"></div>
       </div>
 
       <div class="flex-item" style="width: 20%; height: 100%;">
         <!-- <div  style="width: 200px; height: 200px; background-color: #fff;"></div> -->
-        <div class="picture" ref="onTimePieChart" style="width: 99%; height: 99%;"></div>
+        <div class="picture" ref="onTimePieChart" style="width: 99%; height: 99%; top: 8px;"></div>
       </div>
 
       <div class="flex-item" style="width: 20%; height: 100%;">
         <!-- <div style="width: 200px; height: 200px; background-color: #ddd;"></div> -->
-        <div class="picture" ref="earlyCompletionPieChart" style="width: 99%; height: 99%;"></div>
+        <div class="picture" ref="earlyCompletionPieChart" style="width: 99%; height: 99%; top: 8px;"></div>
       </div>
 
     </div>
@@ -353,23 +353,43 @@ export default {
       const option = {
         title: {
           text: '项目计划进度图表',
+          left: 'center'
         },
         tooltip: {},
         xAxis: {
           // data: ["点1", "点2", "点3", "点4", "点5", "点6"]
           data: this.taskLineData.taskId
         },
+        legend: {
+          data: ['计划时间', '实际时间'],
+          left: "76%"
+        },
         yAxis: {},
         series: [{
           name: '计划时间',
           type: 'line',
           // data: [80, 50, 30, 70, 20, 60]
-          data: this.taskLineData.taskScheduleDays
+          data: this.taskLineData.taskScheduleDays,
+          // label: {
+          //   show: true,
+          //   position: 'top'
+          // },
+          // itemStyle: {
+          //   color: "rgb(69,255,0)",
+          //   borderColor: "rgba(47, 144, 48, 1)",
+          // },
+          // lineStyle: {
+          //   color: "rgba(22,185,245,0.52)"
+          // }
         }, {
           name: '实际时间',
           type: 'line',
           // data: [40, 10, 50, 70, 40, 20]
-          data: this.taskLineData.taskActualDays
+          data: this.taskLineData.taskActualDays,
+          // label: {
+          //   show: true,
+          //   position: 'top'
+          // },
         }]
       };
 
@@ -524,7 +544,7 @@ export default {
   justify-content: center; /* 水平居中 */
   align-items: center; /* 垂直居中 */
   border-radius: 4px;
-  min-height: 36px;
+//min-height: 36px; min-height: 45px; font-size: 18px;
 }
 
 .row-bg {
@@ -540,8 +560,7 @@ export default {
 
 .flex-container {
   display: flex;
-  height: 240px;
-  width: 100%;
+//height: 240px; height: 300px; width: 100%;
 }
 
 

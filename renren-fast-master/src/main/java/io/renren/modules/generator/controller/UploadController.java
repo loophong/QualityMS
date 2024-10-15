@@ -1,6 +1,7 @@
 package io.renren.modules.generator.controller;
 
 import io.renren.common.utils.R;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -28,12 +29,16 @@ import java.util.UUID;
  * @GitHub https://github.com/lenve
  * @Gitee https://gitee.com/lenve
  */
+@Slf4j
 @RestController
 @RequestMapping("test")
 public class UploadController {
     SimpleDateFormat sdf = new SimpleDateFormat("/yyyy/MM/dd/");
     @PostMapping("/upload")
     public Map<String,Object> fileupload(MultipartFile file, HttpServletRequest req) {
+
+        log.info("文件"+file.getOriginalFilename());
+
         Map<String, Object> result = new HashMap<>();
 //        // 使用项目内部路径
 //        String uploadPath = "C:\\Users\\uploads\\"; // 请根据实际路径调节

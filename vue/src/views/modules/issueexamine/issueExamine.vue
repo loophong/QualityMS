@@ -62,12 +62,12 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
-        prop="issuemaskId"
-        header-align="center"
-        align="center"
-        label="">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="issuemaskId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="">-->
+<!--      </el-table-column>-->
 <!--      <el-table-column-->
 <!--        prop="serialNumber"-->
 <!--        header-align="center"-->

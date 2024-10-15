@@ -305,7 +305,7 @@
         const day = String(now.getDate()).padStart(2, '0');
         const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         console.log('执行随机+++++')
-        return `${year}${month}${day}${random}`;
+        return `ZL-TA-${year}${month}${day}${random}`;
       },
       cancel1 () {
         // 重置 subtasks 数组，只保留一个初始组合

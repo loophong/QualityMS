@@ -80,6 +80,34 @@ public class PlanController {
         return plan;
     }
 
+    /**
+     * @description: 查询未完成计划
+     * @author: hong
+     * @date: 2024/10/15 15:11
+     * @version: 1.0
+     */
+    @RequestMapping("/unfinished")
+    @RequiresPermissions("taskmanagement:plan:list")
+    public R unfinishedList(@RequestParam Map<String, Object> params) {
+        PageUtils page = planService.queryPageUnfinishedPlan(params);
+        System.out.println(page.getList().toString());
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * @description: 查询已完成-历史计划
+     * @author: hong
+     * @date: 2024/10/15 15:11
+     * @version: 1.0
+     */
+    @RequestMapping("/finished")
+    @RequiresPermissions("taskmanagement:plan:list")
+    public R finishedList(@RequestParam Map<String, Object> params) {
+        PageUtils page = planService.queryPageFinishedPlan(params);
+        System.out.println(page.getList().toString());
+        return R.ok().put("page", page);
+    }
+
 
     /**
      * 列表
@@ -112,7 +140,8 @@ public class PlanController {
     @PostMapping("/save")
     @RequiresPermissions("taskmanagement:plan:save")
     public R save(@RequestBody PlanAndTaskDTO planAndTaskDTO) {
-        System.out.println(planAndTaskDTO);
+
+        log.info("新增计划：" + planAndTaskDTO);
 
         planService.save(planAndTaskDTO.getPlan());
 

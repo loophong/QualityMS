@@ -274,11 +274,23 @@ public class IssueTableController {
     }
 
     /**
-     * 列表
+     * 问题列表（创建人可见）
+     */
+    @RequestMapping("/listcreator")
+    @RequiresPermissions("generator:issuetable:list")
+    public R listcreator(@RequestParam Map<String, Object> params){
+        PageUtils page = issueTableService.queryPagecreator(params);
+//        PageUtils page = issueTableService.queryPage(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 问题列表完整
      */
     @RequestMapping("/list")
     @RequiresPermissions("generator:issuetable:list")
     public R list(@RequestParam Map<String, Object> params){
+//        PageUtils page = issueTableService.queryPagecreator(params);
         PageUtils page = issueTableService.queryPage(params);
         return R.ok().put("page", page);
     }

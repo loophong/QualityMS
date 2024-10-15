@@ -124,10 +124,11 @@
         </el-select>
       </el-form-item>
       <el-upload
-        class="upload-button"
+        class="upload-button right-aligned"
         :show-file-list="false"
         :before-upload="beforeUpload"
         :on-change="handleFileChange"
+        :auto-upload="false"
       >
         <el-button type="primary">上传图片</el-button>
       </el-upload>
@@ -173,10 +174,11 @@
           </el-radio-group>
         </el-form-item>
         <el-upload
-          class="upload-button"
+          class="upload-button right-aligned"
           :show-file-list="false"
           :before-upload="beforeUpload"
           :on-change="handleFileChange1"
+          :auto-upload="false"
         >
           <el-button type="primary">上传图片</el-button>
         </el-upload>
@@ -535,8 +537,8 @@
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
-        const random = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
-        return `${year}${month}${day}${random}`;
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        return `ZL-IS-${year}${month}${day}${random}`;
       },
       // 处理图片预览
       handlePictureCardPreview(file) {
@@ -1108,3 +1110,8 @@
     }
   }
 </script>
+<style scoped>
+.right-aligned {
+  margin-left: 80px; /* 可根据需要调整移动的距离 */
+}
+</style>

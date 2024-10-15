@@ -70,6 +70,27 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     }
 
     @Override
+    public PageUtils queryPagecreator(Map<String, Object> params) {
+        // 获取当前用户信息
+        SysUserEntity role = ShiroUtils.getUserEntity();
+        String rolename = role.getUsername();
+
+        // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        // 添加条件：查询创建人为 rolename 的数据
+        queryWrapper.eq("creator", rolename); // 假设 "creator" 是 IssueTableEntity 中表示创建人的字段名
+
+        // 执行分页查询
+        IPage<IssueTableEntity> page = this.page(
+                new Query<IssueTableEntity>().getPage(params),
+                queryWrapper
+        );
+
+        return new PageUtils(page);
+    }
+
+
+    @Override
     public PageUtils QueryPage(Map<String, Object> params) {
         // 提取查询参数
         String issueCategoryId = (String) params.get("issueCategoryId");

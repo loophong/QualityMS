@@ -25,6 +25,15 @@
                   </el-option-group>
                 </el-select>
               </el-form-item>
+              <el-form-item label="发起人" prop="planInitiator">
+                <el-select v-model="dataForm.planInitiator" filterable placeholder="请选择发起人">
+                  <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+                    <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                               :value="item.value">
+                    </el-option>
+                  </el-option-group>
+                </el-select>
+              </el-form-item>
             </el-col>
 
             <el-col :span="12">
@@ -66,6 +75,12 @@
             <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" placeholder="请输入计划内容"
                       v-model="dataForm.planContent" maxlength="1000">
             </el-input>
+          </el-form-item>
+          <el-form-item label="上传附件" prop="planFile" required>
+            <el-upload ref="file" :file-list="planFileList" :action="uploadUrl"
+                       :on-change="uploadFile" :auto-upload="false">
+              <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
+            </el-upload>
           </el-form-item>
 
 
@@ -182,6 +197,10 @@ export default {
       title: '计划详情',
       routerPlanId: '',
 
+      // 计划附件
+      planFileList: [],
+      uploadUrl: '',
+
 
       planAndTasksDTO: { // 计划和任务
         plan: {},
@@ -212,7 +231,8 @@ export default {
         planEarlyCompletionDays: '',
         planLagDays: '',
         planLagReasons: '',
-        planAssociatedIndicatorsId: ''
+        planAssociatedIndicatorsId: '',
+        planFile: ''
 
       },
 
@@ -425,6 +445,36 @@ export default {
 
   methods: {
 
+    // 上传文件
+    uploadFile(file) {
+      console.log("文件" + file.raw);
+
+      const formData = new FormData();
+      formData.append('file', file.raw); // 将文件添加到 FormData
+
+      this.$http({
+        url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        method: 'post',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data' // 指定为文件上传
+        }
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          // 保存后端返回的url到变量中
+          this.dataForm.planFile = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+          console.log('获得的文件地址 ：', data.uploadurl)
+          this.$message.success('文件上传成功');
+          // 处理成功后的逻辑，例如更新状态
+        } else {
+          this.$message.error(data.msg);
+        }
+      }).catch(error => {
+        this.$message.error('上传失败');
+        console.error(error);
+      });
+    },
+
     init(routerPlanId) {
       // this.dataForm.planId = routerPlanId || 0
       this.$nextTick(() => {
@@ -460,6 +510,7 @@ export default {
               this.dataForm.planLagDays = data.plan.planLagDays
               this.dataForm.planLagReasons = data.plan.planLagReasons
               this.dataForm.planAssociatedIndicatorsId = data.plan.planAssociatedIndicatorsId
+              this.dataForm.planFile = data.plan.planFile
               this.tasks = data.tasks
             }
           })
@@ -548,6 +599,7 @@ export default {
               'planIsOverdue': this.dataForm.planIsOverdue,
               'planIsOnTime': this.dataForm.planIsOnTime,
               'planAssociatedIndicatorsId': this.dataForm.planAssociatedIndicatorsId,
+              'planInitiator': this.dataForm.planInitiator
             };
 
             const tasksData = this.tasks.map(task => ({

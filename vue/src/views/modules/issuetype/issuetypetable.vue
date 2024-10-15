@@ -11,6 +11,7 @@
 <!--          :show-file-list="false"-->
 <!--          :before-upload="beforeUpload"-->
 <!--          :on-change="handleFileChange"-->
+<!--          :auto-upload="false"-->
 <!--        >-->
 <!--          <el-button type="primary">上传图片</el-button>-->
 <!--        </el-upload>-->

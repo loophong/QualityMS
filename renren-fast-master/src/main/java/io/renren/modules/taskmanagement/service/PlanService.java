@@ -28,5 +28,9 @@ public interface PlanService extends IService<PlanEntity> {
     List<Map<String, Integer>> home();
 
     List<PlanStatisticsLabelDto> getPlanLabel();
+
+    PageUtils queryPageUnfinishedPlan(Map<String, Object> params);
+
+    PageUtils queryPageFinishedPlan(Map<String, Object> params);
 }
 

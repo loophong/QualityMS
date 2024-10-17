@@ -20,7 +20,17 @@
         <result property="deleteFlag" column="delete_flag"/>
         <result property="parentId" column="parent_id"/>
         <result property="groupName" column="group_name"/>
+        <result property="registrationNum" column="registration_num"/>
+        <result property="examineStatus" column="examine_status"/>
     </resultMap>
+
+    <!-- 查询与"我"相关的成员 -->
+    <select id="aboutMeList" parameterType="int" resultType="io.renren.modules.qcManagement.entity.QcGroupMemberEntity">
+        SELECT *
+        FROM qc_group_member
+        WHERE (parent_id = #{id} OR qcgm_id = #{id}) AND delete_flag != 1
+    </select>
+
 
 
 </mapper>

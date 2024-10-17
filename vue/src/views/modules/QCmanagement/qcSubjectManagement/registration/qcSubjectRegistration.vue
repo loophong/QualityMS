@@ -25,8 +25,10 @@
       </el-table-column>
       <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
       </el-table-column>
-      <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+      <el-table-column prop="groupName" header-align="center" align="center" label="小组名称">
       </el-table-column>
+      <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+      </el-table-column> -->
       <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
       </el-table-column>
       <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
@@ -221,7 +223,7 @@ export default {
                   name: item.name,
                   number: item.number,
                   groupName: item.groupName,
-                  roleInTopic: '管理员',
+                  roleInTopic: '组长',
                   children: []
                 };
               }

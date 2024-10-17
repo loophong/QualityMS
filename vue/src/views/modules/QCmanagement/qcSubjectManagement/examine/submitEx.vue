@@ -1,5 +1,19 @@
 <template>
+  <!-- const colorScale = {
+        'E': '#1e1e1e', // 黑色  //跳过
+        'D': '#e74c3c', // 红色  //未通过
+        'C': '#0dbc79', // 绿色  //已通过
+        'B': '#3498db',  // 蓝色 //进行中
+        'A': '#717182'  // 灰色 //未提交
+      }; -->
+
   <div>
+    <div>
+      <span style="color:#717182; font-size: 24px;">--未开始</span>
+      <span style="color:#3498db; font-size: 24px;"> --进行中</span>
+      <span style="color:#0dbc79; font-size: 24px;"> --已通过</span>
+      <span style="color:#1e1e1e; font-size: 24px;"> --跳过</span>
+    </div>
     <div ref="treeChart" style="width: 100%; height: 500px;"></div>
     <el-dialog title="课题提交" :visible.sync="showDialog1">
       <el-form :model="form1">
@@ -156,7 +170,7 @@
           </tbody>
         </table>
         <br>
-        <el-form-item label="初评等级" :label-width="formLabelWidth">
+        <!-- <el-form-item label="初评等级" :label-width="formLabelWidth">
           <el-select v-model="form4.level" placeholder=""
             :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
             <el-option label="A" value="A"></el-option>
@@ -164,7 +178,7 @@
             <el-option label="C" value="C"></el-option>
             <el-option label="D" value="D"></el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form4.result" placeholder=""
             :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
@@ -276,7 +290,7 @@
       </table>
       <br>
       <el-form :model="form5">
-        <el-form-item label="复评等级" :label-width="formLabelWidth">
+        <!-- <el-form-item label="复评等级" :label-width="formLabelWidth">
           <el-select v-model="form5.level" placeholder=""
             :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
             <el-option label="A" value="A"></el-option>
@@ -284,7 +298,7 @@
             <el-option label="C" value="C"></el-option>
             <el-option label="D" value="D"></el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="审核结果" :label-width="formLabelWidth">
           <el-select v-model="form5.result" placeholder=""
             :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
@@ -354,7 +368,9 @@ export default {
     return {
       ifSelected: false,
       tableData: [20, 40, 20, 20],
+      tableDataCount: '',
       finalData: [20, 40, 20, 20],
+      finalDataCount: '',
       formLabelWidth: '120px',
       showDialog1: false,
       showDialog2: false,
@@ -493,7 +509,7 @@ export default {
       try {
         this.routerParam = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', topicType: '', resultType: '', examineId: '' };
         this.ifSelected = this.ifSelectedPart()
-        // console.log(this.routerParam, '++++++++++++')
+        console.log(this.routerParam, '++++++++++++')
       } catch (e) {
         console.log('处理跳转参数失败')
         console.log(e)
@@ -528,10 +544,11 @@ export default {
           this.renderTree()
           // this.tableData = this.dataFormEx.qcFirstScore.split(',')
           this.tableData = this.dataFormEx.qcFirstScore ? this.dataFormEx.qcFirstScore.split(',') : []
-          this.tableData = this.tableData.map(item => Number(item))
+          this.tableData = this.dataFormEx.qcFirstScore ? this.tableData.map(item => Number(item)) : []
           // this.finalData = this.dataFormEx.qcSecondScore.split(',')
           this.finalData = this.dataFormEx.qcSecondScore ? this.dataFormEx.qcSecondScore.split(',') : []
-          this.finalData = this.finalData.map(item => Number(item))
+          this.finalData = this.dataFormEx.qcSecondScore ? this.finalData.map(item => Number(item)) : []
+          this.finalDataCount = this.dataFormEx.qcSecondScore ? this.finalData.reduce((accumulator, currentValue) => accumulator + currentValue, 0) : undefined;
           this.form2.result = this.dataFormEx.qcStatusTwo
           this.form3.result = this.dataFormEx.qcStatusThree
           this.form4.result = this.dataFormEx.qcStatusFour
@@ -1003,6 +1020,15 @@ export default {
                 onClose: () => {
                   this.showDialog7 = false
                 }
+              })
+              //更新终评分数至课题活动结果
+              this.$http({
+                url: this.$http.adornUrl(`/qcSubject/registration/update`),
+                method: 'post',
+                data: this.$http.adornData({
+                  'qcsrId': this.routerParam[0].qcsrId,
+                  'topicActivityResult': this.finalDataCount,
+                })
               })
             } else {
               this.$message.error(data.msg)

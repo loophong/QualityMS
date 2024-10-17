@@ -116,9 +116,7 @@ export default {
             let resultTypeString = data.qcSubjectRegistration.resultType;
             let resultArray = resultTypeString.split(",");
             if (data && data.code === 0) {
-
               this.dataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus
-
               this.dataForm.resultType = resultArray
             }
           })

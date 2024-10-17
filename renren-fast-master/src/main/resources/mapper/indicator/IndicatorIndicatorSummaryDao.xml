@@ -8,6 +8,7 @@
         <result property="indicatorId" column="indicator_id"/>
         <result property="indicatorName" column="indicator_name"/>
         <result property="indicatorValue" column="indicator_value"/>
+        <result property="indicatorActualValue" column="indicator_actual_value"/>
         <result property="indicatorValueUpperBound" column="indicator_value_upper_bound"/>
         <result property="indicatorValueLowerBound" column="indicator_value_lower_bound"/>
         <result property="assessmentDepartment" column="assessment_department"/>

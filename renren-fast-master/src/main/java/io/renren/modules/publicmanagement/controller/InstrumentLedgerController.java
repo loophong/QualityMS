@@ -1,21 +1,28 @@
 package io.renren.modules.publicmanagement.controller;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.read.listener.PageReadListener;
+import io.renren.modules.publicmanagement.dao.InstrumentLedgerDao;
+import io.renren.modules.qcManagement.dao.QcSubjectRegistrationDao;
+import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.publicmanagement.entity.InstrumentLedgerEntity;
 import io.renren.modules.publicmanagement.service.InstrumentLedgerService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
-
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -27,10 +34,16 @@ import io.renren.common.utils.R;
  */
 @RestController
 @RequestMapping("publicmanagement/instrumentledger")
-public class InstrumentLedgerController {
+public class InstrumentLedgerController  {
     @Autowired
     private InstrumentLedgerService instrumentLedgerService;
 
+    @Autowired
+    private InstrumentLedgerDao instrumentLedgerDao;
+
+
+    @Autowired
+    private QcSubjectRegistrationDao qcSubjectRegistrationDao;
     /**
      * 列表
      */
@@ -38,8 +51,75 @@ public class InstrumentLedgerController {
     @RequiresPermissions("publicmanagement:instrumentledger:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = instrumentLedgerService.queryPage(params);
-
         return R.ok().put("page", page);
+    }
+
+    @PostMapping ("/message")
+//    @RequiresPermissions("publicmanagement:instrumentledger:list")
+    public  List<ResMessage> message(){
+        List<InstrumentLedgerEntity> instrumentLedgerEntities = instrumentLedgerDao.selectList(null);
+        System.out.println(instrumentLedgerEntities);
+        // 获取当前日期
+        Date currentDate = new Date();
+
+// 使用stream过滤出calibrationValidity超过当前日期的实体
+//        List<ResMessage> resMessages = instrumentLedgerEntities.stream()
+//                .map(entity -> {
+//                    // 根据InstrumentLedgerEntity的calibrationValidity与当前日期比较，设置state
+//                    int state = entity.getCalibrationValidity() != null && entity.getCalibrationValidity().before(currentDate) ? 1 : 0;
+//                    // 创建ResMessage对象
+//                    return new ResMessage(entity.getCompanyId(), state);
+//                })
+//                .collect(Collectors.toList());
+
+
+        List<ResMessage> resMessages = instrumentLedgerEntities.stream()
+                .map(entity -> {
+                    // 确保 companyId 不为 null
+                    String numberId = entity.getCompanyId() != null ? entity.getCompanyId() : "defaultId";
+                    // 根据InstrumentLedgerEntity的calibrationValidity与当前日期比较，设置state
+                    int state = entity.getCalibrationValidity() != null && entity.getCalibrationValidity().before(currentDate) ? 1 : 0;
+                    // 创建ResMessage对象
+                    return new ResMessage(numberId, state);
+                })
+                .collect(Collectors.toList());
+// 打印过滤后的实体列表
+        System.out.println(resMessages);
+
+        System.out.println("message查询请求");
+        return resMessages;
+
+    }
+
+    @PostMapping("/updatemessage")
+//    @RequiresPermissions("publicmanagement:instrumentledger:list")
+    public void updatemessage(@RequestBody InstrumentLedgerEntity params){
+
+        System.out.println("message更新操作");
+
+    }
+    @PostMapping("/import")
+    public R importExcel(@RequestParam("file") MultipartFile excelFile)
+    {
+        System.out.println("---------import--------------");
+        try {
+            EasyExcel.read(excelFile.getInputStream(), InstrumentLedgerEntity.class, new PageReadListener<InstrumentLedgerEntity>(dataList -> {
+                for (InstrumentLedgerEntity user : dataList) {
+                    //将导入的数据用mybatisPlus一个个添加进数据库
+                    System.out.println(user);
+//                    instrumentLedgerDao.insertinstrumentLedger(user);
+                    int insert = instrumentLedgerDao.insert(user);
+                    System.out.println(insert);
+
+//                    loginMapper.insert(user);
+                }
+            })).sheet().doRead();
+
+//            marketOrderSumnumberService.importInterests(excelFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return R.ok();
     }
 
 
@@ -49,7 +129,7 @@ public class InstrumentLedgerController {
     @RequestMapping("/info/{id}")
 //    @RequiresPermissions("publicmanagement:instrumentledger:info")
     public R info(@PathVariable("id") Integer id){
-		InstrumentLedgerEntity instrumentLedger = instrumentLedgerService.getById(id);
+        InstrumentLedgerEntity instrumentLedger = instrumentLedgerService.getById(id);
 
         return R.ok().put("instrumentLedger", instrumentLedger);
     }
@@ -60,7 +140,7 @@ public class InstrumentLedgerController {
     @RequestMapping("/save")
     @RequiresPermissions("publicmanagement:instrumentledger:save")
     public R save(@RequestBody InstrumentLedgerEntity instrumentLedger){
-		instrumentLedgerService.save(instrumentLedger);
+        instrumentLedgerService.save(instrumentLedger);
 
         return R.ok();
     }
@@ -71,7 +151,7 @@ public class InstrumentLedgerController {
     @RequestMapping("/update")
     @RequiresPermissions("publicmanagement:instrumentledger:update")
     public R update(@RequestBody InstrumentLedgerEntity instrumentLedger){
-		instrumentLedgerService.updateById(instrumentLedger);
+        instrumentLedgerService.updateById(instrumentLedger);
 
         return R.ok();
     }
@@ -82,7 +162,7 @@ public class InstrumentLedgerController {
     @RequestMapping("/delete")
     @RequiresPermissions("publicmanagement:instrumentledger:delete")
     public R delete(@RequestBody Integer[] ids){
-		instrumentLedgerService.removeByIds(Arrays.asList(ids));
+        instrumentLedgerService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }

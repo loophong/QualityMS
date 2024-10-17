@@ -4,7 +4,7 @@
       <el-main>
         <h2>{{ title }}</h2>
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
-          label-width="120px">
+                 label-width="120px">
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="计划编号" prop="planId">
@@ -12,7 +12,7 @@
               </el-form-item>
               <el-form-item label="开始日期" prop="planStartDate">
                 <el-date-picker v-model="dataForm.planStartDate" type="date" placeholder="选择开始日期"
-                  style="width: 100%;"></el-date-picker>
+                                style="width: 100%;"></el-date-picker>
               </el-form-item>
               <el-form-item label="计划天数" prop="planScheduleDays">
                 <el-input :value="planScheduleDays" disabled placeholder="计划天数"></el-input>
@@ -41,7 +41,7 @@
               </el-form-item>
               <el-form-item label="计划完成日期" prop="planScheduleCompletionDate">
                 <el-date-picker v-model="dataForm.planScheduleCompletionDate" type="date" placeholder="选择计划完成日期"
-                  style="width: 100%;"></el-date-picker>
+                                style="width: 100%;"></el-date-picker>
               </el-form-item>
               <el-form-item label="关联指标" prop="planAssociatedIndicatorsId">
                 <el-select v-model="dataForm.planAssociatedIndicatorsId" placeholder="请选择">
@@ -69,15 +69,20 @@
           </el-row>
           <el-form-item label="计划内容" prop="planContent">
             <el-input type="textarea" :autosize="{ minRows: 5, maxRows: 10 }" placeholder="请输入计划内容"
-              v-model="dataForm.planContent" maxlength="1000">
+                      v-model="dataForm.planContent" maxlength="1000">
             </el-input>
           </el-form-item>
-
+          <el-form-item label="上传附件" prop="planFile" required>
+            <el-upload ref="file" :file-list="planFileList" :action="uploadUrl"
+                       :on-change="uploadFile" :auto-upload="false">
+              <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
+            </el-upload>
+          </el-form-item>
 
 
           <!-- 任务列表 -->
           <div v-for="(task, index) in tasks" :key="index" style="background-color:#EEEEEE;" class="task-list-item">
-            <el-form :model="task" :rules="dataRule" :ref="`task_${index}`"  label-width="120px">
+            <el-form :model="task" :rules="dataRule" :ref="`task_${index}`" label-width="120px">
 
               <el-row :gutter="20">
                 <el-col :span="12">
@@ -85,7 +90,7 @@
                 </el-col>
                 <el-col :span="12" class="button-col">
                   <el-button type="text" icon="el-icon-close" size="large" @click="removeTask(index)"
-                    class="remove-task-button"></el-button>
+                             class="remove-task-button"></el-button>
                 </el-col>
               </el-row>
               <el-row :gutter="20">
@@ -95,7 +100,7 @@
                   </el-form-item>
                   <el-form-item label="开始日期" prop="taskStartDate">
                     <el-date-picker v-model="task.taskStartDate" type="date" placeholder="选择开始日期"
-                      style="width: 100%;"></el-date-picker>
+                                    style="width: 100%;"></el-date-picker>
                   </el-form-item>
                   <el-form-item label="任务天数" prop="taskScheduleDays">
                     <el-input :value="task.taskScheduleDays" placeholder="任务天数" disabled></el-input>
@@ -104,7 +109,7 @@
                     <el-select v-model="task.taskPrincipal" filterable placeholder="请选择负责人">
                       <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                          :value="item.value">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -117,13 +122,13 @@
                   </el-form-item>
                   <el-form-item label="预计完成日期" prop="taskScheduleCompletionDate">
                     <el-date-picker v-model="task.taskScheduleCompletionDate" type="date" placeholder="选择任务完成日期"
-                      style="width: 100%;"></el-date-picker>
+                                    style="width: 100%;"></el-date-picker>
                   </el-form-item>
                   <el-form-item label="审核人" prop="taskAuditor">
                     <el-select v-model="task.taskAuditor" filterable placeholder="请选择审核人">
                       <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                          :value="item.value">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -132,7 +137,7 @@
                     <el-select v-model="task.taskExecutor" multiple filterable placeholder="执行人">
                       <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                          :value="item.value">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -142,7 +147,7 @@
 
               <el-form-item label="任务内容" prop="taskContent">
                 <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" placeholder="请输入任务内容"
-                  v-model="task.taskContent" maxlength="1000">
+                          v-model="task.taskContent" maxlength="1000">
                 </el-input>
               </el-form-item>
 
@@ -163,11 +168,18 @@
 
 
 <script>
+// import {uploadFile} from "../../../../api/indicator/indicator";
+import moment from 'moment'
+
 export default {
   data() {
     return {
       title: '新建计划',
       visible: false,
+
+      // 计划附件
+      planFileList: [],
+      uploadUrl: '',
 
       dataForm: { // 计划的基本结构
         tmPid: 0,
@@ -193,7 +205,8 @@ export default {
         // planEarlyCompletionDays: '',
         // planLagDays: '',
         // planLagReasons: '',
-        planAssociatedIndicatorsId: ''
+        planAssociatedIndicatorsId: '',
+        planFile: '',
 
       },
 
@@ -225,17 +238,17 @@ export default {
       tasks: [], // 初始化成员列表
       dataRule: {
         planId: [
-          { required: true, message: '计划编号不能为空', trigger: 'blur' },
-          { validator: this.validatePlanId, trigger: 'blur' }
+          {required: true, message: '计划编号不能为空', trigger: 'blur'},
+          {validator: this.validatePlanId, trigger: 'blur'}
         ],
         planName: [
-          { required: true, message: '计划名不能为空', trigger: 'blur' }
+          {required: true, message: '计划名不能为空', trigger: 'blur'}
         ],
         planContent: [
-          { required: true, message: '任务内容不能为空', trigger: 'blur' }
+          {required: true, message: '任务内容不能为空', trigger: 'blur'}
         ],
         planStartDate: [
-          { required: true, message: '开始日期不能为空', trigger: 'blur' }
+          {required: true, message: '开始日期不能为空', trigger: 'blur'}
         ],
         planScheduleCompletionDate: [
           {
@@ -245,45 +258,45 @@ export default {
           }
         ],
         planInitiator: [
-          { required: true, message: '发起人不能为空', trigger: ['change', 'blur'] }
+          {required: true, message: '发起人不能为空', trigger: ['change', 'blur']}
         ],
         planPrincipal: [
-          { required: true, message: '负责人不能为空', trigger: ['change', 'blur'] }
+          {required: true, message: '负责人不能为空', trigger: ['change', 'blur']}
         ],
         planExecutor: [
-          { required: true, message: '执行人不能为空', trigger: ['change', 'blur'] }
+          {required: true, message: '执行人不能为空', trigger: ['change', 'blur']}
         ],
         planAuditor: [
-          { required: true, message: '审核人不能为空', trigger: ['change', 'blur'] }
+          {required: true, message: '审核人不能为空', trigger: ['change', 'blur']}
         ],
         planAssociatedIndicatorsId: [
-          { required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur'] }
+          {required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur']}
         ],
 
         taskId: [
-          { required: true, message: '任务编号不能为空', trigger: 'blur' },
-          { validator: this.validateTaskId, trigger: 'blur' }
+          {required: true, message: '任务编号不能为空', trigger: 'blur'},
+          {validator: this.validateTaskId, trigger: 'blur'}
         ],
         taskName: [
-          { required: true, message: '任务名不能为空', trigger: 'blur' }
+          {required: true, message: '任务名不能为空', trigger: 'blur'}
         ],
         taskContent: [
-          { required: true, message: '任务内容不能为空', trigger: 'blur' }
+          {required: true, message: '任务内容不能为空', trigger: 'blur'}
         ],
         taskStartDate: [
-          { required: true, message: '任务开始日期不能为空', trigger: 'blur' }
+          {required: true, message: '任务开始日期不能为空', trigger: 'blur'}
         ],
         taskScheduleCompletionDate: [
-          { required: true, message: '任务预计完成日期不能为空', trigger: 'blur' }
+          {required: true, message: '任务预计完成日期不能为空', trigger: 'blur'}
         ],
         taskPrincipal: [
-          { required: true, message: '负责人不能为空', trigger: ['change', 'blur'] }
+          {required: true, message: '负责人不能为空', trigger: ['change', 'blur']}
         ],
         taskExecutor: [
-          { required: true, message: '执行人不能为空', trigger: ['change', 'blur'] }
+          {required: true, message: '执行人不能为空', trigger: ['change', 'blur']}
         ],
         taskAuditor: [
-          { required: true, message: '审核人不能为空', trigger: ['change', 'blur'] }
+          {required: true, message: '审核人不能为空', trigger: ['change', 'blur']}
         ],
       },
 
@@ -316,9 +329,9 @@ export default {
       // },
 
       statusOptions: [
-        { value: '未开始', label: '未开始' },
-        { value: '进行中', label: '进行中' },
-        { value: '已完成', label: '已完成' },
+        {value: '未开始', label: '未开始'},
+        {value: '进行中', label: '进行中'},
+        {value: '已完成', label: '已完成'},
       ],
 
       // 员工列表
@@ -334,7 +347,7 @@ export default {
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
-    }).then(({ data }) => {
+    }).then(({data}) => {
       this.options = data;
       console.log(data);
     })
@@ -352,10 +365,44 @@ export default {
       this.indicatorOptions = opt;
     })
 
+    // 初始化计划编号
+    this.getPlanId()
+
   },
 
 
   methods: {
+
+    // 上传文件
+    uploadFile(file) {
+      console.log("文件" + file.raw);
+
+      const formData = new FormData();
+      formData.append('file', file.raw); // 将文件添加到 FormData
+
+      this.$http({
+        url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        method: 'post',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data' // 指定为文件上传
+        }
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          // 保存后端返回的url到变量中
+          this.dataForm.planFile = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+          console.log('获得的文件地址 ：', data.uploadurl)
+          this.$message.success('文件上传成功');
+          // 处理成功后的逻辑，例如更新状态
+        } else {
+          this.$message.error(data.msg);
+        }
+      }).catch(error => {
+        this.$message.error('上传失败');
+        console.error(error);
+      });
+    },
+
     // 时间校验
     dateValidate(rule, value, callback) {
       let startDate = this.dataForm.planStartDate;
@@ -397,349 +444,151 @@ export default {
     },
 
     dataFormSubmit() {
-    // 先验证 dataForm
-    this.$refs.dataForm.validate((validDataForm) => {
-      if (!validDataForm) {
-        console.log("dataForm 校验失败");
-        return;
-      }
+      // 先验证 dataForm
+      this.$refs.dataForm.validate((validDataForm) => {
+        if (!validDataForm) {
+          console.log("dataForm 校验失败");
+          return;
+        }
 
-      console.log("dataForm 校验通过");
+        console.log("dataForm 校验通过");
 
-      // 验证每个 task 表单
-      // const tasksValidPromises = this.tasks.map((_, index) => {
-      //   console.log("验证 task 表单" + JSON.stringify(this.tasks[index]));
-      //   return new Promise((resolve, reject) => {
-      //     const taskFormRef = this.$refs[`task_${index}`];
+        // 验证每个 task 表单
+        // const tasksValidPromises = this.tasks.map((_, index) => {
+        //   console.log("验证 task 表单" + JSON.stringify(this.tasks[index]));
+        //   return new Promise((resolve, reject) => {
+        //     const taskFormRef = this.$refs[`task_${index}`];
 
-      //     console.log("taskFormRef" + taskFormRef);
-      //     if (taskFormRef) {
-      //       taskFormRef.validate((validTask) => {
-      //         if (validTask) {
-      //           resolve();
-      //         } else {
-      //           reject(`Task ${index + 1} 校验失败`);
-      //         }
-      //       });
-      //     } else {
-      //       reject(`Task ${index + 1} 表单未找到`);
-      //     }
-      //   });
-      // });
+        //     console.log("taskFormRef" + taskFormRef);
+        //     if (taskFormRef) {
+        //       taskFormRef.validate((validTask) => {
+        //         if (validTask) {
+        //           resolve();
+        //         } else {
+        //           reject(`Task ${index + 1} 校验失败`);
+        //         }
+        //       });
+        //     } else {
+        //       reject(`Task ${index + 1} 表单未找到`);
+        //     }
+        //   });
+        // });
 
-      const tasksValidPromises = this.tasks.map((_, index) => {
-        return new Promise((resolve, reject) => {
-          this.$nextTick(() => { // 确保 DOM 渲染完成
-            var taskForm = 'task_' + index;
-            const taskFormRef = this.$refs[`task_${index}`][0];
-                    console.log("验证 task 表单%o" +taskFormRef);
-                    console.log(this.$refs);
-            if (taskFormRef) {
-              taskFormRef.validate((validTask) => {
-                if (validTask) {
-                  resolve();
-                } else {
-                  reject(`Task ${index + 1} 校验失败`);
-                }
-              });
-            } else {
-              reject(`Task ${index + 1} 表单未找到`);
-            }
+        const tasksValidPromises = this.tasks.map((_, index) => {
+          return new Promise((resolve, reject) => {
+            this.$nextTick(() => { // 确保 DOM 渲染完成
+              var taskForm = 'task_' + index;
+              const taskFormRef = this.$refs[`task_${index}`][0];
+              console.log("验证 task 表单%o" + taskFormRef);
+              console.log(this.$refs);
+              if (taskFormRef) {
+                taskFormRef.validate((validTask) => {
+                  if (validTask) {
+                    resolve();
+                  } else {
+                    reject(`Task ${index + 1} 校验失败`);
+                  }
+                });
+              } else {
+                reject(`Task ${index + 1} 表单未找到`);
+              }
+            });
           });
         });
-      });
 
-      Promise.all(tasksValidPromises)
-        .then(() => {
-          console.log("所有 task 校验通过");
+        Promise.all(tasksValidPromises)
+          .then(() => {
+            console.log("所有 task 校验通过");
 
-          // 如果所有校验通过，准备提交数据
-          const plan = {
-            'tmPid': this.dataForm.tmPid || undefined,
-            'planId': this.dataForm.planId,
-            'planName': this.dataForm.planName,
-            'planContent': this.dataForm.planContent,
-            'planStartDate': this.dataForm.planStartDate,
-            'planScheduleCompletionDate': this.dataForm.planScheduleCompletionDate,
-            'planScheduleDays': this.planScheduleDays,
-            'planActualCompletionDate': this.dataForm.planActualCompletionDate,
-            'planActualDays': this.dataForm.planActualDays,
-            'planTasksAssignment': this.dataForm.planTasksAssignment,
-            'planAssociatedTasksId': this.dataForm.planAssociatedTasksId,
-            'planSchedule': this.dataForm.planSchedule,
-            'planPrincipal': this.dataForm.planPrincipal,
-            'planExecutor': this.dataForm.planExecutor,
-            'planAuditor': this.dataForm.planAuditor,
-            'planCurrentState': 0,
-            'planIsCompleted': 0,
-            'planIsOverdue': 0,
-            'planIsOnTime': 0,
-            'planAssociatedIndicatorsId': this.dataForm.planAssociatedIndicatorsId,
-          };
-
-          const tasksData = this.tasks.map(task => ({
-            taskId: task.taskId,
-            taskName: task.taskName,
-            taskContent: task.taskContent,
-            taskStartDate: task.taskStartDate,
-            taskScheduleCompletionDate: task.taskScheduleCompletionDate,
-            taskScheduleDays: task.taskScheduleDays,
-            taskAssociatedPlanId: this.dataForm.planId,
-            taskPrincipal: task.taskPrincipal,
-            taskExecutor: task.taskExecutor,
-            taskAuditor: task.taskAuditor,
-            taskAssociatedIndicatorsId: this.dataForm.planAssociatedIndicatorsId,
-            taskCurrentState: 0,
-            taskIsCompleted: 0,
-            taskIsOverdue: 0,
-            taskIsOnTime: 0,
-            taskParentNode: this.dataForm.planId
-          }));
-
-          // 提交数据
-          this.$http({
-            url: this.$http.adornUrl(`/taskmanagement/plan/save`),
-            method: 'post',
-            data: this.$http.adornData({
-              'plan': plan,
-              'tasks': tasksData
-            })
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500
-              });
-              // this.$router.push({
-              //   name: 'plan-list'
-              // });
-              this.$router.back();
-            } else {
-              this.$message.error(data.msg);
+            let number = this.tasks.length;
+            let associatedTasks = '';
+            // 遍历tasks列表，将其id拼接成字符串，放入associatedTasks中
+            for (let i = 0; i < number; i++) {
+              associatedTasks += this.tasks[i].taskId;
+              if (i < number - 1) {
+                associatedTasks += ',';
+              }
             }
-          });
-        }).catch(error => {
+
+            console.log("任务是否分配:" + number)
+            console.log("任务编号:" + associatedTasks)
+
+            // 如果所有校验通过，准备提交数据
+            const plan = {
+              'tmPid': this.dataForm.tmPid || undefined,
+              'planId': this.dataForm.planId,
+              'planName': this.dataForm.planName,
+              'planContent': this.dataForm.planContent,
+              'planStartDate': this.dataForm.planStartDate,
+              'planScheduleCompletionDate': this.dataForm.planScheduleCompletionDate,
+              'planScheduleDays': this.planScheduleDays,
+              'planActualCompletionDate': this.dataForm.planActualCompletionDate,
+              'planActualDays': this.dataForm.planActualDays,
+              'planTasksAssignment': number > 0 ? '已分配' : '未分配',
+              'planAssociatedTasksId': number > 0 ? associatedTasks : '-',
+              'planSchedule': this.dataForm.planSchedule,
+              'planPrincipal': this.dataForm.planPrincipal,
+              'planExecutor': this.dataForm.planExecutor,
+              'planAuditor': this.dataForm.planAuditor,
+              'planCurrentState': 0,
+              'planIsCompleted': 0,
+              'planIsOverdue': 0,
+              'planIsOnTime': 0,
+              'planAssociatedIndicatorsId': this.dataForm.planAssociatedIndicatorsId,
+              'planFile': this.dataForm.planFile,
+              'planInitiator': this.dataForm.planInitiator
+            };
+
+            const tasksData = this.tasks.map(task => ({
+              taskId: task.taskId,
+              taskName: task.taskName,
+              taskContent: task.taskContent,
+              taskStartDate: task.taskStartDate,
+              taskScheduleCompletionDate: task.taskScheduleCompletionDate,
+              taskScheduleDays: task.taskScheduleDays,
+              taskAssociatedPlanId: this.dataForm.planId,
+              taskPrincipal: task.taskPrincipal,
+              taskExecutor: task.taskExecutor,
+              taskAuditor: task.taskAuditor,
+              taskAssociatedIndicatorsId: this.dataForm.planAssociatedIndicatorsId,
+              taskCurrentState: 0,
+              taskIsCompleted: 0,
+              taskIsOverdue: 0,
+              taskIsOnTime: 0,
+              taskParentNode: this.dataForm.planId
+            }));
+
+            // 提交数据
+            this.$http({
+              url: this.$http.adornUrl(`/taskmanagement/plan/save`),
+              method: 'post',
+              data: this.$http.adornData({
+                'plan': plan,
+                'tasks': tasksData
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500
+                });
+                // this.$router.push({
+                //   name: 'plan-list'
+                // });
+                this.$router.back();
+              } else {
+                this.$message.error(data.msg);
+              }
+            });
+          }).catch(error => {
           console.error(error);
           this.$message.error('请修正任务表单中的错误');
         });
-    });
-  },
-    // 表单提交
-    // dataFormSubmit() {
-    //   var plan = null;
-    //   var tasksData = null;
+      });
+    },
 
-    //   this.$refs['dataForm'].validate((valid) => {
-    //     if (valid) {
-    //       console.log("校验通过")
-    //       plan = {
-    //         'tmPid': this.dataForm.tmPid || undefined,
-    //         'planId': this.dataForm.planId,
-    //         'planName': this.dataForm.planName,
-    //         'planContent': this.dataForm.planContent,
-    //         'planStartDate': this.dataForm.planStartDate,
-    //         'planScheduleCompletionDate': this.dataForm.planScheduleCompletionDate,
-    //         'planScheduleDays': this.planScheduleDays,
-    //         'planActualCompletionDate': this.dataForm.planActualCompletionDate,
-    //         'planActualDays': this.dataForm.planActualDays,
-    //         'planTasksAssignment': this.dataForm.planTasksAssignment,
-    //         'planAssociatedTasksId': this.dataForm.planAssociatedTasksId,
-    //         'planSchedule': this.dataForm.planSchedule,
-    //         'planPrincipal': this.dataForm.planPrincipal,
-    //         'planExecutor': this.dataForm.planExecutor,
-    //         'planAuditor': this.dataForm.planAuditor,
-    //         'planCurrentState': 0,
-    //         'planIsCompleted': 0,
-    //         'planIsOverdue': 0,
-    //         'planIsOnTime': 0,
-    //         'planAssociatedIndicatorsId': this.dataForm.planAssociatedIndicatorsId,
-    //       },
-    //         tasksData = this.tasks.map(task => ({
-    //           taskId: task.taskId,
-    //           taskName: task.taskName,
-    //           taskContent: task.taskContent,
-    //           taskStartDate: task.taskStartDate,
-    //           taskScheduleCompletionDate: task.taskScheduleCompletionDate,
-    //           taskScheduleDays: task.taskScheduleDays,
-    //           taskAssociatedPlanId: this.dataForm.planId,
-    //           taskPrincipal: task.taskPrincipal,
-    //           taskExecutor: task.taskExecutor,
-    //           taskAuditor: task.taskAuditor,
-    //           taskCurrentState: task.taskCurrentState,
-    //           taskAssociatedIndicatorsId: this.dataForm.planAssociatedIndicatorsId,
-    //           taskCurrentState: 0,
-    //           taskIsCompleted: 0,
-    //           taskIsOverdue: 0,
-    //           taskIsOnTime: 0,
-    //           taskParentNode: this.dataForm.planId
-    //         }));
-    //     }
-    //   });
-    //   // Access the nested task form
-    //   // const taskForm = this.$refs.dataForm.$refs.task;
-
-    //   // console.log(taskForm)
-
-    //   // if (taskForm) {
-    //   //   taskForm.validate((valid) => {
-    //   //     console.log("内部task校验通过")
-    //   //   });
-    //   // }
-
-
-    //   const tasksValidPromises = this.tasks.map((_, index) => {
-    //     return new Promise((resolve, reject) => {
-    //       const taskFormRef = this.$refs.dataForm.$refs[`task_${index}`];
-    //       if (taskFormRef) {
-    //         taskFormRef.validate(validTask => {
-    //           if (validTask) {
-    //             resolve();
-    //           } else {
-    //             reject(`Task ${index + 1} validation failed`);
-    //           }
-    //         });
-    //       } else {
-    //         reject(`Task ${index + 1} form not found`);
-    //       }
-    //     });
-    //   });
-    //   Promise.all(tasksValidPromises)
-
-
-    //   // this.$refs['tasks'].validate((valid) => {
-    //   //   if (valid) {
-    //   //     // const membersData = this.dataForm.members.map(member => member.name);
-    //   //     tasksData = this.tasks.map(task => ({
-    //   //       taskId: task.taskId,
-    //   //       taskName: task.taskName,
-    //   //       taskContent: task.taskContent,
-    //   //       taskStartDate: task.taskStartDate,
-    //   //       taskScheduleCompletionDate: task.taskScheduleCompletionDate,
-    //   //       taskScheduleDays: task.taskScheduleDays,
-    //   //       taskAssociatedPlanId: this.dataForm.planId,
-    //   //       taskPrincipal: task.taskPrincipal,
-    //   //       taskExecutor: task.taskExecutor,
-    //   //       taskAuditor: task.taskAuditor,
-    //   //       taskCurrentState: task.taskCurrentState,
-    //   //       taskAssociatedIndicatorsId: this.dataForm.planAssociatedIndicatorsId,
-    //   //       taskCurrentState: 0,
-    //   //       taskIsCompleted: 0,
-    //   //       taskIsOverdue: 0,
-    //   //       taskIsOnTime: 0,
-    //   //       taskParentNode: this.dataForm.planId
-    //   //     }));
-    //   //   }
-    //   // });
-
-    //   if (tasksData && plan) {
-
-    //     this.$http({
-    //       url: this.$http.adornUrl(`/taskmanagement/plan/save`),
-    //       method: 'post',
-    //       data: this.$http.adornData({
-    //         'plan': plan,
-    //         'tasks': tasksData
-    //       })
-    //     }).then(({ data }) => {
-    //       if (data && data.code === 0) {
-    //         this.$message({
-    //           message: '操作成功',
-    //           type: 'success',
-    //           duration: 1500,
-    //           // onClose: () => {
-    //           //   this.visible = false
-    //           //   this.$emit('refreshDataList')
-    //           // }
-    //         })
-    //         this.$router.push({
-    //           name: 'plan-list'
-    //         })
-    //       } else {
-    //         this.$message.error(data.msg)
-    //       }
-    //     })
-    //   }
-
-    // },
-
-
-    // 表单提交
-    // dataFormSubmit() {
-    //   this.$refs['dataForm'].validate((valid) => {
-    //     if (valid) {
-
-    //       // const membersData = this.dataForm.members.map(member => member.name);
-    //       const tasksData = this.tasks.map(task => ({
-    //         taskId: task.taskId,
-    //         taskName: task.taskName,
-    //         taskContent: task.taskContent,
-    //         taskStartDate: task.taskStartDate,
-    //         taskScheduleCompletionDate: task.taskScheduleCompletionDate,
-    //         taskScheduleDays: task.taskScheduleDays,
-    //         taskAssociatedPlanId: this.dataForm.planId,
-    //         taskPrincipal: task.taskPrincipal,
-    //         taskExecutor: task.taskExecutor,
-    //         taskAuditor: task.taskAuditor,
-    //         taskCurrentState: task.taskCurrentState,
-    //         taskAssociatedIndicatorsId: this.dataForm.planAssociatedIndicatorsId,
-    //         taskCurrentState: 0,
-    //         taskIsCompleted: 0,
-    //         taskIsOverdue: 0,
-    //         taskIsOnTime: 0
-    //       }));
-
-    //       this.$http({
-    //         url: this.$http.adornUrl(`/taskmanagement/plan/save`),
-    //         method: 'post',
-    //         data: this.$http.adornData({
-    //           'plan': {
-    //             'tmPid': this.dataForm.tmPid || undefined,
-    //             'planId': this.dataForm.planId,
-    //             'planName': this.dataForm.planName,
-    //             'planContent': this.dataForm.planContent,
-    //             'planStartDate': this.dataForm.planStartDate,
-    //             'planScheduleCompletionDate': this.dataForm.planScheduleCompletionDate,
-    //             'planScheduleDays': this.planScheduleDays,
-    //             'planActualCompletionDate': this.dataForm.planActualCompletionDate,
-    //             'planActualDays': this.dataForm.planActualDays,
-    //             'planTasksAssignment': this.dataForm.planTasksAssignment,
-    //             'planAssociatedTasksId': this.dataForm.planAssociatedTasksId,
-    //             'planSchedule': this.dataForm.planSchedule,
-    //             'planPrincipal': this.dataForm.planPrincipal,
-    //             'planExecutor': this.dataForm.planExecutor,
-    //             'planAuditor': this.dataForm.planAuditor,
-    //             'planCurrentState': 0,
-    //             'planIsCompleted': 0,
-    //             'planIsOverdue': 0,
-    //             'planIsOnTime': 0,
-    //             'planAssociatedIndicatorsId': this.dataForm.planAssociatedIndicatorsId,
-    //           },
-    //           'tasks': tasksData
-    //         })
-    //       }).then(({ data }) => {
-    //         if (data && data.code === 0) {
-    //           this.$message({
-    //             message: '操作成功',
-    //             type: 'success',
-    //             duration: 1500,
-    //             onClose: () => {
-    //               this.visible = false
-    //               this.$emit('refreshDataList')
-    //             }
-    //           })
-    //         } else {
-    //           this.$message.error(data.msg)
-    //         }
-    //       })
-    //     }
-    //   })
-    // },
-
-
-
-
-
+    // 添加任务
     addTask() {
       this.tasks.push({ // 假设这是一个任务的基本结构，根据实际情况调整
         tmTid: 0,
@@ -765,6 +614,7 @@ export default {
         taskAssociatedIndicatorsId: ''
       });
     },
+
     // 移除任务
     removeTask(index) {
       this.tasks.splice(index, 1);
@@ -774,7 +624,7 @@ export default {
       this.$forceUpdate();
     },
 
-    //任务时间计算
+    // 任务时间计算
     calculateTaskScheduleDays(task) {
       if (task.taskStartDate && task.taskScheduleCompletionDate) {
         const startDate = new Date(task.taskStartDate);
@@ -786,6 +636,7 @@ export default {
       return '';
     },
 
+    // 校验计划编号是否重复
     validatePlanId(rule, value, callback) {
       if (this.dataForm.planId) {
         this.$http({
@@ -810,7 +661,6 @@ export default {
       }
     },
 
-
     checkPlanNumber() {
       if (this.dataForm.planId) {
         this.$http({
@@ -833,7 +683,7 @@ export default {
       this.checkTaskIdUsed(value);
       if (value === '' || value === null || value === undefined) {
         callback(new Error('请输入任务编号'));
-      } else if(this.taskIdUsed === true) {
+      } else if (this.taskIdUsed === true) {
         // 检查任务编号是否已存在
         console.log(this.taskIdUsed);
         callback(new Error('此任务编号已被使用，请更换!'));
@@ -860,7 +710,38 @@ export default {
       }
     },
 
+    // 生成随机编号，并回显到planId
+    getPlanId() {
+      // 生成四位随机数字
+      let randomId = Math.floor(Math.random() * 9000) + 1000;
 
+      let nowDate = moment(new Date()).format('YYYYMMDD');
+      randomId = nowDate + randomId;
+
+      if (this.dataForm.planAssociatedIndicatorsId === null) {
+        randomId = "zl" + "zb" + randomId.toString();
+      } else {
+        randomId = "zl" + "rw" + randomId.toString();
+      }
+
+      console.log("生成的计划编号为" + randomId)
+      // 向后端发送请求，校验Id
+      this.$http({
+        url: this.$http.adornUrl(`/taskmanagement/plan/checkPlanNumber`),
+        method: 'get',
+        params: {
+          planId: randomId
+        }
+      }).then(response => {
+        if (response.data) {
+          this.getPlanId()
+        } else {
+          this.dataForm.planId = randomId;
+        }
+      })
+
+
+    }
 
   },
 
@@ -875,6 +756,7 @@ export default {
       }
       return '';
     },
+
 
   },
 
@@ -897,8 +779,6 @@ export default {
       immediate: true
     },
   },
-
-
 
 
 }

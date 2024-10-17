@@ -11,9 +11,12 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="指标值" prop="indicatorValue">
+    <el-form-item label="指标目标值" prop="indicatorValue">
       <el-input v-model="dataForm.indicatorValue" placeholder="指标值"></el-input>
     </el-form-item>
+      <el-form-item label="指标值" prop="indicatorValue">
+        <el-input v-model="dataForm.indicatorActualValue" placeholder="指标值"></el-input>
+      </el-form-item>
 <!--      <el-form-item label="管理部门" prop="managementDepartment">-->
 <!--        <el-input v-model="dataForm.managementDepartment" placeholder="管理部门"></el-input>-->
 <!--      </el-form-item>-->
@@ -95,6 +98,7 @@
         queryParams: {
           indicatorName: '',
           indicatorValue: '',
+          indicatorActualValue: '',
           indicatorValueUpperBound: '',
           indicatorValueLowerBound: '',
           assessmentDepartment: '',
@@ -110,6 +114,7 @@
           indicatorId: 0,
           indicatorName: '',
           indicatorValue: '',
+          indicatorActualValue: '',
           indicatorValueUpperBound: '',
           indicatorValueLowerBound: '',
           assessmentDepartment: '',
@@ -134,53 +139,14 @@
             { required: true, message: '指标名称不能为空', trigger: 'blur' }
           ],
           indicatorValue: [
+            { required: true, message: '指标目标值不能为空', trigger: 'blur' }
+          ],
+          indicatorActualValue: [
             { required: true, message: '指标值不能为空', trigger: 'blur' }
           ],
-          assessmentDepartment: [
-            { required: true, message: '考核部门不能为空', trigger: 'blur' }
-          ],
-          managementDepartment: [
-            { required: true, message: '管理部门不能为空', trigger: 'blur' }
-          ],
-          // indicatorDefinition: [
-          //   { required: true, message: '指标定义不能为空', trigger: 'blur' }
-          // ],
-          // indicatorClassification: [
-          //   { required: true, message: '指标分级不能为空', trigger: 'blur' }
-          // ],
-          managementContentCurrentAnalysis: [
-            { required: true, message: '管理内容（现状分析）不能为空', trigger: 'blur' }
-          ],
-          // dataId: [
-          //   { required: true, message: '数据ID不能为空', trigger: 'blur' }
-          // ],
-          // sourceDepartment: [
-          //   { required: true, message: '来源部门不能为空', trigger: 'blur' }
-          // ],
-          // collectionMethod: [
-          //   { required: true, message: '收集方法不能为空', trigger: 'blur' }
-          // ],
-          // collectionFrequency: [
-          //   { required: true, message: '收集频次不能为空', trigger: 'blur' }
-          // ],
-          // planId: [
-          //   { required: true, message: '关联计划id不能为空', trigger: 'blur' }
-          // ],
-          // taskId: [
-          //   { required: true, message: '关联任务id不能为空', trigger: 'blur' }
-          // ],
-          // indicatorParentNode: [
-          //   { required: true, message: '指标父节点不能为空', trigger: 'blur' }
-          // ],
           yearMonth: [
             { required: true, message: '年月不能为空', trigger: 'blur' }
           ],
-          // indicatorState: [
-          //   { required: true, message: '0表示弃用，1表示使用中不能为空', trigger: 'blur' }
-          // ],
-          // indicatorChildNode: [
-          //   { required: true, message: '指标子节点不能为空', trigger: 'blur' }
-          // ]
         }
       }
     },

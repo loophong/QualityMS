@@ -3,6 +3,7 @@ package io.renren.modules.indicator.controller;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import com.aliyun.oss.ServiceException;
@@ -35,7 +36,7 @@ public class IndicatorIndicatorSummaryController {
     private IndicatorIndicatorSummaryService indicatorIndicatorSummaryService;
 
     /**
-     * 列表
+     * 查询列表
      */
     @RequestMapping("/list")
     @RequiresPermissions("indicator:indicatorindicatorsummary:list")
@@ -43,6 +44,17 @@ public class IndicatorIndicatorSummaryController {
         PageUtils page = indicatorIndicatorSummaryService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 查询列表（不分页）
+     */
+    @RequestMapping("/list01")
+    @RequiresPermissions("indicator:indicatorindicatorsummary:list")
+    public List<IndicatorIndicatorSummaryEntity> list01(@RequestParam Map<String, Object> params){
+        List<IndicatorIndicatorSummaryEntity> list = indicatorIndicatorSummaryService.queryList(params);
+
+        return list;
     }
 
     /**
@@ -107,8 +119,10 @@ public class IndicatorIndicatorSummaryController {
     @PostMapping("/upload")
     public R simpleRead(@RequestParam("multipartFile") MultipartFile multipartFile, @RequestParam("yearMonth") @DateTimeFormat(pattern = "yyyy-MM") Date yearMonth) {
         try (InputStream inputStream = multipartFile.getInputStream()) {
+            InputStream inputStream2 = multipartFile.getInputStream();
+
             // 调用服务方法，并获取返回结果
-            R result = indicatorIndicatorSummaryService.readProductionExcelToDB(multipartFile.getOriginalFilename(), inputStream, yearMonth);
+            R result = indicatorIndicatorSummaryService.readProductionExcelToDB(multipartFile.getOriginalFilename(), inputStream,inputStream2, yearMonth);
 
             // 根据服务方法的返回结果决定返回给前端的消息
             return result;

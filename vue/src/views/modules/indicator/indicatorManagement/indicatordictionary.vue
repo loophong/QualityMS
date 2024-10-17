@@ -151,18 +151,18 @@
         align="center"
         label="上级指标">
       </el-table-column>
-      <el-table-column
-        prop="indicatorValueLowerBound"
-        header-align="center"
-        align="center"
-        label="指标值下界">
-      </el-table-column>
-      <el-table-column
-        prop="indicatorValueUpperBound"
-        header-align="center"
-        align="center"
-        label="指标值上界">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="indicatorValueLowerBound"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="指标值下界">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="indicatorValueUpperBound"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="指标值上界">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="indicatorCreatTime"
         header-align="center"

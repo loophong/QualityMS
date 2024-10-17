@@ -28,6 +28,7 @@
         <result property="planLagDays" column="plan_lag_days"/>
         <result property="planLagReasons" column="plan_lag_reasons"/>
         <result property="planAssociatedIndicatorsId" column="plan_associated_Indicators_id"/>
+        <result property="planFile" column="plan_file"/>
     </resultMap>
 
     <select id="getPlansByUserId" resultMap="planMap">

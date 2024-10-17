@@ -75,15 +75,11 @@ public class QcStepController {
 
                 List<QcStepEntity> reuseList = qcStepDao.getStepListById(subjectID);
 
-                log.info("遍历列表并修改每个元素的"+reuseList.toString());
                 // 遍历列表并修改每个元素的 stepSubjectId
                 for (QcStepEntity entity : reuseList) {
                     entity.setStepSubjectId(reuseStepId);
                     entity.setStepId(null);
                 }
-//                for (QcStepEntity entity : reuseList) {
-//                    qcStepService.updateById(entity);
-//                }
 
                 for (QcStepEntity entity : reuseList) {
                     qcStepService.save(entity);

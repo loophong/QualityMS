@@ -27,6 +27,7 @@
         <result property="note" column="note"/>
         <result property="resultType" column="result_type"/>
         <result property="examineId" column="examine_id"/>
+        <result property="groupName" column="group_name"/>
     </resultMap>
 
     <!--    根据输入动态模糊查询-->

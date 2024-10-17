@@ -2,6 +2,7 @@ package io.renren.modules.qcManagement.controller;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.qcManagement.dao.QcGroupMemberDao;
 import io.renren.modules.qcManagement.dao.QcStepDao;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -64,6 +66,17 @@ public class QcGroupMemberController {
         return R.ok().put("result", result);
     }
 
+    /**
+     * 注册号
+     */
+    @RequestMapping("/registration")
+    @RequiresPermissions("qcMembers:qcGroupMember:list")
+    public R registrationList(){
+        Integer registrationNum = qcGroupMemberDao.registrationCount();
+        Map<String, Object> result = new HashMap<>();
+        result.put("registrationNum", registrationNum);
+        return R.ok().put("result", result);
+    }
 
     /**
      * 列表
@@ -72,7 +85,31 @@ public class QcGroupMemberController {
     @RequiresPermissions("qcMembers:qcGroupMember:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = qcGroupMemberService.queryPage(params);
+        //获取delete_flag不为1的数据
+        List<QcGroupMemberEntity> resultList = qcGroupMemberDao.myAllGroupMemberList();
+        page.setList(resultList);
+        page.setTotalCount(resultList.size());
+        long id = ShiroUtils.getUserId();
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 我的列表
+     */
+    @RequestMapping("/myList")
+    @RequiresPermissions("qcMembers:qcGroupMember:list")
+    public R myList(@RequestParam Map<String, Object> params){
+//        PageUtils page = qcGroupMemberService.queryPage(params);
+        String userName= ShiroUtils.getUserEntity().getUsername();
+
+        PageUtils page = qcGroupMemberService.queryPage(params);
+//        PageUtils page2 = qcGroupMemberService.myQueryPage(params,userName);
+        //获取delete_flag不为1的数据
+        List<QcGroupMemberEntity> resultList = qcGroupMemberDao.myAllGroupMemberList();
+        page.setList(resultList);
+        page.setTotalCount(resultList.size());
+//        List<QcGroupMemberEntity> filterList = resultList.stream().filter(e -> e.getName().equals(userName)).collect(Collectors.toList());
+        return R.ok().put("page", page).put("userName",userName);
     }
 
 
@@ -103,6 +140,16 @@ public class QcGroupMemberController {
     @RequestMapping("/update")
     @RequiresPermissions("qcMembers:qcGroupMember:update")
     public R update(@RequestBody QcGroupMemberEntity qcGroupMember){
+        qcGroupMemberService.updateById(qcGroupMember);
+        return R.ok();
+    }
+
+    /**
+     * 逻辑删除
+     */
+    @RequestMapping("/updateLogic")
+    @RequiresPermissions("qcMembers:qcGroupMember:update")
+    public R updateLogic(@RequestBody QcGroupMemberEntity qcGroupMember){
         if(qcGroupMember.getParentId() == null){
             log.info("删除父节点：" + qcGroupMember.getQcgmId());
             log.info("getQcgmId：" + qcGroupMember.getQcgmId().intValue());

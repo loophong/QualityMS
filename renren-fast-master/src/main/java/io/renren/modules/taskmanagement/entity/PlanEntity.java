@@ -135,5 +135,9 @@ public class PlanEntity implements Serializable {
 
 //	@TableField(typeHandler = JacksonTypeHandler.class)
 //	private List<TaskEntity> tasks;
+    /**
+     * 计划附件
+     */
+    private String planFile;
 
 }

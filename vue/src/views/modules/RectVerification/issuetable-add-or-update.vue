@@ -314,7 +314,7 @@
         verificationOptions: [
           { label: '未完成', value: '未完成' },
           { label: '已完成', value: '已完成' },
-          { label: '持续', value: '持续' },
+          { label: '暂停', value: '暂停' },
           { label: '结项', value: '结项' },
         ],
         vehicleTypeOptions: [],

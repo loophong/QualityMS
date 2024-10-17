@@ -19,15 +19,6 @@
           placeholder="请选择实际完成时间">
         </el-date-picker>
       </el-form-item>
-<!--      <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
-<!--        <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择验证人">-->
-<!--          <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
-<!--            <el-option v-for="item in group.options" :key="item.value" :label="item.label"-->
-<!--                       :value="item.label">-->
-<!--            </el-option>-->
-<!--          </el-option-group>-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
       <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
         <el-select v-model="selectedResponsiblePersons" filterable multiple placeholder="请选择整改责任人">
           <el-option-group v-for="group in options" :key="group.label" :label="group.label">
@@ -36,21 +27,6 @@
           </el-option-group>
         </el-select>
       </el-form-item>
-      <!--      <el-form-item label="整改图片/交付物" prop="image">-->
-<!--        <el-upload-->
-<!--          action="#"-->
-<!--          list-type="picture-card"-->
-<!--          :on-preview="handlePictureCardPreview"-->
-<!--          :on-remove="handleRemove"-->
-<!--          :on-change="handleFileChange"-->
-<!--          :file-list="imageList"-->
-<!--          :auto-upload="false">-->
-<!--          <i class="el-icon-plus"></i>-->
-<!--        </el-upload>-->
-<!--        <el-dialog :visible.sync="dialogVisible">-->
-<!--          <img width="100%" :src="dialogImageUrl" alt="">-->
-<!--        </el-dialog>-->
-<!--      </el-form-item>-->
       <el-form-item label="" prop="rectificationPhotoDeliverable">
         <el-button @click="imageload()">上传图片</el-button>
       </el-form-item>
@@ -736,7 +712,7 @@
                   // 'verifier': this.dataForm.verifier,
                   // 'reviewers': this.dataForm.reviewers,
                   // 'level': this.dataForm.level,
-                  'state': '持续',
+                  'state': '暂停',
                   // 'superiorMask': this.dataForm.superiorMask,
                   // 'nextMask': this.dataForm.nextMask,
                   // 'formula': this.dataForm.formula

@@ -736,7 +736,7 @@
                   // 'verifier': this.dataForm.verifier,
                   // 'reviewers': this.dataForm.reviewers,
                   // 'level': this.dataForm.level,
-                  'state': '持续',
+                  'state': '暂停',
                   // 'superiorMask': this.dataForm.superiorMask,
                   // 'nextMask': this.dataForm.nextMask,
                   // 'formula': this.dataForm.formula

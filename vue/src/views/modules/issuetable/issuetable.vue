@@ -28,7 +28,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="责任科室" prop="responsibleDepartment">
-        <el-select v-model="queryParams.responsibleDepartment" placeholder="请选择责任科室">
+        <el-select v-model="queryParams.responsibleDepartment" filterable placeholder="请选择责任科室">
           <el-option
             v-for="department in departmentOptions"
             :key="department.value"
@@ -134,42 +134,12 @@
         align="center"
         label="车号">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="issueDescription"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题描述">-->
-<!--        <template slot-scope="scope">-->
-<!--          <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullDescription(scope.row.issueDescription)">-->
-<!--            {{ truncateDescription(scope.row.issueDescription) }}-->
-<!--            <span v-if="scope.row.issueDescription.length > 8">-->
-<!--        <strong>...</strong> &lt;!&ndash; 将省略号加粗 &ndash;&gt;-->
-<!--      </span>-->
-<!--          </div>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-
             <el-table-column
         prop="issueDescription"
         header-align="center"
         align="center"
         label="问题描述">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="issuePhoto"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题照片">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="issuePhoto"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题照片">-->
-<!--        <template slot-scope="scope">-->
-<!--          <el-image :src="scope.row.issuePhoto" style="width: 100px;height: 100px;"></el-image>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
       <el-table-column
         prop="issuePhoto"
         header-align="center"
@@ -197,12 +167,6 @@
         align="center"
         label="责任科室">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="rectificationStatus"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改情况">-->
-<!--      </el-table-column>-->
       <el-table-column
         prop="rectificationStatus"
         header-align="center"
@@ -223,12 +187,6 @@
         align="center"
         label="实际完成时间">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="rectificationPhotoDeliverable"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改照片交付物">-->
-<!--      </el-table-column>-->
       <el-table-column
         prop="rectificationPhotoDeliverable"
         header-align="center"
@@ -298,12 +256,6 @@
         align="center"
         label="创建时长">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="causeAnalysis"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="原因分析">-->
-<!--      </el-table-column>-->
       <el-table-column
         prop="causeAnalysis"
         header-align="center"
@@ -359,10 +311,10 @@
             <span v-for="(state, index) in getStates(scope.row.verificationConclusion)" :key="index">
                 <el-tag v-if="state === '未完成'" type="danger" disable-transitions>{{ state }}</el-tag>
                 <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '持续'" type="info" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '暂停'" type="info" disable-transitions>{{ state }}</el-tag>
                 <el-tag v-else-if="state === '结项'" type="warning" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '未完成，持续'" type="danger" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '持续，未完成'" type="info" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '未完成，暂停'" type="danger" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-else-if="state === '暂停，未完成'" type="info" disable-transitions>{{ state }}</el-tag>
                 <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
             </span>
           </div>
@@ -888,7 +840,26 @@
 .row-odd {
   background-color: #0BB2D4 !important; /* 灰色 */
 }
+.el-table {
+  font-size: 16px; /* 调整表格整体的字体大小 */
+  border-color: #333; /* 深化表格边框颜色 */
+}
 
+.el-table th, .el-table td {
+  border-color: #333; /* 深化表格单元格的边框颜色 */
+}
+
+.el-table th {
+  font-weight: bold; /* 表头字体加粗 */
+}
+
+.el-pagination {
+  font-size: 16px; /* 分页器字体大小 */
+}
+
+.el-button {
+  font-size: 14px; /* 调整按钮字体大小 */
+}
 </style>
 
 

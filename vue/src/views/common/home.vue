@@ -165,7 +165,7 @@ export default {
       const mi = ('0' + dt.getMinutes()).slice(-2); // 补零
       const s = ('0' + dt.getSeconds()).slice(-2); // 补零
       this.currentTime = `${y}-${m}-${d} ${h}:${mi}:${s}`; // 格式化时间
-      console.log('当前时间1：' ,this.currentTime);
+      // console.log('当前时间1：' ,this.currentTime);
     },
     beforeDestroy() {
       if (this.t) {
@@ -200,6 +200,10 @@ export default {
       });
     },
     renderChart1() {
+        // 销毁旧的实例，防止缓存导致问题
+  if (this.chartInstance1) {
+    this.chartInstance1.dispose();
+  }
       const chart = echarts.init(this.$refs.indicatorChart1);
 
       const option = {
@@ -530,7 +534,7 @@ export default {
 
       chart.setOption(option);
     },
-   
+
   }
 };
 </script>

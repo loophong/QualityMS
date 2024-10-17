@@ -24,9 +24,9 @@ export class FishBones {
       /*鱼骨主题，用来修改样式，默认是1,目前不支持 */
       theme: "default",
       /*是否可以拖动，默认是true */
-      dragable: true,
+      dragable: false,
       /*是否显示工具条 */
-      showToolbar: true,
+      showToolbar: false,
       /* 画布的大小 */
       canvasSize: [document.body.scrollWidth - 10 - 222, document.body.scrollHeight - 55 - 56],
       /*  鱼头左侧中心坐标  */

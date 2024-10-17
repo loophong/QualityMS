@@ -1,22 +1,55 @@
 <template>
-  <div id="fishBone">
-    <el-dialog
-      title="编辑节点"
-      :visible.sync="editDialogVisible"
-      width="30%">
-      <el-form :model="editableNode">
-        <el-form-item label="节点名称">
-          <el-input v-model="editableNode.name"></el-input>
-        </el-form-item>
-        <el-form-item label="节点链接">
-          <el-input v-model="editableNode.link"></el-input>
+  <div>
+    <div class="button-container">
+      <el-form>
+        <el-form-item>
+          <el-button type="primary" @click="addEdge">新增</el-button>
+          <el-button type="success" @click="downloadAsImage">下载</el-button>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="editDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveChanges">保存</el-button>
-      </div>
-    </el-dialog>
+    </div>
+    <div id="fishBone">
+      <el-dialog
+        title="编辑节点"
+        :visible.sync="editDialogVisible"
+        width="30%"
+        :modal="false">
+        <el-form :model="editableNode">
+          <el-form-item label="节点名称">
+            <el-input v-model="editableNode.name"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveChanges">保存</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog
+        title="新增节点"
+        :visible.sync="addDialogVisible"
+        width="30%"
+        :modal="false">
+        <el-form :model="newNode">
+          <el-form-item label="节点名称">
+            <el-input v-model="newNode.name"></el-input>
+          </el-form-item>
+          <el-form-item label="父节点">
+            <el-select v-model="newNode.parentId" placeholder="请选择父节点">
+              <el-option
+                v-for="item in nodeNames"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="addDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="addNode">保存</el-button>
+        </div>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
@@ -24,66 +57,32 @@
 
 
 import { FishBones } from '@/components/fishbone/FishBone'
+import html2canvas from 'html2canvas';
 
 export default {
   data () {
     return {
       testFishData: [
-        {"children": [
-            {"children": [
-                {"children": [], "id": "1001001123123", "fid": "1001", "name": "主机A[100]", fontColor: "", lineColor: "", link: "http://www.baidu.com"},
-                {"children": [], "id": "1001002123123", "fid": "1001", "name": "主机B[100]", fontColor: "", lineColor: "", link: ""}
-              ], "id": "1001", "fid": "1", "name": "主机[100]", fontColor: "", lineColor: "", link: ""},
-            {"children": [
-                {"children": [], "id": "100200435431", "fid": "1002", "name": "探测点1[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1002034502", "fid": "1002", "name": "探测点2[100]", fontColor: "", lineColor: "", link: ""}
-              ], "id": "1002", "fid": "1", "name": "网络[100]", fontColor: "", lineColor: "", link: ""},
-            {"children": [
-                {"children": [], "id": "100303451", "fid": "1003", "name": "数据库A[93]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1003034502", "fid": "1003", "name": "数据库B[93]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1003045603", "fid": "1003", "name": "数据库C[93]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "100345645004", "fid": "1003", "name": "数据库D[93]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "10064563005", "fid": "1003", "name": "数据库E[93]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1004563006", "fid": "1003", "name": "数据库F[93]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1004563007", "fid": "1003", "name": "数据库G[93]", fontColor: "", lineColor: "", link: ""}
-              ], "id": "1003", "fid": "1", "name": "数据库[93]", fontColor: "", lineColor: "", link: ""},
-            {"children": [
-                {"children": [], "id": "100423423001", "fid": "1004", "name": "端口1[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1002344002", "fid": "1004", "name": "端口2[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1002344003", "fid": "1004", "name": "端口3[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1002344004", "fid": "1004", "name": "端口4[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1004354005", "fid": "1004", "name": "端口5[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1004354006", "fid": "1004", "name": "端口6[100]", fontColor: "", lineColor: "", link: ""}
-              ], "id": "1004", "fid": "1", "name": "拨测[100]", fontColor: "", lineColor: "", link: ""},
-            {"children": [
-                {"children": [], "id": "1004355001", "fid": "10051111111", "name": "进程[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1003455002", "fid": "10051111111", "name": "进程[100]", fontColor: "", lineColor: "", link: ""}
-              ], "id": "10051111111", "fid": "1", "name": "进程[100]", fontColor: "", lineColor: "", link: ""},
-            {"children": [
-                {"children": [], "id": "1006345001", "fid": "1006", "name": "中间件1[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1006345002", "fid": "1006", "name": "中间件2[100]", fontColor: "", lineColor: "", link: ""}
-              ], "id": "1006", "fid": "1", "name": "中间件[100]", fontColor: "", lineColor: "", link: ""},
-            {"children": [
-                {"children": [], "id": "1007034501", "fid": "1007", "name": "安全[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1007034502", "fid": "1007", "name": "安全[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1007435003", "fid": "1007", "name": "安全[100]", fontColor: "", lineColor: "", link: ""}
-              ], "id": "1007", "fid": "1", "name": "安全[100]", fontColor: "", lineColor: "", link: ""},
-            {"children": [
-                {"children": [], "id": "1008034501", "fid": "1008", "name": "巡检1[100]", fontColor: "", lineColor: "", link: ""},
-                {"children": [], "id": "1008034502", "fid": "1008", "name": "巡检2[100]", fontColor: "", lineColor: "", link: ""}
-              ], "id": "1008", "fid": "1", "name": "巡检[100]", fontColor: "", lineColor: "", link: ""}
-          ], "id": "1", "fid": "0", "name": "质量问题", fontColor: "", lineColor: "", link: ""}
+        {"id": "1", "fid": "0", "name": "质量问题", fontColor: "", lineColor: "", link: "", "children": [], }
       ],
       editDialogVisible: false, // 控制弹出框的可见性
       editableNode: { // 用于存储可编辑的节点信息
         name: '',
         link: ''
       },
-      currentNode: null // 用于存储当前被点击的节点
+      currentNode: null, // 用于存储当前被点击的节点
+      addDialogVisible: false, // 控制新增弹出框的可见性
+      newNode: { // 用于存储新增节点的信息
+        name: '',
+        link: '',
+        parentId: ''
+      },
+      nodeNames: [] // 用于存储节点名称数组
     }
   },
   mounted () {
     this.initFishBone()
+    this.getNodeNames(this.testFishData)
   },
   methods: {
     initFishBone () {
@@ -91,42 +90,117 @@ export default {
       new FishBones({
         id: 'fishBone',
         jsonData: this.testFishData,
-        canvasSize: [document.body.scrollWidth, document.body.scrollHeight],
+        // canvasSize: [document.body.scrollWidth, document.body.scrollHeight],
         clickNodeFunction: (node, event) => {
           this.editNode(node) // 点击节点时调用 editNode 方法
         },
       }).init()
     },
-    // editNode(node) {
-    //   this.currentNode = node // 保存当前点击的节点
-    //   this.editableNode = { ...node } // 将节点信息复制到可编辑的对象中
-    //   this.editDialogVisible = true // 打开编辑框
-    // },
-    // saveChanges() {
-    //   // 查找当前被编辑的节点在 testFishData 中的位置
-    //   const updateNode = (nodeList, updatedNode) => {
-    //     for (let i = 0; i < nodeList.length; i++) {
-    //       if (nodeList[i].id === updatedNode.id) {
-    //         nodeList[i] = { ...updatedNode }
-    //         return true
-    //       } else if (nodeList[i].children && nodeList[i].children.length > 0) {
-    //         const found = updateNode(nodeList[i].children, updatedNode)
-    //         if (found) {
-    //           return true
-    //         }
-    //       }
-    //     }
-    //     return false
-    //   }
-    //
-    //   updateNode(this.testFishData, this.editableNode)
-    //   // 打印修改后的节点信息
-    //   console.log('保存的节点信息:', this.editableNode)
-    //   // 重新初始化鱼骨图，以反映更新后的数据
-    //   this.initFishBone()
-    //   // 关闭编辑框
-    //   this.editDialogVisible = false
-    // }
+    editNode(node) {
+      this.currentNode = node // 保存当前点击的节点
+      this.editableNode = { ...node } // 将节点信息复制到可编辑的对象中
+      console.log('当前点击的节点信息:', node)
+      console.log('当前可编辑的节点信息:', this.editableNode)
+      this.editDialogVisible = true // 打开编辑框
+    },
+    saveChanges() {
+      this.updateNode(this.testFishData, this.editableNode)
+      // 打印修改后的节点信息
+      console.log('保存的节点信息:', this.editableNode)
+      console.log('更新后的数据:', this.testFishData)
+      // 重新初始化鱼骨图，以反映更新后的数据
+      this.initFishBone()
+      // 关闭编辑框
+      this.editDialogVisible = false
+    },
+    updateNode(nodeList, updatedNode) {
+      for (let i = 0; i < nodeList.length; i++) {
+        console.log('当前节点:', nodeList[i])
+        if (nodeList[i].id === updatedNode.id_) {
+          // 使用 Vue.set 确保变化被检测到
+          console.log('Found and updating node:', nodeList[i]);
+          this.$set(nodeList[i], 'name', updatedNode.name)
+          return true
+        } else if (nodeList[i].children && nodeList[i].children.length > 0) {
+          const found = this.updateNode(nodeList[i].children, updatedNode)
+          if (found) {
+            return true
+          }
+        }
+      }
+      return false
+    },
+    addEdge() {
+      this.nodeNames = [] // 清空现有的 nodeNames 数组
+      this.getNodeNames(this.testFishData) // 重新获取最新的 nodeNames
+      this.addDialogVisible = true // 打开新增节点对话框
+    },
+    addNode() {
+      const parentNode = this.findNodeById(this.testFishData, this.newNode.parentId)
+      if (parentNode) {
+        const newNode = {
+          id: Date.now().toString(), // 生成唯一ID
+          fid: this.newNode.parentId,
+          name: this.newNode.name,
+          children: []
+        }
+        if (!parentNode.children) {
+          this.$set(parentNode, 'children', [])
+        }
+        parentNode.children.push(newNode)
+        // 重新初始化鱼骨图，以反映更新后的数据
+        this.initFishBone()
+      }
+      this.addDialogVisible = false // 关闭新增节点对话框
+    },
+    findNodeById(nodeList, id) {
+      for (let i = 0; i < nodeList.length; i++) {
+        if (nodeList[i].id === id) {
+          return nodeList[i]
+        } else if (nodeList[i].children && nodeList[i].children.length > 0) {
+          const found = this.findNodeById(nodeList[i].children, id)
+          if (found) {
+            return found
+          }
+        }
+      }
+      return null
+    },
+    //获取节点名称
+    getNodeNames(nodeList) {
+      for (let i = 0; i < nodeList.length; i++) {
+        this.nodeNames.push({ value: nodeList[i].id, label: nodeList[i].name })
+        if (nodeList[i].children && nodeList[i].children.length > 0) {
+          this.getNodeNames(nodeList[i].children)
+        }
+      }
+    },
+    downloadAsImage() {
+      html2canvas(document.querySelector('#fishBone')).then(canvas => {
+        const imgData = canvas.toDataURL('image/png')
+        const a = document.createElement('a')
+        a.href = imgData
+        a.download = 'fishbone_image.png'
+        a.click()
+      })
+    }
   },
 }
 </script>
+
+<style scoped>#fishBone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1000px;
+  height: 600px;
+  margin: 40px auto;
+}
+
+.button-container {
+  position: absolute;
+  top: 50px;
+  left: 20px;
+  padding: 10px;
+}
+</style>

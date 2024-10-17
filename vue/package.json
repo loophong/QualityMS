@@ -28,6 +28,7 @@
     "gulp-load-plugins": "2.0.5",
     "gulp-replace": "1.0.0",
     "gulp-shell": "0.8.0",
+    "html2canvas": "^1.4.1",
     "jtopo-in-node-yz": "^1.0.2",
     "lodash": "4.17.5",
     "moment": "^2.30.1",

@@ -394,7 +394,7 @@
               }
             })
           }).then(({data}) => {
-            if (data && data.code === 0 && data.page.exist) {
+            if (data && data.code === 0 && data.page.totalCount === 0) {
               console.log("data123====>",data)
               this.dataList = data.page.list
               const aimUrl = http.adornUrl('/indicator/indicatorindicatorsummary/upload');

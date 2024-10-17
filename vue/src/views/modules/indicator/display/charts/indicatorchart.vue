@@ -72,6 +72,7 @@ export default {
       }).then(() => {
         this.chartData = this.dataList.map(item => ({     //填充图表数据
           date: item.yearMonth,
+          actualValue: item.indicatorActualValue,
           value: item.indicatorValue
         }));
         console.log('Chart Data:', this.chartData);
@@ -81,6 +82,44 @@ export default {
     },
     renderChart() {
       console.log('renderChart===>',this.selectedDate);
+      // 获取起始日期和结束日期
+      const startDate = this.selectedDate[0];
+      const endDate = this.selectedDate[1];
+      // 生成起止时间内的所有年月
+      const generateYearMonths = (start, end) => {
+        const yearMonths = [];
+        let currentDate = new Date(start);
+        while (currentDate <= end) {
+          const year = currentDate.getFullYear();
+          const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+          yearMonths.push(`${year}-${month}`);
+
+          // 增加一个月
+          currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+        return yearMonths;
+      };
+
+      const allYearMonths = generateYearMonths(startDate, endDate);
+      console.log('allYearMonths:', allYearMonths);
+
+      // 处理 chartData，使其与 allYearMonths 对应
+      const processChartData = (data, yearMonths) => {
+        const processedData = yearMonths.map(yearMonth => {
+          const matchingItem = data.find(item => item.date === yearMonth);
+          return matchingItem ? matchingItem.value : null; // 或者使用 0 作为默认值
+        });
+
+        const processedActualData = yearMonths.map(yearMonth => {
+          const matchingItem = data.find(item => item.date === yearMonth);
+          return matchingItem ? matchingItem.actualValue : null; // 或者使用 0 作为默认值
+        });
+
+        return { processedData, processedActualData };
+      };
+
+      const { processedData, processedActualData } = processChartData(this.chartData, allYearMonths);
+
       const chart = echarts.init(this.$refs.indicatorChart);
 
       const option = {
@@ -93,6 +132,7 @@ export default {
             type: 'shadow'
           }
         },
+        legend: {},
         grid: {
           left: '3%',
           right: '4%',
@@ -101,20 +141,22 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: this.chartData.map(item => item.date),
+          data: allYearMonths
         },
         yAxis: {
           type: 'value',
         },
         series: [
           {
-            name: '值',
+            name: '指标值',
             type: 'bar',
-            data: this.chartData.map(item => item.value),
-            itemStyle: {
-              color: '#409EFF',
-            },
+            data: processedActualData,
           },
+          {
+            name: '目标值',
+            type: 'bar',
+            data: processedData,
+          }
         ],
       };
 

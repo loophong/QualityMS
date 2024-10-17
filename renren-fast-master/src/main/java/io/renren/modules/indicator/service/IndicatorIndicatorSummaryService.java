@@ -9,6 +9,7 @@ import io.renren.modules.indicator.listener.DataReadListener;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,9 +23,11 @@ public interface IndicatorIndicatorSummaryService extends IService<IndicatorIndi
 
     PageUtils queryPage(Map<String, Object> params);
 
+    List<IndicatorIndicatorSummaryEntity> queryList(Map<String, Object> params);
+
     PageUtils queryIndicatorList(Map<String, Object> params);
 
-    public R readProductionExcelToDB(String fileName, InputStream inputStream, Date yearMonth);
+    public R readProductionExcelToDB(String fileName, InputStream inputStream, InputStream inputStream2, Date yearMonth);
 
 }
 

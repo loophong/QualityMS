@@ -64,6 +64,10 @@
           </el-dialog>
         </el-col>
       </el-col>
+
+      <el-col :span="1.5">
+        <el-button v-if="isAuth('indicator:indicatorindicatorsummary:list')" type="primary" @click="exportAll()">导出</el-button>
+      </el-col>
     </el-row>
     <el-table
       :data="dataList"
@@ -108,6 +112,12 @@
       </el-table-column>
       <el-table-column
         prop="indicatorValue"
+        header-align="center"
+        align="center"
+        label="指标目标值">
+      </el-table-column>
+      <el-table-column
+        prop="indicatorActualValue"
         header-align="center"
         align="center"
         label="指标值">
@@ -178,6 +188,10 @@
   import AddOrUpdate from './indicatorindicatorsummary-add-or-update'
   import { listIndicatorSummary, uploadFile} from '@/api/indicator/indicator.js'
   import http from "../../../../utils/httpRequest";
+  //导出总台账excel功能
+  import * as XLSX from "xlsx";
+  import { saveAs } from "file-saver";
+  import {Loading} from "element-ui";
   export default {
     data () {
       return {
@@ -192,6 +206,7 @@
         queryParams: {
           indicatorName: '',
           indicatorValue: '',
+          indicatorActualValue: '',
           indicatorValueUpperBound: '',
           indicatorValueLowerBound: '',
           assessmentDepartment: '',
@@ -215,6 +230,7 @@
           indicatorId: 0,
           indicatorName: '',
           indicatorValue: '',
+          indicatorActualValue: '',
           indicatorValueUpperBound: '',
           indicatorValueLowerBound: '',
           assessmentDepartment: '',
@@ -235,6 +251,7 @@
           indicatorChildNode: ''
         },
         dataList: [],
+        dataList01: [], //列表数据(不分页)
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -304,7 +321,7 @@
             console.log("data2====>",data)
             this.indicatorDictionaryList = data.page.list
           } else {
-            this.dataList = []
+            this.indicatorDictionaryList = []
           }
         })
       },
@@ -355,6 +372,8 @@
         console.log("file=====>",file);
         console.log("this.form=====>",this.form);
         console.log("formData=====>",formData);
+
+
         if (file === undefined || yearMonth == null) {
           if (file === undefined) {
             this.$message.error("请选择文件!");
@@ -364,29 +383,47 @@
             return;
           }
         } else {
-          console.log("formData=====>",formData);
-          const aimUrl = http.adornUrl('/indicator/indicatorindicatorsummary/upload');
-          uploadFile(formData, aimUrl)
-            .then(response => {
-              console.log("response=====>",response);
-              if (response && response.data.code === 0) {
-                if (response.data.msg.includes('存在未定义的指标')) {
-                  this.$message.warning(response.data.msg); // 提示存在未定义的指标
-                } else {
-                  this.$message.success(response.data.msg); // 正常成功提示
-                }
-                this.getDataList();
-              } else {
-                this.$message.error("上传失败，请重试");
+          this.$http({
+            url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+            method: 'get',
+            params: this.$http.adornParams({
+              'page': this.pageIndex,
+              'limit': this.pageSize,
+              'key': {
+                'yearMonth': yearMonth
               }
             })
-            .catch(error => {
-              console.error('上传失败：', error);
-              this.$message.error("上传失败，请重试");
-            })
-            .finally(() => {
-              this.showUploadDialog = false;
-            });
+          }).then(({data}) => {
+            if (data && data.code === 0 && data.page.exist) {
+              console.log("data123====>",data)
+              this.dataList = data.page.list
+              const aimUrl = http.adornUrl('/indicator/indicatorindicatorsummary/upload');
+              uploadFile(formData, aimUrl)
+                .then(response => {
+                  console.log("response=====>",response);
+                  if (response && response.data.code === 0) {
+                    if (response.data.msg.includes('存在未定义的指标')) {
+                      this.$message.warning(response.data.msg); // 提示存在未定义的指标
+                    } else {
+                      this.$message.success(response.data.msg); // 正常成功提示
+                    }
+                    this.getDataList();
+                  } else {
+                    this.$message.error("上传失败，请重试");
+                  }
+                })
+                .catch(error => {
+                  console.error('上传失败：', error);
+                  this.$message.error("上传失败，请重试");
+                })
+                .finally(() => {
+                  this.showUploadDialog = false;
+                });
+            } else {
+              this.$message.error(`该月份(${yearMonth})已有数据，无法重复导入`);
+            }
+          })
+
 
         }
       },
@@ -441,6 +478,65 @@
             }
           })
         })
+      },
+
+      // 导出
+      exportAll(){
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list01'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'key': this.queryParams
+          })
+        }).then(({data}) => {
+          if (data) {
+            this.dataList01 = data
+          } else {
+            this.dataList01 = []
+          }
+        })
+        const loadingInstance = Loading.service({
+          lock: true,
+          text: "正在导出，请稍后...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
+
+        const promises = this.dataList01.map((tableRow, index) => {
+            return {
+              序号: index + 1,
+              指标名称: tableRow.indicatorName,
+              年月: tableRow.yearMonth,
+              指标值: tableRow.indicatorValue,
+              管理部门: tableRow.managementDepartment,
+              考核部门: tableRow.assessmentDepartment,
+              指标填报时间: tableRow.indicatorCreatTime,
+            };
+        });
+        Promise.all(promises)
+          .then((data) => {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+            saveAs(
+              new Blob([wbout], { type: "application/octet-stream" }),
+              "指标月度数据总台账.xlsx"
+            );
+
+            // // 提交数据到Vuex Store
+            // this.updateExportedData(data);
+
+
+          })
+          .finally(() => {
+            loadingInstance.close();
+          })
+          .catch((error) => {
+            console.error("导出失败:", error);
+            loadingInstance.close();
+          });
       },
     }
   }

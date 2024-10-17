@@ -74,12 +74,12 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="指标值下界" prop="indicatorValueLowerBound" >
-        <el-input v-model="dataForm.indicatorValueLowerBound" placeholder="请输入指标值下界"></el-input>
-      </el-form-item>
-      <el-form-item label="指标值上界" prop="indicatorValueUpperBound"  >
-        <el-input v-model="dataForm.indicatorValueUpperBound" placeholder="请输入指标值上界"></el-input>
-      </el-form-item>
+<!--      <el-form-item label="指标值下界" prop="indicatorValueLowerBound" >-->
+<!--        <el-input v-model="dataForm.indicatorValueLowerBound" placeholder="请输入指标值下界"></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="指标值上界" prop="indicatorValueUpperBound"  >-->
+<!--        <el-input v-model="dataForm.indicatorValueUpperBound" placeholder="请输入指标值上界"></el-input>-->
+<!--      </el-form-item>-->
       <el-form-item label="指标创建时间" prop="indicatorCreatTime">
         <el-date-picker
           v-model="dataForm.indicatorCreatTime"
@@ -154,9 +154,9 @@ export default {
           { required: true, message: '指标名称不能为空', trigger: 'blur' },
           { validator: this.validateIndicatorName, trigger: 'blur' }
         ],
-        assessmentDepartment: [
-          { required: true, message: '考核部门不能为空', trigger: 'blur' }
-        ],
+        // assessmentDepartment: [
+        //   { required: true, message: '考核部门不能为空', trigger: 'blur' }
+        // ],
         managementDepartment: [
           { required: true, message: '管理部门不能为空', trigger: 'blur' }
         ],

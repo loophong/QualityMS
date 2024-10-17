@@ -41,22 +41,22 @@
   <div id="index">
     <header>
       <h1>盘锦企管系统</h1>
-      <div class="showTime"></div>
+      <div class="showTime">{{ currentTime }}</div>
     </header>
     <section class="mainbox">
       <div class="column">
         <div class="panel indicator1">
-          <h2>盘锦企管系统部门指标统计</h2>
+          <h2>部门指标统计</h2>
           <div id="indicatorChart1" ref="indicatorChart1"></div>
           <div class="panel-footer"></div>
         </div>
         <div class="panel indicator2">
-          <h2>盘锦企管系统指标分级统计</h2>
+          <h2>分级指标统计</h2>
           <div id="indicatorChart2" ref="indicatorChart2"></div>
           <div class="panel-footer"></div>
         </div>
         <div class="panel issue">
-          <h2>当月问题数量统计</h2>
+          <h2>当月问题统计</h2>
           <div id="issueChart" ref="issueChart"></div>
           <div class="panel-footer"></div>
         </div>
@@ -130,7 +130,7 @@ export default {
       completionRateData: { completed: 0, notCompleted: 0 },// 新增的完成率数据
       completionRate: 0, // 完成率
       // issueCategories: ["创建", "暂停", "未完成", "已完成", "结项"], // 问题分类
-
+      currentTime: '', // 存储当前时间
       t: null, // 定时器
     }
   },
@@ -140,6 +140,8 @@ export default {
 
   async mounted() {
     console.log('组件已经挂载');
+    this.updateTime(); // 初始化时立即调用一次以显示当前时间
+    this.t = setInterval(this.updateTime, 1000); // 每秒更新一次
     // this.getIndicatorCounts()
     // this.renderChart()
     this.getIssueStats(); // 获取问题统计数据
@@ -152,20 +154,24 @@ export default {
     this.initEarlyCompletionPieChart();
 
 
-
   },
   methods: {
-    getTime(){
-      clearTimeout(t);
-      dt = new Date();
-      var y = dt.getFullYear();
-      var m = dt.getMonth() + 1;
-      var d = dt.getDate();
-      var h = dt.getHours();
-      var mi = dt.getMinutes();
-      var s = dt.getSeconds();
-      document.querySelector
-      t = setTimeout(this.getTime, 1000);
+    updateTime() {
+      const dt = new Date();
+      const y = dt.getFullYear();
+      const m = ('0' + (dt.getMonth() + 1)).slice(-2); // 补零
+      const d = ('0' + dt.getDate()).slice(-2); // 补零
+      const h = ('0' + dt.getHours()).slice(-2); // 补零
+      const mi = ('0' + dt.getMinutes()).slice(-2); // 补零
+      const s = ('0' + dt.getSeconds()).slice(-2); // 补零
+      this.currentTime = `${y}-${m}-${d} ${h}:${mi}:${s}`; // 格式化时间
+      console.log('当前时间1：' ,this.currentTime);
+    },
+    beforeDestroy() {
+      if (this.t) {
+        clearInterval(this.t); // 清除定时器
+      }
+      console.log('组件即将销毁');
     },
     //----------------指标模块-----------------
     getIndicatorCounts() {

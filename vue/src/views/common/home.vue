@@ -1,42 +1,116 @@
+
+<!--    <div class="header-box">-->
+<!--      <h1 class="header-title">盘锦企管系统</h1>-->
+<!--    </div>-->
+<!--<template>-->
+<!--        <div class="mod-home">-->
+<!--          <div id="indicator" class="box">-->
+<!--            <div style="height: 10%">指标总数：{{indicatorCounts}}</div>-->
+<!--            <div id="indicatorChart1" ref="indicatorChart1"></div>-->
+<!--            <div id="indicatorChart2" ref="indicatorChart2"></div>-->
+<!--          </div>-->
+
+
+<!--          <div id="issue" class="box">-->
+<!--            <div style="height: 10%"></div>-->
+<!--            <div id="issueChart"></div>-->
+<!--          </div>-->
+
+<!--          <div id="task" class="box">-->
+<!--            <div id="task" class="box">-->
+<!--              <div class="flex-container">-->
+<!--                <div class="flex-item" style="width: 50%; height: 96%;">-->
+<!--                  <div class="picture" ref="onTimePieChart" style="width: 96%; height: 96%;"></div>-->
+<!--                </div>-->
+<!--                <div class="flex-item" style="width: 50%; height: 96%;">-->
+<!--                  <div class="picture" ref="earlyCompletionPieChart" style="width: 96%; height: 96%;"></div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+
+<!--          <div id="QC" class="box">-->
+<!--            &lt;!&ndash; QC图表 &ndash;&gt;-->
+<!--            <div>-->
+<!--              <qc-chart ref="qcChart"></qc-chart>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--</template>-->
 <template>
-  <div class="mod-home">
-    <div id="indicator" class="box">
-      <div style="height: 10%">指标总数：{{indicatorCounts}}</div>
-      <div id="indicatorChart1" ref="indicatorChart1"></div>
-      <div id="indicatorChart2" ref="indicatorChart2"></div>
-    </div>
-
-
-    <div id="issue" class="box">
-      <div style="height: 10%"></div>
-      <div id="issueChart"></div>
-    </div>
-
-    <div id="task" class="box">
-      <div id="task" class="box">
-        <div class="flex-container">
-          <div class="flex-item" style="width: 50%; height: 96%;">
-            <div class="picture" ref="onTimePieChart" style="width: 96%; height: 96%;"></div>
-          </div>
-          <div class="flex-item" style="width: 50%; height: 96%;">
-            <div class="picture" ref="earlyCompletionPieChart" style="width: 96%; height: 96%;"></div>
-          </div>
+  <div id="index">
+    <header>
+      <h1>盘锦企管系统</h1>
+      <div class="showTime"></div>
+    </header>
+    <section class="mainbox">
+      <div class="column">
+        <div class="panel indicator1">
+          <h2>盘锦企管系统部门指标统计</h2>
+          <div id="indicatorChart1" ref="indicatorChart1"></div>
+          <div class="panel-footer"></div>
+        </div>
+        <div class="panel indicator2">
+          <h2>盘锦企管系统指标分级统计</h2>
+          <div id="indicatorChart2" ref="indicatorChart2"></div>
+          <div class="panel-footer"></div>
+        </div>
+        <div class="panel issue">
+          <h2>当月问题数量统计</h2>
+          <div id="issueChart" ref="issueChart"></div>
+          <div class="panel-footer"></div>
         </div>
       </div>
-    </div>
-
-    <div id="QC" class="box">
-      <!-- QC图表 -->
-      <div>
-        <qc-chart ref="qcChart"></qc-chart>
+      <div class="column">
+        <div class="no">
+          <div class="no-hd">
+            <ul>
+              <li>{{ indicatorCounts }}</li>
+              <li>{{ completionRate }}</li>
+          </ul>
+          </div>
+          <div class="no-bd">
+            <ul>
+              <li>指标总数</li>
+              <li>当月问题完成率</li>
+            </ul>
+          </div>
+        </div>
+        <div class="map">
+          <div class="map1"></div>
+          <div class="map2"></div>
+          <div class="map3"></div>
+          <div class="chart"></div>
+        </div>
       </div>
-    </div>
+      <div class="column">
+        <div class="panel task">
+          <h2>计划完成情况</h2>
+          <div class="picture" ref="onTimePieChart" style="width: 98%; height: 90%;"></div>
+          <div class="panel-footer"></div>
+        </div>
+        <div class="panel QC">
+          <h2>点检统计</h2>
+          <div id="qc-chart" ref="qcChart"></div>
+          <div class="panel-footer"></div>
+        </div>
+        <div class="panel QC">
+          <h2>QC</h2>
+          <div id="qc-chart" ref="qcChart"></div>
+          <div class="panel-footer"></div>
+        </div>
+      </div>
+    </section>
+
   </div>
 </template>
 
 <script>
 import * as echarts from "echarts";
 import qcChart from "../modules/QCmanagement/qcChart/qcChart.vue";
+import { color } from "d3";
+import china from "./china.js";  // 导入 .js 文件
+
 
 export default {
   name: 'home',
@@ -49,9 +123,15 @@ export default {
 
       //----------------任务模块-----------------
       taskData: {},
+
+      //----------------问题模块-----------------
       issueStats: {}, // 存储当月问题统计数据
-      issueCategories: ["持续", "未完成", "已完成", "结项"], // 问题分类
-      // issueCategories: ["创建", "持续", "未完成", "已完成", "结项"], // 问题分类
+      issueCategories: ["暂停", "未完成", "已完成", "结项"], // 问题分类
+      completionRateData: { completed: 0, notCompleted: 0 },// 新增的完成率数据
+      completionRate: 0, // 完成率
+      // issueCategories: ["创建", "暂停", "未完成", "已完成", "结项"], // 问题分类
+
+      t: null, // 定时器
     }
   },
   components: {
@@ -65,13 +145,28 @@ export default {
     this.getIssueStats(); // 获取问题统计数据
     this.getIndicatorCounts();
 
+    this.getCompletionRate(); // 新增调用完成率数据的方法
 
     await this.getTaskCounts();
     this.initOnTimePieChart();
     this.initEarlyCompletionPieChart();
 
+
+
   },
   methods: {
+    getTime(){
+      clearTimeout(t);
+      dt = new Date();
+      var y = dt.getFullYear();
+      var m = dt.getMonth() + 1;
+      var d = dt.getDate();
+      var h = dt.getHours();
+      var mi = dt.getMinutes();
+      var s = dt.getSeconds();
+      document.querySelector
+      t = setTimeout(this.getTime, 1000);
+    },
     //----------------指标模块-----------------
     getIndicatorCounts() {
       this.$http({
@@ -103,8 +198,6 @@ export default {
 
       const option = {
         title: {
-          text: '盘锦企管系统部门指标统计',
-          left: 'center'
         },
         tooltip: {
           trigger: 'axis',
@@ -113,17 +206,33 @@ export default {
           }
         },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
+          left: '0%',
+          top: '10px',
+          right: '0%',
+          bottom: '20px',
           containLabel: true
         },
         xAxis: {
           type: 'category',
           data: this.departmentCountsList.map(item => item.managementDepartment),
+          axisLabel: {
+            color:"rgba(255,255,255,.6)",
+            fontSize:12,
+          },
+          axisLine: {
+            show:false,
+            lineStyle: {
+              color: "rgba(255,255,255,.1)",
+              width: 2,
+            },
+          },
         },
         yAxis: {
           type: 'value',
+          axisLabel: {
+            color:"rgba(255,255,255,.6)",
+            fontSize:12,
+          },
         },
         series: [
           {
@@ -144,8 +253,6 @@ export default {
 
       const option = {
         title: {
-          text: '盘锦企管系统指标分级统计',
-          left: 'center'
         },
         tooltip: {
           trigger: 'axis',
@@ -154,17 +261,33 @@ export default {
           }
         },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
+          left: '0%',
+          top: '10px',
+          right: '0%',
+          bottom: '20px',
           containLabel: true
         },
         xAxis: {
           type: 'category',
           data: this.classificationCountList.map(item => item.indicatorClassification),
+          axisLabel: {
+            color:"rgba(255,255,255,.6)",
+            fontSize:12,
+          },
+          axisLine: {
+            show:false,
+            lineStyle: {
+              color: "rgba(255,255,255,.1)",
+              width: 2,
+            },
+          },
         },
         yAxis: {
           type: 'value',
+          axisLabel: {
+            color:"rgba(255,255,255,.6)",
+            fontSize:12,
+          },
         },
         series: [
           {
@@ -203,8 +326,7 @@ export default {
       this.chartInstance = echarts.init(this.$refs.onTimePieChart);
       const option = {
         title: {
-          text: '计划完成情况',
-          left: 'center'
+
         },
         tooltip: {
           trigger: 'item'
@@ -306,15 +428,38 @@ export default {
         params: this.$http.adornParams({})
       }).then(({data}) => {
         if (data && data.code === 0) {
-          this.issueStats = data.stats; // 假设返回的数据格式为 { 提出: 10, 持续: 12, ... }
+          this.issueStats = data.stats; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
           console.log('数据转换中......', this.issueStats)
           this.renderIssueChart(); // 渲染图表
         } else {
-          this.issueStats = { 持续: 0, 未完成: 0, 已完成: 0, 结项: 0}; // 默认值
+          this.issueStats = { 暂停: 0, 未完成: 0, 已完成: 0, 结项: 0}; // 默认值
           // this.issueStats = {创建: 0, 持续: 0, 未完成: 0, 已完成: 0, 结项: 0};
         }
       });
     },
+    // 查询当月问题完成情况
+    getCompletionRate() {
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuetable/completionRate'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({data}) => {
+        if (data) {
+          console.log('返回的data', data);
+          // 获取完成率
+          const completed = data.completionRate.completed;
+          const notCompleted = data.completionRate.notCompleted;
+          const total = completed + notCompleted;
+          const completionRate = total > 0 ? ((completed / total) * 100).toFixed(2) + '%' : '0%';
+
+          // 更新显示的完成率
+          this.completionRate = completionRate;  // 使用 Vue 响应式数据绑定
+        } else {
+          console.error('无效的数据格式');
+        }
+      });
+    },
+
 
     // 渲染问题统计图表
     renderIssueChart() {
@@ -323,8 +468,6 @@ export default {
 
       const option = {
         title: {
-          text: "当月问题数量统计",
-          left: 'center'
         },
         tooltip: {
           trigger: 'axis',
@@ -333,17 +476,33 @@ export default {
           }
         },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
+          left: '0%',
+          top: '10px',
+          right: '0%',
+          bottom: '26px',
           containLabel: true
         },
         xAxis: {
           type: 'category',
           data: this.issueCategories, // 问题分类作为X轴
+          axisLabel: {
+            color:"rgba(255,255,255,.6)",
+            fontSize:12,
+          },
+          axisLine: {
+            show:false,
+            lineStyle: {
+              color: "rgba(255,255,255,.1)",
+              width: 2,
+            },
+          },
         },
         yAxis: {
           type: 'value',
+          axisLabel: {
+            color:"rgba(255,255,255,.6)",
+            fontSize:12,
+          },
         },
         series: [
           {
@@ -351,7 +510,7 @@ export default {
             type: 'bar',
             data: [
               // this.issueStats['创建'] || 0,
-              this.issueStats['持续'] || 0,
+              this.issueStats['暂停'] || 0,
               this.issueStats['未完成'] || 0,
               this.issueStats['已完成'] || 0,
               this.issueStats['结项'] || 0
@@ -365,14 +524,23 @@ export default {
 
       chart.setOption(option);
     },
-
-
-
-
+   
   }
 };
 </script>
+<style lang="scss">
+@import "../../assets/echart/index.scss";
+/* 保持原有样式 */
+.box {
+  background-color: transparent; /* 设置为透明背景 */
+}
+.el-card__body {
+  background-color: transparent; /* 设置为透明背景 */
+}
+</style>
 
+<style>
+</style>
 <style>
 .mod-home {
   display: flex;
@@ -391,12 +559,12 @@ export default {
 }
 
 #indicatorChart1 {
-  width: 100%;
-  height: 50%;
+  width: 98%;
+  height: 90%;
 }
 #indicatorChart2 {
-  width: 100%;
-  height: 50%;
+  width: 98%;
+  height: 90%;
 }
 
 #QC {
@@ -424,7 +592,8 @@ export default {
 }
 
 #issueChart {
-  width: 80%; /* 使其宽度充满父容器 */
-  height: 100%; /* 高度可以设置为100%，需要确保父容器有明确的高度 */
+  width: 98%; /* 使其宽度充满父容器 */
+  height: 90%; /* 高度可以设置为100%，需要确保父容器有明确的高度 */
 }
 </style>
+

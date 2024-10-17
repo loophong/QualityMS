@@ -7,7 +7,7 @@
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="150px">
 
       <el-form-item label="检查科室" prop="inspectionDepartment">
-        <el-select v-model="dataForm.inspectionDepartment" placeholder="请选择检查科室">
+        <el-select v-model="dataForm.inspectionDepartment" filterable placeholder="请选择检查科室">
           <el-option
             v-for="department in departmentOptions"
             :key="department.value"
@@ -114,7 +114,7 @@
 <!--      <el-input v-model="dataForm.responsibleDepartment" placeholder="责任科室"></el-input>-->
 <!--    </el-form-item>-->
       <el-form-item label="责任科室" prop="responsibleDepartment">
-        <el-select v-model="dataForm.responsibleDepartment" placeholder="请选择检查科室">
+        <el-select v-model="dataForm.responsibleDepartment" filterable placeholder="请选择检查科室">
           <el-option
             v-for="department in departmentOptions"
             :key="department.value"

@@ -425,7 +425,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         Map<String, Integer> statistics = new HashMap<>();
 
         // 定义可能的验证结论状态
-        List<String> verificationConclusions = Arrays.asList("持续", "未完成", "已完成", "结项");
+        List<String> verificationConclusions = Arrays.asList("暂停", "未完成", "已完成", "结项");
 
         // 获取当前月份起止日期
         String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
@@ -681,6 +681,28 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
     }
 
+    @Override
+    public Map<String, Integer> getCurrentMonthCompletionRate() {
+        // 获取当前月的起始和结束日期
+        LocalDate now = LocalDate.now();
+        String startDate = now.withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 本月第一天
+        String endDate = now.plusMonths(1).withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 下月第一天
+
+        // 统计当前月份已完成和未完成的条数
+        int completedCount = countIssuesByStateAndDate("已完成", startDate, endDate);
+        int notCompletedCount = countIssuesByStateAndDate("未完成", startDate, endDate);
+        int pauseCount = countIssuesByStateAndDate("暂停", startDate, endDate);
+        int conclusionCount = countIssuesByStateAndDate("结项", startDate, endDate);
+        int noCount = notCompletedCount + pauseCount + conclusionCount ;
+        // 创建一个结果Map用于存放完成率数据
+        Map<String, Integer> completionRate = new HashMap<>();
+        completionRate.put("completed", completedCount);
+        completionRate.put("notCompleted", noCount);
+
+        return completionRate;
+    }
+
+
 
     // 统计“创建”的条件
     private Integer countIssuesByCreationCondition(String startDate, String endDate) {
@@ -741,6 +763,15 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
             default:
                 return null;
         }
+    }
+
+    private Integer countIssuesByStateAndDate(String state, String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("verification_conclusion", state) // 状态匹配
+                .ge("creation_time", startDate) // 创建时间在本月
+                .lt("creation_time", endDate); // 创建时间在本月内
+
+        return this.count(queryWrapper); // 使用 MyBatis-Plus 的 count 方法
     }
 
 

@@ -48,5 +48,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     Workbook generateTemplate(); // 声明生成模板的方法
 
     void removeAll(Integer[] issueIds);
+
+    Map<String, Integer> getCurrentMonthCompletionRate();
 }
 

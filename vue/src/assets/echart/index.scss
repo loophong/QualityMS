@@ -1,0 +1,244 @@
+#index {
+  //color: #d3d6dd;
+  background: url("~@/assets/bg.jpg")
+  no-repeat top center;
+  width: 100%;
+  height: 100vh;
+}
+li{
+  list-style: none;
+}
+header{
+  position: relative;
+  height: 5.25rem;
+  background: url('~@/assets/head_bg.png')
+  no-repeat top center;
+  background-size: 100% 100%;
+  h1{
+    font-size: 2.2rem;
+    color: #FFFFFF;
+    text-align: center;
+    line-height: 4.5rem;
+  }
+  .showTime{
+    position: absolute;
+    right: 1.875rem;
+    top: 0;
+    line-height: 3.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.5rem;
+  }
+}
+.mainbox{
+  display: flex;
+  min-width: 1024px;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0.35rem 0.35rem 0;
+  .column{
+    flex:3;
+  }
+  .column:nth-child(2){
+    flex: 5;
+    margin: 0 0.5rem 0.5rem;
+  }
+  .panel {
+    position: relative;
+    height: 13rem;
+    padding: 0 0.2rem 0.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(25, 186, 139, 0.17);
+    background: url('~@/assets/line(1).png');
+    &::before{
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 10px;
+      height: 10px;
+      border-left: 2px solid #19baba;
+      border-top: 2px solid #19baba;
+    }
+    &::after{
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid #19baba;
+      border-top: 2px solid #19baba;
+    }
+    h2{
+      height: 2rem;
+      color: #FFFFFF;
+      line-height: 2rem;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 400;
+      margin: 0.3rem 0 0.3rem;
+    }
+    .indicatorChart1{
+      height: 80%;
+      width: 100%;
+      background-color: pink;
+    }
+    .issueChart{
+      height: 10rem;
+      width: 100%;
+      background-color: pink;
+    }
+    .panel-footer{
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      &::before{
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 10px;
+        height: 10px;
+        border-left: 2px solid #19baba;
+        border-bottom: 2px solid #19baba;
+      }
+      &::after{
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #19baba;
+        border-bottom: 2px solid #19baba;
+      }
+    }
+  }
+}
+.no{
+  background: rgba(101, 132 , 226 , 0.1);
+  padding-left: 0.35rem;
+  .no-hd{
+    position: relative;
+    border: 1px solid rgba(25, 186 , 139 , 0.17);
+    &::before{
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: '';
+      width: 30px;
+      height: 10px;
+      border-top: 2px solid #19baba;
+      border-left: 2px solid #19baba;
+    }
+    &::after{
+      position: absolute;
+      bottom:  0;
+      right: 0;
+      content: '';
+      width: 30px;
+      height: 10px;
+      border-bottom: 2px solid #19baba;
+      border-right: 2px solid #19baba;
+    }
+    ul{
+      display: flex;
+      li{
+        position: relative;
+        flex: 1;
+        line-height: 1.5rem;
+        font-size: 2rem;
+        color: rgb(251, 174, 81);
+        text-align: center;
+        &::after{
+          content: '';
+          position: absolute;
+          top: 5%;
+          right: 0;
+          height: 80%;
+          width: 1px;
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+      }
+    }
+  }
+  .no-bd{
+    ul{
+      display: flex;
+      li{
+        flex: 1;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.8rem;
+        height: 1.2rem;
+        line-height: 1.2rem;
+        padding-bottom: 1.6rem;
+      }
+    }
+  }
+}
+.map{
+  position: relative;
+  height: 33rem;
+  .map1{
+    width: 22.5rem;
+    height: 22.5rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: url('~@/assets/map.png');
+    background-size: 100% 100%;
+    opacity: 0.3;
+  }
+  .map2{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 26.5rem;
+    height: 26.5rem;
+    background: url('~@/assets/lbx.png');
+    background-size: 100% 100%;
+    animation: rotate1 15s linear infinite;
+    opacity: 0.6;
+  }
+  .map3{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 22.5rem;
+    height: 22.5rem;
+    background: url('~@/assets/jt.png');
+    background-size: 100% 100%;
+    animation: rotate2 10s linear infinite;
+    opacity: 0.6;
+  }
+  .chart{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 33rem;
+  }
+  @keyframes rotate1 {
+    from{
+      transform: translate(-50%, -50%) rotate(0deg);  // 把 rotate 放到 transform 中
+    }
+    to{
+      transform: translate(-50%, -50%) rotate(360deg);  // 完成 360 度旋转
+    }
+  }
+  @keyframes rotate2 {
+    from{
+      transform: translate(-50%, -50%) rotate(0deg);  // 把 rotate 放到 transform 中
+    }
+    to{
+      transform: translate(-50%, -50%) rotate(-360deg);  // 完成 360 度旋转
+    }
+  }
+
+}
+

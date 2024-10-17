@@ -213,7 +213,18 @@ public class IssueTableController {
     }
 
 
-
+    /**
+     * 当月问题完成率
+     */
+//    @Value("${file.upload-dir}")
+    // 获取当月问题完成率
+    @RequestMapping("/completionRate")
+    @RequiresPermissions("generator:issuetable:list")
+    public R getCompletionRate() {
+        Map<String, Integer> completionRate = issueTableService.getCurrentMonthCompletionRate();
+        System.out.println("返回前端的完成率数据: " + completionRate);
+        return R.ok().put("completionRate", completionRate);
+    }
 
     /**
      * 获取所有问题列表

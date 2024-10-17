@@ -67,7 +67,7 @@ public class SysCaptchaServiceImpl extends ServiceImpl<SysCaptchaDao, SysCaptcha
         int result = 0;   // 结果
 
         // 随机选择一个运算符
-        switch (random.nextInt(4)) { // 生成0到3之间的随机数
+        switch (random.nextInt(3)) { // 生成0到2之间的随机数
             case 0:
                 operator = "+";
                 result = num1 + num2; // 加法
@@ -79,14 +79,6 @@ public class SysCaptchaServiceImpl extends ServiceImpl<SysCaptchaDao, SysCaptcha
             case 2:
                 operator = "*";
                 result = num1 * num2; // 乘法
-                break;
-            case 3:
-                operator = "/";
-                // 防止除数为0
-                if (num2 == 0) {
-                    num2 = 1; // 确保除法有效
-                }
-                result = num1 / num2; // 除法
                 break;
             default:
                 operator = "+";

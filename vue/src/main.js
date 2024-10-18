@@ -12,9 +12,12 @@ import '@/assets/scss/index.scss'
 import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/axios
 import { isAuth } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
-import echarts from 'echarts';
+import echarts from 'echarts'
+import Vue2OrgTree from 'vue2-org-tree'
+import 'vue2-org-tree/dist/style.css'
 Vue.prototype.$echarts = echarts;
 
+Vue.use(Vue2OrgTree);
 Vue.use(VueCookie)
 // Vue.use(ElementUI ,{size: 'middle'})
 Vue.config.productionTip = false

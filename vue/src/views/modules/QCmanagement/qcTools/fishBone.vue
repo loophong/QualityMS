@@ -21,7 +21,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveChanges">保存</el-button>
+          <el-button type="primary" @click="saveChanges">确定</el-button>
         </div>
       </el-dialog>
       <el-dialog
@@ -46,7 +46,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="addDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="addNode">保存</el-button>
+          <el-button type="primary" @click="addNode">确定</el-button>
         </div>
       </el-dialog>
     </div>

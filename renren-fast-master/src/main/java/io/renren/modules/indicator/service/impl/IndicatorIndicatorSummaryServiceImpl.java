@@ -44,6 +44,8 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
         System.out.println("params:" + params);
         String key = (String) params.get("key");
         QueryWrapper<IndicatorIndicatorSummaryEntity> queryWrapper = new QueryWrapper<>();
+////        排序的话要将各个月份的分成几个组，然后在组间排序
+//        queryWrapper.orderByAsc("`year_month`");
 
         if (key != null && !key.isEmpty()) {
             try {

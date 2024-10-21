@@ -285,6 +285,17 @@ public class IssueTableController {
     }
 
     /**
+     * 查询并复用列表
+     */
+    @RequestMapping("/QueryFulist")
+    @RequiresPermissions("generator:issuetable:list")
+    public R QueryFulist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueTableService.QueryFuPage(params);
+        System.out.println("-------------------------------------------"+page);
+        return R.ok().put("page", page);
+    }
+
+    /**
      * 问题列表（创建人可见）
      */
     @RequestMapping("/listcreator")

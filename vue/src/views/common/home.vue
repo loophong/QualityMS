@@ -345,6 +345,7 @@ export default {
           top: '5%',
           left: 'center'
         },
+        color: ['#00baff', '#3de7c9', '#ffc530', '#469f4b'],  // 设置颜色数组
         series: [
           {
             // name: 'Access From',

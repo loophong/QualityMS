@@ -11,23 +11,6 @@
         <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="auditHandle()" :disabled="dataListSelections.length <= 0">审核</el-button>
       </el-form-item>
     </el-form>
-<!--    <el-dialog-->
-<!--      title="审核"-->
-<!--      :visible.sync="auditDialogVisible"-->
-<!--      width="30%">-->
-<!--      <span>请选择审核结果：</span>-->
-<!--      <el-radio-group v-model="auditResult">-->
-<!--        <el-radio label="approved">审核通过</el-radio>-->
-<!--        <el-radio label="rejected">审核不通过</el-radio>-->
-<!--      </el-radio-group>-->
-<!--      <el-form-item label="审核意见" prop="reviewerOpinion">-->
-<!--        <el-input v-model="reviewerOpinion" placeholder="请输入审核意见" clearable></el-input>-->
-<!--      </el-form-item>-->
-<!--      <div slot="footer" class="dialog-footer">-->
-<!--        <el-button @click="auditDialogVisible = false">取 消</el-button>-->
-<!--        <el-button type="primary" @click="confirmAudit">确 定</el-button>-->
-<!--      </div>-->
-<!--    </el-dialog>-->
     <el-dialog
       title="审核"
       :visible.sync="auditDialogVisible"
@@ -62,18 +45,6 @@
         align="center"
         width="50">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="issuemaskId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="serialNumber"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="序号">-->
-<!--      </el-table-column>-->
       <el-table-column
         prop="issueNumber"
         header-align="center"
@@ -391,3 +362,38 @@ export default {
   }
 }
 </script>
+<style scoped>
+/* 表格的样式 */
+.el-table {
+  font-size: 16px; /* 放大文字字体 */
+  border: 2px solid #ccc; /* 加粗边框 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 增加阴影效果 */
+  border-radius: 10px; /* 可选：使表格边角变圆滑 */
+}
+
+/* 表格头部文字的样式 */
+.el-table th {
+  font-size: 18px; /* 放大表头的字体 */
+  font-weight: bold; /* 加粗表头文字 */
+  color: #333; /* 表头文字颜色 */
+  border-bottom: 2px solid #ccc; /* 表头的下边框 */
+}
+
+/* 表格单元格文字样式 */
+.el-table td {
+  font-size: 16px; /* 调整单元格字体大小 */
+  color: #333; /* 单元格文字颜色 */
+}
+
+/* 设置选中行的样式 */
+.el-table .el-table__row--striped:hover {
+  background-color: #f5f7fa; /* 表格行的悬停背景颜色 */
+}
+
+/* 调整表格分页器的样式 */
+.el-pagination {
+  margin-top: 10px;
+  font-size: 14px; /* 分页器字体大小 */
+}
+</style>
+

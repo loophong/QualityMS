@@ -254,43 +254,70 @@
       <el-button type="primary" @click="submitFormT ('dataForm')">提交</el-button>
     </span>
     </el-dialog>
-
     <el-dialog
-      title="上传文件"
+      :title="'问题重写'"
       :close-on-click-modal="false"
-      @close="closeHandle"
-      :visible.sync="visibleUpload">
-      <el-upload
-        drag
-        :action="url"
-        :before-upload="beforeUploadHandle"
-        :on-success="successHandle"
-        multiple
-        :file-list="fileList"
-        style="text-align: center;">
-        <i class="el-icon-upload"></i>
-        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-        <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
-      </el-upload>
+      :visible.sync="revisible">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+        <el-form-item label="原因分析" prop="causeAnalysis">
+          <el-input v-model="dataForm.causeAnalysis" placeholder="原因分析"></el-input>
+        </el-form-item>
+        <el-form-item label="整改情况" prop="rectificationStatus">
+          <el-input v-model="dataForm.rectificationStatus" placeholder="整改情况"></el-input>
+        </el-form-item>
+        <el-form-item label="实际完成时间" prop="actualCompletionTime">
+          <el-input v-model="dataForm.actualCompletionTime" placeholder="实际完成时间"></el-input>
+        </el-form-item>
+<!--        <el-form-item label="整改照片交付物" prop="rectificationPhotoDeliverable">-->
+<!--          <el-input v-model="dataForm.rectificationPhotoDeliverable" placeholder="整改照片交付物"></el-input>-->
+<!--        </el-form-item>-->
+        <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
+          <el-input v-model="dataForm.rectificationResponsiblePerson" placeholder="整改责任人"></el-input>
+        </el-form-item>
+        <el-form-item label="关联问题" prop="rectificationVerificationStatus">
+          <el-input v-model="dataForm.rectificationVerificationStatus" placeholder="关联问题整改记录"></el-input>
+        </el-form-item>
+        <el-form-item label="整改验证情况" prop="rectificationVerificationStatus">
+          <el-input v-model="dataForm.rectificationVerificationStatus" placeholder="整改验证情况"></el-input>
+        </el-form-item>
+        <el-form-item label="验证结论" prop="verificationConclusion">
+          <el-input v-model="dataForm.verificationConclusion" placeholder="验证结论"></el-input>
+        </el-form-item>
+        <el-form-item label="验证人" prop="verifier">
+          <el-input v-model="dataForm.verifier" placeholder="验证人"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="timeReuse ()">确认</el-button>
+        <el-button @click="revisible = false">关闭</el-button>
+      </span>
     </el-dialog>
-
     <el-dialog
-      title="上传文件"
+      :title="'请选择日期'"
       :close-on-click-modal="false"
-      @close="closeHandle"
-      :visible.sync="visibleUpload">
-      <el-upload
-        drag
-        :action="url"
-        :before-upload="beforeUploadHandle"
-        :on-success="successHandle"
-        multiple
-        :file-list="fileList"
-        style="text-align: center;">
-        <i class="el-icon-upload"></i>
-        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-        <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
-      </el-upload>
+      :visible.sync="retimevisible">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+        <el-form-item label="检查日期" prop="inspectionDate">
+          <el-date-picker
+            v-model="dataForm.inspectionDate"
+            type="date"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="请选择日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="要求完成时间" prop="requiredCompletionTime">
+          <el-date-picker
+            v-model="dataForm.requiredCompletionTime"
+            type="date"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="请选择日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFormreuse ()">确认</el-button>
+        <el-button @click="retimevisible = false">关闭</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -308,6 +335,8 @@
         visible1: false,
         visibleR: false,
         visibleT: false,
+        revisible: false,
+        retimevisible: false,
         file: null,
         dialogImageUrl: '',
         imageList: [],
@@ -398,7 +427,7 @@
         this.options = data;
 
 
-        console.log(data);
+        // console.log(data);
         // if (data && data.code === 0) {
         //   console.log(data);
         // }
@@ -423,7 +452,7 @@
           if (data && data.code === 0) {
             // 保存后端返回的url到变量中
             this.dataForm.issuePhoto = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
-            console.log('获得的文件地址 ：' ,data.uploadurl)
+            // console.log('获得的文件地址 ：' ,data.uploadurl)
             this.$message.success('文件上传成功');
             // 处理成功后的逻辑，例如更新状态
           } else {
@@ -461,7 +490,7 @@
           if (data && data.code === 0) {
             // 保存后端返回的url到变量中
             this.dataForm.rectificationPhotoDeliverable = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
-            console.log('获得的文件地址 ：' ,data.uploadurl)
+            // console.log('获得的文件地址 ：' ,data.uploadurl)
             this.$message.success('文件上传成功');
             // 处理成功后的逻辑，例如更新状态
           } else {
@@ -493,25 +522,9 @@
       successHandle(response, file, fileList) {
         this.fileList = fileList;
         this.successNum++;
-        // if (response && response.code === 0) {
-        //   console.log('获取图片的返回' ,response)
-        //   console.log('获取图片的返回' ,response.code)
-        //   this.dataForm.issuePhoto = response.url; // 假设返回的数据中包含图片地址
-        //   if (this.num === this.successNum) {
-        //     this.$confirm('操作成功, 是否继续操作?', '提示', {
-        //       confirmButtonText: '确定',
-        //       cancelButtonText: '取消',
-        //       type: 'warning'
-        //     }).catch(() => {
-        //       this.visibleUpload = false; // 关闭上传对话框
-        //     });
-        //   }
-        // } else {
-        //   this.$message.error(response.msg);
-        // }
         if (response && response.code === 0) {
-          console.log('获取图片的返回', response);
-          console.log('获取图片的返回', response.code);
+          // console.log('获取图片的返回', response);
+          // console.log('获取图片的返回', response.code);
           this.dataForm.issuePhoto = response.url; // 假设返回的数据中包含图片地址
 
           // 显示操作成功的消息
@@ -559,7 +572,7 @@
       },
       addSubtask () {
         const serialNumber = this.generateSerialNumber();
-        console.log('Successfully setnumber:', serialNumber)
+        // console.log('Successfully setnumber:', serialNumber)
         this.dataForm.subtasks.push({
           name: '',
           assignee: '',
@@ -667,6 +680,57 @@
           }
         }).catch(error => {
           console.error('There was an error fetching the vehicle types!', error)
+        })
+      },
+      timeReuse(){
+        this.retimevisible = true
+      },
+      reuseIssue (id) {
+        this.dataForm.issueId = id
+        this.revisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields()
+          if (this.dataForm.issueId) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.dataForm.serialNumber = data.issueTable.serialNumber
+                this.dataForm.issueNumber = data.issueTable.issueNumber
+                this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
+                this.dataForm.inspectionDate = data.issueTable.inspectionDate
+                this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
+                this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
+                this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
+                this.dataForm.issueDescription = data.issueTable.issueDescription
+                this.dataForm.issuePhoto = data.issueTable.issuePhoto
+                this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+                this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
+                this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
+                this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
+                this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+                this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
+                this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
+                this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
+                this.dataForm.remark = data.issueTable.remark
+                this.dataForm.creator = data.issueTable.creator
+                this.dataForm.creationTime = data.issueTable.creationTime
+                this.dataForm.lastModifier = data.issueTable.lastModifier
+                this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
+                this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
+                this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
+                this.dataForm.creationDuration = data.issueTable.creationDuration
+                this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
+                this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
+                this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
+                this.dataForm.verifier = data.issueTable.verifier
+                this.dataForm.formula = data.issueTable.formula
+              }
+
+            })
+          }
         })
       },
       init (id) {
@@ -877,19 +941,10 @@
       },
       // 表单提交
       dataFormSubmit () {
-        console.log('Successfully 获得 vehicle:', this.dataForm.vehicles)
-        console.log('Successfully fetched photo2:', this.imageurl)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            // 检查是否上传了图片
-            // if (!this.imageurl) {
-            //   this.$message.error('请上传图片')
-            //   return
-            // }
-            // 创建 vehicleTypeIds 数组
             this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
             this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
-            console.log('Successfully 获得 vehicle:', this.dataForm.vehicleTypeIds)
             // 确保 issueCategoryId 是一个数组
             if (!Array.isArray(this.dataForm.issueCategoryId)) {
               this.dataForm.issueCategoryId = [this.dataForm.issueCategoryId]
@@ -959,22 +1014,12 @@
       },
       // 表单提交
       dataFormSubmitR () {
-        console.log('Successfully 获得 vehicle:', this.dataForm.vehicles)
-        console.log('Successfully fetched photo2:', this.imageurl)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            // 检查是否上传了图片
-            // if (!this.imageurl) {
-            //   this.$message.error('请上传图片')
-            //   return
-            // }
-            // 创建 vehicleTypeIds 数组
             this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
             this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
             // 将选中的责任人ID数组转换为字符串
             this.dataForm.rectificationResponsiblePerson = this.selectedResponsiblePersons.join(',');
-            console.log('整改责任人:', this.dataForm.rectificationResponsiblePerson);
-            console.log('Successfully 获得 vehicle:', this.dataForm.vehicleTypeIds)
             // 确保 issueCategoryId 是一个数组
             if (!Array.isArray(this.dataForm.issueCategoryId)) {
               this.dataForm.issueCategoryId = [this.dataForm.issueCategoryId]
@@ -986,41 +1031,12 @@
               method: 'post',
               data: this.$http.adornData({
                 'issueId': this.dataForm.issueId || undefined,
-                // 'serialNumber': this.dataForm.serialNumber,
-                // 'issueNumber': this.dataForm.issueNumber,
-                // 'inspectionDepartment': this.dataForm.inspectionDepartment,
-                // 'inspectionDate': this.dataForm.inspectionDate,
-                // 'issueCategoryId': this.dataForm.issueCategoryId, // 使用转换后的字符串
-                // 'vehicleTypeId': this.dataForm.vehicleTypeIds,
-                // 'vehicleNumberId': this.dataForm.vehicleNumbers,
-                // 'issueDescription': this.dataForm.issueDescription,
-                // 'issuePhoto': this.dataForm.issuePhoto,
-                // 'rectificationRequirement': this.dataForm.rectificationRequirement,
-                // 'requiredCompletionTime': this.dataForm.requiredCompletionTime,
-                // 'responsibleDepartment': this.dataForm.responsibleDepartment,
                 'rectificationStatus': this.dataForm.rectificationStatus,
                 'actualCompletionTime': this.dataForm.actualCompletionTime,
                 'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,
                 'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
-                // 'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
-                // 'remark': this.dataForm.remark,
-                // 'creator': this.dataForm.creator,
-                // 'creationTime': this.dataForm.creationTime,
-                // 'lastModifier': this.dataForm.lastModifier,
-                // 'lastModificationTime': this.dataForm.lastModificationTime,
-                // 'associatedRectificationRecords': this.dataForm.associatedRectificationRecords,
-                // 'associatedIssueAddition': this.dataForm.associatedIssueIds, // 将数组转换为逗号分隔的字符串
-                // 'creationDuration': this.dataForm.creationDuration,
                 'causeAnalysis': this.dataForm.causeAnalysis,
-                // 'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
-                // 'verificationConclusion': this.dataForm.verificationConclusion,
-                // 'verifier': this.dataForm.verifier,
-                // 'reviewers': this.dataForm.reviewers,
-                // 'level': this.dataForm.level,
                 'state': '持续',
-                // 'superiorMask': this.dataForm.superiorMask,
-                // 'nextMask': this.dataForm.nextMask,
-                // 'formula': this.dataForm.formula
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -1062,7 +1078,6 @@
       },
       submitFormT (formName) {
         this.fetchuserinform()
-        console.log('Successfully fetched user info4:', this.dataForm.creator)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.dataForm.subtasks.forEach(subtask => {
@@ -1097,14 +1112,84 @@
                   this.$message.error(data.msg)
                 }
               })
-              console.log('时间:', this.dataForm.requiredCompletionTime)
-              console.log('发起人:', this.dataForm.userinfo)
             })
           }
           // 重置 subtasks 数组，只保留一个初始组合
           this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
           this.visible1 = false // 关闭对话框或重置其他状态
         })
+      },
+      // 表单提交
+      submitFormreuse() {
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
+            this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
+            // 确保 issueCategoryId 是一个数组
+            if (!Array.isArray(this.dataForm.issueCategoryId)) {
+              this.dataForm.issueCategoryId = [this.dataForm.issueCategoryId]
+            }
+            // 将数组转换为逗号分隔的字符串
+            const issueCategoryIdString = this.dataForm.issueCategoryId.join(',')
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuetable/save`),
+              method: 'post',
+              data: this.$http.adornData({
+                'issueId': this.dataForm.issueId || undefined,
+                'serialNumber': this.dataForm.serialNumber,
+                'issueNumber': this.generateSerialNumber(),
+                'inspectionDepartment': this.dataForm.inspectionDepartment,
+                'inspectionDate': this.dataForm.inspectionDate,
+                'issueCategoryId': issueCategoryIdString,
+                'vehicleTypeId': this.dataForm.vehicleTypeId,
+                'vehicleNumberId': this.dataForm.vehicleNumberId,
+                'issueDescription': this.dataForm.issueDescription,
+                'issuePhoto': this.dataForm.issuePhoto,
+                'rectificationRequirement': this.dataForm.rectificationRequirement,
+                'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+                'responsibleDepartment': this.dataForm.responsibleDepartment,
+                // 'rectificationStatus': this.dataForm.rectificationStatus,
+                // 'actualCompletionTime': this.dataForm.actualCompletionTime,
+                // 'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,
+                // 'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+                // 'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
+                // 'remark': this.dataForm.remark,
+                // 'creator': this.dataForm.creator,
+                // 'creationTime': this.dataForm.creationTime,
+                // 'lastModifier': this.dataForm.lastModifier,
+                // 'lastModificationTime': this.dataForm.lastModificationTime,
+                // 'associatedRectificationRecords': this.dataForm.associatedRectificationRecords,
+                // 'associatedIssueAddition': this.dataForm.associatedIssueIds.join(','), // 将数组转换为逗号分隔的字符串
+                // 'creationDuration': this.dataForm.creationDuration,
+                // 'causeAnalysis': this.dataForm.causeAnalysis,
+                // 'rectificationVerificationStatus':this.dataForm.rectificationVerificationStatus,
+                // 'verificationConclusion': this.dataForm.verificationConclusion,
+                // 'verifier': this.dataForm.verifier,
+                // 'level': this.dataForm.level,
+                // 'state': this.dataForm.state,
+                // 'formula': this.dataForm.formula
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.revisible = false
+                    this.retimevisible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
+        })
+        // 重置 vehicles 数组，只保留一个初始组合
+        this.dataForm.vehicles = [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }]
+        this.vehicleNumberOptions = []
       },
 
     }

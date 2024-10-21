@@ -142,65 +142,48 @@
       <el-form-item label="责任科室" prop="responsibleDepartment">
         <el-input v-model="dataForm.responsibleDepartment" readonly></el-input>
       </el-form-item>
-<!--      <el-form-item label="整改情况" prop="rectificationStatus">-->
-<!--        <el-input v-model="dataForm.rectificationStatus" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="实际完成时间" prop="actualCompletionTime">-->
-<!--        <el-input v-model="dataForm.actualCompletionTime" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="整改照片交付物" prop="rectificationPhotoDeliverable">-->
-<!--        <el-input v-model="dataForm.rectificationPhotoDeliverable" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
-<!--        <el-input v-model="dataForm.rectificationResponsiblePerson" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="要求二次整改时间" prop="requiredSecondRectificationTime">-->
-<!--        <el-input v-model="dataForm.requiredSecondRectificationTime" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="备注" prop="remark">-->
-<!--        <el-input v-model="dataForm.remark" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="创建人" prop="creator">-->
-<!--        <el-input v-model="dataForm.creator" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="创建时间" prop="creationTime">-->
-<!--        <el-input v-model="dataForm.creationTime" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="最后修改人" prop="lastModifier">-->
-<!--        <el-input v-model="dataForm.lastModifier" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="最后修改时间" prop="lastModificationTime">-->
-<!--        <el-input v-model="dataForm.lastModificationTime" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="关联问题整改记录" prop="associatedRectificationRecords">-->
-<!--        <el-input v-model="dataForm.associatedRectificationRecords" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="关联问题添加" prop="associatedIssueAddition">-->
-<!--        <el-input v-model="dataForm.associatedIssueAddition" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="创建时长" prop="creationDuration">-->
-<!--        <el-input v-model="dataForm.creationDuration" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="原因分析" prop="causeAnalysis">-->
-<!--        <el-input v-model="dataForm.causeAnalysis" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="整改验证情况" prop="rectificationVerificationStatus">-->
-<!--        <el-input v-model="dataForm.rectificationVerificationStatus" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="验证结论" prop="verificationConclusion">-->
-<!--        <el-input v-model="dataForm.verificationConclusion" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="验证人" prop="verifier">-->
-<!--        <el-input v-model="dataForm.verifier" readonly></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="公式" prop="formula">-->
-<!--        <el-input v-model="dataForm.formula" readonly></el-input>-->
-<!--      </el-form-item>-->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible1 = false">关闭</el-button>
     </span>
   </el-dialog>
+    <el-dialog
+      :title="'问题重写'"
+      :close-on-click-modal="false"
+      :visible.sync="visible">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+        <el-form-item label="原因分析" prop="causeAnalysis">
+          <el-input v-model="dataForm.causeAnalysis" placeholder="原因分析"></el-input>
+        </el-form-item>
+        <el-form-item label="整改情况" prop="rectificationStatus">
+          <el-input v-model="dataForm.rectificationStatus" placeholder="整改情况"></el-input>
+        </el-form-item>
+        <el-form-item label="实际完成时间" prop="actualCompletionTime">
+          <el-input v-model="dataForm.actualCompletionTime" placeholder="实际完成时间"></el-input>
+        </el-form-item>
+        <el-form-item label="整改照片交付物" prop="rectificationPhotoDeliverable">
+          <el-input v-model="dataForm.rectificationPhotoDeliverable" placeholder="整改照片交付物"></el-input>
+        </el-form-item>
+        <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
+          <el-input v-model="dataForm.rectificationResponsiblePerson" placeholder="整改责任人"></el-input>
+        </el-form-item>
+        <el-form-item label="关联问题整改记录" prop="rectificationVerificationStatus">
+          <el-input v-model="dataForm.rectificationVerificationStatus" placeholder="关联问题整改记录"></el-input>
+        </el-form-item>
+        <el-form-item label="整改验证情况" prop="rectificationVerificationStatus">
+          <el-input v-model="dataForm.rectificationVerificationStatus" placeholder="整改验证情况"></el-input>
+        </el-form-item>
+        <el-form-item label="验证结论" prop="verificationConclusion">
+          <el-input v-model="dataForm.verificationConclusion" placeholder="验证结论"></el-input>
+        </el-form-item>
+        <el-form-item label="验证人" prop="verifier">
+          <el-input v-model="dataForm.verifier" placeholder="验证人"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+      <el-button @click="revisible = false">关闭</el-button>
+    </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -210,6 +193,7 @@
       return {
         visible: false,
         visible1: false,
+        revisible: false,
         dataForm: {
           issueId: 0,
           serialNumber: '',
@@ -244,100 +228,57 @@
           formula: ''
         },
         dataRule: {
-          // serialNumber: [
-          //   { required: true, message: '序号不能为空', trigger: 'blur' }
-          // ],
-          // issueNumber: [
-          //   { required: true, message: '问题编号不能为空', trigger: 'blur' }
-          // ],
-          // inspectionDepartment: [
-          //   { required: true, message: '检查科室不能为空', trigger: 'blur' }
-          // ],
-          // inspectionDate: [
-          //   { required: true, message: '检查日期不能为空', trigger: 'blur' }
-          // ],
-          // issueCategoryId: [
-          //   { required: true, message: '问题类别ID不能为空', trigger: 'blur' }
-          // ],
-          // vehicleTypeId: [
-          //   { required: true, message: '车型ID不能为空', trigger: 'blur' }
-          // ],
-          // vehicleNumberId: [
-          //   { required: true, message: '车号ID不能为空', trigger: 'blur' }
-          // ],
-          // issueDescription: [
-          //   { required: true, message: '问题描述不能为空', trigger: 'blur' }
-          // ],
-          // issuePhoto: [
-          //   { required: true, message: '问题照片不能为空', trigger: 'blur' }
-          // ],
-          // rectificationRequirement: [
-          //   { required: true, message: '整改要求不能为空', trigger: 'blur' }
-          // ],
-          // requiredCompletionTime: [
-          //   { required: true, message: '要求完成时间不能为空', trigger: 'blur' }
-          // ],
-          // responsibleDepartment: [
-          //   { required: true, message: '责任科室不能为空', trigger: 'blur' }
-          // ],
-          // rectificationStatus: [
-          //   { required: true, message: '整改情况不能为空', trigger: 'blur' }
-          // ],
-          // actualCompletionTime: [
-          //   { required: true, message: '实际完成时间不能为空', trigger: 'blur' }
-          // ],
-          // rectificationPhotoDeliverable: [
-          //   { required: true, message: '整改照片交付物不能为空', trigger: 'blur' }
-          // ],
-          // rectificationResponsiblePerson: [
-          //   { required: true, message: '整改责任人不能为空', trigger: 'blur' }
-          // ],
-          // requiredSecondRectificationTime: [
-          //   { required: true, message: '要求二次整改时间不能为空', trigger: 'blur' }
-          // ],
-          // remark: [
-          //   { required: true, message: '备注不能为空', trigger: 'blur' }
-          // ],
-          // creator: [
-          //   { required: true, message: '创建人不能为空', trigger: 'blur' }
-          // ],
-          // creationTime: [
-          //   { required: true, message: '创建时间不能为空', trigger: 'blur' }
-          // ],
-          // lastModifier: [
-          //   { required: true, message: '最后修改人不能为空', trigger: 'blur' }
-          // ],
-          // lastModificationTime: [
-          //   { required: true, message: '最后修改时间不能为空', trigger: 'blur' }
-          // ],
-          // associatedRectificationRecords: [
-          //   { required: true, message: '关联问题整改记录不能为空', trigger: 'blur' }
-          // ],
-          // associatedIssueAddition: [
-          //   { required: true, message: '关联问题添加不能为空', trigger: 'blur' }
-          // ],
-          // creationDuration: [
-          //   { required: true, message: '创建时长不能为空', trigger: 'blur' }
-          // ],
-          // causeAnalysis: [
-          //   { required: true, message: '原因分析不能为空', trigger: 'blur' }
-          // ],
-          // rectificationVerificationStatus: [
-          //   { required: true, message: '整改验证情况不能为空', trigger: 'blur' }
-          // ],
-          // verificationConclusion: [
-          //   { required: true, message: '验证结论不能为空', trigger: 'blur' }
-          // ],
-          // verifier: [
-          //   { required: true, message: '验证人不能为空', trigger: 'blur' }
-          // ],
-          // formula: [
-          //   { required: true, message: '公式不能为空', trigger: 'blur' }
-          // ]
         }
       }
     },
     methods: {
+      reuse (id) {
+        this.dataForm.issueId = id || 0
+        this.revisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields()
+          if (this.dataForm.issueId) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.dataForm.serialNumber = data.issueTable.serialNumber
+                this.dataForm.issueNumber = data.issueTable.issueNumber
+                this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
+                this.dataForm.inspectionDate = data.issueTable.inspectionDate
+                this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
+                this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
+                this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
+                this.dataForm.issueDescription = data.issueTable.issueDescription
+                this.dataForm.issuePhoto = data.issueTable.issuePhoto
+                this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+                this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
+                this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
+                this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
+                this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+                this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
+                this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
+                this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
+                this.dataForm.remark = data.issueTable.remark
+                this.dataForm.creator = data.issueTable.creator
+                this.dataForm.creationTime = data.issueTable.creationTime
+                this.dataForm.lastModifier = data.issueTable.lastModifier
+                this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
+                this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
+                this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
+                this.dataForm.creationDuration = data.issueTable.creationDuration
+                this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
+                this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
+                this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
+                this.dataForm.verifier = data.issueTable.verifier
+                this.dataForm.formula = data.issueTable.formula
+              }
+            })
+          }
+        })
+      },
       init (id) {
         this.dataForm.issueId = id || 0
         this.visible = true

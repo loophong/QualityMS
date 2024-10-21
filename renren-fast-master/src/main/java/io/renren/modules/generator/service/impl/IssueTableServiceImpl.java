@@ -124,7 +124,23 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         return new PageUtils(page);
     }
 
-
+    @Override
+    public PageUtils QueryFuPage(Map<String, Object> params) {
+        // 提取查询参数
+        String issueCategoryId = (String) params.get("issueCategoryId");
+        // 创建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        // 如果 issueCategoryId 不为空，则添加模糊查询条件
+        if (issueCategoryId != null && !issueCategoryId.isEmpty()) {
+            queryWrapper.like("issue_category_id", issueCategoryId);
+        }
+        // 执行分页查询并返回结果
+        IPage<IssueTableEntity> page = this.page(
+                new Query<IssueTableEntity>().getPage(params),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
 
 
     @Override

@@ -1,12 +1,6 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-<!--      <el-form-item>-->
-<!--        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="问题类别" prop="issueCategoryId">-->
-<!--        <el-input v-model="queryParams.issueCategoryId" filterable placeholder="请输入问题类别"></el-input>-->
-<!--      </el-form-item>-->
       <el-form-item label="问题类别" prop="issueCategoryId">
         <el-select v-model="queryParams.issueCategoryId" filterable placeholder="请选择问题类别">
           <el-option
@@ -86,12 +80,6 @@
         align="center"
         width="50">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="issueId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="">-->
-<!--      </el-table-column>-->
       <el-table-column
         prop="serialNumber"
         header-align="center"
@@ -174,9 +162,11 @@
         label="整改情况">
         <template slot-scope="scope">
           <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullDescription(scope.row.rectificationStatus)">
-            {{ truncateDescription(scope.row.rectificationStatus) }}
-            <span v-if="scope.row.rectificationStatus.length > 20">
-        <strong>...</strong> <!-- 将省略号加粗 -->
+      <span v-if="scope.row.rectificationStatus && scope.row.rectificationStatus.length > 8">
+        {{ scope.row.rectificationStatus.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+      </span>
+            <span v-else>
+        {{ scope.row.rectificationStatus || '' }} <!-- 显示完整描述，或为空字符串 -->
       </span>
           </div>
         </template>
@@ -193,7 +183,7 @@
         align="center"
         label="整改照片交付物">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">下载</el-button>
+          <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">预览</el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -263,11 +253,11 @@
         label="原因分析">
         <template slot-scope="scope">
           <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
-      <span v-if="scope.row.causeAnalysis.length > 8">
+      <span v-if="scope.row.causeAnalysis && scope.row.causeAnalysis.length > 8">
         {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
       </span>
             <span v-else>
-        {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+        {{ scope.row.causeAnalysis || '' }} <!-- 显示完整描述，或为空字符串 -->
       </span>
           </div>
         </template>
@@ -279,28 +269,15 @@
         label="整改验证情况">
         <template slot-scope="scope">
           <div style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">
-      <span v-if="scope.row.rectificationVerificationStatus.length > 50">
-        {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+      <span v-if="scope.row.rectificationVerificationStatus && scope.row.rectificationVerificationStatus.length > 50">
+        {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong> <!-- 显示前50个字符，加粗省略号 -->
       </span>
             <span v-else>
-        {{ scope.row.rectificationVerificationStatus }} <!-- 显示完整描述 -->
+        {{ scope.row.rectificationVerificationStatus || '' }} <!-- 显示完整描述，或为空字符串 -->
       </span>
           </div>
         </template>
       </el-table-column>
-
-      <!--      <el-table-column-->
-<!--        prop="rectificationVerificationStatus"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改验证情况">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="verificationConclusion"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="验证结论">-->
-<!--      </el-table-column>-->
       <el-table-column
         prop="verificationConclusion"
         header-align="center"
@@ -328,24 +305,6 @@
         label="验证人">
       </el-table-column>
       <el-table-column
-        prop="reviewers"
-        header-align="center"
-        align="center"
-        label="审核人">
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="level"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题等级">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="state"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题状态">-->
-<!--      </el-table-column>-->
-      <el-table-column
         prop="formula"
         header-align="center"
         align="center"
@@ -360,6 +319,7 @@
         <template slot-scope="scope">
 <!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.issueId)">修改</el-button>-->
           <el-button type="text" size="small" @click="showTaskDetails(scope.row.issueNumber)">问题详情</el-button>
+          <el-button type="text" size="small" @click="reuseTask(scope.row.issueId)">问题重写</el-button>
           <el-button type="text" size="small" @click="closeRelatedTasks(scope.row.issueId)">问题关闭</el-button>
         </template>
       </el-table-column>
@@ -375,11 +335,14 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-updateD v-if="addOrUpdateVisibleD" ref="addOrUpdateD" @refreshDataList="recigetDataList"></add-or-updateD>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from '../issuefind/issuetable-add-or-update.vue'
+  import AddOrUpdateD from "./issuetable-add-or-update.vue";
+
 
   // import {isAuth} from "../../../utils";
   export default {
@@ -413,7 +376,9 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
+        reuseTaskVisible: false,
         addOrUpdateVisible: false,
+        addOrUpdateVisibleD: false,
         taskDetailVisible: false, // 控制弹窗可见性
         taskDetails: {
           totalCount: 0,
@@ -425,12 +390,14 @@
         fullDescription: '' ,   // 用于存储完整描述
         dialogVisible1: false, // 控制对话框显示
         fullCause: '',    // 用于存储完整描述
+        fullstatus: '',
         dialogVisible2: false,
         fullRetStates:'',
       }
 
     },
     components: {
+      AddOrUpdateD,
       AddOrUpdate
     },
     activated () {
@@ -517,23 +484,16 @@
         // 获取当前的 token，假设它存储在 localStorage 中
         const token = this.$cookie.get('token');
         if (token) {
-          console.log('Token found:', token);
         } else {
           console.error('Token not found!');
         }
-
         // 将 token 作为参数添加到 URL
         const imageUrlWithToken = `${imageUrl}?token=${token}`;
-
-        console.log("cur imageUrl====>", imageUrlWithToken);
-
         // 打开包含 token 的图片地址
         window.open(imageUrlWithToken);
 
-        console.log("图片地址：", imageUrlWithToken);
       },
       getRowClassName({ row, rowIndex }) {
-        console.log(`Row index: ${rowIndex}, Class: ${rowIndex % 2 === 0 ? 'row-even' : 'row-odd'}`);
         return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
       },
       // 关闭相关任务
@@ -602,29 +562,6 @@
           reader.readAsDataURL(blob)
         })
       },
-
-      // 获取数据列表
-      // getDataList () {
-      //   this.dataListLoading = true
-      //   this.$http({
-      //     url: this.$http.adornUrl('/generator/issuetable/list'),
-      //     method: 'get',
-      //     params: this.$http.adornParams({
-      //       'page': this.pageIndex,
-      //       'limit': this.pageSize,
-      //       'key': this.dataForm.key
-      //     })
-      //   }).then(({data}) => {
-      //     if (data && data.code === 0) {
-      //       this.dataList = data.page.list
-      //       this.totalPage = data.page.totalCount
-      //     } else {
-      //       this.dataList = []
-      //       this.totalPage = 0
-      //     }
-      //     this.dataListLoading = false
-      //   })
-      // },
       getDataList () {
         this.dataListLoading = true
         this.$http({
@@ -697,6 +634,13 @@
         }
         this.getDataList()
       },
+      // 问题重写
+      reuseTask (id) {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.reuseIssue(id)
+        })
+      },
       isValidImageUrl (url) {
         // 简单的URL验证，可以根据需要扩展
         return url && (url.startsWith('http://') || url.startsWith('https://'))
@@ -754,9 +698,10 @@
         })
       },
       truncateDescription(description) {
-        if (!description) return '';
+        if (!description || typeof description !== 'string') return '';
         return description.length > 20 ? description.slice(0, 20) : description;
       },
+
 
       showFullDescription(description) {
         this.fullDescription = description; // 存储完整描述
@@ -833,33 +778,39 @@
 </script>
 
 <style scoped>
-.row-even {
-  background-color: #ffffff !important; /* 白色 */
-}
-
-.row-odd {
-  background-color: #0BB2D4 !important; /* 灰色 */
-}
+/* 表格的样式 */
 .el-table {
-  font-size: 16px; /* 调整表格整体的字体大小 */
-  border-color: #333; /* 深化表格边框颜色 */
+  font-size: 16px; /* 放大文字字体 */
+  border: 2px solid #ccc; /* 加粗边框 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 增加阴影效果 */
+  border-radius: 10px; /* 可选：使表格边角变圆滑 */
 }
 
-.el-table th, .el-table td {
-  border-color: #333; /* 深化表格单元格的边框颜色 */
-}
-
+/* 表格头部文字的样式 */
 .el-table th {
-  font-weight: bold; /* 表头字体加粗 */
+  font-size: 18px; /* 放大表头的字体 */
+  font-weight: bold; /* 加粗表头文字 */
+  color: #333; /* 表头文字颜色 */
+  border-bottom: 2px solid #ccc; /* 表头的下边框 */
 }
 
+/* 表格单元格文字样式 */
+.el-table td {
+  font-size: 16px; /* 调整单元格字体大小 */
+  color: #333; /* 单元格文字颜色 */
+}
+
+/* 设置选中行的样式 */
+.el-table .el-table__row--striped:hover {
+  background-color: #f5f7fa; /* 表格行的悬停背景颜色 */
+}
+
+/* 调整表格分页器的样式 */
 .el-pagination {
-  font-size: 16px; /* 分页器字体大小 */
-}
-
-.el-button {
-  font-size: 14px; /* 调整按钮字体大小 */
+  margin-top: 10px;
+  font-size: 14px; /* 分页器字体大小 */
 }
 </style>
+
 
 

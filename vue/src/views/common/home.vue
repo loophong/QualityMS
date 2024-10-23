@@ -1,4 +1,3 @@
-
 <!--    <div class="header-box">-->
 <!--      <h1 class="header-title">盘锦企管系统</h1>-->
 <!--    </div>-->
@@ -67,7 +66,7 @@
             <ul>
               <li>{{ indicatorCounts }}</li>
               <li>{{ completionRate }}</li>
-          </ul>
+            </ul>
           </div>
           <div class="no-bd">
             <ul>
@@ -90,14 +89,12 @@
           <div class="panel-footer"></div>
         </div>
         <div class="panel QC">
-          <h2>点检统计</h2>
-          <div id="qc-chart" ref="qcChart"></div>
-          <div class="panel-footer"></div>
+          <br>
+          <qc-chart></qc-chart>
         </div>
         <div class="panel QC">
-          <h2>QC</h2>
-          <div id="qc-chart" ref="qcChart"></div>
-          <div class="panel-footer"></div>
+          <br>
+          <qc-pie-chart id="qc-pie-chart" ref="qcPieChart"></qc-pie-chart>
         </div>
       </div>
     </section>
@@ -108,6 +105,7 @@
 <script>
 import * as echarts from "echarts";
 import qcChart from "../modules/QCmanagement/qcChart/qcChart.vue";
+import qcPieChart from "../modules/QCmanagement/qcChart/qcPieChart.vue";
 import { color } from "d3";
 import china from "./china.js";  // 导入 .js 文件
 
@@ -135,7 +133,8 @@ export default {
     }
   },
   components: {
-    qcChart
+    qcChart,
+    qcPieChart
   },
 
   async mounted() {
@@ -179,7 +178,7 @@ export default {
         url: this.$http.adornUrl('/indicator/indicatordictionary/countsByDepartmant'),
         method: 'get',
         params: this.$http.adornParams({})
-      }).then(({data}) => {
+      }).then(({ data }) => {
         console.log('data111:', data);
         this.departmentCountsList = data;
         console.log('departmentCountsList:', this.departmentCountsList);
@@ -192,7 +191,7 @@ export default {
         url: this.$http.adornUrl('/indicator/indicatordictionary/countsByClassification'),
         method: 'get',
         params: this.$http.adornParams({})
-      }).then(({data}) => {
+      }).then(({ data }) => {
         console.log('data222:', data);
         this.classificationCountList = data;
         console.log('classificationCountList:', this.classificationCountList);
@@ -200,10 +199,10 @@ export default {
       });
     },
     renderChart1() {
-        // 销毁旧的实例，防止缓存导致问题
-  if (this.chartInstance1) {
-    this.chartInstance1.dispose();
-  }
+      // 销毁旧的实例，防止缓存导致问题
+      if (this.chartInstance1) {
+        this.chartInstance1.dispose();
+      }
       const chart = echarts.init(this.$refs.indicatorChart1);
 
       const option = {
@@ -226,11 +225,11 @@ export default {
           type: 'category',
           data: this.departmentCountsList.map(item => item.managementDepartment),
           axisLabel: {
-            color:"rgba(255,255,255,.6)",
-            fontSize:12,
+            color: "rgba(255,255,255,.6)",
+            fontSize: 12,
           },
           axisLine: {
-            show:false,
+            show: false,
             lineStyle: {
               color: "rgba(255,255,255,.1)",
               width: 2,
@@ -240,8 +239,8 @@ export default {
         yAxis: {
           type: 'value',
           axisLabel: {
-            color:"rgba(255,255,255,.6)",
-            fontSize:12,
+            color: "rgba(255,255,255,.6)",
+            fontSize: 12,
           },
         },
         series: [
@@ -250,7 +249,9 @@ export default {
             type: 'bar',
             data: this.departmentCountsList.map(item => item.counts),
             itemStyle: {
-              color: '#409EFF',
+              normal: {
+                color: '#409EFF',
+              },
             },
           },
         ],
@@ -260,7 +261,24 @@ export default {
     },
     renderChart2() {
       const chart = echarts.init(this.$refs.indicatorChart2);
-
+      let data = this.classificationCountList.map(item => item.counts);
+      console.log('data:', data);
+      let seriesData = [
+        {
+          name: '指标总数',
+          type: 'bar',
+          data: [
+            { value: data[0], itemStyle: { normal: { color: '#ff63e1' } } },//粉
+            { value: data[1], itemStyle: { normal: { color: '#ff8a22' } } },//橙
+            { value: data[2], itemStyle: { normal: { color: '#67c23a' } } },//绿
+          ],
+          itemStyle: {
+            normal: {
+              color: '#67c23a',
+            },
+          },
+        },
+      ]
       const option = {
         title: {
         },
@@ -281,11 +299,11 @@ export default {
           type: 'category',
           data: this.classificationCountList.map(item => item.indicatorClassification),
           axisLabel: {
-            color:"rgba(255,255,255,.6)",
-            fontSize:12,
+            color: "rgba(255,255,255,.6)",
+            fontSize: 12,
           },
           axisLine: {
-            show:false,
+            show: false,
             lineStyle: {
               color: "rgba(255,255,255,.1)",
               width: 2,
@@ -295,20 +313,11 @@ export default {
         yAxis: {
           type: 'value',
           axisLabel: {
-            color:"rgba(255,255,255,.6)",
-            fontSize:12,
+            color: "rgba(255,255,255,.6)",
+            fontSize: 12,
           },
         },
-        series: [
-          {
-            name: '指标总数',
-            type: 'bar',
-            data: this.classificationCountList.map(item => item.counts),
-            itemStyle: {
-              color: '#409EFF',
-            },
-          },
-        ],
+        series: seriesData,
       };
 
       chart.setOption(option);
@@ -320,7 +329,7 @@ export default {
         url: this.$http.adornUrl('/taskmanagement/plan/home'),
         method: 'get',
         params: this.$http.adornParams({})
-      }).then(({data}) => {
+      }).then(({ data }) => {
         // console.log('taskData:', data);
         // console.log('data.taskNum:', data[0].taskNum);
         this.taskData.taskNum = data[0].taskNum
@@ -372,8 +381,8 @@ export default {
               show: false
             },
             data: [
-              {value: this.taskData.completedPlanNum, name: '已完成'},
-              {value: this.taskData.planNum - this.taskData.completedPlanNum, name: '未完成'}
+              { value: this.taskData.completedPlanNum, name: '已完成', itemStyle: { normal: { color: '#67c23a' } } },
+              { value: this.taskData.planNum - this.taskData.completedPlanNum, name: '未完成', itemStyle: { normal: { color: '#FFFFCC' } } }
             ]
           }
         ]
@@ -421,8 +430,8 @@ export default {
               show: false
             },
             data: [
-              {value: this.taskData.completedTaskNum, name: '已完成'},
-              {value: this.taskData.taskNum - this.taskData.completedTaskNum, name: '未完成'}
+              { value: this.taskData.completedTaskNum, name: '已完成' },
+              { value: this.taskData.taskNum - this.taskData.completedTaskNum, name: '未完成' }
             ]
           }
         ]
@@ -437,13 +446,13 @@ export default {
         url: this.$http.adornUrl('/generator/issuetable/currentMonth'),
         method: 'get',
         params: this.$http.adornParams({})
-      }).then(({data}) => {
+      }).then(({ data }) => {
         if (data && data.code === 0) {
           this.issueStats = data.stats; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
           console.log('数据转换中......', this.issueStats)
           this.renderIssueChart(); // 渲染图表
         } else {
-          this.issueStats = { 暂停: 0, 未完成: 0, 已完成: 0, 结项: 0}; // 默认值
+          this.issueStats = { 暂停: 0, 未完成: 0, 已完成: 0, 结项: 0 }; // 默认值
           // this.issueStats = {创建: 0, 持续: 0, 未完成: 0, 已完成: 0, 结项: 0};
         }
       });
@@ -454,7 +463,7 @@ export default {
         url: this.$http.adornUrl('/generator/issuetable/completionRate'),
         method: 'get',
         params: this.$http.adornParams({})
-      }).then(({data}) => {
+      }).then(({ data }) => {
         if (data) {
           console.log('返回的data', data);
           // 获取完成率
@@ -497,11 +506,11 @@ export default {
           type: 'category',
           data: this.issueCategories, // 问题分类作为X轴
           axisLabel: {
-            color:"rgba(255,255,255,.6)",
-            fontSize:12,
+            color: "rgba(255,255,255,.6)",
+            fontSize: 12,
           },
           axisLine: {
-            show:false,
+            show: false,
             lineStyle: {
               color: "rgba(255,255,255,.1)",
               width: 2,
@@ -511,8 +520,8 @@ export default {
         yAxis: {
           type: 'value',
           axisLabel: {
-            color:"rgba(255,255,255,.6)",
-            fontSize:12,
+            color: "rgba(255,255,255,.6)",
+            fontSize: 12,
           },
         },
         series: [
@@ -521,10 +530,10 @@ export default {
             type: 'bar',
             data: [
               // this.issueStats['创建'] || 0,
-              this.issueStats['暂停'] || 0,
-              this.issueStats['未完成'] || 0,
-              this.issueStats['已完成'] || 0,
-              this.issueStats['结项'] || 0
+              { value: this.issueStats['暂停'] || 0, itemStyle: { normal: { color: '#2d84ff' } } },
+              { value: this.issueStats['未完成'] || 0, itemStyle: { normal: { color: '#ff8a22' } } },
+              { value: this.issueStats['已完成'] || 0, itemStyle: { normal: { color: '#67c23a' } } },
+              { value: this.issueStats['结项'] || 0, itemStyle: { normal: { color: '#f7ff10' } } }
             ], // 根据获取的数据填充
             itemStyle: {
               color: '#409EFF',
@@ -541,38 +550,54 @@ export default {
 </script>
 <style lang="scss">
 @import "../../assets/echart/index.scss";
+
 /* 保持原有样式 */
 .box {
-  background-color: transparent; /* 设置为透明背景 */
+  background-color: transparent;
+  /* 设置为透明背景 */
 }
+
 .el-card__body {
-  background-color: transparent; /* 设置为透明背景 */
+  background-color: transparent;
+  /* 设置为透明背景 */
 }
 </style>
 
-<style>
-</style>
+<style></style>
 <style>
 .mod-home {
   display: flex;
-  flex-wrap: wrap; /* 自动换行 */
-  gap: 20px; /* 每个区域之间的间距 */
+  flex-wrap: wrap;
+  /* 自动换行 */
+  gap: 20px;
+  /* 每个区域之间的间距 */
 }
 
+
 .box {
-  font-size: 24px; /* 设置字体大小 */
-  flex: 1 1 40%; /* 每个区域占 30% 宽度 */
+  font-size: 24px;
+  /* 设置字体大小 */
+  flex: 1 1 40%;
+  /* 每个区域占 30% 宽度 */
   text-align: center;
   padding: 20px;
   border-radius: 4px;
-  min-width: 200px; /* 设置最小宽度，防止过小 */
-  height: 400px; /* 设置每个容器的高度为父容器的百分比 */
+  min-width: 200px;
+  /* 设置最小宽度，防止过小 */
+  height: 400px;
+  /* 设置每个容器的高度为父容器的百分比 */
+}
+
+#panel QC {
+  width: 98%;
+  height: 90%;
 }
 
 #indicatorChart1 {
   width: 98%;
   height: 90%;
 }
+
 #indicatorChart2 {
   width: 98%;
   height: 90%;
@@ -586,7 +611,8 @@ export default {
 
 .flex-container {
   display: flex;
-  justify-content: space-between; /* 在主轴上均匀分布 */
+  justify-content: space-between;
+  /* 在主轴上均匀分布 */
   width: 100%;
   height: 100%;
 }
@@ -603,8 +629,9 @@ export default {
 }
 
 #issueChart {
-  width: 98%; /* 使其宽度充满父容器 */
-  height: 90%; /* 高度可以设置为100%，需要确保父容器有明确的高度 */
+  width: 98%;
+  /* 使其宽度充满父容器 */
+  height: 90%;
+  /* 高度可以设置为100%，需要确保父容器有明确的高度 */
 }
 </style>
-

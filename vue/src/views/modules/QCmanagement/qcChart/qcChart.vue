@@ -1,7 +1,6 @@
 <template>
   <div style="display: flex;">
-    <div id="barChart" ref="barChart" style="width: 50%; height: 300px;"></div>
-    <div id="pieChart" ref="pieChart" style="width: 50%; height: 300px;"></div>
+    <div id="barChart" ref="barChart" style="width: 100%; height: 225px;"></div>
   </div>
 </template>
 
@@ -37,8 +36,6 @@ export default {
     await this.initData();
     this.myChart = echarts.init(document.getElementById('barChart'))
     this.updateChart()
-    this.myChart2 = echarts.init(document.getElementById('pieChart'))
-    this.pieChart()
   },
   methods: {
     async initData() {
@@ -188,9 +185,19 @@ export default {
           name: {}
         }
       };
+      let dataR = [(this.currentCount / this.allCount) * 100, this.activityDataResult, (this.countData.countExamined / this.countData.countSubmitted) * 100]
+      let formattedData = [
+        { value: dataR[0], itemStyle: { normal: { color: '#409eff' } } },
+        { value: dataR[1], itemStyle: { normal: { color: '#67c23a' } } },
+        { value: dataR[2], itemStyle: { normal: { color: '#e6a23c' } } }
+      ];
       option = {
         title: {
-          text: ''
+          text: '点检统计',
+          left: 'center', // 居中对齐
+          textStyle: {
+            color: '#ffffff' // 设置字体颜色为白色
+          }
         },
         tooltip: {
           trigger: 'axis',
@@ -198,9 +205,9 @@ export default {
             type: 'shadow'
           }
         },
-        legend: {
-          data: ['普及率', '活动率', '成果率']
-        },
+        // legend: {
+        //   data: ['普及率', '活动率', '成果率']
+        // },
         toolbox: {
           show: false,
           orient: 'vertical',
@@ -218,43 +225,57 @@ export default {
           {
             type: 'category',
             axisTick: { show: false },
-            data: ['点检统计']
+            data: ['普及率', '活动率', '成果率'],
+            axisLabel: {
+              color: '#ffffff' // 设置x轴标签字体颜色为白色
+            }
           }
         ],
         yAxis: [
           {
-            type: 'value'
+            type: 'value',
+            axisLabel: {
+              color: '#ffffff' // 设置y轴标签字体颜色为白色
+            },
+            splitLine: {
+              show: false
+            }
           }
         ],
         series: [
           {
-            name: '普及率',
+            name: '值',
             type: 'bar',
             barGap: 0,
             label: labelOption,
             emphasis: {
               focus: 'series'
             },
-            data: [(this.currentCount / this.allCount) * 100]
+            // itemStyle: {
+            //   normal: {
+            //     color: '#17b3a3' // 设置柱状图颜色为橙色
+            //   }
+            // },
+            data: formattedData
           },
-          {
-            name: '活动率',
-            type: 'bar',
-            label: labelOption,
-            emphasis: {
-              focus: 'series'
-            },
-            data: [this.activityDataResult]
-          },
-          {
-            name: '成果率',
-            type: 'bar',
-            label: labelOption,
-            emphasis: {
-              focus: 'series'
-            },
-            data: [(this.countData.countExamined / this.countData.countSubmitted) * 100]
-          },
+          // {
+          //   name: '活动率',
+          //   type: 'bar',
+          //   label: labelOption,
+          //   emphasis: {
+          //     focus: 'series'
+          //   },
+          //   data: [this.activityDataResult]
+          // },
+          // {
+          //   name: '成果率',
+          //   type: 'bar',
+          //   label: labelOption,
+          //   emphasis: {
+          //     focus: 'series'
+          //   },
+          //   data: [(this.countData.countExamined / this.countData.countSubmitted) * 100]
+          // },
 
         ]
       };
@@ -262,59 +283,6 @@ export default {
       option && myChart.setOption(option);
     },
 
-    pieChart() {
-      console.log(this.countData)
-      var chartDom = document.getElementById('pieChart');
-      var myChart = echarts.init(chartDom);
-      var option;
-
-      option = {
-        title: {
-          text: '课题状态分布',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: "{a} <br/>{b}: {c} ({d}%)"
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left'
-        },
-        series: [
-          {
-            name: '课题状态',
-            type: 'pie',
-            radius: '50%',
-            center: ['50%', '50%'], // 饼图位置
-            data: [
-              { value: this.countData.countRegistration - this.countData.countSubmitted, name: '进行中' },
-              { value: this.countData.countWithoutExamined, name: '审核中' },
-              { value: this.countData.countExamined, name: '已完成' },
-              { value: this.countData.countRegistration, name: '已注册' },
-            ],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            },
-            label: {
-              show: true,
-              position: 'outside', // 标签位置,inside、outside、top、bottom、left、right
-              formatter: '{b}: {c} ({d}%)'
-            },
-            labelLine: {
-              show: true,
-              smooth: 0.2,
-            }
-          }
-        ]
-      };
-
-      option && myChart.setOption(option);
-    }
   },
 
 
@@ -328,21 +296,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#barChart {
-  width: 1000px;
-  height: 600px;
-  margin: 40px auto;
-}
+// #barChart {
+//   width: 1000px;
+//   height: 300px;
+//   margin: 40px auto;
+// }
 
 
 .block {
   margin-top: 50px;
   text-align: center;
-}
-
-#pieChart {
-  width: 1000px;
-  height: 600px;
-  margin: 40px auto;
 }
 </style>

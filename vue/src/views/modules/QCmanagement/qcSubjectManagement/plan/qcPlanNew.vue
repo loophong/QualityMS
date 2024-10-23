@@ -14,8 +14,8 @@
     <div class="plan1" v-if="value === '问题解决型'">
       <br>
       <el-steps :active="active1" align-center>
-        <el-step v-for="(item, index) in filteredDataList1" :key="item.dictId" :title="`${item.phase}阶段`"
-          :description="item.step" @click="handleStepClick(index)"></el-step>
+        <el-step v-for="item in filteredDataList1" :key="item.dictId" :title="`${item.phase}阶段`"
+          :description="item.step"></el-step>
       </el-steps>
       <!-- <br> -->
       <span>
@@ -65,21 +65,22 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" ref="upload" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :auto-upload="false" :on-remove="handleRemove"
-                  :before-remove="beforeRemove" multiple :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button slot="trigger" size="small" type="primary">添加文件</el-button>
-                  <el-button style="margin-left: 10px;" size="small" type="success"
-                    @click="submitUpload">上传文件</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
@@ -124,21 +125,23 @@
             <el-form-item>
               <span>QC工具： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
-              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :auto-upload="false" :on-remove="handleRemove"
-                  :before-remove="beforeRemove" multiple :limit="3" :on-exceed="handleExceed" :file-list="fileList"
-                  list-type="picture-card">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
@@ -185,18 +188,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary" @click="submitUpload">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
@@ -242,18 +248,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
@@ -299,17 +308,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -355,18 +366,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
@@ -411,17 +425,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -473,17 +489,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -529,17 +547,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -585,18 +605,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.desc"></el-input>
@@ -663,18 +686,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :on-change="handleUpChange" :file-list="fileList">
-                  <el-button style="margin-left: 10px;" size="small" type="success"
-                    @click="submitUpload">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -720,17 +744,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -776,17 +802,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -832,17 +860,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -888,17 +918,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -944,17 +976,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -1000,17 +1034,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -1062,17 +1098,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -1118,17 +1156,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -1174,17 +1214,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -1250,17 +1292,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -1306,18 +1350,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
@@ -1364,18 +1411,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
@@ -1421,18 +1471,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
@@ -1478,18 +1531,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
@@ -1541,18 +1597,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
@@ -1598,18 +1657,21 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
+
 
             <el-form-item label="备注">
               <el-input type="textarea" v-model="form.stageExtra"></el-input>
@@ -1655,17 +1717,19 @@
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
-            <el-form-item>
-              <div style="display: flex; align-items: center;">
-                <span>上传附件：</span>
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                  :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" multiple
-                  :limit="3" :on-exceed="handleExceed" :file-list="fileList">
-                  <el-button size="small" type="primary">点击上传</el-button>
-                </el-upload>
-              </div>
+            <el-form-item label="上传附件">
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+              </el-upload>
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
             <el-form-item label="备注">
@@ -1680,43 +1744,62 @@
         </div>
       </el-card>
     </div>
-    <el-dialog title="折柱混合图" :close-on-click-modal="false" :visible.sync="dialogVisible">
-      <div id="main" ref="main" style="width: 100%; height: 400px;"></div>
-      <div>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-        </span>
+    <el-dialog title="折柱混合图" :close-on-click-modal="false" :visible.sync="dialogVisible" width="80%">
+      <div style="width: 100%; height: 100%;">
+        <line-and-bar ref="qcChart"></line-and-bar>
       </div>
     </el-dialog>
-    <!--    <el-dialog title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible">-->
-    <!--      <div id="main" ref="main" style="width: 100%; height: 400px;"></div>-->
-    <!--      <div>-->
-    <!--        <span slot="footer" class="dialog-footer">-->
-    <!--          <el-button @click="fishBonedialogVisible = false">取 消</el-button>-->
-    <!--          <el-button type="primary" @click="fishBonedialogVisible = false">确 定</el-button>-->
-    <!--        </span>-->
-    <!--      </div>-->
-    <!--    </el-dialog>-->
     <el-dialog title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible" width="80%">
       <div>
         <fish-bone ref="fishBone"></fish-bone>
       </div>
-      <div>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="fishBonedialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="fishBonedialogVisible = false">确 定</el-button>
-        </span>
-      </div>
     </el-dialog>
+
     <el-dialog title="控制图" :visible.sync="dialogVisibleControl" :close-on-click-modal="false" width="80%">
       <div style="width: 100%; height: 100%;">
         <control ref="qcChart"></control>
       </div>
-      <el-button @click="dialogVisibleControl = false">取 消</el-button>
-      <el-button type="primary" @click="dialogVisibleControl = false">确 定</el-button>
-
     </el-dialog>
+
+    <el-dialog title="系统图" :visible.sync="dialogVisibleSystem" :close-on-click-modal="false" width="80%">
+      <div style="width: 100%; height: 100%;">
+        <system ref="qcChart"></system>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="散点图" :visible.sync="dialogVisibleScatter" :close-on-click-modal="false" width="80%">
+      <div style="width: 100%; height: 100%;">
+        <Scatter ref="qcChart"></Scatter>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="关联图" :visible.sync="dialogVisibleRelation" :close-on-click-modal="false" width="80%">
+      <div style="width: 100%; height: 100%;">
+        <RelationGraph ref="qcChart"></RelationGraph>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="直方图" :visible.sync="dialogVisibleHistogram" :close-on-click-modal="false" width="80%">
+      <div style="width: 100%; height: 100%;">
+        <histogram ref="qcChart"></histogram>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="附件预览" :visible.sync="uploadAllListVisible">
+      <div style="color:orange">注：若原先存在文件，则点击备注下方的确定后，将会用新上传文件替换原文件</div>
+      <br>
+      <el-table :data="uploadAllList" border style="width: 100%">
+        <el-table-column prop="name" label="文件名">
+        </el-table-column>
+        <el-table-column prop="url" label="预览">
+          <template slot-scope="scope">
+            <el-button v-if="scope.row.url" @click="previewDoc(scope.row.url)">点击预览</el-button>
+            <span v-else>--</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+
 
   </div>
 </template>
@@ -1726,14 +1809,31 @@ import * as echarts from 'echarts';
 import { FishBones } from '@/components/fishbone/FishBone'
 import fishBone from "../../qcTools/fishBone.vue";
 import control from '@/views/modules/QCmanagement/qcTools/control.vue';
+import histogram from '@/views/modules/QCmanagement/qcTools/histogram.vue';
+import RelationGraph from '@/views/modules/QCmanagement/qcTools/RelationGraph.vue';
+import Scatter from '@/views/modules/QCmanagement/qcTools/Scatter.vue';
+import system from '@/views/modules/QCmanagement/qcTools/system.vue';
+import lineAndBar from '@/views/modules/QCmanagement/qcTools/lineAndBar.vue';
 export default {
   components: {
     fishBone,
-    control
+    control,
+    histogram,
+    RelationGraph,
+    Scatter,
+    system,
+    lineAndBar,
   },
   data() {
     return {
       fileList: [],
+      uploadUrl: '',
+      uploadAllListVisible: false,
+      uploadUrlList: [],
+      uploadNameList: [],
+      uploadAllList: [],
+      tmpAllList: [],
+      uploadingFile: '',
       dataForm: {
         stepId: 0,
         stepSubjectId: '',
@@ -1753,7 +1853,11 @@ export default {
         key: ''
       },
       dialogVisible: false,
-      dialogVisibleControl: false,
+      dialogVisibleControl: false, //控制图弹窗
+      dialogVisibleSystem: false, //系统图弹窗
+      dialogVisibleRelation: false, //关联图弹窗
+      dialogVisibleScatter: false, //散点图弹窗
+      dialogVisibleHistogram: false, //直方图弹窗
       fishBonedialogVisible: false,  //鱼骨图弹窗
       active1: 1,
       active2: 1,
@@ -1776,6 +1880,7 @@ export default {
         stageAfter: '',
         stageExtra: '',
         stageConsolidate: '',
+        stepFile: ''
       },
 
       participantOptions: [
@@ -1836,6 +1941,10 @@ export default {
     },
   },
   methods: {
+
+    // click() {
+    //   console.log(this.fileList)
+    // },
     // 获取数据列表
     async getPlanStepDataList() {
       await this.$http({
@@ -1849,7 +1958,7 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.planStepList = data.idList
-          console.log(this.planStepList)
+
           this.findMatchingItem(1)
           // this.totalPage = data.page.totalCount
         } else {
@@ -1861,7 +1970,7 @@ export default {
     initRouterParam() {
       const res = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', teamNumberIds: '', topicLeader: '', topicType: '' };
       this.routerParam = res
-      console.log(this.routerParam)
+      // console.log(this.routerParam)
       const tmp = this.routerParam[0].teamNumberIds.split(',');
       this.participantOptions = tmp.map(id => ({
         value: id.trim(),
@@ -1891,10 +2000,9 @@ export default {
     //每步数据查询
     findMatchingItem(id) {
       this.initForm()
-      console.log(this.form)
+      this.uploadAllList = []
       // console.log('++++++++++++++++')
       for (let item of this.planStepList) {
-        console.log(item)
         if (item.stepProcess === id) {
           this.form.stepId = item.stepId
           // this.form = item;
@@ -1912,10 +2020,9 @@ export default {
             this.form.stagePeople = stringArray;
           } else {
             if (item.stagePeople !== 'null' || item.stagePeople !== '') {
-              console.log(item.stagePeople)
               this.form.stagePeople = [item.stagePeople]
             } else {
-              this.form.stagePeople = ''
+              this.form.stagePeople = []
             }
           }
           if (item.stageDescribe) {
@@ -1929,6 +2036,10 @@ export default {
           }
           if (item.stageConsolidate) {
             this.form.stageConsolidate = item.stageConsolidate
+          }
+          if (item.stageAttachment) {
+            const tmp = JSON.parse(item.stageAttachment)
+            this.uploadAllList = tmp
           }
           break;
         }
@@ -1953,44 +2064,35 @@ export default {
         }
       })
     },
-    handleUpChange(file, fileList) {
-      console.log('++++++++++++++++++++++++++++')
-      console.log(file)
-      console.log(fileList)
-      console.log('++++++++++++++++++++++++++++')
-      this.fileList = fileList;
-    },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
-    },
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
-    },
-    submitUpload() {
-      this.$refs.upload.submit();
-    },
-    onSubmit() {
-      console.log('提交表单，上传文件:', this.fileList);
-    },
+
+
     toggleLineAndBar() {
       this.dialogVisible = !this.dialogVisible;
-      this.$nextTick(() => {
-        this.initChart();
-      });
     },
     // 鱼骨图弹窗
     fishBonetoggleLineAndBar() {
       this.fishBonedialogVisible = !this.fishBonedialogVisible;
 
     },
+    //控制图弹窗
     toggleControl() {
       this.dialogVisibleControl = !this.dialogVisibleControl;
+    },
+    //系统图弹窗
+    toggleSystem() {
+      this.dialogVisibleSystem = !this.dialogVisibleSystem;
+    },
+    //散点图弹窗
+    toggleScatter() {
+      this.dialogVisibleScatter = !this.dialogVisibleScatter;
+    },
+    //关联图弹窗
+    toggleRelation() {
+      this.dialogVisibleRelation = !this.dialogVisibleRelation;
+    },
+    //直方图弹窗
+    toggleHistogram() {
+      this.dialogVisibleHistogram = !this.dialogVisibleHistogram;
     },
     handleClose(done) {
       this.$confirm('确认关闭？')
@@ -2035,180 +2137,13 @@ export default {
       }
       this.findMatchingItem(this.active3)
     },
-    //步骤点击
-    handleStepClick(index) {
-      console.log(index)
-      console.log('++++++++++++++++++++')
-    },
 
-    initChart() {
-      if (!this.$refs.main) {
-        console.error('Main element not found');
-        return;
-      }
-      var app = {};
-      let myChart = echarts.init(this.$refs.main);
-      const posList = [
-        'left',
-        'right',
-        'top',
-        'bottom',
-        'inside',
-        'insideTop',
-        'insideLeft',
-        'insideRight',
-        'insideBottom',
-        'insideTopLeft',
-        'insideTopRight',
-        'insideBottomLeft',
-        'insideBottomRight'
-      ];
-      app.configParameters = {
-        rotate: {
-          min: -90,
-          max: 90
-        },
-        align: {
-          options: {
-            left: 'left',
-            center: 'center',
-            right: 'right'
-          }
-        },
-        verticalAlign: {
-          options: {
-            top: 'top',
-            middle: 'middle',
-            bottom: 'bottom'
-          }
-        },
-        position: {
-          options: posList.reduce(function (map, pos) {
-            map[pos] = pos;
-            return map;
-          }, {})
-        },
-        distance: {
-          min: 0,
-          max: 100
-        }
-      };
-      app.config = {
-        rotate: 0,
-        align: 'center',
-        verticalAlign: 'middle',
-        position: 'top',
-        distance: 15,
-        onChange: function () {
-          const labelOption = {
-            rotate: app.config.rotate,
-            align: app.config.align,
-            verticalAlign: app.config.verticalAlign,
-            position: app.config.position,
-            distance: app.config.distance
-          };
-          myChart.setOption({
-            series: [
-              {
-                label: labelOption
-              },
-              {
-                label: labelOption
-              },
-              {
-                label: labelOption
-              },
-              {
-                label: labelOption
-              }
-            ]
-          });
-        }
-      };
-      const labelOption = {
-        show: true,
-        position: app.config.position,
-        distance: app.config.distance,
-        align: app.config.align,
-        verticalAlign: app.config.verticalAlign,
-        rotate: app.config.rotate,
-        formatter: '{c}',
-        fontSize: 16,
-        rich: {
-          name: {}
-        }
-      };
-      const option = {
-        title: {
-          text: '折柱混合图',
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
-        },
-        legend: {
-          data: ['柱', '线']
-        },
-        toolbox: {
-          show: true,
-          orient: 'vertical',
-          left: 'right',
-          top: 'center',
-          feature: {
-            mark: { show: true, },
-            dataView: {
-              show: true,
-              readOnly: false,
-              title: '编辑',
-              lang: ['数据编辑', '关闭', '更新'],
-            },
-            restore: { show: true, title: '重置' },
-            saveAsImage: { show: true, title: '保存' }
-          }
-        },
-        xAxis: [
-          {
-            axisTick: { show: false },
-            data: ['A', 'B', 'C', 'D', 'E', 'F'],
-          }
-        ],
-        yAxis: [
-          {
-            type: 'value'
-          },
-          {
-            type: 'value',
-            name: '线',
-            splitLine: { show: false },
-            axisLabel: {
-              formatter: '{value} '
-            }
-          }
-        ],
-        series: [{
-          name: '柱',
-          type: 'bar',
-          color: '',
-          label: labelOption,
-          emphasis: {
-            focus: 'series'
-          },
-          data: [5, 20, 36, 10, 10, 20],
-        },
-        {
-          name: '线',
-          type: 'line',
-          label: labelOption,
-          yAxisIndex: 1,
-          emphasis: {
-            focus: 'series'
-          },
-          data: [20, 3, 12, 46, 22, 14],
-        }]
-      };
-      option && myChart.setOption(option);
+    handleRemove(file, fileList) {
+      // 移除文件时触发
+      console.log(file);
+      this.uploadAllList.filter(item => item.name !== file.name)
+      this.tmpAllList.filter(item => item.name !== file.name)
+      console.log(fileList);
     },
     //初始化鱼骨图
     initFishBoneChart() {
@@ -2221,6 +2156,78 @@ export default {
         },
       }).init()
     },
+    // 上传文件
+    handleFileChange(file) {
+      // 存储待上传的文件
+
+      this.uploadingFile = file.raw; // 获取 File 对象
+
+      this.uploadNameList.push(file.raw.name)
+      this.uploadFile(file.raw); // 调用上传方法
+    },
+    uploadFile(file) {
+      const formData = new FormData();
+      let file2 = file;
+      formData.append('file', file); // 将文件添加到 FormData
+      this.$http({
+        url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        method: 'post',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data' // 指定为文件上传
+        }
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          // 保存后端返回的url到变量中
+          this.dataForm.rectificationPhotoDeliverable = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+          // console.log('获得的文件地址 ：', data.uploadurl)
+          // console.log('获得的文件 ：', data)
+          this.uploadUrlList.push(data.uploadurl)
+          let fileTmp = {
+            name: file2.name,
+            url: data.uploadurl
+          }
+          // this.uploadAllList = []
+          this.tmpAllList.push(fileTmp)
+          // console.log('上传文件列表 ：', fileTmp)
+          this.uploadAllList.push(fileTmp)
+          console.log('上传文件列表 ：', this.uploadAllList)
+          // console.log('上传文件名字列表 ：', this.uploadNameList)
+          // this.form.stepFile = data.uploadurl
+          // this.$message.success('文件上传成功');
+          // 处理成功后的逻辑，例如更新状态
+        } else {
+          this.$message.error(data.msg);
+        }
+      }).catch(error => {
+        this.$message.error('上传失败');
+        console.error(error);
+      });
+    },
+    //文件预览
+    previewDoc(docUrl) {
+      console.log(docUrl)
+      // 获取当前的 token，假设它存储在 localStorage 中
+      const token = this.$cookie.get('token');
+      if (token) {
+        console.log('Token found:', token);
+      } else {
+        console.error('Token not found!');
+      }
+
+      // 将 token 作为参数添加到 URL
+      const docUrlWithToken = `${docUrl}?token=${token}`;
+
+      console.log("cur docUrl====>", docUrlWithToken);
+
+      // 打开包含 token 的图片地址
+      window.open(docUrlWithToken);
+
+      console.log("图片地址：", docUrlWithToken);
+    },
+
+
+
     initForm() {
       this.form = {
         stepId: 0,
@@ -2267,9 +2274,8 @@ export default {
     },
     // 表单提交
     dataFormSubmit(id) {
-      // this.$refs['dataForm'].validate((valid) => {
-      //   if (valid) {
-
+      let tmpListString = []
+      tmpListString = JSON.stringify(this.tmpAllList, null, 2)
       this.$http({
         url: this.$http.adornUrl(`/qcPlan/step/${!this.form.stepId ? 'save' : 'update'}`),
         method: 'post',
@@ -2278,17 +2284,18 @@ export default {
           'stepSubjectId': this.routerParam[0].qcsrId,
           'stepType': this.routerParam[0].topicType,
           'stepProcess': id,
-          'stageName': this.form.stageName,
+          'stageName': this.form.stageName ? this.form.stageName : undefined,
           'stagePlanStart': this.form.planDate[0],
           'stagePlanEnd': this.form.planDate[1],
-          'stageActualStart': this.form.actualDate[0],
-          'stageActualEnd': this.form.actualDate[1],
-          'stagePeople': `${this.form.stagePeople}`,
-          'stageDescribe': this.form.stageDescribe,
-          'stageExtra': this.form.stageExtra,
-          'stageBefore': this.form.stageBefore,
-          'stageAfter': this.form.stageAfter,
-          'stageConsolidate': this.form.stageConsolidate || '',
+          'stageActualStart': this.form.actualDate[0] ? this.form.actualDate[0] : undefined,
+          'stageActualEnd': this.form.actualDate[1] ? this.form.actualDate[1] : undefined,
+          'stagePeople': this.form.stagePeople ? `${this.form.stagePeople}` : undefined,
+          'stageDescribe': this.form.stageDescribe || undefined,
+          'stageExtra': this.form.stageExtra || undefined,
+          'stageBefore': this.form.stageBefore || undefined,
+          'stageAfter': this.form.stageAfter || undefined,
+          'stageConsolidate': this.form.stageConsolidate || undefined,
+          'stageAttachment': tmpListString || undefined,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -2298,7 +2305,6 @@ export default {
             duration: 1500,
             onClose: () => {
               this.visible = false
-              // this.$emit('refreshDataList')
             }
           })
           if (this.routerParam[0].qcsrId) {
@@ -2315,9 +2321,9 @@ export default {
         } else {
           this.$message.error(data.msg)
         }
+      }).catch(error => {
+        console.log(error)
       })
-      //   }
-      // })
     }
   }
 }
@@ -2326,5 +2332,18 @@ export default {
 <style lang="scss" scoped>
 .formZone {
   padding: 20px;
+}
+
+.upload-btn-group {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.upload-preview-btn {
+  margin-left: 10px;
+  /* 调整间距以适应你的布局 */
+  display: inline-block;
+  vertical-align: top;
+
 }
 </style>

@@ -20,12 +20,10 @@
         <result property="stageBefore" column="stage_before"/>
         <result property="stageAfter" column="stage_after"/>
         <result property="stageConsolidate" column="stage_consolidate"/>
-        <result property="ifReuse" column="if_reuse"/>
+        <result property="stageAttachment" column="stage_attachment"/>
     </resultMap>
 
-    <insert id="reUse">
 
-    </insert>
 
 
 </mapper>

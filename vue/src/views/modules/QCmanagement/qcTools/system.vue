@@ -1,18 +1,33 @@
 <template>
   <div>
-    <vue2-org-tree
-      :data="treeData"
-      horizontal="true"
-      collapsable
-      :render-content="renderContent"
-      @on-expand="onExpand"
-      @on-node-click="NodeClick"/>
-    <div v-if="showMenu" class="context-menu" :style="menuStyle">
-      <button @click="editNode(selectedNode)">编辑</button>
-      <button @click="addNode(selectedNode)">添加</button>
-      <button @click="deleteNode(selectedNode.id)">删除</button>
+    <div>
+      <span>
+        <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+        <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
+      </span>
     </div>
-    <button @click="downloadScreenshot">下载截图</button>
+    <div>
+      <vue2-org-tree :data="treeData" horizontal collapsable :render-content="renderContent" @on-expand="onExpand"
+        @on-node-click="NodeClick" />
+      <div v-if="showMenu" class="context-menu" :style="menuStyle">
+        <button @click="editNode(selectedNode)">编辑</button>
+        <button @click="addNode(selectedNode)">添加</button>
+        <button @click="deleteNode(selectedNode.id)">删除</button>
+      </div>
+
+      <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
+      <el-button type="warning" @click="downloadScreenshot">下载截图</el-button>
+    </div>
+    <el-dialog title="模版名" :visible.sync="dialogFormVisible">
+      <el-input v-model="inputName" placeholder="请输入模版名" style="width:50%"></el-input>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleUp">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -25,59 +40,60 @@ export default {
     return {
       treeData: {
         id: '0',
-        label: "NBA季后赛",
+        label: "直拉钢丝亮丝不良",
         children: [
           {
             id: '1',
-            label: "西部球队",
+            label: "粗拉钢丝表面涂硼不良",
             children: [
               {
                 id: '1-1',
-                label: "勇士"
+                label: "涂硼液位偏低"
               },
               {
                 id: '1-2',
-                label: "火箭"
+                label: "涂硼温度低"
               },
               {
                 id: '1-3',
-                label: "太阳"
+                label: "涂硼浓度偏低"
               },
               {
                 id: '1-4',
-                label: "小牛"
+                label: "涂硼后钢丝表面潮湿"
               }
             ]
           },
           {
             id: '2',
-            label: "东部球队",
+            label: "拉拔工艺不合理",
             children: [
               {
                 id: '2-1',
-                label: "热火"
+                label: "拉拔压缩率不合理"
               },
               {
                 id: '2-2',
-                label: "雄鹿"
+                label: "进线规格不合理"
               },
               {
                 id: '2-3',
-                label: "骑士"
+                label: "拉拔速度过大"
               },
               {
                 id: '2-4',
-                label: "凯尔特人"
-              },
-              {
-                id: '2-5',
-                label: "76人"
+                label: "涂硼浓度标准不合理"
               }
             ]
           }
         ]
       },
+      options: [],
+      value: '',
+      name: '',
+      inputName: '',
       showMenu: false,
+      dialogFormVisible: false,
       menuStyle: {
         top: '0px',
         left: '0px'
@@ -88,9 +104,125 @@ export default {
 
   created() {
     this.toggleExpand(this.treeData, true);
+    this.getTemplateData();
   },
 
   methods: {
+    handleUp() {
+      console.log(this.treeData)
+      console.log(this.inputName)
+      console.log(JSON.stringify(this.treeData))
+      this.dialogFormVisible = false
+      this.addTemplate()
+    },
+    //保存为模版
+    async addTemplate() {
+      await this.$http({
+        url: this.$http.adornUrl(`/qcTools/template/save`),
+        method: 'post',
+        data: this.$http.adornData({
+          'templateId': undefined,
+          'templateName': this.inputName || '未命名',
+          'templateType': '系统图',
+          'templateText': undefined,
+          'templateSeries': JSON.stringify(this.treeData),
+          'templateAxis': undefined,
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.visible = false
+              this.$emit('refreshDataList')
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    //获取模版数据
+    async getTemplateData() {
+      await this.$http({
+        url: this.$http.adornUrl('/qcTools/template/templateList'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'templateType': '系统图',
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultList = data.resultList.map(row => ({
+            templateId: row.templateId,
+            templateName: row.templateName,
+            templateType: row.templateType,
+            templateText: row.templateText,
+            templateSeries: JSON.parse(row.templateSeries),
+          }))
+          this.options = data.resultList.map(item => ({
+            value: item.templateId,
+            label: item.templateName
+          }))
+          console.log(this.resultList)
+        } else {
+          this.options = []
+        }
+      })
+    },
+    //删除当前模版
+    handleDelete() {
+      let ids = [this.value]
+      console.log(ids)
+      if (ids) {
+        this.$confirm(`确定对 [${this.name}] 进行删除?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/qcTools/template/delete'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.name = ''
+                  this.value = ''
+                  // this.toggleExpand(this.treeData, true);
+                  this.getTemplateData()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        })
+      } else {
+        this.$message({
+          message: '未选择',
+          type: 'info',
+          duration: 1500,
+
+        })
+      }
+
+    },
+    handleSelectChange(value) {
+      console.log(this.treeData)
+      this.resultList.forEach(item => {
+        if (item.templateId == this.value) {
+          console.log(item.templateSeries)
+          this.treeData = item.templateSeries
+          this.name = item.templateName
+        }
+      })
+    },
 
     addNode(data) {
       const newNode = {

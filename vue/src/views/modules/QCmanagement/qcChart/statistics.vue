@@ -179,15 +179,17 @@ export default {
 
           });
           this.stageNumData.forEach(item => {
-            if (90 < item.topicActivityResult < 100) {
+            if (85 <= item.topicActivityResult) {
               this.scoreResult.first++
-            } else if (80 < item.topicActivityResult <= 90) {
+            } else if (75 <= item.topicActivityResult < 85) {
               this.scoreResult.second++
-            } else if (70 < item.topicActivityResult <= 80) {
+            } else if (65 <= item.topicActivityResult < 75) {
               this.scoreResult.third++
             }
-            else if (60 < item.topicActivityResult <= 70) {
+            else if (55 <= item.topicActivityResult < 65) {
               this.scoreResult.fourth++
+            } else if (45 <= item.topicActivityResult < 55) {
+              this.scoreResult.fifth++
             }
           });
         } else {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.qcManagement.dao.QcToolsTemplateDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.qcManagement.entity.QcToolsTemplateEntity" id="qcToolsTemplateMap">
+        <result property="templateId" column="template_id"/>
+        <result property="templateName" column="template_name"/>
+        <result property="templateType" column="template_type"/>
+        <result property="templateSeries" column="template_series"/>
+        <result property="templateAxis" column="template_axis"/>
+        <result property="templateText" column="template_text"/>
+    </resultMap>
+
+
+</mapper>

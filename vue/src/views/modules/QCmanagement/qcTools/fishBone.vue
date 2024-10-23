@@ -1,19 +1,24 @@
 <template>
   <div>
+    <span>
+      <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
+    </span>
     <div class="button-container">
       <el-form>
         <el-form-item>
+          <br>
           <el-button type="primary" @click="addEdge">新增</el-button>
           <el-button type="success" @click="downloadAsImage">下载</el-button>
+          <el-button type="success" @click="dialogVisibleSave = true">保存为模版</el-button>
         </el-form-item>
       </el-form>
     </div>
     <div id="fishBone">
-      <el-dialog
-        title="编辑节点"
-        :visible.sync="editDialogVisible"
-        width="30%"
-        :modal="false">
+      <el-dialog title="编辑节点" :visible.sync="editDialogVisible" width="30%" :modal="false">
         <el-form :model="editableNode">
           <el-form-item label="节点名称">
             <el-input v-model="editableNode.name"></el-input>
@@ -24,22 +29,14 @@
           <el-button type="primary" @click="saveChanges">确定</el-button>
         </div>
       </el-dialog>
-      <el-dialog
-        title="新增节点"
-        :visible.sync="addDialogVisible"
-        width="30%"
-        :modal="false">
+      <el-dialog title="新增节点" :visible.sync="addDialogVisible" width="30%" :modal="false">
         <el-form :model="newNode">
           <el-form-item label="节点名称">
             <el-input v-model="newNode.name"></el-input>
           </el-form-item>
           <el-form-item label="父节点">
             <el-select v-model="newNode.parentId" placeholder="请选择父节点">
-              <el-option
-                v-for="item in nodeNames"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+              <el-option v-for="item in nodeNames" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -47,6 +44,13 @@
         <div slot="footer" class="dialog-footer">
           <el-button @click="addDialogVisible = false">取消</el-button>
           <el-button type="primary" @click="addNode">确定</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog title="模版名" :visible.sync="dialogVisibleSave">
+        <el-input v-model="inputName" placeholder="请输入模版名" style="width:50%"></el-input>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisibleSave = false">取 消</el-button>
+          <el-button type="primary" @click="handleUp">确 定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -60,10 +64,10 @@ import { FishBones } from '@/components/fishbone/FishBone'
 import html2canvas from 'html2canvas';
 
 export default {
-  data () {
+  data() {
     return {
       testFishData: [
-        {"id": "1", "fid": "0", "name": "质量问题", fontColor: "", lineColor: "", link: "", "children": [], }
+        { "id": "1", "fid": "0", "name": "质量问题", fontColor: "", lineColor: "", link: "", "children": [], }
       ],
       editDialogVisible: false, // 控制弹出框的可见性
       editableNode: { // 用于存储可编辑的节点信息
@@ -77,15 +81,22 @@ export default {
         link: '',
         parentId: ''
       },
-      nodeNames: [] // 用于存储节点名称数组
+      dialogVisibleSave: false,//保存模版
+      value: '',
+      name: '',
+      inputName: '',
+      resultList: [],
+      nodeNames: [], // 用于存储节点名称数组
+      options: [] // 用于存储节点名称数组
     }
   },
-  mounted () {
+  mounted() {
+    this.getTemplateData()
     this.initFishBone()
     this.getNodeNames(this.testFishData)
   },
   methods: {
-    initFishBone () {
+    initFishBone() {
       console.log('initFishBone')
       new FishBones({
         id: 'fishBone',
@@ -183,12 +194,128 @@ export default {
         a.download = 'fishbone_image.png'
         a.click()
       })
-    }
+    },
+    //处理下拉框选择变化
+    handleSelectChange() {
+      console.log(this.value)
+
+      this.resultList.forEach(item => {
+        if (item.templateId == this.value) {
+          this.testFishData = item.templateSeries
+          this.name = item.templateName
+        }
+      })
+      this.initFishBone()
+      this.getNodeNames(this.testFishData)
+    },
+    async getTemplateData() {
+      await this.$http({
+        url: this.$http.adornUrl('/qcTools/template/templateList'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'templateType': '鱼骨图',
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultList = data.resultList.map(row => ({
+            templateId: row.templateId,
+            templateName: row.templateName,
+            templateType: row.templateType,
+            templateText: row.templateText,
+            templateSeries: JSON.parse(row.templateSeries),
+            templateAxis: JSON.parse(row.templateAxis),
+          }))
+          this.options = data.resultList.map(item => ({
+            value: item.templateId,
+            label: item.templateName
+          }))
+          console.log(this.resultList)
+        } else {
+          this.options = []
+        }
+      })
+    },
+    handleUp() {
+      console.log(this.updatedSeries)
+      console.log(this.test)
+      this.dialogVisibleSave = false
+      this.addTemplate()
+    },
+    //删除当前模版
+    handleDelete() {
+      let ids = [this.value]
+      console.log(ids)
+      if (ids) {
+        this.$confirm(`确定对 [${this.name}] 进行删除?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/qcTools/template/delete'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.name = ''
+                  this.value = ''
+                  this.getTemplateData()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        })
+      } else {
+        this.$message({
+          message: '未选择',
+          type: 'info',
+          duration: 1500,
+
+        })
+      }
+
+    },
+    addTemplate() {
+      this.$http({
+        url: this.$http.adornUrl(`/qcTools/template/save`),
+        method: 'post',
+        data: this.$http.adornData({
+          'templateId': this.value || undefined,
+          'templateName': this.inputName || '未命名',
+          'templateType': '鱼骨图',
+          'templateText': this.textBy || '未命名',
+          'templateSeries': JSON.stringify(this.testFishData),
+          // 'templateAxis': JSON.stringify(tmp),
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.visible = false
+              this.getTemplateData()
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
   },
 }
 </script>
 
-<style scoped>#fishBone {
+<style scoped>
+#fishBone {
   display: flex;
   justify-content: center;
   align-items: center;

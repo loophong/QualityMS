@@ -98,12 +98,12 @@
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
-          <!-- <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
-          </el-table-column> -->
+          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
+          </el-table-column>
           <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="180">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
-            align="center" label="操作" width="160">
+            align="center" label="操作">
             <template slot-scope="scope">
               <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
                 @click="addMemberHandle(scope.row.id)">新增成员</el-button>
@@ -257,7 +257,6 @@ export default {
       this.membersOptions = data;
       // console.log(this.membersOptions);
     });
-    this.abc();
   },
   computed: {
     // formattedName() {

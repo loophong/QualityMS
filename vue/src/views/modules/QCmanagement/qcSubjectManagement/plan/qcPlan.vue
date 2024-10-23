@@ -56,7 +56,16 @@
         </template>
       </el-table-column>
       <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
+        <template slot-scope="scope">
+          <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
+          <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
+          <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
+          <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
+          <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
+          <span v-else>--</span> <!-- 处理未知状态 -->
+        </template>
       </el-table-column>
+
       <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
       </el-table-column>
       <el-table-column prop="note" header-align="center" align="center" label="备注">

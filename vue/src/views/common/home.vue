@@ -55,23 +55,25 @@
           <div class="panel-footer"></div>
         </div>
         <div class="panel issue">
-          <h2>当月问题统计</h2>
+          <h2>当月问题统计  完成率：{{ completionRate }}</h2>
           <div id="issueChart" ref="issueChart"></div>
           <div class="panel-footer"></div>
         </div>
       </div>
       <div class="column">
         <div class="no">
-          <div class="no-hd">
-            <ul>
-              <li>{{ indicatorCounts }}</li>
-              <li>{{ completionRate }}</li>
-            </ul>
-          </div>
           <div class="no-bd">
             <ul>
               <li>指标总数</li>
-              <li>当月问题完成率</li>
+              <li>计划总数</li>
+              <li>问题总数</li>
+            </ul>
+          </div>
+          <div class="no-hd">
+            <ul>
+              <li>{{ indicatorCounts }}</li>
+              <li>{{ totalIssue }}</li>
+              <li>{{ totalIssue }}</li>
             </ul>
           </div>
         </div>
@@ -125,6 +127,7 @@ export default {
       //----------------问题模块-----------------
       issueStats: {}, // 存储当月问题统计数据
       issueCategories: ["暂停", "未完成", "已完成", "结项"], // 问题分类
+      totalIssue: '',
       completionRateData: { completed: 0, notCompleted: 0 },// 新增的完成率数据
       completionRate: 0, // 完成率
       // issueCategories: ["创建", "暂停", "未完成", "已完成", "结项"], // 问题分类
@@ -138,12 +141,13 @@ export default {
   },
 
   async mounted() {
-    console.log('组件已经挂载');
+    // console.log('组件已经挂载');
     this.updateTime(); // 初始化时立即调用一次以显示当前时间
     this.t = setInterval(this.updateTime, 1000); // 每秒更新一次
     // this.getIndicatorCounts()
     // this.renderChart()
     this.getIssueStats(); // 获取问题统计数据
+    this.gettotalIssue();
     this.getIndicatorCounts();
 
     this.getCompletionRate(); // 新增调用完成率数据的方法
@@ -242,6 +246,9 @@ export default {
             color: "rgba(255,255,255,.6)",
             fontSize: 12,
           },
+          splitLine: {
+            show: false
+          }
         },
         series: [
           {
@@ -316,6 +323,9 @@ export default {
             color: "rgba(255,255,255,.6)",
             fontSize: 12,
           },
+          splitLine: {
+            show: false
+          }
         },
         series: seriesData,
       };
@@ -449,7 +459,8 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.issueStats = data.stats; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
-          console.log('数据转换中......', this.issueStats)
+          // this.totalIssue = data.stats['暂停'] + data.stats['未完成'] + data.stats['已完成'] + data.stats['结项']
+          // console.log('数据转换中......', this.issueStats)
           this.renderIssueChart(); // 渲染图表
         } else {
           this.issueStats = { 暂停: 0, 未完成: 0, 已完成: 0, 结项: 0 }; // 默认值
@@ -468,8 +479,8 @@ export default {
           console.log('返回的data', data);
           // 获取完成率
           const completed = data.completionRate.completed;
-          const notCompleted = data.completionRate.notCompleted;
-          const total = completed + notCompleted;
+          // const notCompleted = data.completionRate.notCompleted;
+          const total = data.completionRate.tolCompleted;
           const completionRate = total > 0 ? ((completed / total) * 100).toFixed(2) + '%' : '0%';
 
           // 更新显示的完成率
@@ -479,11 +490,24 @@ export default {
         }
       });
     },
-
+    gettotalIssue() {
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuetable/totalIssue'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.totalIssue = data.totalIssue; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
+          // console.log('数据转换中......', this.issueStats)
+        } else {
+          console.error('无效的数据格式');
+        }
+      });
+    },
 
     // 渲染问题统计图表
     renderIssueChart() {
-      console.log('开始渲染.....')
+      // console.log('开始渲染.....')
       const chart = echarts.init(document.getElementById("issueChart"));
 
       const option = {
@@ -523,6 +547,9 @@ export default {
             color: "rgba(255,255,255,.6)",
             fontSize: 12,
           },
+          splitLine: {
+            show: false
+          }
         },
         series: [
           {

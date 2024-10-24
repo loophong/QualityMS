@@ -134,7 +134,7 @@
         align="center"
         label="问题照片">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
+          <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -183,7 +183,7 @@
         align="center"
         label="整改照片交付物">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="previewImage(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -407,6 +407,20 @@
       this.fetchData()
     },
     methods: {
+      handleFileAction(fileflag) {
+        const token = this.$cookie.get('token'); // 获取当前的 token
+        if (!token) {
+          console.error('Token not found!');
+          return;
+        }
+        console.log('获取的地址 ' ,fileflag)
+        // 拼接带有 token 的请求地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+
+          window.open(url);
+
+      },
+
       getStates(verificationConclusion) {
         if (!verificationConclusion) return [];
         // 按照逗号分隔，并去除多余的空格
@@ -480,19 +494,32 @@
       //   window.open(imageUrl + '?token' + '03fa820c47519bd3e2f845b9f720fa96');
       //   console.log("图片地址：" ,imageUrl)
       // },
-      previewImage(imageUrl) {
-        // 获取当前的 token，假设它存储在 localStorage 中
-        const token = this.$cookie.get('token');
-        if (token) {
-        } else {
-          console.error('Token not found!');
-        }
-        // 将 token 作为参数添加到 URL
-        const imageUrlWithToken = `${imageUrl}?token=${token}`;
-        // 打开包含 token 的图片地址
-        window.open(imageUrlWithToken);
-
-      },
+      // previewImage(imageUrl) {
+      //   // 获取当前的 token，假设它存储在 localStorage 中
+      //   const token = this.$cookie.get('token');
+      //   if (token) {
+      //   } else {
+      //     console.error('Token not found!');
+      //   }
+      //   // 将 token 作为参数添加到 URL
+      //   const imageUrlWithToken = `${imageUrl}?token=${token}`;
+      //   // 打开包含 token 的图片地址
+      //   window.open(imageUrlWithToken);
+      //
+      // },
+      // previewImagetest2(flag) {
+      //   // 获取当前的 token，假设它存储在 localStorage 中
+      //   const token = this.$cookie.get('token');
+      //   if (token) {
+      //   } else {
+      //     console.error('Token not found!');
+      //   }
+      //   // 将 token 作为参数添加到 URL
+      //   const imageUrlWithToken = `${imageUrl}?token=${token}`;
+      //   // 打开包含 token 的图片地址
+      //   window.open(imageUrlWithToken);
+      //
+      // },
       getRowClassName({ row, rowIndex }) {
         return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
       },
@@ -577,7 +604,7 @@
             this.dataList = data.page.list.map(item => {
               // 确保图片路径有效
               if (!item.issuePhoto || !this.isValidImageUrl(item.issuePhoto)) {
-                item.issuePhoto = '默认图片路径' // 设置默认图片路径
+                // item.issuePhoto = '默认图片路径' // 设置默认图片路径
               }
               return item
             })
@@ -606,7 +633,7 @@
             this.dataList = data.page.list.map(item => {
               // 确保图片路径有效
               if (!item.issuePhoto || !this.isValidImageUrl(item.issuePhoto)) {
-                item.issuePhoto = '默认图片路径' // 设置默认图片路径
+                // item.issuePhoto = '默认图片路径' // 设置默认图片路径
               }
               return item
             })

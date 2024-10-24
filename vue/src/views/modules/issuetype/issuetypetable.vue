@@ -104,7 +104,7 @@
         formData.append('file', file); // 将文件添加到 FormData
 
         this.$http({
-          url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+          url: this.$http.adornUrl('/generator/issuetable/upload'), // 替换为实际上传接口
           method: 'post',
           data: formData,
           headers: {

@@ -705,15 +705,17 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         String endDate = now.plusMonths(1).withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 下月第一天
 
         // 统计当前月份已完成和未完成的条数
-        int completedCount = countIssuesByStateAndDate("已完成", startDate, endDate);
-        int notCompletedCount = countIssuesByStateAndDate("未完成", startDate, endDate);
-        int pauseCount = countIssuesByStateAndDate("暂停", startDate, endDate);
-        int conclusionCount = countIssuesByStateAndDate("结项", startDate, endDate);
-        int noCount = notCompletedCount + pauseCount + conclusionCount ;
+        int completedCount = countIssuesByVerificationConclusion("已完成", startDate, endDate);
+        int notCompletedCount = countIssuesByVerificationConclusion("未完成", startDate, endDate);
+        int pauseCount = countIssuesByVerificationConclusion("暂停", startDate, endDate);
+        int conclusionCount = countIssuesByVerificationConclusion("结项", startDate, endDate);
+        int profoundCount1 = countIssuesByVerificationConclusion("",startDate,endDate);
+//        int profoundCount2 = countIssuesByVerificationConclusion(null,startDate,endDate);
+        int tolCompleted = notCompletedCount + pauseCount + conclusionCount + profoundCount1 ;
         // 创建一个结果Map用于存放完成率数据
         Map<String, Integer> completionRate = new HashMap<>();
         completionRate.put("completed", completedCount);
-        completionRate.put("notCompleted", noCount);
+        completionRate.put("tolCompleted", tolCompleted);
 
         return completionRate;
     }

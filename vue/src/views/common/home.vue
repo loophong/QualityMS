@@ -123,6 +123,7 @@ export default {
 
       //----------------任务模块-----------------
       taskData: {},
+      planCounts: 0, // 计划总数
 
       //----------------问题模块-----------------
       issueStats: {}, // 存储当月问题统计数据
@@ -153,6 +154,7 @@ export default {
     this.getCompletionRate(); // 新增调用完成率数据的方法
 
     await this.getTaskCounts();
+    await this.getPlanCounts();
     this.initOnTimePieChart();
     this.initEarlyCompletionPieChart();
 
@@ -348,6 +350,18 @@ export default {
         this.taskData.completedPlanNum = data[3].completedPlanNum
         console.log('taskData:', this.taskData);
         // this.renderChart();
+      });
+    },
+
+    async getPlanCounts() {
+      await this.$http({
+        url: this.$http.adornUrl('/taskmanagement/plan/getPlanCount'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({ data }) => {
+        // console.log('计划总数:', data);
+        this.planCounts = data.count
+        // console.log('planCounts:', this.planCounts)
       });
     },
 

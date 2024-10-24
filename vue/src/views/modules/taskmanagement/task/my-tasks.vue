@@ -9,11 +9,12 @@
           <el-form-item>
             <el-button @click="getUnfinishedTasksList()">查询</el-button>
             <el-button v-if="isAuth('taskmanagement:task:delete')" type="danger" @click="deleteHandle()"
-              :disabled="dataListSelections.length <= 0">批量删除</el-button>
+                       :disabled="dataListSelections.length <= 0">批量删除
+            </el-button>
           </el-form-item>
         </el-form>
         <el-table :data="unfinishedTasksList" border v-loading="unfinishedTasksListLoading"
-          @selection-change="selectionChangeHandle" style="width: 100%;">
+                  @selection-change="selectionChangeHandle" style="width: 100%;">
           <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column>
           <el-table-column prop="taskId" header-align="center" align="center" label="任务编号">
@@ -105,20 +106,25 @@
             <template slot-scope="scope">
               <!-- <el-button type="text" size="small" @click="finishTask(scope.row.taskId)">完成</el-button> -->
               <el-button type="text" size="small"
-                @click="taskUpdatePage(scope.row.taskId)">任务分解</el-button>
+                         @click="taskUpdatePage(scope.row.taskId)">任务分解
+              </el-button>
               <el-button type="text" size="small" v-if="scope.row.taskCurrentState === 'IN_PROGRESS'"
-                @click="showApproverDialog(scope.row)">提交审批</el-button>
+                         @click="showApproverDialog(scope.row)">提交审批
+              </el-button>
               <el-button type="text" size="small" v-if="scope.row.taskCurrentState === 'APPROVAL_IN_PROGRESS'"
-                @click="showApproverDialog(scope.row)">取消审批</el-button>
+                         @click="cancelApproval(scope.row)">取消审批
+              </el-button>
               <!-- <el-button type="text" size="small" @click="showApproverDialog(scope.row)">完成</el-button> -->
               <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.tmTid)">修改</el-button> -->
               <!-- <el-button type="text" size="small" @click="deleteHandle(scope.row.tmTid)">删除</el-button> -->
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="unfinishedTasksSizeChangeHandle" @current-change="unfinishedTasksCurrentChangeHandle"
-          :current-page="unfinishedTasksPageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="unfinishedTasksPageSize"
-          :total="unfinishedTasksTotalPage" layout="total, sizes, prev, pager, next, jumper">
+        <el-pagination @size-change="unfinishedTasksSizeChangeHandle"
+                       @current-change="unfinishedTasksCurrentChangeHandle"
+                       :current-page="unfinishedTasksPageIndex" :page-sizes="[10, 20, 50, 100]"
+                       :page-size="unfinishedTasksPageSize"
+                       :total="unfinishedTasksTotalPage" layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
       </el-tab-pane>
 
@@ -179,6 +185,8 @@
                 <el-tag type="success" disable-transitions>已通过</el-tag></span>
               <span v-else-if="scope.row.approvalStatus === 'REJECTED'">
                 <el-tag type="danger" disable-transitions>已拒绝</el-tag></span>
+              <span v-else-if="scope.row.approvalStatus === 'CANCEL'">
+                <el-tag type="danger" disable-transitions>已取消</el-tag></span>
               <span v-else>-</span> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
@@ -195,9 +203,10 @@
           </el-table-column>
         </el-table>
         <el-pagination @size-change="mySubmitApprovalSizeChangeHandle"
-          @current-change="mySubmitApprovalCurrentChangeHandle" :current-page="mySubmitApprovalPageIndex"
-          :page-sizes="[10, 20, 50, 100]" :page-size="mySubmitApprovalPageSize" :total="mySubmitApprovalTotalPage"
-          layout="total, sizes, prev, pager, next, jumper">
+                       @current-change="mySubmitApprovalCurrentChangeHandle" :current-page="mySubmitApprovalPageIndex"
+                       :page-sizes="[10, 20, 50, 100]" :page-size="mySubmitApprovalPageSize"
+                       :total="mySubmitApprovalTotalPage"
+                       layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
 
 
@@ -212,8 +221,9 @@
             <el-button @click="getCompletedTasksList()">查询</el-button>
           </el-form-item>
         </el-form>
-        <el-table :data="completedTasksList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%;">
+        <el-table :data="completedTasksList" border v-loading="dataListLoading"
+                  @selection-change="selectionChangeHandle"
+                  style="width: 100%;">
           <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column>
           <el-table-column prop="taskId" header-align="center" align="center" label="任务ID">
@@ -305,8 +315,9 @@
           </el-table-column>
         </el-table>
         <el-pagination @size-change="completedTasksSizeChangeHandle" @current-change="completedTasksCurrentChangeHandle"
-          :current-page="completedTasksPageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="completedTasksPageSize"
-          :total="completedTasksTotalPage" layout="total, sizes, prev, pager, next, jumper">
+                       :current-page="completedTasksPageIndex" :page-sizes="[10, 20, 50, 100]"
+                       :page-size="completedTasksPageSize"
+                       :total="completedTasksTotalPage" layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
       </el-tab-pane>
     </el-tabs>
@@ -435,7 +446,6 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
 
 
-
     <!-- 审批人弹窗 -->
     <el-dialog title="选择审批人" :visible.sync="submitApprovalDialogVisible" width="50%">
       <!-- <el-form :model="form"> -->
@@ -465,7 +475,6 @@
 </template>
 
 
-
 <script>
 import AddOrUpdate from './task-update'
 
@@ -481,7 +490,6 @@ export default {
         key: ''
       },
       dataList: [],
-
 
 
       pageIndex: 1,
@@ -547,7 +555,7 @@ export default {
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
-    }).then(({ data }) => {
+    }).then(({data}) => {
       console.log(data);
       console.log(1111);
 
@@ -569,7 +577,6 @@ export default {
     })
 
 
-
   },
 
   methods: {
@@ -582,6 +589,36 @@ export default {
       // });
     },
 
+    // 取消审批
+    cancelApproval(row) {
+      this.$confirm(`确定取消审批任务[${row.taskName}]?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl(`/taskmanagement/approval/cancelApproval`),
+          method: 'get',
+          params: this.$http.adornParams({
+            'taskId': row.taskId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getUnfinishedTasksList()
+              }
+            })
+          }
+        })
+
+      })
+
+
+    },
 
 
     // 获取数据列表
@@ -595,7 +632,7 @@ export default {
           'limit': this.pageSize,
           'key': this.dataForm.key
         })
-      }).then(({ data }) => {
+      }).then(({data}) => {
         if (data && data.code === 0) {
 
           // console.log("data" + data);
@@ -621,7 +658,7 @@ export default {
           'limit': this.pageSize,
           'key': this.dataForm.key
         })
-      }).then(({ data }) => {
+      }).then(({data}) => {
         if (data && data.code === 0) {
           // console.log("data" + data);
           this.unfinishedTasksList = data.page.list
@@ -644,7 +681,7 @@ export default {
           'limit': this.pageSize,
           'key': this.dataForm.key
         })
-      }).then(({ data }) => {
+      }).then(({data}) => {
         if (data && data.code === 0) {
           // console.log("data" + data);
           this.completedTasksList = data.page.list
@@ -731,7 +768,7 @@ export default {
           url: this.$http.adornUrl('/taskmanagement/task/delete'),
           method: 'post',
           data: this.$http.adornData(ids, false)
-        }).then(({ data }) => {
+        }).then(({data}) => {
           if (data && data.code === 0) {
             this.$message({
               message: '操作成功',
@@ -772,7 +809,6 @@ export default {
     },
 
 
-
     finishTask(taskId) {
       console.log("当前任务id" + taskId)
       this.$confirm(`确定完成任务吗？`, '提示', {
@@ -799,7 +835,7 @@ export default {
           'taskId': this.approvalForm.taskId,
           'taskApprovalor': this.approvalForm.taskApprovalor,
         })
-      }).then(({ data }) => {
+      }).then(({data}) => {
 
         if (data && data.code === 0) {
           this.submitApprovalDialogVisible = false;
@@ -830,7 +866,7 @@ export default {
           'key': this.dataForm.key
 
         })
-      }).then(({ data }) => {
+      }).then(({data}) => {
         if (data && data.code === 0) {
           this.mySubmitApprovalList = data.page.list
           this.mySubmitApprovalTotalPage = data.page.totalCount
@@ -844,7 +880,7 @@ export default {
       })
     },
 
-    taskUpdatePage(taskId){
+    taskUpdatePage(taskId) {
       this.$router.push({
         // path: '/taskmanagement/task/task-detail-page',
         name: 'task-update-page',
@@ -863,8 +899,6 @@ export default {
     // },
 
   }
-
-
 
 
 }

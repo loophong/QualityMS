@@ -10,6 +10,8 @@ import com.aliyun.oss.common.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import io.renren.common.utils.ShiroUtils;
+import io.renren.modules.notice.entity.CreateNoticeParams;
+import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.ApprovalService;
@@ -40,6 +42,8 @@ public class TaskController {
     private TaskService taskService;
     @Autowired
     private ApprovalService approvalService;
+    @Autowired
+    private MessageNotificationService messageService;
 
     /**
      * @description: 任务折线图展示
@@ -183,6 +187,9 @@ public class TaskController {
 //
 //
 //        taskService.updateById(taskEntity);
+
+        // 发送消息
+        messageService.sendMessages(new CreateNoticeParams( Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()} , "您有一个任务需要审批，请及时审批！", "任务审批通知"));
 
         return R.ok();
 

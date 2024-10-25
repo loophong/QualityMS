@@ -264,7 +264,7 @@ public class IssueTableController {
     }
 
     /**
-     * 获取当月问题统计
+     * 获取当月问题总数
      */
     @RequestMapping("/totalIssue")
     @RequiresPermissions("generator:issuetable:list") // 权限控制

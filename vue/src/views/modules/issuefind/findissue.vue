@@ -15,11 +15,11 @@
       <!-- 问题添加 Tab Pane -->
       <el-tab-pane label="问题添加">
         <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+<!--          <el-form-item>-->
+<!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--          </el-form-item>-->
           <el-form-item>
-            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button @click="getDataList()">查询</el-button>
+<!--            <el-button @click="getDataList()">查询</el-button>-->
             <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
                        @click="addOrUpdateHandle()">新增</el-button>
             <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
@@ -79,11 +79,11 @@
       <el-tab-pane label="整改记录">
         <div class="mod-config">
           <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+<!--            <el-form-item>-->
+<!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--            </el-form-item>-->
             <el-form-item>
-              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button @click="getDataList()">查询</el-button>
+<!--              <el-button @click="getDataList()">查询</el-button>-->
               <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
               <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
                          :disabled="dataListSelections.length <= 0">批量删除</el-button>
@@ -192,11 +192,11 @@
       <el-tab-pane label="问题验证">
         <div class="mod-config">
           <el-form v-if="showForm1" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+<!--            <el-form-item>-->
+<!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--            </el-form-item>-->
             <el-form-item>
-              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button @click="getDataList()">查询</el-button>
+<!--              <el-button @click="getDataList()">查询</el-button>-->
               <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
               <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
                          :disabled="dataListSelections.length <= 0">批量删除</el-button>

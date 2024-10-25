@@ -6,6 +6,8 @@ import java.util.Map;
 
 import io.renren.common.utils.DateUtils;
 import io.renren.common.utils.ShiroUtils;
+import io.renren.modules.notice.entity.CreateNoticeParams;
+import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.taskmanagement.entity.ApprovalStatus;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.entity.TaskStatus;
@@ -38,6 +40,9 @@ public class ApprovalController {
 
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private MessageNotificationService messageService;
 
     /**
      * @description: 取消审批
@@ -240,6 +245,12 @@ public class ApprovalController {
         }
         taskService.updateById(task);
         approvalService.updateById(taskManagementApprovalTable);
+
+        // 发送消息
+        messageService.sendMessages(new CreateNoticeParams( Long.parseLong(taskManagementApprovalTable.getApprover()), new Long[]{Long.valueOf(taskManagementApprovalTable.getSubmitter())} ,
+                "您有一个任务审批结果，请及时查看！", "任务审批结果通知"));
+
+
         return R.ok();
     }
 

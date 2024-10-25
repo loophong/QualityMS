@@ -2159,9 +2159,7 @@ export default {
     // 上传文件
     handleFileChange(file) {
       // 存储待上传的文件
-
       this.uploadingFile = file.raw; // 获取 File 对象
-
       this.uploadNameList.push(file.raw.name)
       this.uploadFile(file.raw); // 调用上传方法
     },
@@ -2170,7 +2168,7 @@ export default {
       let file2 = file;
       formData.append('file', file); // 将文件添加到 FormData
       this.$http({
-        url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        url: this.$http.adornUrl('/generator/issuetable/upload'), // 替换为实际上传接口
         method: 'post',
         data: formData,
         headers: {
@@ -2205,25 +2203,16 @@ export default {
       });
     },
     //文件预览
-    previewDoc(docUrl) {
-      console.log(docUrl)
-      // 获取当前的 token，假设它存储在 localStorage 中
-      const token = this.$cookie.get('token');
-      if (token) {
-        console.log('Token found:', token);
-      } else {
-        console.error('Token not found!');
-      }
-
-      // 将 token 作为参数添加到 URL
-      const docUrlWithToken = `${docUrl}?token=${token}`;
-
-      console.log("cur docUrl====>", docUrlWithToken);
-
-      // 打开包含 token 的图片地址
-      window.open(docUrlWithToken);
-
-      console.log("图片地址：", docUrlWithToken);
+    previewDoc(fileflag) {
+      const token = this.$cookie.get('token'); // 获取当前的 token
+        if (!token) {
+          console.error('Token not found!');
+          return;
+        }
+        console.log('获取的地址 ' ,fileflag)
+        // 拼接带有 token 的请求地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+          window.open(url);
     },
 
 

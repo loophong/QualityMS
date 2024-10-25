@@ -1,11 +1,4 @@
 <template>
-  <!-- const colorScale = {
-        'E': '#1e1e1e', // 黑色  //跳过
-        'D': '#e74c3c', // 红色  //未通过
-        'C': '#0dbc79', // 绿色  //已通过
-        'B': '#3498db',  // 蓝色 //进行中
-        'A': '#717182'  // 灰色 //未提交
-      }; -->
 
   <div>
     <div>
@@ -70,6 +63,7 @@
         <el-button type="primary" @click="dataFormSubmitEx(form3.id)">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- TODO 表格内容动态 -->
     <el-dialog title="成果初评" :visible.sync="showDialog4" width="60%">
       <el-form :model="form4">
         <table width="100%">

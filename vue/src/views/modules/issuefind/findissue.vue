@@ -15,11 +15,11 @@
       <!-- 问题添加 Tab Pane -->
       <el-tab-pane label="问题添加">
         <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+<!--          <el-form-item>-->
+<!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--          </el-form-item>-->
           <el-form-item>
-            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button @click="getDataList()">查询</el-button>
+<!--            <el-button @click="getDataList()">查询</el-button>-->
             <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
                        @click="addOrUpdateHandle()">新增</el-button>
             <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
@@ -53,7 +53,7 @@
           </el-table-column>
           <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
+              <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>
             </template>
           </el-table-column>
           <el-table-column prop="rectificationRequirement" header-align="center" align="center" label="整改要求">
@@ -79,11 +79,11 @@
       <el-tab-pane label="整改记录">
         <div class="mod-config">
           <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+<!--            <el-form-item>-->
+<!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--            </el-form-item>-->
             <el-form-item>
-              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button @click="getDataList()">查询</el-button>
+<!--              <el-button @click="getDataList()">查询</el-button>-->
               <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
               <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
                          :disabled="dataListSelections.length <= 0">批量删除</el-button>
@@ -110,7 +110,7 @@
 
             <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
+                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>
               </template>
             </el-table-column>
             <el-table-column prop="rectificationRequirement" header-align="center" align="center" label="整改要求">
@@ -162,7 +162,7 @@
             <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">
               <template slot-scope="scope">
                 <el-button type="text" size="small"
-                           @click="previewImage(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
               </template>
             </el-table-column>
             <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
@@ -192,11 +192,11 @@
       <el-tab-pane label="问题验证">
         <div class="mod-config">
           <el-form v-if="showForm1" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+<!--            <el-form-item>-->
+<!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--            </el-form-item>-->
             <el-form-item>
-              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button @click="getDataList()">查询</el-button>
+<!--              <el-button @click="getDataList()">查询</el-button>-->
               <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
               <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
                          :disabled="dataListSelections.length <= 0">批量删除</el-button>
@@ -235,7 +235,7 @@
 
             <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="previewImage(scope.row.issuePhoto)">预览</el-button>
+                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>
               </template>
             </el-table-column>
             <!--      <el-table-column-->
@@ -293,7 +293,7 @@
             <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">
               <template slot-scope="scope">
                 <el-button type="text" size="small"
-                           @click="previewImage(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
               </template>
             </el-table-column>
             <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
@@ -470,6 +470,19 @@ export default {
     this.getDataList()
   },
   methods: {
+    handleFileAction(fileflag) {
+      const token = this.$cookie.get('token'); // 获取当前的 token
+      if (!token) {
+        console.error('Token not found!');
+        return;
+      }
+      console.log('获取的地址 ' ,fileflag)
+      // 拼接带有 token 的请求地址
+      const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+
+      window.open(url);
+
+    },
     getStates(verificationConclusion) {
       if (!verificationConclusion) return [];
       // 按照逗号分隔，并去除多余的空格
@@ -621,25 +634,25 @@ export default {
       })
     },
     //图片预览
-    previewImage(imageUrl) {
-      // 获取当前的 token，假设它存储在 localStorage 中
-      const token = this.$cookie.get('token');
-      if (token) {
-        console.log('Token found:', token);
-      } else {
-        console.error('Token not found!');
-      }
-
-      // 将 token 作为参数添加到 URL
-      const imageUrlWithToken = `${imageUrl}?token=${token}`;
-
-      console.log("cur imageUrl====>", imageUrlWithToken);
-
-      // 打开包含 token 的图片地址
-      window.open(imageUrlWithToken);
-
-      console.log("图片地址：", imageUrlWithToken);
-    },
+    // previewImage(imageUrl) {
+    //   // 获取当前的 token，假设它存储在 localStorage 中
+    //   const token = this.$cookie.get('token');
+    //   if (token) {
+    //     console.log('Token found:', token);
+    //   } else {
+    //     console.error('Token not found!');
+    //   }
+    //
+    //   // 将 token 作为参数添加到 URL
+    //   const imageUrlWithToken = `${imageUrl}?token=${token}`;
+    //
+    //   console.log("cur imageUrl====>", imageUrlWithToken);
+    //
+    //   // 打开包含 token 的图片地址
+    //   window.open(imageUrlWithToken);
+    //
+    //   console.log("图片地址：", imageUrlWithToken);
+    // },
     // previewImage(imageUrl) {
     //   console.log("cur imageUrl====>", imageUrl);
     //

@@ -1,11 +1,11 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+<!--      <el-form-item>-->
+<!--        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--      </el-form-item>-->
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+<!--        <el-button @click="getDataList()">查询</el-button>-->
 <!--        <el-upload-->
 <!--          class="upload-button"-->
 <!--          :show-file-list="false"-->
@@ -104,7 +104,7 @@
         formData.append('file', file); // 将文件添加到 FormData
 
         this.$http({
-          url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+          url: this.$http.adornUrl('/generator/issuetable/upload'), // 替换为实际上传接口
           method: 'post',
           data: formData,
           headers: {

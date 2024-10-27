@@ -2,6 +2,8 @@ package io.renren.modules.spc.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.*;
 
 import com.aliyun.oss.ServiceException;
@@ -28,7 +30,6 @@ public class SPCController {
         System.out.println("------------import-------import------------");
         try {
             List<List<Double>> date = parseExcel(excelFile);
-            System.out.println(date);
             return ResponseEntity.ok(date);
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,19 +44,49 @@ public class SPCController {
 
         ZipSecureFile.setMinInflateRatio(0);
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
-        Sheet sheet = workbook.getSheetAt(0);
-        Iterator<Row> rowIterator = sheet.rowIterator();
 
-        // Skip header row
-        if (rowIterator.hasNext()) {
-            rowIterator.next();
-        }
+        /*
+        *
+        X-R图
+        * */
+
+
+        Sheet sheet = workbook.getSheetAt(0);
 
 
         //子组大小
         int arrayLength = getCellValueAsInt(sheet.getRow(3).getCell(12));
 
         int arraySize = getCellValueAsInt(sheet.getRow(5).getCell(12));
+
+        DecimalFormat df = new DecimalFormat("#.00");
+        //X图上限、中心限、下限
+        double X_ucl = getNumericCellValue(sheet.getRow(3).getCell(16));
+        double X_cl = getNumericCellValue(sheet.getRow(4).getCell(16));
+        double X_lcl = getNumericCellValue(sheet.getRow(5).getCell(16));
+
+        String formattedX_ucl = df.format(X_ucl);
+        String formattedX_cl = df.format(X_cl);
+        String formattedX_lcl = df.format(X_lcl);
+
+        double roundedX_ucl = Double.parseDouble(formattedX_ucl);
+        double roundedX_cl = Double.parseDouble(formattedX_cl);
+        double roundedX_lcl = Double.parseDouble(formattedX_lcl);
+
+        //R图上限、中心限、下限
+        double R_ucl = getNumericCellValue(sheet.getRow(3).getCell(18));
+        double R_cl = getNumericCellValue(sheet.getRow(4).getCell(18));
+        double R_lcl = getNumericCellValue(sheet.getRow(5).getCell(18));
+
+        String formattedR_ucl = df.format(R_ucl);
+        String formattedR_cl = df.format(R_cl);
+        String formattedR_lcl = df.format(R_lcl);
+
+        double roundedR_ucl = Double.parseDouble(formattedR_ucl);
+        double roundedR_cl = Double.parseDouble(formattedR_cl);
+        double roundedR_lcl = Double.parseDouble(formattedR_lcl);
+
+
 
         double[][] date = new double[arrayLength][arraySize];
         int n = 0;
@@ -68,13 +99,6 @@ public class SPCController {
             }
             n++;
         }
-
-//        for (double[] doubles : date) {
-//            for (int j = 0; j < date[0].length; j++) {
-//                System.out.print(doubles[j] + " ");
-//            }
-//            System.out.println();
-//        }
 
         //计算求和
         List<Double> sumList = new ArrayList<>();
@@ -96,7 +120,27 @@ public class SPCController {
             averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
         }
         dataList.add(averageList);
-//        System.out.println(averageList);
+
+        //存入X图的UCL上限
+        List<Double> X_UCL = new ArrayList<>();
+        for (int col = 0; col < arraySize; col++){
+            X_UCL.add(roundedX_ucl);
+        }
+        dataList.add(X_UCL);
+
+        //存入X图的CL中心限
+        List<Double> X_CL = new ArrayList<>();
+        for (int col = 0; col < arraySize; col++){
+            X_CL.add(roundedX_cl);
+        }
+        dataList.add(X_CL);
+
+        //存入X图的LCL下限
+        List<Double> X_LCL = new ArrayList<>();
+        for (int col = 0; col < arraySize; col++){
+            X_LCL.add(roundedX_lcl);
+        }
+        dataList.add(X_LCL);
 
         //计算R
         List<Double> R = new ArrayList<>();
@@ -119,36 +163,95 @@ public class SPCController {
         }
         dataList.add(R);
 
-        List<Double> unliang = new ArrayList<>();
-        unliang.add(1.97);unliang.add(1.24);unliang.add(3.82);unliang.add(1.71);unliang.add(1.95);
-        unliang.add(2.40);unliang.add(2.42);unliang.add(1.73);unliang.add(1.29);unliang.add(3.15);
-        unliang.add(1.97);unliang.add(1.78);unliang.add(2.38);unliang.add(2.04);unliang.add(1.32);
-        unliang.add(1.61);unliang.add(1.86);unliang.add(1.37);unliang.add(4.22);unliang.add(2.58);
-        unliang.add(3.78);unliang.add(1.07);unliang.add(1.51);unliang.add(0.71);unliang.add(2.16);
-        dataList.add(unliang);
+        //存入X图的UCL上限
+        List<Double> R_UCL = new ArrayList<>();
+        for (int col = 0; col < arraySize; col++){
+            R_UCL.add(roundedR_ucl);
+        }
+        dataList.add(R_UCL);
+
+        //存入X图的CL中心限
+        List<Double> R_CL = new ArrayList<>();
+        for (int col = 0; col < arraySize; col++){
+            R_CL.add(roundedR_cl);
+        }
+        dataList.add(R_CL);
+
+        //存入X图的LCL下限
+        List<Double> R_LCL = new ArrayList<>();
+        for (int col = 0; col < arraySize; col++){
+            R_LCL.add(roundedR_lcl);
+        }
+        dataList.add(R_LCL);
+
+
+        /*
+        *
+        P-Chart
+        * */
+
+        //获取数据
+        Sheet sheet2 = workbook.getSheetAt(1);
+
+        //抽检数
+//        List<Integer> sampling_Tests_Number = new ArrayList<>();
+//        List<Integer> defects_Number = new ArrayList<>();
+
+        int[] sampling_Tests_Number = new int[arraySize];
+        int[] defects_Number = new int[arraySize];
+
+        Row row6 = sheet2.getRow(5);   //抽检数一行
+        Row row7 = sheet2.getRow(6);   //不良数一行
+
+        for (int i = 1; i < 1 + arraySize; i++){
+            sampling_Tests_Number[i-1] = getCellValueAsInt(row6.getCell(i));
+            defects_Number[i-1] = getCellValueAsInt(row7.getCell(i));
+        }
+
+
+
+
+        //计算不良率
+        List<Double> defect_Rate = new ArrayList<>();
+
+        int sum_Sampling_Tests_Number = 0;
+        int sum_Defects_Number = 0;
+
+        for(int i = 0; i < arraySize; i++){
+            BigDecimal defectRate = BigDecimal.valueOf(defects_Number[i]).divide(BigDecimal.valueOf(sampling_Tests_Number[i]),4, RoundingMode.HALF_UP);
+            defect_Rate.add(defectRate.doubleValue());
+            sum_Sampling_Tests_Number += sampling_Tests_Number[i];
+            sum_Defects_Number += defects_Number[i];
+        }
+        dataList.add(defect_Rate);
+
+        //计算总体不良率（p）
+
+        BigDecimal p =  BigDecimal.valueOf(sum_Defects_Number).divide(BigDecimal.valueOf(sum_Sampling_Tests_Number),4, RoundingMode.HALF_UP);
 
         List<Double> UCL = new ArrayList<>();
-        UCL.add(2.95);UCL.add(3.19);UCL.add(3.04);UCL.add(2.94);UCL.add(3.03);
-        UCL.add(2.99);UCL.add(3.04);UCL.add(3.04);UCL.add(2.97);UCL.add(3.29);
-        UCL.add(2.97);UCL.add(3.29);UCL.add(2.97);UCL.add(3.19);UCL.add(3.01);
-        UCL.add(3.12);UCL.add(2.95);UCL.add(2.95);UCL.add(3.17);UCL.add(2.99);
-        UCL.add(3.13);UCL.add(3.09);UCL.add(3.03);UCL.add(2.95);UCL.add(3.00);
+
+        for (int i = 0; i < arraySize; i++){
+
+            //计算公式： UCL = p + 3 * sqrt(p * (1-p) / n) 其中n为抽检数
+            BigDecimal ucl = calculateUCL(p, sampling_Tests_Number[i]);
+            UCL.add(ucl.doubleValue());
+        }
         dataList.add(UCL);
 
         List<Double> CL = new ArrayList<>();
-        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
-        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
-        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
-        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
-        CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);CL.add(2.07);
+        for(int i = 0; i < arraySize; i++){
+            CL.add(p.doubleValue());
+        }
         dataList.add(CL);
 
         List<Double> LCL = new ArrayList<>();
-        LCL.add(1.20);LCL.add(0.95);LCL.add(1.10);LCL.add(1.21);LCL.add(1.12);
-        LCL.add(1.15);LCL.add(1.10);LCL.add(1.11);LCL.add(1.17);LCL.add(0.86);
-        LCL.add(1.18);LCL.add(0.96);LCL.add(1.13);LCL.add(1.03);LCL.add(1.19);
-        LCL.add(1.19);LCL.add(0.97);LCL.add(1.16);LCL.add(1.25);LCL.add(1.17);
-        LCL.add(1.02);LCL.add(1.06);LCL.add(1.12);LCL.add(1.20);LCL.add(1.15);
+        for (int i = 0; i < arraySize; i++){
+
+            //计算公式： LCL = p - 3 * sqrt(p * (1-p) / n) 其中n为抽检数
+            BigDecimal lcl = calculateLCL(p, sampling_Tests_Number[i]);
+            LCL.add(lcl.doubleValue());
+        }
         dataList.add(LCL);
 
         workbook.close();
@@ -186,4 +289,24 @@ public class SPCController {
         cell.setCellType(CellType.NUMERIC);
         return cell.getNumericCellValue();
     }
+
+    public static BigDecimal calculateUCL(BigDecimal p, int samplingTestsNumber) {
+
+        BigDecimal sqrtResult = (p.multiply(BigDecimal.valueOf(1).subtract(p))
+                .divide(BigDecimal.valueOf(samplingTestsNumber), RoundingMode.HALF_UP));
+        double sqrt = sqrtResult.doubleValue();
+        BigDecimal ucl = p.add(BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(Math.sqrt(sqrt))));
+        return ucl.setScale(4, RoundingMode.HALF_UP);
+    }
+
+    public static BigDecimal calculateLCL(BigDecimal p, int samplingTestsNumber) {
+
+        BigDecimal sqrtResult = (p.multiply(BigDecimal.valueOf(1).subtract(p))
+                .divide(BigDecimal.valueOf(samplingTestsNumber), RoundingMode.HALF_UP));
+        double sqrt = sqrtResult.doubleValue();
+        BigDecimal ucl = p.subtract(BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(Math.sqrt(sqrt))));
+        return ucl.setScale(4, RoundingMode.HALF_UP);
+    }
+
+
 }

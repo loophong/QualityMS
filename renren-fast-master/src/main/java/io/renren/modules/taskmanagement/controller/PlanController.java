@@ -81,6 +81,19 @@ public class PlanController {
     }
 
     /**
+     * @description: 大屏展示-查询计划总数
+     * @author: hong
+     * @date: 2024/10/24 15:32
+     * @version: 1.0
+     */
+    @RequestMapping("/getPlanCount")
+    public R getPlanCount() {
+        int count = planService.query().count();
+        log.info("计划总数：" + count);
+        return R.ok().put("count", count);
+    }
+
+    /**
      * @description: 查询未完成计划
      * @author: hong
      * @date: 2024/10/15 15:11

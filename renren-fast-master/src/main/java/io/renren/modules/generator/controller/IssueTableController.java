@@ -1,5 +1,7 @@
 package io.renren.modules.generator.controller;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import io.minio.*;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
@@ -19,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,25 +50,9 @@ public class IssueTableController {
 
     SimpleDateFormat saf = new SimpleDateFormat("/yyyy/MM/dd");
 
-    private final String uploadDir = "C:/uploads"; // 请确保这个路径已存在或可写
+    private static final String uploadDir = System.getProperty("user.dir") + "/file/"; // 请确保这个路径已存在或可写
 
-    /**
-     * 上传图片
-     */
-//    @Value("${file.upload-dir}")
-    @PostMapping("/testio")
-    @RequiresPermissions("generator:issuetable:update")
-    public R testio(@RequestParam("file") MultipartFile file , HttpServletRequest request) throws Exception {
-        System.out.println("文件上传+++++++");
-        ObjectWriteResponse objectWriteResponse = minioClient.putObject(PutObjectArgs.builder()
-                .bucket("myfile")
-                .object("user.jpg")
-                .stream(file.getInputStream(), file.getSize(), -1)
-                .build()
-        );
-        System.out.println(objectWriteResponse);
-        return R.ok();
-    }
+
 
     /**
      * 上传图片
@@ -72,26 +60,75 @@ public class IssueTableController {
 //    @Value("${file.upload-dir}")
     @PostMapping("/upload")
     @RequiresPermissions("generator:issuetable:update")
-    @CrossOrigin(origins = "http://localhost:8001") // 只允许这个源
-    public R uploadImage(@RequestParam("file") MultipartFile file , HttpServletRequest request) {
+    public R uploadImage(@RequestParam("file") MultipartFile file ) {
+        System.out.println("开始上传" + uploadDir);
+        //原始文化名
         String originName = file.getOriginalFilename();
-        String format = saf.format(new Date());
-        String realPath = request.getServletContext().getRealPath("/") + format;
-        File floder = new File(realPath);
-        if (!floder.exists()){
-            floder.mkdirs();
+        //时间戳
+        String flag = System.currentTimeMillis() + "" ;
+        try{
+            if (!FileUtil.isDirectory(uploadDir));{
+                FileUtil.mkdir(uploadDir);
+            }
+            FileUtil.writeBytes(file.getBytes(),uploadDir + flag + "-" + originName);
+            System.out.println("上传成功");
+        }catch (Exception e){
+            System.out.println("上传失败");
         }
-        String newName = UUID.randomUUID().toString()+".jpg";
-        try {
-            file.transferTo(new File(floder,newName));
-            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() +"/renren-fast" + format+"/" + newName;
-            System.out.println("获取的url"+url);
-//            R.ok().put("data",url);
-            return R.ok().put("data",url);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        System.out.println("上传结束" + flag);
+        return R.ok().put("uploadurl", flag);
+    }
+
+    /**
+     * 文件获取
+     */
+    @RequestMapping("/{flag}")
+    @RequiresPermissions("generator:issuetable:update")
+    public R avatarPath(@PathVariable String flag, HttpServletResponse response) throws Exception {
+        if (!FileUtil.isDirectory(uploadDir));{
+            FileUtil.mkdir(uploadDir);
         }
-//        return R.ok();
+        OutputStream os;
+        List<String> fileNames = FileUtil.listFileNames(uploadDir);
+        String avatar = fileNames.stream().filter(name -> name.contains(flag)).findAny().orElse("");
+        try{
+            if (StrUtil.isNotEmpty(avatar)){
+//                response.addHeader( "Content-Disposition", "attachment;filename="+ URLEncoder.encode(avatar,"UTF-8"));
+//                response.setContentType("application/octet-stream");
+                // 获取文件的扩展名，判断文件类型
+                String fileType = FileUtil.extName(avatar).toLowerCase();
+
+                // 根据文件类型设置合适的 Content-Type
+                switch (fileType) {
+                    case "jpg":
+                    case "jpeg":
+                        response.setContentType("image/jpeg");
+                        break;
+                    case "png":
+                        response.setContentType("image/png");
+                        break;
+                    case "gif":
+                        response.setContentType("image/gif");
+                        break;
+                    case "pdf":
+                        response.setContentType("application/pdf");
+                        break;
+                    default:
+                        response.setContentType("application/octet-stream");
+                        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(avatar, "UTF-8"));
+                        break;
+                }
+                byte[] bytes = FileUtil.readBytes(uploadDir + avatar);
+                os = response.getOutputStream();
+                os.write(bytes);
+                os.flush();
+                os.close();
+            }
+
+        } catch (Exception e ){
+            System.out.println("文件下载失败");
+        };
+        return R.ok();
     }
 
 //    @PostMapping("/minioimage")
@@ -227,6 +264,17 @@ public class IssueTableController {
     }
 
     /**
+     * 获取当月问题总数
+     */
+    @RequestMapping("/totalIssue")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R gettotalIssue() {
+        List<IssueTableEntity> issues = issueTableService.listAll();
+        int totalIssue = issues.size();
+        return R.ok().put("totalIssue" ,totalIssue);
+    }
+
+    /**
      * 获取所有问题列表
      */
     @RequestMapping("/issuesid")
@@ -335,7 +383,7 @@ public class IssueTableController {
     @RequestMapping("/info/{issueId}")
     @RequiresPermissions("generator:issuetable:info")
     public R info(@PathVariable("issueId") Integer issueId){
-		IssueTableEntity issueTable = issueTableService.getById(issueId);
+        IssueTableEntity issueTable = issueTableService.getById(issueId);
 
         return R.ok().put("issueTable", issueTable);
     }
@@ -346,7 +394,7 @@ public class IssueTableController {
     @RequestMapping("/save")
     @RequiresPermissions("generator:issuetable:save")
     public R save(@RequestBody IssueTableEntity issueTable){
-		issueTableService.save(issueTable);
+        issueTableService.save(issueTable);
 
         return R.ok();
     }
@@ -359,7 +407,7 @@ public class IssueTableController {
     public R update(@RequestBody IssueTableEntity issueTable){
 
         System.out.println("开始修改整改数据"+issueTable);
-		issueTableService.updateById(issueTable);
+        issueTableService.updateById(issueTable);
         System.out.println("结束修改整改数据");
         return R.ok();
     }
@@ -371,7 +419,7 @@ public class IssueTableController {
     @RequiresPermissions("generator:issuetable:delete")
     public R delete(@RequestBody Integer[] issueIds){
         issueTableService.removeAll(issueIds);
-		issueTableService.removeByIds(Arrays.asList(issueIds));
+        issueTableService.removeByIds(Arrays.asList(issueIds));
 
         return R.ok();
     }

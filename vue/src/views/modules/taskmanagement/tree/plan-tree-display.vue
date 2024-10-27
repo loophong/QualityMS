@@ -1,5 +1,31 @@
 <template>
-  <div ref="treeChart" style="width: 100%; height: 500px;"></div>
+  <div>
+<!--    div 放到底层-->
+
+
+    <div style=" height: auto; width: auto; ">
+<!--      <el-col>-->
+<!--        <el-row style="color: #95a5a6; font-size: 20px; margin-bottom: 5px; width: 200px">● 未开始</el-row>-->
+<!--        <el-row style="color: #3498db; font-size: 20px; margin-bottom: 5px; width: 200px">● 进行中</el-row>-->
+<!--        <el-row style="color: #e67e22; font-size: 20px; margin-bottom: 5px; width: 200px">● 审批中</el-row>-->
+<!--        <el-row style="color: #2ecc71; font-size: 20px; margin-bottom: 5px; width: 200px">● 已完成</el-row>-->
+<!--        &lt;!&ndash;      <el-row style="color: #0BB2D4; font-size: 20px">● 红色代表已过期</el-row>&ndash;&gt;-->
+<!--      </el-col>-->
+      <el-row>
+        <el-col style="color: #95a5a6; font-size: 20px; margin-bottom: 5px; width: 200px">● 未开始</el-col>
+        <el-col style="color: #3498db; font-size: 20px; margin-bottom: 5px; width: 200px">● 进行中</el-col>
+        <el-col style="color: #e67e22; font-size: 20px; margin-bottom: 5px; width: 200px">● 审批中</el-col>
+        <el-col style="color: #2ecc71; font-size: 20px; margin-bottom: 5px; width: 200px">● 已完成</el-col>
+      </el-row>
+
+
+    </div>
+    <div ref="treeChart" style="width: 100%; height: 500px;">
+
+
+    </div>
+  </div>
+
 </template>
 
 <script>
@@ -143,7 +169,6 @@ export default {
       // svg.attr('transform', initialTransform).append("g");
 
 
-
       svg.selectAll('line.link')
         .data(root.links())
         .enter()
@@ -161,7 +186,6 @@ export default {
         .append('g')
         .attr('class', 'node')
         .attr('transform', d => `translate(${d.y},${d.x})`);
-
 
 
       // 根据指标等级设置矩形颜色

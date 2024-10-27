@@ -307,7 +307,51 @@ export default {
         this.dataListLoading = false
       })
     },
+    //消息提示
+    async handleTip() {
+      let registerList = [];
+      let examineList = [];
+      await this.$http({
+        url: this.$http.adornUrl('/qcSubject/registration/list'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'page': this.pageIndex,
+          'limit': 900000,
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          registerList = data.page.list
+        } else {
+          console.log('handleTip() error')
+        }
+      })
+      await this.$http({
+        url: this.$http.adornUrl('/qcManagement/examineStatus/list'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'page': this.pageIndex,
+          'limit': 900000,
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          examineList = data.page.list
+        } else {
+          console.log('handleTip() error')
+        }
+      })
+      examineList.forEach(item => {
+        if (item.qcExamineCurrent !== '完成') {
+          if (item.qcExamineCurrent == '1') {
+            this.$message({
+              message: '您有课题审核中，请及时处理',
+              type: 'warning',
+              duration: 1500
+            })
+          }
+        }
 
+      });
+    },
     // 获取我的课题数据列表
     async getSubjectList() {
       this.dataListLoading = true

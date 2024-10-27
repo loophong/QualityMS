@@ -11,13 +11,14 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getDataList()">查询</el-button>
-
-
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
               :disabled="dataListSelections.length != 1">课题重用</el-button> -->
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <el-badge :value="superScriptNumber" class="item">
+              <el-button type="warning" @click="dialogMessageVisible = true">消息详情</el-button>
+            </el-badge>
           </el-form-item>
         </el-form>
         <el-table :data="subjectDataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -57,15 +58,15 @@
           </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
-          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
             <template slot-scope="scope">
               <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
               <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
               <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
               <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
-              <span v-else>-</span> <!-- 处理未知状态 -->
+              <span v-else>-</span>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
@@ -142,6 +143,52 @@
     <!-- <el-tab-pane label="我的审核" name="3">
 
     </el-tab-pane> -->
+    <el-dialog title="消息详情" :visible.sync="dialogMessageVisible">
+      <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%;" row-key="id">
+        <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+        </el-table-column>
+        <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
+        </el-table-column>
+        <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column> -->
+        <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+        </el-table-column>
+        <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+        </el-table-column>
+        <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+        </el-table-column>
+        <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+        </el-table-column>
+        <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+        </el-table-column>
+        <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <template slot-scope="scope">
+            <span>{{ toStatus(scope.row.topicActivityStatus, scope.row.topicType) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+        </el-table-column>
+        <el-table-column prop="note" header-align="center" align="center" label="备注">
+        </el-table-column>
+        <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
+            <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
+            <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
+            <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
+            <span v-else>-</span> <!-- 处理未知状态 -->
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
+              @click="messagePlanHandle(scope.row.qcsrId)">关联计划</el-button>
+            <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
+              @click="messageExamineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
 
   </el-tabs>
 
@@ -154,6 +201,8 @@ export default {
   data() {
     return {
       activeName: '1',
+      dialogMessageVisible: false,
+      messageListLoading: false,
       dataForm: {
         key: ''
       },
@@ -173,7 +222,9 @@ export default {
         topicName: '',
         keywords: '',
       },
-      reuseStepId: ''
+      reuseStepId: '',
+      superScriptNumber: '',  //消息详情角标
+      messageList: [],  //消息详情角标
     }
   },
   components: {
@@ -182,6 +233,7 @@ export default {
   activated() {
     this.getGroupList()
     this.getSubjectList()
+    this.handleTip()
     // this.getGroupList().then(groupList => {
     //   this.groupMemberList = groupList;
     // });
@@ -340,18 +392,106 @@ export default {
           console.log('handleTip() error')
         }
       })
+      let tipList = [];
+      let tipSubjectList = [];
       examineList.forEach(item => {
         if (item.qcExamineCurrent !== '完成') {
-          if (item.qcExamineCurrent == '1') {
+          if ((item.qcExamineCurrent == '1' && this.isAuth('qcExamine:Achievement:recognition'))) {
+            tipList.push(item)
             this.$message({
-              message: '您有课题审核中，请及时处理',
+              message: '您有课题[成果认定]审核中，请及时处理',
               type: 'warning',
-              duration: 1500
+              duration: 5000
+            })
+          } else if (item.qcExamineCurrent == '2') {
+            registerList.forEach(row => {
+              if (row.qcsrId == item.qcExamineSubject) {
+                if ((row.resultType.includes('安全') && this.isAuth('qcExamine:interested:safety'))) {
+                  tipList.push(item)
+                  this.$message({
+                    message: '您有课题[相关方审核]审核中，请及时处理',
+                    type: 'warning',
+                    duration: 5000
+                  })
+                } else if ((row.resultType.includes('设备') && this.isAuth('qcExamine:interested:instrument'))) {
+                  tipList.push(item)
+                  this.$message({
+                    message: '您有课题[相关方审核]审核中，请及时处理',
+                    type: 'warning',
+                    duration: 5000
+                  })
+                } else if ((row.resultType.includes('质量') && this.isAuth('qcExamine:interested:quality'))) {
+                  tipList.push(item)
+                  this.$message({
+                    message: '您有课题[相关方审核]审核中，请及时处理',
+                    type: 'warning',
+                    duration: 5000
+                  })
+                } else if ((row.resultType.includes('生产') && this.isAuth('qcExamine:interested:production'))) {
+                  tipList.push(item)
+                  this.$message({
+                    message: '您有课题[相关方审核]审核中，请及时处理',
+                    type: 'warning',
+                    duration: 5000
+                  })
+                } else if ((row.resultType.includes('技术') && this.isAuth('qcExamine:interested:technology'))) {
+                  tipList.push(item)
+                  this.$message({
+                    message: '您有课题[相关方审核]审核中，请及时处理',
+                    type: 'warning',
+                    duration: 5000
+                  })
+                } else {
+                }
+              }
+            })
+          } else if ((item.qcExamineCurrent == '3' && this.isAuth('qcExamine:first:comment'))) {
+            tipList.push(item)
+            this.$message({
+              message: '您有课题[成果初评]审核中，请及时处理',
+              type: 'warning',
+              duration: 5000
+            })
+          } else if (((item.qcExamineCurrent == '4' || item.qcExamineCurrent == '4.2') && this.isAuth('qcExamine:second:comment'))) {
+            tipList.push(item)
+            console.log(item)
+            this.$message({
+              message: '您有课题[成果复评]审核中，请及时处理',
+              type: 'warning',
+              duration: 5000
+            })
+          } else if (((item.qcExamineCurrent == '4' || item.qcExamineCurrent == '4.1') && this.isAuth('qcExamine:second:comment'))) {
+            tipList.push(item)
+            this.$message({
+              message: '您有课题[财务部审核]审核中，请及时处理',
+              type: 'warning',
+              duration: 5000
+            })
+          } else if ((item.qcExamineCurrent == '5' && this.isAuth('qcExamine:final:submit'))) {
+            tipList.push(item)
+            this.$message({
+              message: '您有课题[终评提交]待完成，请及时处理',
+              type: 'warning',
+              duration: 5000
             })
           }
         }
-
       });
+      tipList.forEach(t => {
+        registerList.forEach(r => {
+          if (t.qcExamineSubject == r.qcsrId) {
+            tipSubjectList.push(r)
+          }
+        });
+      });
+      this.superScriptNumber = tipList.length
+      this.messageList = tipSubjectList
+      console.log('++++++++++')
+      console.log(tipSubjectList)
+      console.log('++++++++++')
+      console.log('----------')
+      console.log(tipList)
+      console.log('----------')
     },
     // 获取我的课题数据列表
     async getSubjectList() {
@@ -625,6 +765,25 @@ export default {
           }
         });
     },
+    //消息创建计划跳转
+    messagePlanHandle(id) {
+      this.dialogMessageVisible = false
+      let filteredArray = [];
+      // 遍历原始数组
+      for (let i = 0; i < this.messageList.length; i++) {
+        if (this.messageList[i].qcsrId === id) {
+          // 如果满足条件，将对象添加到新数组中
+          filteredArray.push(this.messageList[i]);
+        }
+      }
+      this.$router.push(
+        {
+          name: 'qcPlanNew',
+          query: {
+            data: JSON.stringify(filteredArray)
+          }
+        });
+    },
     //计划审批跳转
     examineStatus(id, resultType) {
       console.log(resultType)
@@ -636,12 +795,43 @@ export default {
           duration: 1500
         })
       } else {
+        this.dialogMessageVisible = false
         let filteredArray = [];
         // 遍历原始数组
         for (let i = 0; i < this.subjectDataList.length; i++) {
           if (this.subjectDataList[i].qcsrId === id) {
             // 如果满足条件，将对象添加到新数组中
             filteredArray.push(this.subjectDataList[i]);
+            console.log(filteredArray)
+          }
+        }
+        this.$router.push(
+          {
+            name: 'qcExamineStatus',
+            query: {
+              data: JSON.stringify(filteredArray)
+            }
+          });
+      }
+    },
+    //消息计划审批跳转
+    messageExamineStatus(id, resultType) {
+      console.log(resultType)
+      console.log(id)
+      if (resultType === null || resultType === '') {
+        this.$message({
+          message: '课题计划尚未提交',
+          type: 'warning',
+          duration: 1500
+        })
+      } else {
+        this.dialogMessageVisible = false
+        let filteredArray = [];
+        // 遍历原始数组
+        for (let i = 0; i < this.messageList.length; i++) {
+          if (this.messageList[i].qcsrId === id) {
+            // 如果满足条件，将对象添加到新数组中
+            filteredArray.push(this.messageList[i]);
             console.log(filteredArray)
           }
         }

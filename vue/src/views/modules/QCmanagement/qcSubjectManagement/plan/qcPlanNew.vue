@@ -2015,9 +2015,8 @@ export default {
           if (item.stageActualStart) {
             this.form.actualDate = [item.stageActualStart, item.stageActualEnd]
           }
-          if (item.stagePeople.includes(',')) {
-            const stringArray = this.form.stagePeople.split(',')
-            this.form.stagePeople = stringArray;
+          if (item.stagePeople) {
+            this.form.stagePeople = JSON.parse(item.stagePeople);
           } else {
             if (item.stagePeople !== 'null' || item.stagePeople !== '') {
               this.form.stagePeople = [item.stagePeople]
@@ -2227,8 +2226,6 @@ export default {
       console.log("图片地址：", docUrlWithToken);
     },
 
-
-
     initForm() {
       this.form = {
         stepId: 0,
@@ -2277,6 +2274,8 @@ export default {
     dataFormSubmit(id) {
       let tmpListString = []
       tmpListString = JSON.stringify(this.tmpAllList, null, 2)
+      const tmpStagePeople = JSON.stringify(this.form.stagePeople)
+      console.log(tmpStagePeople)
       this.$http({
         url: this.$http.adornUrl(`/qcPlan/step/${!this.form.stepId ? 'save' : 'update'}`),
         method: 'post',
@@ -2290,7 +2289,7 @@ export default {
           'stagePlanEnd': this.form.planDate[1],
           'stageActualStart': this.form.actualDate[0] ? this.form.actualDate[0] : undefined,
           'stageActualEnd': this.form.actualDate[1] ? this.form.actualDate[1] : undefined,
-          'stagePeople': this.form.stagePeople ? `${this.form.stagePeople}` : undefined,
+          'stagePeople': this.form.stagePeople ? tmpStagePeople : undefined,
           'stageDescribe': this.form.stageDescribe || undefined,
           'stageExtra': this.form.stageExtra || undefined,
           'stageBefore': this.form.stageBefore || undefined,

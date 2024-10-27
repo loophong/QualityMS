@@ -54,15 +54,14 @@
     <el-dialog title="相关方审核" :visible.sync="showDialog3">
       <el-form :model="form3">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
-          <el-select v-model="form3.result" placeholder=""
-            :disabled="!isAuth('qcExamine:interested:party') || dataList[1].status != 'B' || !ifSelected">
+          <el-select v-model="form3.result" placeholder="" :disabled="dataList[1].status != 'B' || !ifSelected">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form3.comment" autocomplete="off"
-            :disabled="!isAuth('qcExamine:interested:party') || dataList[1].status != 'B' || !ifSelected"></el-input>
+            :disabled="dataList[1].status != 'B' || !ifSelected"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

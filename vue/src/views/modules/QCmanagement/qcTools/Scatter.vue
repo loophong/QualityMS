@@ -30,7 +30,7 @@
                 <el-button type="primary" @click="modifyDataPoint">修改数据点</el-button>
                 <br>
                 <h3>删除选中数据</h3>
-                <select v-model="selectedIndex">
+                <select v-model="selectedIndex2">
                     <option v-for="(point, index) in dataPoints" :key="index" :value="index">
                         点{{ index + 1 }}: ({{ point[0] }}, {{ point[1] }})
                     </option>
@@ -88,6 +88,7 @@ export default {
             resultList: [],
             newDataPoint: { x: '', y: '' },
             selectedIndex: null,
+            selectedIndex2: null,
             modifiedDataPoint: { x: '', y: '' },
             deleteDataPoint: { x: '', y: '' }
         };
@@ -257,14 +258,14 @@ export default {
             }
         },
         deletePoint() {
-            const index = this.selectedIndex;
+            const index = this.selectedIndex2;
             if (index >= 0 && index < this.dataPoints.length) {
                 // 删除指定索引处的数据点
                 this.dataPoints.splice(index, 1);
                 // 更新图表
                 this.updateChart();
                 // 清空选择索引
-                this.selectedIndex = null;
+                this.selectedIndex2 = null;
             } else {
                 alert('无效的索引');
             }

@@ -116,9 +116,6 @@ export default {
     this.getGroupMemberData().then(groupList => {
       this.groupMemberList = groupList;
     });
-    // console.log('+++++++++++++++++++++++++++++++')
-    // console.log(this.isAuth('qcExamine:interested:technology'))
-    // console.log('+++++++++++++++++++++++++++++++')
   },
   methods: {
 

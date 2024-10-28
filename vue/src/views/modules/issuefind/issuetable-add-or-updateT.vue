@@ -737,7 +737,17 @@
         // 重置 vehicles 数组，只保留一个初始组合
         this.dataForm.vehicles = [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }]
         this.vehicleNumberOptions = []
-      }
+      },
+      getUserIdByUsername(username) {
+        for (const category of this.options) {
+          for (const auditor of category.options) {
+            if (auditor.label === username) { // 根据标签匹配
+              return auditor.value; // 返回对应的ID
+            }
+          }
+        }
+        return null; // 如果没有找到，返回null
+      },
 
     }
   }

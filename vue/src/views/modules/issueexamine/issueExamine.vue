@@ -165,11 +165,21 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       dataListSelections: [],
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      options: '',
     }
   },
   components: {
     AddOrUpdate
+  },
+  created() {
+    this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.options = data;
+      // console.log("所有的用户信息" ,data);
+    })
   },
   activated () {
     this.recigetDataList()
@@ -292,6 +302,36 @@ export default {
       this.auditIds = auditIds; // 保存审核的 ID 字符串
     },
 
+    // confirmAudit() {
+    //   // 发送审核请求
+    //   this.$http({
+    //     url: this.$http.adornUrl('/generator/issuemasktable/audit'),
+    //     method: 'post',
+    //     params: {
+    //       issuemaskIds: this.auditIds, // 传递逗号分隔的任务 ID
+    //       reviewerOpinion: this.reviewerOpinion, // 传递审核意见
+    //       result: this.auditResult // 传递审核结果
+    //     }
+    //   }).then(({ data }) => {
+    //     if (data && data.code === 0) {
+    //       this.$message({
+    //         message: '审核操作成功',
+    //         type: 'success',
+    //         duration: 1500,
+    //         onClose: () => {
+    //           this.recigetDataList();
+    //         }
+    //       });
+    //     } else {
+    //       this.$message.error(data.msg);
+    //     }
+    //   }).catch(error => {
+    //     this.$message.error('请求失败，请稍后重试');
+    //     console.error(error);
+    //   }).finally(() => {
+    //     this.auditDialogVisible = false; // 关闭弹窗
+    //   });
+    // }
     confirmAudit() {
       // 发送审核请求
       this.$http({
@@ -304,6 +344,10 @@ export default {
         }
       }).then(({ data }) => {
         if (data && data.code === 0) {
+          // 如果审核通过，发送消息通知
+          if (this.auditResult === 'approved') {
+            this.sendMessageNotification();
+          }
           this.$message({
             message: '审核操作成功',
             type: 'success',
@@ -321,44 +365,46 @@ export default {
       }).finally(() => {
         this.auditDialogVisible = false; // 关闭弹窗
       });
-    }
-    // auditHandle (id) {
-    //   var ids = id ? [id] : this.dataListSelections.map(item => {
-    //     return item.issuemaskId
-    //   })
-    //   this.$confirm(`确定审核?`, '提示', {
-    //     confirmButtonText: '确定',
-    //     cancelButtonText: '取消',
-    //     type: 'warning'
-    //   }).then(() => {
-    //     this.$http({
-    //       url: this.$http.adornUrl('/generator/issuemasktable/audit'),
-    //       method: 'post',
-    //       data: this.$http.adornData(ids, false)
-    //     }).then(({data}) => {
-    //       if (data && data.code === 0) {
-    //         this.$message({
-    //           message: '操作成功',
-    //           type: 'success',
-    //           duration: 1500,
-    //           onClose: () => {
-    //             this.recigetDataList();
-    //           }
-    //         });
-    //       } else {
-    //         this.$message.error(data.msg);
-    //       }
-    //     }).catch(error => {
-    //       this.$message.error('请求失败，请稍后重试');
-    //       console.error(error);
-    //     });
-    //   }).catch(() => {
-    //     this.$message({
-    //       type: 'info',
-    //       message: '已取消'
-    //     });
-    //   });
-    // }
+    },
+
+    sendMessageNotification() {
+      const receivers = this.dataListSelections.map(item => item.recipients); // 获取选中任务的接收人
+      const senderId = this.getUserIdByUsername(this.dataList[0].creator); // 获取发起人ID
+      console.log("发送人的id为 ：" ,senderId);
+
+      // 遍历接收人，发送消息通知
+      receivers.forEach(receiverId => {
+        const messageNotification = {
+          receiverId: this.getUserIdByUsername(receiverId), // 根据映射获取接收人ID
+          senderId: senderId, // 发起人ID
+          content: '您有新的任务需要执行！', // 消息内容
+          type: '任务执行通知' // 消息类型
+        };
+
+        this.$http({
+          url: this.$http.adornUrl('/notice/save'),
+          method: 'post',
+          data: messageNotification
+        }).then(({ data }) => {
+          if (data && data.code !== 0) {
+            console.error('消息通知发送失败:', data.msg);
+          }
+        });
+      });
+    },
+    getUserIdByUsername(username) {
+      for (const category of this.options) {
+        for (const auditor of category.options) {
+          if (auditor.label === username) { // 根据标签匹配
+            return auditor.value; // 返回对应的ID
+          }
+        }
+      }
+      return null; // 如果没有找到，返回null
+    },
+
+
+
   }
 }
 </script>

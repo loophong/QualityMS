@@ -1750,7 +1750,7 @@
       </div>
     </el-dialog>
     <el-dialog title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible" width="80%">
-      <div>
+      <div style="width: 100%; height: 100%;">
         <fish-bone ref="fishBone"></fish-bone>
       </div>
     </el-dialog>
@@ -1880,7 +1880,8 @@ export default {
         stageAfter: '',
         stageExtra: '',
         stageConsolidate: '',
-        stepFile: ''
+        stepFile: '',
+        stepAttachment: '',
       },
 
       participantOptions: [
@@ -2039,6 +2040,7 @@ export default {
           if (item.stageAttachment) {
             const tmp = JSON.parse(item.stageAttachment)
             this.uploadAllList = tmp
+            this.form.stepAttachment = item.stageAttachment
           }
           break;
         }
@@ -2265,9 +2267,10 @@ export default {
     // 表单提交
     dataFormSubmit(id) {
       let tmpListString = []
-      tmpListString = JSON.stringify(this.tmpAllList, null, 2)
+      if(this.tmpAllList.length){
+        tmpListString = JSON.stringify(this.tmpAllList)
+      }
       const tmpStagePeople = JSON.stringify(this.form.stagePeople)
-      console.log(tmpStagePeople)
       this.$http({
         url: this.$http.adornUrl(`/qcPlan/step/${!this.form.stepId ? 'save' : 'update'}`),
         method: 'post',
@@ -2287,7 +2290,7 @@ export default {
           'stageBefore': this.form.stageBefore || undefined,
           'stageAfter': this.form.stageAfter || undefined,
           'stageConsolidate': this.form.stageConsolidate || undefined,
-          'stageAttachment': tmpListString || undefined,
+          'stageAttachment': this.tmpAllList.length ? tmpListString : this.form.stepAttachment,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {

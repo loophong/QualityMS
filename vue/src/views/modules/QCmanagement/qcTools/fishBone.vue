@@ -1,12 +1,12 @@
 <template>
   <div>
-    <span>
+    <div>
       <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
       <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
-    </span>
+    </div>
     <div class="button-container">
       <el-form>
         <el-form-item>
@@ -320,12 +320,11 @@ export default {
   justify-content: center;
   align-items: center;
   width: 1000px;
-  height: 600px;
+  height: 500px;
   margin: 40px auto;
 }
 
 .button-container {
-  position: absolute;
   top: 50px;
   left: 20px;
   padding: 10px;

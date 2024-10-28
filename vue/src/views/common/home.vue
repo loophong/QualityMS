@@ -72,7 +72,7 @@
           <div class="no-hd">
             <ul>
               <li>{{ indicatorCounts }}</li>
-              <li>{{ totalIssue }}</li>
+              <li>{{ planCounts }}</li>
               <li>{{ totalIssue }}</li>
             </ul>
           </div>

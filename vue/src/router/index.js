@@ -145,6 +145,13 @@ const mainRoutes = {
     //   name: route => `indicatorchart-${route.params.indicatorName}`, // 动态生成name
     //   meta: { title: '指标详情', isTab: true }
     // }
+    //消息通知
+    {
+      path: '/toNotice',
+      component: _import('modules/notice/messagenotification'),
+      name: 'toNotice',
+      meta: { title: '消息通知', isDynamic: true, isTab: false }
+    },
 
   ],
   beforeEnter(to, from, next) {

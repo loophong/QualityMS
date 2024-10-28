@@ -441,7 +441,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         Map<String, Integer> statistics = new HashMap<>();
 
         // 定义可能的验证结论状态
-        List<String> verificationConclusions = Arrays.asList("暂停", "未完成", "已完成", "结项");
+        List<String> verificationConclusions = Arrays.asList("暂停", "已完成", "结项");
 
         // 获取当前月份起止日期
         String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
@@ -728,6 +728,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         queryWrapper.and(wrapper ->
                         wrapper.isNull("verification_conclusion")
                                 .or().eq("verification_conclusion", "")
+                                .or().like("verification_conclusion", "未完成")
                 )
                 .ge("creation_time", startDate)
                 .le("creation_time", endDate);

@@ -6,6 +6,7 @@ import io.renren.modules.notice.entity.CreateNoticeParams;
 import io.renren.modules.notice.entity.MessageNotificationEntity;
 
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,5 +23,8 @@ public interface MessageNotificationService extends IService<MessageNotification
     PageUtils queryPageMyNoticeList(Map<String, Object> params, Long userId);
 
     Boolean sendMessages(CreateNoticeParams params);
+
+    int getUnreadNotices(Long userId);
+
 }
 

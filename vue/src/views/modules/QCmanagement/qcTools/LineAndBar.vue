@@ -24,6 +24,7 @@
       <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
     </span>
 
+    
     <el-dialog title="模版名" :visible.sync="dialogFormVisible">
       <el-input v-model="inputName" placeholder="请输入模版名" style="width:50%"></el-input>
       <div slot="footer" class="dialog-footer">

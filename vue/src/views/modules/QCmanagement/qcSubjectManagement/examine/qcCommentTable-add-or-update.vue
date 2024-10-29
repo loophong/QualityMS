@@ -2,9 +2,9 @@
   <el-dialog :title="!dataForm.qcTableId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
       label-width="80px">
-      <el-form-item label="类型" prop="tableType">
+      <!-- <el-form-item label="类型" prop="tableType">
         <el-input v-model="dataForm.tableType" placeholder="类型"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="标题编号" prop="tableNumber">
         <el-input v-model="dataForm.tableNumber" placeholder="标题编号"></el-input>
       </el-form-item>
@@ -12,7 +12,7 @@
         <el-input v-model="dataForm.tableTag" placeholder="标题内容"></el-input>
       </el-form-item>
       <el-form-item label="评审内容" prop="tableComment">
-        <el-input type="textarea" v-model="dataForm.tableComment" placeholder="评审内容"></el-input>
+        <el-input type="textarea" :rows="6" v-model="dataForm.tableComment" placeholder="评审内容"></el-input>
       </el-form-item>
       <!-- <el-form-item label="备注" prop="tableExtra">
         <el-input v-model="dataForm.tableExtra" placeholder="备注"></el-input>
@@ -89,6 +89,7 @@ export default {
             method: 'post',
             data: this.$http.adornData({
               'qcTableId': this.dataForm.qcTableId || undefined,
+              'tableNumber': this.dataForm.tableNumber,
               'tableTag': this.dataForm.tableTag,
               'tableComment': JSON.stringify(this.dataForm.tableComment),
               // 'tableExtra': this.dataForm.tableExtra

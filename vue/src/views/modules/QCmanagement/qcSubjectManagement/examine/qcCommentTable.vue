@@ -1,13 +1,12 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-
+    <!-- <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
         <el-button v-if="isAuth('qc:table:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
-    </el-form>
+    </el-form> -->
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-      style="width: 100%;">
+      style="width: 100%;" stripe>
       <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column> -->
       <!-- <el-table-column prop="qcTableId" header-align="center" align="center" label="主键id">

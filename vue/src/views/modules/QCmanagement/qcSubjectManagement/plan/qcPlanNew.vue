@@ -1750,7 +1750,7 @@
       </div>
     </el-dialog>
     <el-dialog title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible" width="80%">
-      <div>
+      <div style="width: 100%; height: 100%;">
         <fish-bone ref="fishBone"></fish-bone>
       </div>
     </el-dialog>
@@ -1880,7 +1880,8 @@ export default {
         stageAfter: '',
         stageExtra: '',
         stageConsolidate: '',
-        stepFile: ''
+        stepFile: '',
+        stepAttachment: '',
       },
 
       participantOptions: [
@@ -2039,6 +2040,7 @@ export default {
           if (item.stageAttachment) {
             const tmp = JSON.parse(item.stageAttachment)
             this.uploadAllList = tmp
+            this.form.stepAttachment = item.stageAttachment
           }
           break;
         }
@@ -2169,7 +2171,7 @@ export default {
       let file2 = file;
       formData.append('file', file); // 将文件添加到 FormData
       this.$http({
-        url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        url: this.$http.adornUrl('/generator/issuetable/upload'), // 替换为实际上传接口
         method: 'post',
         data: formData,
         headers: {
@@ -2204,27 +2206,19 @@ export default {
       });
     },
     //文件预览
-    previewDoc(docUrl) {
-      console.log(docUrl)
-      // 获取当前的 token，假设它存储在 localStorage 中
-      const token = this.$cookie.get('token');
-      if (token) {
-        console.log('Token found:', token);
-      } else {
-        console.error('Token not found!');
-      }
-
-
-      // 将 token 作为参数添加到 URL
-      const docUrlWithToken = `${docUrl}?token=${token}`;
-
-      console.log("cur docUrl====>", docUrlWithToken);
-
-      // 打开包含 token 的图片地址
-      window.open(docUrlWithToken);
-
-      console.log("图片地址：", docUrlWithToken);
+    previewDoc(fileflag) {
+      const token = this.$cookie.get('token'); // 获取当前的 token
+        if (!token) {
+          console.error('Token not found!');
+          return;
+        }
+        console.log('获取的地址 ' ,fileflag)
+        // 拼接带有 token 的请求地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+          window.open(url);
     },
+
+
 
     initForm() {
       this.form = {
@@ -2273,9 +2267,10 @@ export default {
     // 表单提交
     dataFormSubmit(id) {
       let tmpListString = []
-      tmpListString = JSON.stringify(this.tmpAllList, null, 2)
+      if(this.tmpAllList.length){
+        tmpListString = JSON.stringify(this.tmpAllList)
+      }
       const tmpStagePeople = JSON.stringify(this.form.stagePeople)
-      console.log(tmpStagePeople)
       this.$http({
         url: this.$http.adornUrl(`/qcPlan/step/${!this.form.stepId ? 'save' : 'update'}`),
         method: 'post',
@@ -2295,7 +2290,7 @@ export default {
           'stageBefore': this.form.stageBefore || undefined,
           'stageAfter': this.form.stageAfter || undefined,
           'stageConsolidate': this.form.stageConsolidate || undefined,
-          'stageAttachment': tmpListString || undefined,
+          'stageAttachment': this.tmpAllList.length ? tmpListString : this.form.stepAttachment,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {

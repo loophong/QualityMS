@@ -137,7 +137,7 @@
                   :src="getImageUrl(scope.row.issuePhoto)"
                   alt="问题照片"
                   style="width: 100px; height: auto; cursor: pointer;"
-                  @click="handleFileAction(scope.row.issuePhoto)"
+                  @click="handleFileAction(scope.row.issuePhoto ,scope.row.issueId)"
                 />
               </template>
             </el-table-column>
@@ -290,7 +290,7 @@
                   :src="getImageUrl(scope.row.issuePhoto)"
                   alt="问题照片"
                   style="width: 100px; height: auto; cursor: pointer;"
-                  @click="handleFileAction(scope.row.issuePhoto)"
+                  @click="handleFileAction(scope.row.issuePhoto ,scope.row.issueId)"
                 />
               </template>
             </el-table-column>

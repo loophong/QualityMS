@@ -51,9 +51,23 @@
           </el-table-column>
           <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
           </el-table-column>
-          <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">
+<!--          <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
+<!--            <template slot-scope="scope">-->
+<!--              <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="issuePhoto"
+            header-align="center"
+            align="center"
+            label="问题照片">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>
+              <img
+                :src="getImageUrl(scope.row.issuePhoto)"
+                alt="问题照片"
+                style="width: 100px; height: auto; cursor: pointer;"
+                @click="handleFileAction(scope.row.issuePhoto ,scope.row.issueId)"
+              />
             </template>
           </el-table-column>
           <el-table-column prop="rectificationRequirement" header-align="center" align="center" label="整改要求">
@@ -108,9 +122,23 @@
             <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
             </el-table-column>
 
-            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">
+<!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
+<!--              <template slot-scope="scope">-->
+<!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+<!--              </template>-->
+<!--            </el-table-column>-->
+            <el-table-column
+              prop="issuePhoto"
+              header-align="center"
+              align="center"
+              label="问题照片">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>
+                <img
+                  :src="getImageUrl(scope.row.issuePhoto)"
+                  alt="问题照片"
+                  style="width: 100px; height: auto; cursor: pointer;"
+                  @click="handleFileAction(scope.row.issuePhoto)"
+                />
               </template>
             </el-table-column>
             <el-table-column prop="rectificationRequirement" header-align="center" align="center" label="整改要求">
@@ -159,10 +187,24 @@
             </el-table-column>
             <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
             </el-table-column>
-            <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">
+<!--            <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">-->
+<!--              <template slot-scope="scope">-->
+<!--                <el-button type="text" size="small"-->
+<!--                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
+<!--              </template>-->
+<!--            </el-table-column>-->
+            <el-table-column
+              prop="rectificationPhotoDeliverable"
+              header-align="center"
+              align="center"
+              label="整改照片交付物">
               <template slot-scope="scope">
-                <el-button type="text" size="small"
-                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+                <img
+                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"
+                  alt="整改照片交付物"
+                  style="width: 100px; height: auto; cursor: pointer;"
+                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"
+                />
               </template>
             </el-table-column>
             <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
@@ -233,9 +275,23 @@
             <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
             </el-table-column>
 
-            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">
+<!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
+<!--              <template slot-scope="scope">-->
+<!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+<!--              </template>-->
+<!--            </el-table-column>-->
+            <el-table-column
+              prop="issuePhoto"
+              header-align="center"
+              align="center"
+              label="问题照片">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>
+                <img
+                  :src="getImageUrl(scope.row.issuePhoto)"
+                  alt="问题照片"
+                  style="width: 100px; height: auto; cursor: pointer;"
+                  @click="handleFileAction(scope.row.issuePhoto)"
+                />
               </template>
             </el-table-column>
             <!--      <el-table-column-->
@@ -290,70 +346,24 @@
             </el-table-column>
             <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
             </el-table-column>
-            <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">
+            <el-table-column
+              prop="rectificationPhotoDeliverable"
+              header-align="center"
+              align="center"
+              label="整改照片交付物">
               <template slot-scope="scope">
-                <el-button type="text" size="small"
-                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+                <img
+                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"
+                  alt="整改照片交付物"
+                  style="width: 100px; height: auto; cursor: pointer;"
+                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable,scope.row.issueId)"
+                />
               </template>
             </el-table-column>
             <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
             </el-table-column>
-            <!--      <el-table-column-->
-            <!--        prop="requiredSecondRectificationTime"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="要求二次整改时间">-->
-            <!--      </el-table-column>-->
-            <!--      <el-table-column-->
-            <!--        prop="remark"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="备注">-->
-            <!--      </el-table-column>-->
-            <!--      <el-table-column-->
-            <!--        prop="creator"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="创建人">-->
-            <!--      </el-table-column>-->
-            <!--      <el-table-column-->
-            <!--        prop="creationTime"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="创建时间">-->
-            <!--      </el-table-column>-->
-            <!--      <el-table-column-->
-            <!--        prop="lastModifier"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="最后修改人">-->
-            <!--      </el-table-column>-->
-            <!--      <el-table-column-->
-            <!--        prop="lastModificationTime"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="最后修改时间">-->
-            <!--      </el-table-column>-->
             <el-table-column prop="associatedIssueAddition" header-align="center" align="center" label="关联问题整改记录">
             </el-table-column>
-            <!--      <el-table-column-->
-            <!--        prop="associatedIssueAddition"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="关联问题添加">-->
-            <!--      </el-table-column>-->
-            <!--      <el-table-column-->
-            <!--        prop="creationDuration"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="创建时长">-->
-            <!--      </el-table-column>-->
-            <!--            <el-table-column-->
-            <!--              prop="rectificationVerificationStatus"-->
-            <!--              header-align="center"-->
-            <!--              align="center"-->
-            <!--              label="整改验证情况">-->
-            <!--            </el-table-column>-->
             <el-table-column prop="rectificationVerificationStatus" header-align="center" align="center" label="整改验证情况">
               <template slot-scope="scope">
                 <div
@@ -386,12 +396,6 @@
             </el-table-column>
             <el-table-column prop="verifier" header-align="center" align="center" label="验证人">
             </el-table-column>
-            <!--      <el-table-column-->
-            <!--        prop="formula"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="公式">-->
-            <!--      </el-table-column>-->
             <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
               <template slot-scope="scope">
                 <el-button type="text" size="small" @click="checkStateAndHandle(scope.row)">验证记录</el-button>
@@ -470,19 +474,34 @@ export default {
     this.getDataList()
   },
   methods: {
-    handleFileAction(fileflag) {
+    getImageUrl(fileflag) {
+      const token = this.$cookie.get('token'); // 获取当前的 token
+      if (!token) {
+        console.error('Token not found!');
+        return '';
+      }
+      return `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+    },
+    handleFileAction(fileflag, id) {
       const token = this.$cookie.get('token'); // 获取当前的 token
       if (!token) {
         console.error('Token not found!');
         return;
       }
-      console.log('获取的地址 ' ,fileflag)
-      // 拼接带有 token 的请求地址
-      const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
 
-      window.open(url);
-
+      if (!fileflag) {
+        // 如果没有 issuePhoto，弹出添加图片的弹窗
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.addPhoto(id)
+        }); // 显示添加图片的弹窗
+      } else {
+        // 拼接带有 token 的请求地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+        window.open(url);
+      }
     },
+
     getStates(verificationConclusion) {
       if (!verificationConclusion) return [];
       // 按照逗号分隔，并去除多余的空格

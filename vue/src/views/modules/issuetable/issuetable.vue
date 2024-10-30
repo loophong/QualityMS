@@ -128,13 +128,27 @@
         align="center"
         label="问题描述">
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="issuePhoto"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="问题照片">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="issuePhoto"
         header-align="center"
         align="center"
         label="问题照片">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>
+          <img
+            :src="getImageUrl(scope.row.issuePhoto)"
+            alt="问题照片"
+            style="width: 100px; height: auto; cursor: pointer;"
+            @click="handleFileAction(scope.row.issuePhoto)"
+          />
         </template>
       </el-table-column>
       <el-table-column
@@ -177,13 +191,27 @@
         align="center"
         label="实际完成时间">
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="rectificationPhotoDeliverable"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="整改照片交付物">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="rectificationPhotoDeliverable"
         header-align="center"
         align="center"
         label="整改照片交付物">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+          <img
+            :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"
+            alt="整改照片交付物"
+            style="width: 100px; height: auto; cursor: pointer;"
+            @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"
+          />
         </template>
       </el-table-column>
       <el-table-column
@@ -407,6 +435,14 @@
       this.fetchData()
     },
     methods: {
+      getImageUrl(fileflag) {
+        const token = this.$cookie.get('token'); // 获取当前的 token
+        if (!token) {
+          console.error('Token not found!');
+          return '';
+        }
+        return `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+      },
       handleFileAction(fileflag) {
         const token = this.$cookie.get('token'); // 获取当前的 token
         if (!token) {

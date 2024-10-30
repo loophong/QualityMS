@@ -293,6 +293,29 @@
       </span>
     </el-dialog>
     <el-dialog
+      title="添加图片"
+      :visible.sync="addImageDialogVisible"
+      width="30%">
+      <el-form ref="dataForm" :model="dataForm">
+        <el-form-item label="上传图片">
+          <el-upload
+            :before-upload="beforeUpload"
+            :on-change="handleFileChange"
+            :show-file-list="false"
+            :auto-upload="false"
+            accept="image/*"> <!-- 限制上传类型为图片 -->
+            <el-button size="small" type="primary">选择文件</el-button>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="addPhotoSubmit ()">确认</el-button>
+        <el-button @click="addImageDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
+
+
+    <el-dialog
       :title="'请选择日期'"
       :close-on-click-modal="false"
       :visible.sync="retimevisible">
@@ -319,6 +342,7 @@
         <el-button @click="retimevisible = false">关闭</el-button>
       </span>
     </el-dialog>
+
   </div>
 </template>
 
@@ -328,6 +352,7 @@
   export default {
     data () {
       return {
+        addImageDialogVisible: false,
         selectedResponsiblePersons: [], // 存放选中的责任人ID
         bloburl: '',
         imageurl: '',
@@ -506,10 +531,10 @@
         this.uploadingFile = file.raw; // 获取 File 对象
         this.uploadFile1(file.raw); // 调用上传方法
       },
-      imageload() {
-        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`);
-        this.visibleUpload = true; // 打开上传对话框
-      },
+      // imageload() {
+      //   this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`);
+      //   this.visibleUpload = true; // 打开上传对话框
+      // },
       // 上传之前
       beforeUploadHandle(file) {
         if (file.type !== 'image/jpg' && file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
@@ -732,6 +757,55 @@
             })
           }
         })
+      },
+      addPhoto (id) {
+        this.dataForm.issueId = id
+        this.addImageDialogVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields()
+          if (this.dataForm.issueId) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.dataForm.serialNumber = data.issueTable.serialNumber
+                this.dataForm.issueNumber = data.issueTable.issueNumber
+                this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
+                this.dataForm.inspectionDate = data.issueTable.inspectionDate
+                this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
+                this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
+                this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
+                this.dataForm.issueDescription = data.issueTable.issueDescription
+                this.dataForm.issuePhoto = data.issueTable.issuePhoto
+                this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+                this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
+                this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
+                this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
+                this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+                this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
+                this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
+                this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
+                this.dataForm.remark = data.issueTable.remark
+                this.dataForm.creator = data.issueTable.creator
+                this.dataForm.creationTime = data.issueTable.creationTime
+                this.dataForm.lastModifier = data.issueTable.lastModifier
+                this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
+                this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
+                this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
+                this.dataForm.creationDuration = data.issueTable.creationDuration
+                this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
+                this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
+                this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
+                this.dataForm.verifier = data.issueTable.verifier
+                this.dataForm.formula = data.issueTable.formula
+              }
+
+            })
+          }
+        })
+        console.log('数据+++' ,this.dataForm)
       },
       init (id) {
         this.fetchuserinform() //获取用户名
@@ -1121,6 +1195,7 @@
       },
       // 表单提交
       submitFormreuse() {
+        this.fetchuserinform()
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
@@ -1148,26 +1223,7 @@
                 'rectificationRequirement': this.dataForm.rectificationRequirement,
                 'requiredCompletionTime': this.dataForm.requiredCompletionTime,
                 'responsibleDepartment': this.dataForm.responsibleDepartment,
-                // 'rectificationStatus': this.dataForm.rectificationStatus,
-                // 'actualCompletionTime': this.dataForm.actualCompletionTime,
-                // 'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,
-                // 'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
-                // 'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
-                // 'remark': this.dataForm.remark,
-                // 'creator': this.dataForm.creator,
-                // 'creationTime': this.dataForm.creationTime,
-                // 'lastModifier': this.dataForm.lastModifier,
-                // 'lastModificationTime': this.dataForm.lastModificationTime,
-                // 'associatedRectificationRecords': this.dataForm.associatedRectificationRecords,
-                // 'associatedIssueAddition': this.dataForm.associatedIssueIds.join(','), // 将数组转换为逗号分隔的字符串
-                // 'creationDuration': this.dataForm.creationDuration,
-                // 'causeAnalysis': this.dataForm.causeAnalysis,
-                // 'rectificationVerificationStatus':this.dataForm.rectificationVerificationStatus,
-                // 'verificationConclusion': this.dataForm.verificationConclusion,
-                // 'verifier': this.dataForm.verifier,
-                // 'level': this.dataForm.level,
-                // 'state': this.dataForm.state,
-                // 'formula': this.dataForm.formula
+                'creator':this.dataForm.creator,
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -1190,6 +1246,65 @@
         // 重置 vehicles 数组，只保留一个初始组合
         this.dataForm.vehicles = [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }]
         this.vehicleNumberOptions = []
+      },
+      // 新图提交
+      addPhotoSubmit () {
+        this.addImageDialogVisible = false
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/generator/issuetable/update`),
+              method: 'post',
+              data: this.$http.adornData({
+                'issueId': this.dataForm.issueId || undefined,
+                'serialNumber': this.dataForm.serialNumber,
+                'issueNumber': this.dataForm.issueNumber,
+                'inspectionDepartment': this.dataForm.inspectionDepartment,
+                'inspectionDate': this.dataForm.inspectionDate,
+                'issueCategoryId': this.dataForm.issueCategoryId,
+                'vehicleTypeId': this.dataForm.vehicleTypeId,
+                'vehicleNumberId': this.dataForm.vehicleNumberId,
+                'issueDescription': this.dataForm.issueDescription,
+                'issuePhoto': this.dataForm.issuePhoto,
+                'rectificationRequirement': this.dataForm.rectificationRequirement,
+                'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+                'responsibleDepartment': this.dataForm.responsibleDepartment,
+                'rectificationStatus': this.dataForm.rectificationStatus,
+                'actualCompletionTime': this.dataForm.actualCompletionTime,
+                'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,
+                'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+                'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
+                'remark': this.dataForm.remark,
+                'creator': this.dataForm.creator,
+                'creationTime': this.dataForm.creationTime,
+                'lastModifier': this.dataForm.lastModifier,
+                'lastModificationTime': this.dataForm.lastModificationTime,
+                'associatedRectificationRecords': this.dataForm.associatedRectificationRecords,
+                'associatedIssueAddition': this.dataForm.associatedIssueAddition,
+                'creationDuration': this.dataForm.creationDuration,
+                'causeAnalysis': this.dataForm.causeAnalysis,
+                'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
+                'verificationConclusion': this.dataForm.verificationConclusion,
+                'verifier': this.dataForm.verifier,
+                'formula': this.dataForm.formula
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
+        })
       },
 
     }

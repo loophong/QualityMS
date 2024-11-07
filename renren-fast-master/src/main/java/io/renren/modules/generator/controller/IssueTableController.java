@@ -9,6 +9,7 @@ import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.entity.IssueUtils;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.generator.service.MinioService;
+import org.apache.http.HttpStatus;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,6 +172,59 @@ public class IssueTableController {
 //        }
 //    }
 
+    /**
+     * 检查车号和问题类别是否重复
+     */
+//    @RequestMapping("/checkDuplicateIssue")
+//    @RequiresPermissions("generator:issuetable:list")
+//    public R checkDuplicateIssue(@RequestBody Map<String, List<String>> params) {
+//        List<String> vehicleNumbers = params.get("vehicleNumbers");
+//        List<String> issueCategoryIds = params.get("issueCategoryIds");
+//
+//        System.out.println("开始检查车号和问题类别是否重复1");
+//        if (vehicleNumbers == null || issueCategoryIds == null) {
+//            return R.error("缺少参数: vehicleNumbers 或 issueCategoryIds");
+//        }
+//
+//        // 调用服务层方法检查是否有重复的车号和问题类别
+//        boolean isDuplicate = issueTableService.checkDuplicateIssue(vehicleNumbers, issueCategoryIds);
+//
+//        if (isDuplicate) {
+//            return R.error("此车已发生过相同问题");
+//        }
+//
+//        return R.ok();
+//    }
+    @RequestMapping("/checkDuplicateIssue")
+    @RequiresPermissions("generator:issuetable:list")
+    public R checkDuplicateIssue(@RequestBody Map<String, Object> params) {
+
+        // 获取前端传递的车号列表和问题类别ID字符串
+        List<String> vehicleNumbers = (List<String>) params.get("vehicleNumbers"); // 车号是一个数组
+        String issueCategoryIds = (String) params.get("issueCategoryId"); // 问题类别ID是一个字符串
+
+        System.out.println("开始检查车号和问题类别是否重复"+issueCategoryIds+","+vehicleNumbers);
+
+        // 参数校验
+        if (vehicleNumbers == null || issueCategoryIds == null) {
+            return R.error("缺少参数: vehicleNumbers 或 issueCategoryId");
+        }
+
+        // 将问题类别ID的字符串按逗号分割成列表
+//        List<String> issueCategoryIdList = Arrays.asList(issueCategoryIds.split(",")); // 将逗号分隔的字符串转为列表
+
+        // 调用服务层方法检查是否有重复的车号和问题类别
+        boolean isDuplicate = issueTableService.checkDuplicateIssue(vehicleNumbers, issueCategoryIds);
+        System.out.println("结束检查车号和问题类别是否重复"+isDuplicate);
+        if (isDuplicate) {
+            return R.error("此车已发生过相同问题");
+        }
+
+        return R.ok();
+    }
+
+
+
 
     /**
      * Excel上传
@@ -238,7 +292,7 @@ public class IssueTableController {
     }
 
     /**
-     * 获取当月问题统计
+     * 获取问题统计
      */
     @RequestMapping("/currentMonth")
     @RequiresPermissions("generator:issuetable:list") // 权限控制
@@ -369,12 +423,23 @@ public class IssueTableController {
     /**
      * 信息
      */
+    @RequestMapping("/infoByassociate/{associatedRectificationRecords}")
+    @RequiresPermissions("generator:issuetable:info")
+    public R infoByassociate(@PathVariable("associatedRectificationRecords") String associatedRectificationRecords){
+        IssueTableEntity issueTable = issueTableService.getByassociate(associatedRectificationRecords);
+//        System.out.println("获取关联问题+" + issueTable);
+        return R.ok().put("issueTable", issueTable);
+    }
+
+    /**
+     * 信息
+     */
     @RequestMapping("/infoByIssueNumber/{issueNumber}")
     @RequiresPermissions("generator:issuetable:info")
     public R infoBynumber(@PathVariable("issueNumber") String issueNumber){
-        System.out.println("开始获取+++++++++++++++++++++++++++++");
+//        System.out.println("开始获取+++++++++++++++++++++++++++++");
         IssueTableEntity issueTable = issueTableService.getByissueNumber(issueNumber);
-        System.out.println("获取问题为："+issueTable);
+//        System.out.println("获取问题为："+issueTable);
         return R.ok().put("issueTable", issueTable);
     }
 

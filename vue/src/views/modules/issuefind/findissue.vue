@@ -24,6 +24,10 @@
                        @click="addOrUpdateHandle()">新增</el-button>
             <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
                        :disabled="dataListSelections.length <= 0">批量删除</el-button>
+            <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
+                       @click="openRegistration()">课题登记</el-button>
+            <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
+                       @click="openTools()">QC工具</el-button>
           </el-form-item>
           <el-form-item>
             <el-upload class="upload-demo" :before-upload="beforeUpload" :show-file-list="false"
@@ -517,25 +521,25 @@ export default {
       })
     },
     handleRectificationRecords(issueNumber, issueId) {
-      this.$http({
-        url: this.$http.adornUrl('/generator/issuemasktable/records'),
-        method: 'post',
-        params: this.$http.adornParams({ issueNumber: issueNumber })
-      }).then(({ data }) => {
-        console.log("返回数据：", data)
-        if (data && data.msg === 'success') {
-          console.log('整改得到的id为', issueId)
-          // 操作成功后触发addOrUpdateHandle
-          this.addOrUpdateHandleR(issueId)
-        } else if (data && data.msg === 'error') {
-          this.$message.error('任务未全部完成')
-        } else {
-          this.$message.error('操作失败')
-        }
-      }).catch(() => {
-        this.$message.error('请求失败')
-      })
-
+      // this.$http({
+      //   url: this.$http.adornUrl('/generator/issuemasktable/records'),
+      //   method: 'post',
+      //   params: this.$http.adornParams({ issueNumber: issueNumber })
+      // }).then(({ data }) => {
+      //   console.log("返回数据：", data)
+      //   if (data && data.msg === 'success') {
+      //     console.log('整改得到的id为', issueId)
+      //     // 操作成功后触发addOrUpdateHandle
+      //
+      //   } else if (data && data.msg === 'error') {
+      //     this.$message.error('任务未全部完成')
+      //   } else {
+      //     this.$message.error('操作失败')
+      //   }
+      // }).catch(() => {
+      //   this.$message.error('请求失败')
+      // })
+      this.addOrUpdateHandleR(issueId)
     },
     // 在上传前的检查
     beforeUpload(file) {
@@ -715,7 +719,22 @@ export default {
         }
       })
     },
+    openRegistration() {
+      this.$router.push({
+        name: 'qcSubjectRegistration',
+        params: {
 
+        }
+      })
+    },
+    openTools() {
+      this.$router.push({
+        name: 'qcTools',
+        params: {
+
+        }
+      })
+    },
     // 删除
     deleteHandle(id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {

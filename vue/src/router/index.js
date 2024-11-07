@@ -105,6 +105,18 @@ const mainRoutes = {
       name: 'qcExamineStatus',
       meta: { title: '计划审核', isDynamic: true, isTab: false }
     },
+    {
+      path: '/SubjectRegistration',
+      component: _import('modules/QCmanagement/qcSubjectManagement/registration/qcSubjectRegistration'),
+      name: 'qcSubjectRegistration',
+      meta: { title: '课题登记', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/qcTools',
+      component: _import('modules/QCmanagement/qcTools/system'),
+      name: 'qcTools',
+      meta: { title: 'QC工具', isDynamic: true, isTab: false }
+    },
 
     //任务
     {

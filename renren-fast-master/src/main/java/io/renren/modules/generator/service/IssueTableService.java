@@ -52,5 +52,9 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     void removeAll(Integer[] issueIds);
 
     Map<String, Integer> getCurrentMonthCompletionRate();
+
+    boolean checkDuplicateIssue(List<String> vehicleNumbers, String issueCategoryIds);
+
+    IssueTableEntity getByassociate(String associatedRectificationRecords);
 }
 

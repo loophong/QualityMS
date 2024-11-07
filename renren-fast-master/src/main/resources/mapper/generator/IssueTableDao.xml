@@ -15,6 +15,7 @@
         <result property="vehicleTypeId" column="vehicle_type_id"/>
         <result property="vehicleNumberId" column="vehicle_number_id"/>
         <result property="issueDescription" column="issue_description"/>
+        <result property="peliminaryAnalysis" column="peliminary_analysis"/>
         <result property="issuePhoto" column="issue_photo"/>
         <result property="rectificationRequirement" column="rectification_requirement"/>
         <result property="requiredCompletionTime" column="required_completion_time"/>

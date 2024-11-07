@@ -80,12 +80,12 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
-        prop="serialNumber"
-        header-align="center"
-        align="center"
-        label="序号">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="serialNumber"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="序号">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="issueNumber"
         header-align="center"
@@ -220,12 +220,12 @@
         align="center"
         label="整改责任人">
       </el-table-column>
-      <el-table-column
-        prop="requiredSecondRectificationTime"
-        header-align="center"
-        align="center"
-        label="要求二次整改时间">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="requiredSecondRectificationTime"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="要求二次整改时间">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="remark"
         header-align="center"
@@ -244,30 +244,31 @@
         align="center"
         label="创建时间">
       </el-table-column>
-      <el-table-column
-        prop="lastModifier"
-        header-align="center"
-        align="center"
-        label="最后修改人">
-      </el-table-column>
-      <el-table-column
-        prop="lastModificationTime"
-        header-align="center"
-        align="center"
-        label="最后修改时间">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="lastModifier"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="最后修改时间">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="lastModificationTime"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="最后修改时间">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="associatedRectificationRecords"
         header-align="center"
         align="center"
-        label="关联问题整改记录">
+        label="关联问题">
       </el-table-column>
-      <el-table-column
-        prop="associatedIssueAddition"
-        header-align="center"
-        align="center"
-        label="关联问题添加">
-      </el-table-column>
+
+<!--      <el-table-column-->
+<!--        prop="associatedIssueAddition"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="关联问题添加">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="creationDuration"
         header-align="center"
@@ -349,9 +350,30 @@
           <el-button type="text" size="small" @click="showTaskDetails(scope.row.issueNumber)">问题详情</el-button>
           <el-button type="text" size="small" @click="reuseTask(scope.row.issueId)">问题重写</el-button>
           <el-button type="text" size="small" @click="closeRelatedTasks(scope.row.issueId)">问题关闭</el-button>
+          <el-button type="text" size="small" @click="showAssociatedIssues(scope.row.associatedRectificationRecords)">关联问题</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 弹出框，用于显示关联问题列表 -->
+    <el-dialog
+      :visible.sync="dialogVisible3"
+      title="关联问题"
+      width="30%"
+    >
+      <el-row>
+        <el-col :span="24" v-for="(issue, index) in currentIssues" :key="index">
+        <span
+          @click="viewIssueDetails(issue)"
+          style="display: block; color: #409EFF; cursor: pointer; margin-bottom: 8px;"
+        >
+          {{ issue }}
+        </span>
+        </el-col>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+      <el-button @click="dialogVisible3 = false">关闭</el-button>
+    </span>
+    </el-dialog>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -394,6 +416,7 @@
           { value: '企管科', label: '企管科' }
           // 其他科室选项
         ],
+        currentIssues: [],
         tableData: [],
         dataForm: {
           key: ''
@@ -420,6 +443,7 @@
         fullCause: '',    // 用于存储完整描述
         fullstatus: '',
         dialogVisible2: false,
+        dialogVisible3: false,
         fullRetStates:'',
       }
 
@@ -524,38 +548,19 @@
         myChart.setOption(option);
       }
       ,
-      // previewImage (imageUrl) {
-      //   const token = localStorage.getItem('token');
-      //   console.log("cur imageUrl====>" + imageUrl);
-      //   window.open(imageUrl + '?token' + '03fa820c47519bd3e2f845b9f720fa96');
-      //   console.log("图片地址：" ,imageUrl)
-      // },
-      // previewImage(imageUrl) {
-      //   // 获取当前的 token，假设它存储在 localStorage 中
-      //   const token = this.$cookie.get('token');
-      //   if (token) {
-      //   } else {
-      //     console.error('Token not found!');
-      //   }
-      //   // 将 token 作为参数添加到 URL
-      //   const imageUrlWithToken = `${imageUrl}?token=${token}`;
-      //   // 打开包含 token 的图片地址
-      //   window.open(imageUrlWithToken);
-      //
-      // },
-      // previewImagetest2(flag) {
-      //   // 获取当前的 token，假设它存储在 localStorage 中
-      //   const token = this.$cookie.get('token');
-      //   if (token) {
-      //   } else {
-      //     console.error('Token not found!');
-      //   }
-      //   // 将 token 作为参数添加到 URL
-      //   const imageUrlWithToken = `${imageUrl}?token=${token}`;
-      //   // 打开包含 token 的图片地址
-      //   window.open(imageUrlWithToken);
-      //
-      // },
+      showAssociatedIssues(associatedRectificationRecords) {
+        // 将数据库中的字符串分割成数组
+        this.currentIssues = associatedRectificationRecords.split(',');
+        this.dialogVisible3 = true; // 打开对话框
+      },
+      viewIssueDetails(associatedRectificationRecords) {
+        // 将数据库中的字符串分割成数组
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.viewIssueDetails(associatedRectificationRecords)
+        })
+        this.dialogVisible3 = false; // 打开对话框
+      },
       getRowClassName({ row, rowIndex }) {
         return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
       },

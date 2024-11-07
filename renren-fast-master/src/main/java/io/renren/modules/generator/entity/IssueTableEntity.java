@@ -61,6 +61,10 @@ public class IssueTableEntity implements Serializable {
 	 */
 	private String issueDescription;
 	/**
+	 * 初步分析
+	 */
+	private String peliminaryAnalysis;
+	/**
 	 * 问题照片
 	 */
 	private String issuePhoto;

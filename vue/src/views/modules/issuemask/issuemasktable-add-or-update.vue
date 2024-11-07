@@ -34,6 +34,7 @@
     <el-form-item label="任务内容" prop="maskcontent">
       <el-input v-model="dataForm.maskcontent" placeholder="任务内容"></el-input>
     </el-form-item>
+
 <!--    <el-form-item label="任务发起人" prop="creator">-->
 <!--      <el-input v-model="dataForm.creator" placeholder="任务发起人"></el-input>-->
 <!--    </el-form-item>-->
@@ -51,6 +52,7 @@
           placeholder="请选择日期">
         </el-date-picker>
       </el-form-item>
+
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -63,6 +65,19 @@
       :visible.sync="visible2"
       :width="'400px'"> <!-- 设置对话框宽度 -->
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="40px">
+        <el-form-item label="处理方案" prop="handlingScenarios">
+<!--          <el-input v-model="dataForm.handlingscenarios" placeholder="处理方案"></el-input>-->
+          <el-input v-model="dataForm.handlingscenarios" placeholder="处理方案"></el-input>
+        </el-form-item>
+        <el-upload
+          class="upload-button right-aligned"
+          :show-file-list="false"
+          :before-upload="beforeUpload"
+          :on-change="handleFileChange"
+          :auto-upload="false"
+        >
+          <el-button type="primary">上传附件</el-button>
+        </el-upload>
       </el-form>
       <span slot="footer" class="dialog-footer">
       <el-button @click="visible2 = false">取消</el-button>
@@ -138,6 +153,8 @@
           reviewerOpinion: '',
           recipients: '',
           maskcontent: '',
+          handlingscenarios:'',
+          annex: '',
           creator: '',
           creationTime: '', // 初始化为当前时间
           state: '',
@@ -203,6 +220,61 @@
         const day = String(now.getDate()).padStart(2, '0');
         const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         return `${year}${month}${day}${random}`;
+      },
+      beforeUpload(file) {
+        // 定义允许的文件类型
+        const allowedTypes = [
+          'image/',       // 图片文件类型
+          'application/pdf',    // PDF文件
+          'application/msword', // Word文件（.doc）
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // Word文件（.docx）
+        ];
+
+        // 检查文件类型是否在允许的类型列表中
+        const isAllowedType = allowedTypes.some(type => file.type.startsWith(type));
+
+        if (!isAllowedType) {
+          this.$message.error('仅支持上传图片、Word文件和PDF文件!');
+        }
+
+        return isAllowedType; // 返回 true 继续上传，返回 false 阻止上传
+      },
+
+      handleFileChange(file) {
+        // 存储待上传的文件
+        this.uploadingFile = file.raw; // 获取 File 对象
+        this.uploadFile(file.raw); // 调用上传方法
+      },
+      uploadFile(file) {
+        const formData = new FormData();
+        formData.append('file', file); // 将文件添加到 FormData
+
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/upload'), // 替换为实际上传接口
+          method: 'post',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data' // 指定为文件上传
+          }
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            // 保存后端返回的url到变量中
+            this.dataForm.annex = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+            // console.log('获得的文件地址 ：' ,data.uploadurl)
+            this.$message.success('文件上传成功');
+            // 处理成功后的逻辑，例如更新状态
+          } else {
+            this.$message.error(data.msg);
+          }
+        }).catch(error => {
+          this.$message.error('上传失败');
+          console.error(error);
+        });
+      },
+      handleFileChange1(file) {
+        // 存储待上传的文件
+        this.uploadingFile = file.raw; // 获取 File 对象
+        this.uploadFile1(file.raw); // 调用上传方法
       },
       init (id) {
         this.dataForm.issuemaskId = id || 0
@@ -277,6 +349,7 @@
                 this.dataForm.reviewers = data.issueMaskTable.reviewers
                 this.dataForm.recipients = data.issueMaskTable.recipients
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
+                this.dataForm.handlingscenarios = data.issueMaskTable.handlingscenarios
                 this.dataForm.creator = data.issueMaskTable.creator
                 this.dataForm.creationTime = data.issueMaskTable.creationTime
                 this.dataForm.requiredCompletionTime = data.issueMaskTable.requiredCompletionTime
@@ -324,21 +397,43 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            // this.$http({
+            //   url: this.$http.adornUrl(`/generator/issuemasktable/${!this.dataForm.issuemaskId ? 'save' : 'update'}`),
+            //   method: 'post',
+            //   data: this.$http.adornData({
+            //     'issuemaskId': this.dataForm.issuemaskId || undefined,
+            //     'serialNumber': this.dataForm.serialNumber,
+            //     'issueNumber': this.dataForm.issueNumber,
+            //     'reviewers': this.dataForm.reviewers,
+            //     'reviewerOpinion': this.dataForm.reviewerOpinion,
+            //     'recipients': this.dataForm.recipients,
+            //     'maskcontent': this.dataForm.maskcontent,
+            //     'handlingscenarios': this.dataForm.handlingscenarios,
+            //     'annex': this.dataForm.annex,
+            //     'creator': this.dataForm.creator,
+            //     'creationTime': this.dataForm.creationTime,
+            //     'state': this.dataForm.state
+            //   })
+            const requestData = this.$http.adornData({
+              'issuemaskId': this.dataForm.issuemaskId || undefined,
+              'serialNumber': this.dataForm.serialNumber,
+              'issueNumber': this.dataForm.issueNumber,
+              'reviewers': this.dataForm.reviewers,
+              'reviewerOpinion': this.dataForm.reviewerOpinion,
+              'recipients': this.dataForm.recipients,
+              'maskcontent': this.dataForm.maskcontent,
+              'handlingScenarios': this.dataForm.handlingscenarios,
+              'annex': this.dataForm.annex,
+              'creator': this.dataForm.creator,
+              'creationTime': this.dataForm.creationTime,
+              'state': this.dataForm.state
+            });
+
+            console.log('Request Data:', requestData);  // 打印请求数据
             this.$http({
               url: this.$http.adornUrl(`/generator/issuemasktable/${!this.dataForm.issuemaskId ? 'save' : 'update'}`),
               method: 'post',
-              data: this.$http.adornData({
-                'issuemaskId': this.dataForm.issuemaskId || undefined,
-                'serialNumber': this.dataForm.serialNumber,
-                'issueNumber': this.dataForm.issueNumber,
-                'reviewers': this.dataForm.reviewers,
-                'reviewerOpinion': this.dataForm.reviewerOpinion,
-                'recipients': this.dataForm.recipients,
-                'maskcontent': this.dataForm.maskcontent,
-                'creator': this.dataForm.creator,
-                'creationTime': this.dataForm.creationTime,
-                'state': this.dataForm.state
-              })
+              data: requestData
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.$message({
@@ -374,6 +469,8 @@
                 'reviewerOpinion': this.dataForm.reviewerOpinion,
                 'recipients': this.dataForm.recipients,
                 'maskcontent': this.dataForm.maskcontent,
+                'handlingscenarios': this.dataForm.handlingscenarios,
+                'annex': this.dataForm.annex,
                 'creator': this.dataForm.creator,
                 'creationTime': this.dataForm.creationTime,
                 'requiredCompletionTime': this.dataForm.requiredCompletionTime,

@@ -436,29 +436,48 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         }
     }
 
+//    @Override
+//    public Map<String, Integer> getCurrentMonthVerificationConclusionStatistics() {
+//        Map<String, Integer> statistics = new HashMap<>();
+//
+//        // 定义可能的验证结论状态
+//        List<String> verificationConclusions = Arrays.asList("暂缓", "结项");
+//
+//        // 获取当前月份起止日期
+//        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
+//        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+//        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
+////        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+//
+//        // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
+//        statistics.put("持续", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
+//
+//        // 对其他验证结论进行统计
+//        for (String conclusion : verificationConclusions) {
+//            statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion, currentMonthStart, nextMonthFirstDayString));
+//        }
+//
+//        return statistics;
+//    }
+
     @Override
     public Map<String, Integer> getCurrentMonthVerificationConclusionStatistics() {
         Map<String, Integer> statistics = new HashMap<>();
 
         // 定义可能的验证结论状态
-        List<String> verificationConclusions = Arrays.asList("暂停", "已完成", "结项");
-
-        // 获取当前月份起止日期
-        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
-        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
-        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
-//        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        List<String> verificationConclusions = Arrays.asList("暂缓", "结项");
 
         // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
-        statistics.put("未完成", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
+        statistics.put("持续", countIssuesByCreationCondition());
 
         // 对其他验证结论进行统计
         for (String conclusion : verificationConclusions) {
-            statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion, currentMonthStart, nextMonthFirstDayString));
+            statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion));
         }
 
         return statistics;
     }
+
 
     @Override
     public IssueTableEntity getByissueNumber(String issueNumber) {
@@ -546,12 +565,22 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         // 5. 遍历所有相关问题，处理其 associatedRectificationRecords 字段
         for (IssueTableEntity issue : relatedIssues) {
             String associatedRecords = issue.getAssociatedRectificationRecords();
+            System.out.println("问题关联记录: " + associatedRecords + " + " ); // 打印更新过程
             // 如果 records 不为空，前面加上逗号，并添加问题编号
             if (associatedRecords != null && !associatedRecords.isEmpty()) {
                 associatedRectificationRecordsBuilder.append(",").append(issueNumber);
+                String newAssociatedRecords = associatedRecords + associatedRectificationRecordsBuilder;
+//                System.out.println("associatedRectificationRecordsBuilder1: " + associatedRectificationRecordsBuilder); // 打印更新过程
+//                System.out.println("associatedRectificationRecordsBuilder1: " + newAssociatedRecords); // 打印更新过程
+                issue.setAssociatedRectificationRecords(newAssociatedRecords);
                 System.out.println("更新相关问题的关联整改记录: " + associatedRecords + " + " + issueNumber); // 打印更新过程
+                boolean relatedUpdateSuccess = this.updateById(issue);
             }
-
+            else {
+                System.out.println("无记录的空问题处理: " + associatedRecords + " + " + issueNumber); // 打印更新过程
+                issue.setAssociatedRectificationRecords(issueNumber);
+                boolean relatedUpdateSuccess = this.updateById(issue);
+            }
             // 收集车号
             String vehicleNumber = issue.getIssueNumber(); //
             if (vehicleNumber != null && !vehicleNumber.isEmpty()) {
@@ -562,11 +591,11 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         // 6. 将当前问题的 associatedRectificationRecords 修改为收集到的所有车号
         String newAssociatedRecords = String.join(",", relatedVehicleNumbers);
         currentIssue.setAssociatedRectificationRecords(newAssociatedRecords);
-        System.out.println("更新当前问题的 associatedRectificationRecords: " + currentIssue); // 打印更新后的记录
+//        System.out.println("更新当前问题的 associatedRectificationRecords: " + currentIssue); // 打印更新后的记录
 
         // 7. 更新当前问题的实体
         boolean updateSuccess = this.updateById(currentIssue);
-        System.out.println("当前问题更新操作成功: " + updateSuccess); // 打印更新操作结果
+//        System.out.println("当前问题更新操作成功: " + updateSuccess); // 打印更新操作结果
 
 //        // 8. 更新所有相关问题的 associatedRectificationRecords
 //        for (IssueTableEntity issue : relatedIssues) {
@@ -584,15 +613,15 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 //            System.out.println("相关问题ID: " + issue.getIssueId() + " 更新操作成功: " + relatedUpdateSuccess); // 打印每个相关问题的更新结果
 //        }
         // 8. 更新所有相关问题的 associatedRectificationRecords
-        for (IssueTableEntity issue : relatedIssues) {
-            // 将每个相关问题的 associatedRectificationRecords 修改为 newAssociatedRecords
-            issue.setAssociatedRectificationRecords(newAssociatedRecords);
-            System.out.println("更新相关问题ID: " + issue.getIssueId() + " 的关联整改记录为: " + newAssociatedRecords); // 打印更新后的记录
-
-            // 更新每个相关问题
-            boolean relatedUpdateSuccess = this.updateById(issue);
-            System.out.println("相关问题ID: " + issue.getIssueId() + " 更新操作成功: " + relatedUpdateSuccess); // 打印每个相关问题的更新结果
-        }
+//        for (IssueTableEntity issue : relatedIssues) {
+//            // 将每个相关问题的 associatedRectificationRecords 修改为 newAssociatedRecords
+//            issue.setAssociatedRectificationRecords(newAssociatedRecords);
+//            System.out.println("更新相关问题ID: " + issue.getIssueId() + " 的关联整改记录为: " + newAssociatedRecords); // 打印更新后的记录
+//
+//            // 更新每个相关问题
+//            boolean relatedUpdateSuccess = this.updateById(issue);
+//            System.out.println("相关问题ID: " + issue.getIssueId() + " 更新操作成功: " + relatedUpdateSuccess); // 打印每个相关问题的更新结果
+//        }
 
     }
 
@@ -697,53 +726,128 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
     }
 
+//    @Override
+//    public Map<String, Integer> getCurrentMonthCompletionRate() {
+//        // 获取当前月的起始和结束日期
+//        LocalDate now = LocalDate.now();
+//        String startDate = now.withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 本月第一天
+//        String endDate = now.plusMonths(1).withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 下月第一天
+//
+//        // 统计当前月份已完成和未完成的条数
+//        int completedCount = countIssuesByVerificationConclusion("已完成", startDate, endDate);
+//        int notCompletedCount = countIssuesByVerificationConclusion("未完成", startDate, endDate);
+//        int pauseCount = countIssuesByVerificationConclusion("暂停", startDate, endDate);
+//        int conclusionCount = countIssuesByVerificationConclusion("结项", startDate, endDate);
+//        int profoundCount1 = countIssuesByVerificationConclusion("",startDate,endDate);
+////        int profoundCount2 = countIssuesByVerificationConclusion(null,startDate,endDate);
+//        int tolCompleted = notCompletedCount + pauseCount + conclusionCount + profoundCount1 ;
+//        // 创建一个结果Map用于存放完成率数据
+//        Map<String, Integer> completionRate = new HashMap<>();
+//        completionRate.put("completed", completedCount);
+//        completionRate.put("tolCompleted", tolCompleted);
+//
+//        return completionRate;
+//    }
+@Override
+public Map<String, Integer> getCurrentMonthCompletionRate() {
+    // 统计已完成、未完成、暂停、结项等状态的条数
+    int completedCount = countIssuesByVerificationConclusion("结项");
+    int notCompletedCount = countIssuesByVerificationConclusion("持续");
+    int pauseCount = countIssuesByVerificationConclusion("暂缓");
+//    int conclusionCount = countIssuesByVerificationConclusion("结项");
+    int profoundCount1 = countIssuesByVerificationConclusion("");  // 空字符串表示没有结论的情况
+
+    // 计算总的已完成条数
+    int tolCompleted = countAllIssues();  // 查询所有记录的总数
+
+    // 创建一个结果Map用于存放完成率数据
+    Map<String, Integer> completionRate = new HashMap<>();
+    completionRate.put("completed", completedCount);
+    completionRate.put("tolCompleted", tolCompleted);
+
+    return completionRate;
+}
+
     @Override
-    public Map<String, Integer> getCurrentMonthCompletionRate() {
-        // 获取当前月的起始和结束日期
-        LocalDate now = LocalDate.now();
-        String startDate = now.withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 本月第一天
-        String endDate = now.plusMonths(1).withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 下月第一天
+    public boolean checkDuplicateIssue(List<String> vehicleNumbers, String issueCategoryIds) {
+        // 构建查询条件：查询 issue_category_id 和 vehicle_number_id
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
 
-        // 统计当前月份已完成和未完成的条数
-        int completedCount = countIssuesByVerificationConclusion("已完成", startDate, endDate);
-        int notCompletedCount = countIssuesByVerificationConclusion("未完成", startDate, endDate);
-        int pauseCount = countIssuesByVerificationConclusion("暂停", startDate, endDate);
-        int conclusionCount = countIssuesByVerificationConclusion("结项", startDate, endDate);
-        int profoundCount1 = countIssuesByVerificationConclusion("",startDate,endDate);
-//        int profoundCount2 = countIssuesByVerificationConclusion(null,startDate,endDate);
-        int tolCompleted = notCompletedCount + pauseCount + conclusionCount + profoundCount1 ;
-        // 创建一个结果Map用于存放完成率数据
-        Map<String, Integer> completionRate = new HashMap<>();
-        completionRate.put("completed", completedCount);
-        completionRate.put("tolCompleted", tolCompleted);
+        // 1. 使用 in 查询 issue_category_id
+        queryWrapper.eq("issue_category_id", issueCategoryIds);
 
-        return completionRate;
+        // 2. 通过 vehicle_number_id 字段模糊匹配车号
+        for (String vehicleNumber : vehicleNumbers) {
+            queryWrapper.or().like("vehicle_number_id", "%" + vehicleNumber + "%"); // 添加模糊查询条件
+        }
+
+        // 执行查询，查找是否存在相同的记录
+        int count = this.count(queryWrapper); // 使用 count 查询符合条件的记录数
+
+        // 如果查询结果为 0，说明没有符合条件的记录
+        return count > 0; // 如果 count 大于 0，说明存在相同的记录
     }
+
+    @Override
+    public IssueTableEntity getByassociate(String associatedRectificationRecords) {
+        // 使用 QueryWrapper 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+//        System.out.println("associatedRectificationRecords: " + associatedRectificationRecords);
+        queryWrapper.eq("issue_number", associatedRectificationRecords); // 根据问题编号查询
+
+        // 调用 MyBatis-Plus 的方法查找对应的实体
+        return this.getOne(queryWrapper, false); // 这里的 false 表示如果没有找到记录不会抛出异常
+    }
+
+
+    private Integer countAllIssues() {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        // 查询所有记录
+        return this.count(queryWrapper);
+    }
+
 
 
 
     // 统计“创建”的条件
-    private Integer countIssuesByCreationCondition(String startDate, String endDate) {
+//    private Integer countIssuesByCreationCondition(String startDate, String endDate) {
+//        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.and(wrapper ->
+//                        wrapper.isNull("verification_conclusion")
+//                                .or().eq("verification_conclusion", "")
+//                                .or().like("verification_conclusion", "持续")
+//                )
+//                .ge("creation_time", startDate)
+//                .le("creation_time", endDate);
+//
+//        return this.count(queryWrapper);
+//    }
+    private Integer countIssuesByCreationCondition() {
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.and(wrapper ->
-                        wrapper.isNull("verification_conclusion")
-                                .or().eq("verification_conclusion", "")
-                                .or().like("verification_conclusion", "未完成")
-                )
-                .ge("creation_time", startDate)
-                .le("creation_time", endDate);
+                wrapper.isNull("verification_conclusion")
+                        .or().eq("verification_conclusion", "")
+                        .or().like("verification_conclusion", "持续")
+        );
 
         return this.count(queryWrapper);
     }
 
-    // 根据 verification_conclusion 统计数量，处理包含多个状态的组合
-    private Integer countIssuesByVerificationConclusion(String conclusion, String startDate, String endDate) {
-        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
 
-        // 使用 FIND_IN_SET() 函数判断字段中是否包含该状态
-        queryWrapper.ge("creation_time", startDate)
-                .le("creation_time", endDate)
-                .like("verification_conclusion", conclusion); // 使用 LIKE 查询
+    // 根据 verification_conclusion 统计数量，处理包含多个状态的组合
+//    private Integer countIssuesByVerificationConclusion(String conclusion, String startDate, String endDate) {
+//        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+//
+//        // 使用 FIND_IN_SET() 函数判断字段中是否包含该状态
+//        queryWrapper.ge("creation_time", startDate)
+//                .le("creation_time", endDate)
+//                .like("verification_conclusion", conclusion); // 使用 LIKE 查询
+//
+//        return this.count(queryWrapper);
+//    }
+    private Integer countIssuesByVerificationConclusion(String conclusion) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("verification_conclusion", conclusion); // 使用 LIKE 查询
 
         return this.count(queryWrapper);
     }

@@ -6,6 +6,8 @@ import io.renren.modules.notice.entity.MessageNotificationEntity;
 import io.renren.modules.notice.entity.NoticeStatus;
 import io.renren.modules.notice.service.MessageNotificationService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -37,6 +39,14 @@ public class MessageNotificationServiceImpl extends ServiceImpl<MessageNotificat
             this.save(notification);
         }
         return true;
+    }
+
+    @Override
+    public int getUnreadNotices(Long userId) {
+        QueryWrapper<MessageNotificationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("receiver_id", userId)
+                .eq("status", String.valueOf(NoticeStatus.UNREAD));
+        return this.count(queryWrapper); // 查询未读消息数量
     }
 
     @Override

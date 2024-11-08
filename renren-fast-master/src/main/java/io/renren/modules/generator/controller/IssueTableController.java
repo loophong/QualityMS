@@ -84,7 +84,7 @@ public class IssueTableController {
      */
     @RequestMapping("/{flag}")
     @RequiresPermissions("generator:issuetable:update")
-    public R avatarPath(@PathVariable String flag, HttpServletResponse response) throws Exception {
+    public void avatarPath(@PathVariable String flag, HttpServletResponse response) throws Exception {
         if (!FileUtil.isDirectory(uploadDir));{
             FileUtil.mkdir(uploadDir);
         }
@@ -123,12 +123,13 @@ public class IssueTableController {
                 os.write(bytes);
                 os.flush();
                 os.close();
+                return ;
             }
 
         } catch (Exception e ){
             System.out.println("文件下载失败");
         };
-        return R.ok();
+//        return R.ok();
     }
 
 //    @PostMapping("/minioimage")

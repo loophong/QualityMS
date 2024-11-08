@@ -1,11 +1,4 @@
 <template>
-  <!-- const colorScale = {
-        'E': '#1e1e1e', // 黑色  //跳过
-        'D': '#e74c3c', // 红色  //未通过
-        'C': '#0dbc79', // 绿色  //已通过
-        'B': '#3498db',  // 蓝色 //进行中
-        'A': '#717182'  // 灰色 //未提交
-      }; -->
 
   <div>
     <div>
@@ -69,6 +62,7 @@
         <el-button type="primary" @click="dataFormSubmitEx(form3.id)">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- TODO 表格内容动态 -->
     <el-dialog title="成果初评" :visible.sync="showDialog4" width="60%">
       <el-form :model="form4">
         <table width="100%">
@@ -88,26 +82,22 @@
             <tr>
               <td rowspan="5">1</td>
               <td rowspan="5">活动过程<br />的规范性</td>
-              <td>1</td>
-              <td>否则项</td>
+              <td>{{ commentTable[0].tableNumber }}</td>
+              <td>{{ commentTable[0].tableTag }}</td>
               <td>
                 <ul>
-                  <li>1、课题未完成，无具体措施或未实施，或实施无效果。</li>
-                  <li>2、虚报数据，弄虚做假。</li>
-                  <li>{{ '3、课题为单人独立完成课题或小组人数<3人(建议申报改善提案）' }}</li>
+                  <li v-for="(item, index) in commentTableFirst[0]" :key="index">{{ item }}</li>
                 </ul>
               </td>
               <td></td>
               <td></td>
             </tr>
             <tr>
-              <td>1.1</td>
-              <td>选题内容</td>
+              <td>{{ commentTable[1].tableNumber }}</td>
+              <td>{{ commentTable[1].tableTag }}</td>
               <td>
                 <ul>
-                  <li>(1)解决市场反馈问题的成果(20分);</li>
-                  <li>(2)解决生产过程质量问题的成果(16分);</li>
-                  <li>(3)其他类改善成果(10分)。</li>
+                  <li v-for="(item, index) in commentTableFirst[1]" :key="index">{{ item }}</li>
                 </ul>
               </td>
               <td>
@@ -119,16 +109,11 @@
               <td rowspan="4">推进组</td>
             </tr>
             <tr>
-              <td>1.2</td>
-              <td>PDCA完整<br />性、步骤<br />连贯性、申报材料<br />规范</td>
+              <td>{{ commentTable[2].tableNumber }}</td>
+              <td>{{ commentTable[2].tableTag }}</td>
               <td>
                 <ul>
-                  <li>(1)活动程序按要求进行，活动步骤完整、正确(10分);</li>
-                  <li>(2)现状调查充分，有数据支撑，为目标设定提供依据(6分);</li>
-                  <li>(3)目标设定恰当、且量化目标并有一定依据(6分);</li>
-                  <li>(4)原因分析透彻，且用数据、事实客观证明主要原因(6分);</li>
-                  <li>(5)针对主因逐条制定对策，制定对策应按5W1H原则(6分);</li>
-                  <li>(6)资料以图表、数据为主(6分)。</li>
+                  <li v-for="(item, index) in commentTableFirst[2]" :key="index">{{ item }}</li>
                 </ul>
               </td>
               <td>
@@ -139,9 +124,13 @@
               </td>
             </tr>
             <tr>
-              <td>1.3</td>
-              <td>正确使用<br />改进工具</td>
-              <td>正确且适宜应用超过4种QC新老七种工具(每种工具5分，错用不得分);</td>
+              <td>{{ commentTable[3].tableNumber }}</td>
+              <td>{{ commentTable[3].tableTag }}</td>
+              <td>
+                <ul>
+                  <li v-for="(item, index) in commentTableFirst[3]" :key="index">{{ item }}</li>
+                </ul>
+              </td>
               <td>
                 <el-input v-model="tableData[2]"
                   :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
@@ -150,13 +139,11 @@
               </td>
             </tr>
             <tr>
-              <td>1.4</td>
-              <td>改进效果</td>
+              <td>{{ commentTable[4].tableNumber }}</td>
+              <td>{{ commentTable[4].tableTag }}</td>
               <td>
                 <ul>
-                  <li>(1)取得效果后与原状比较,确认其改进的有效性，与所制订的目标比较，看其是否已达到(7分);</li>
-                  <li>(2)有经济效益计算，有经济效益计算(10分)，无经济效益计算不得分;</li>
-                  <li>(3)有无形效益的评价(3分)。</li>
+                  <li v-for="(item, index) in commentTableFirst[4]" :key="index">{{ item }}</li>
                 </ul>
               </td>
               <td>
@@ -213,13 +200,11 @@
         </thead>
         <tbody>
           <tr>
-            <td>2</td>
-            <td colspan="3">成果的经济效益</td>
+            <td>{{ commentTable[5].tableNumber }}</td>
+            <td colspan="3">{{ commentTable[5].tableTag }}</td>
             <td>
               <ul>
-                <li>高收益:2万元以上(32-40分);</li>
-                <li>较高收益:5000万元以上(16-28分);</li>
-                <li>有一定收益:2000元以上(1-12分)。</li>
+                <li v-for="(item, index) in commentTableSecond[0]" :key="index">{{ item }}</li>
               </ul>
             </td>
             <td>
@@ -231,13 +216,11 @@
             <td>评价组</td>
           </tr>
           <tr>
-            <td>3</td>
-            <td colspan="3">成果的创新性</td>
+            <td>{{ commentTable[6].tableNumber }}</td>
+            <td colspan="3">{{ commentTable[6].tableTag }}</td>
             <td>
               <ul>
-                <li>原创:发明创造、新管理方法推广、技术改进行业领先(16-20分);</li>
-                <li>集成:多种成熟技术综合运用、公司内首创、部门范围内管理方法推广(8-14分);</li>
-                <li>引进:单项成熟技术应用(1-6分)。</li>
+                <li v-for="(item, index) in commentTableSecond[1]" :key="index">{{ item }}</li>
               </ul>
             </td>
             <td>
@@ -249,13 +232,11 @@
             <td>评价组</td>
           </tr>
           <tr>
-            <td>4</td>
-            <td colspan="3">成果推广价值</td>
+            <td>{{ commentTable[7].tableNumber }}</td>
+            <td colspan="3">{{ commentTable[7].tableTag }}</td>
             <td>
               <ul>
-                <li>很强：制度、标准、流程已在公司内得到应用的;模式可直接在企业管理中参照借鉴得到应用的(16-20分);</li>
-                <li>较强：制度、标准、流程可直接在公司内参照借鉴得到应用的(8-14分);</li>
-                <li>强：经验在集公司内举一反三容易得到应用(1-6分)。</li>
+                <li v-for="(item, index) in commentTableSecond[2]" :key="index">{{ item }}</li>
               </ul>
             </td>
             <td>
@@ -267,14 +248,11 @@
             <td>评价组</td>
           </tr>
           <tr>
-            <td>5</td>
-            <td colspan="3">现场发布效果</td>
+            <td>{{ commentTable[8].tableNumber }}</td>
+            <td colspan="3">{{ commentTable[8].tableTag }}</td>
             <td>
               <ul>
-                <li>(1)发布人自信大方、语言流利、口齿清楚(6分);</li>
-                <li>(2)发表资料应以图、表、数据为主，避免通篇文字、照本宣读(6分);</li>
-                <li>(3)时间控制在8分钟以内(4分),超时自动关闭,超时1分钟不得分;</li>
-                <li>(4)小组成员发布，非小组成员发布不得分(4分)。</li>
+                <li v-for="(item, index) in commentTableSecond[3]" :key="index">{{ item }}</li>
               </ul>
             </td>
             <td>
@@ -488,14 +466,20 @@ export default {
         qcTwoContent: '',
         qcOneContent: '',
       },
+      commentTable: [],
+      commentTableFirst: [],
+      commentTableSecond: [],
     };
   },
 
   async mounted() {
+
     this.initRouterParam()
+    this.getCommentTable()
     await this.getStatusList()
     const tmp = this.ifSelectedPart()
     console.log(tmp)
+    console.log('-----')
     console.log(this.dataFormEx)
   },
   computed: {
@@ -508,11 +492,35 @@ export default {
       try {
         this.routerParam = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', topicType: '', resultType: '', examineId: '' };
         this.ifSelected = this.ifSelectedPart()
-        console.log(this.routerParam, '++++++++++++')
       } catch (e) {
         console.log('处理跳转参数失败')
         console.log(e)
+
       }
+    },
+    //获取评论表数据
+    async getCommentTable() {
+      await this.$http({
+        url: this.$http.adornUrl(`/qc/table/list`),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.commentTable = data.page.list
+          this.commentTable.forEach(item => {
+            item.tableComment = JSON.parse(item.tableComment).split('\n')
+          })
+          this.commentTableFirst = this.commentTable.filter(item => item.tableType === '初评').map(item => item.tableComment)
+          this.commentTableSecond = this.commentTable.filter(item => item.tableType === '复评').map(item => item.tableComment)
+          console.log(this.commentTableFirst)
+          console.log(this.commentTableSecond)
+
+          console.log(this.commentTable)
+        } else {
+          this.commentTable = {}
+          console.log('获取评论表失败')
+        }
+      })
     },
     //是否是选择的相关方
     ifSelectedPart() {
@@ -532,7 +540,6 @@ export default {
     },
     async getStatusList() {
       await this.$http({
-        // url: this.$http.adornUrl('/qcManagement/examineStatus/list'),
         url: this.$http.adornUrl(`/qcManagement/examineStatus/info/${this.routerParam[0].examineId}`),
         method: 'get',
         params: this.$http.adornParams()

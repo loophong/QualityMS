@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import io.renren.common.utils.ShiroUtils;
+import io.renren.modules.notice.entity.CreateNoticeParams;
+import io.renren.modules.notice.service.MessageNotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ import io.renren.common.utils.R;
 public class QcExamineStatusController {
     @Autowired
     private QcExamineStatusService qcExamineStatusService;
+    @Autowired
+    private MessageNotificationService messageService;
 
     /**
      * 列表
@@ -60,6 +64,7 @@ public class QcExamineStatusController {
         return R.ok().put("qcExamineStatus", qcExamineStatus);
     }
 
+
     /**
      * 保存
      */
@@ -68,8 +73,9 @@ public class QcExamineStatusController {
     public R save(@RequestBody QcExamineStatusEntity qcExamineStatus){
         qcExamineStatusService.saveOrUpdateBySubject(qcExamineStatus);
 		qcExamineStatusService.save(qcExamineStatus);
+        //发送消息
+//        messageService.sendMessages(new CreateNoticeParams());
         return R.ok().put("id", qcExamineStatus.getQcExamineId());
-
     }
 
     /**

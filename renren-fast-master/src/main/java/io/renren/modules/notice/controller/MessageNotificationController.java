@@ -1,6 +1,7 @@
 package io.renren.modules.notice.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import io.renren.common.utils.ShiroUtils;
@@ -31,6 +32,19 @@ import io.renren.common.utils.R;
 public class MessageNotificationController {
     @Autowired
     private MessageNotificationService messageNotificationService;
+
+    /**
+     * @description: 查询是否有未读消息
+     */
+    @RequestMapping("/Unread")
+    @RequiresPermissions("notice:messagenotification:list")
+    public R getUnreadNotice(@RequestParam Map<String, Object> params){
+        Long userId = ShiroUtils.getUserId(); // 获取当前登录用户的ID
+        System.out.println("f："+userId+"-------------");
+        int unreadNotices = messageNotificationService.getUnreadNotices(userId);
+        System.out.println("未读信息为："+unreadNotices+"-------------");
+        return R.ok().put("hasUnread", unreadNotices > 0 ? 1 : 0);
+    }
 
     /**
      * @description: 查询我的消息列表
@@ -97,7 +111,7 @@ public class MessageNotificationController {
     @RequestMapping("/info/{id}")
     @RequiresPermissions("notice:messagenotification:info")
     public R info(@PathVariable("id") Long id){
-		MessageNotificationEntity messageNotification = messageNotificationService.getById(id);
+        MessageNotificationEntity messageNotification = messageNotificationService.getById(id);
 
         return R.ok().put("messageNotification", messageNotification);
     }
@@ -110,7 +124,7 @@ public class MessageNotificationController {
     @RequestMapping("/update")
     @RequiresPermissions("notice:messagenotification:update")
     public R update(@RequestBody MessageNotificationEntity messageNotification){
-		messageNotificationService.updateById(messageNotification);
+        messageNotificationService.updateById(messageNotification);
 
         return R.ok();
     }
@@ -121,7 +135,7 @@ public class MessageNotificationController {
     @RequestMapping("/delete")
     @RequiresPermissions("notice:messagenotification:delete")
     public R delete(@RequestBody Long[] ids){
-		messageNotificationService.removeByIds(Arrays.asList(ids));
+        messageNotificationService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }

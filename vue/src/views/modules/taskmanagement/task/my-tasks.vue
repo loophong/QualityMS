@@ -114,6 +114,9 @@
               <el-button type="text" size="small" v-if="scope.row.taskCurrentState === 'APPROVAL_IN_PROGRESS'"
                          @click="cancelApproval(scope.row)">取消审批
               </el-button>
+              <el-button type="text" size="small"
+                         @click="gotoIndicatorPage(scope.row)">查看指标
+              </el-button>
               <!-- <el-button type="text" size="small" @click="showApproverDialog(scope.row)">完成</el-button> -->
               <!-- <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.tmTid)">修改</el-button> -->
               <!-- <el-button type="text" size="small" @click="deleteHandle(scope.row.tmTid)">删除</el-button> -->
@@ -620,6 +623,17 @@ export default {
 
     },
 
+    // 跳转到指标页面gotoIndicatorPage
+    gotoIndicatorPage(row) {
+      // console.log("跳转时传入参数为" + JSON.stringify(row))
+      let name = this.getIndicatorNameById(row.taskAssociatedIndicatorsId)
+      // this.$router.push({path: '/indicator/indicator-list'})
+      this.$router.push({
+        name: 'indicatorchart',
+        params: {indicatorName: name}
+      })
+
+    },
 
     // 获取数据列表
     getDataList() {
@@ -645,7 +659,8 @@ export default {
         }
         this.dataListLoading = false
       })
-    },
+    }
+    ,
 
     // 获取未完成任务
     getUnfinishedTasksList() {
@@ -669,7 +684,8 @@ export default {
         }
         this.unfinishedTasksListLoading = false
       })
-    },
+    }
+    ,
     // 获取已完成任务
     getCompletedTasksList() {
       this.completedTasksListLoading = true
@@ -692,67 +708,78 @@ export default {
         }
         this.completedTasksListLoading = false
       })
-    },
+    }
+    ,
     // 每页数
     sizeChangeHandle(val) {
       this.pageSize = val
       this.pageIndex = 1
       this.getDataList()
-    },
+    }
+    ,
     // 当前页
     currentChangeHandle(val) {
       this.pageIndex = val
       this.getDataList()
-    },
+    }
+    ,
 
     // 未完成任务-每页数
     unfinishedTasksSizeChangeHandle(val) {
       this.unfinishedTasksPageSize = val
       this.unfinishedTasksPageIndex = 1
       this.getUnfinishedTasksList()
-    },
+    }
+    ,
     // 未完成任务-当前页
     unfinishedTasksCurrentChangeHandle(val) {
       this.unfinishedTasksPageIndex = val
       this.getUnfinishedTasksList()
-    },
+    }
+    ,
 
     // 我提交审批-每页数
     mySubmitApprovalSizeChangeHandle(val) {
       this.mySubmitApprovalPageSize = val
       this.mySubmitApprovalPageIndex = 1
       this.getMySubmitApprovalList()
-    },
+    }
+    ,
     // 我提交审批-当前页
     mySubmitApprovalCurrentChangeHandle(val) {
       this.mySubmitApprovalPageIndex = val
       this.getMySubmitApprovalList()
-    },
+    }
+    ,
 
     // 已完成任务-每页数
     completedTasksSizeChangeHandle(val) {
       this.completedTasksPageSize = val
       this.completedTasksPageIndex = 1
       this.getCompletedTasksList()
-    },
+    }
+    ,
     // 已完成任务-当前页
     completedTasksCurrentChangeHandle(val) {
       this.completedTasksPageIndex = val
       this.getCompletedTasksList()
-    },
+    }
+    ,
 
 
     // 多选
     selectionChangeHandle(val) {
       this.dataListSelections = val
-    },
+    }
+    ,
     // 新增 / 修改
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
       })
-    },
+    }
+    ,
 
     // 删除
     deleteHandle(id) {
@@ -783,7 +810,8 @@ export default {
           }
         })
       })
-    },
+    }
+    ,
 
 
     getUserameByUserId(auditorId) {
@@ -795,7 +823,8 @@ export default {
         }
       }
       return "-";
-    },
+    }
+    ,
 
     getIndicatorNameById(indicatorId) {
       for (const indicator of this.indicatorOptions) {
@@ -806,7 +835,8 @@ export default {
         }
       }
       return "-";
-    },
+    }
+    ,
 
 
     finishTask(taskId) {
@@ -823,7 +853,8 @@ export default {
         })
         // window.location.reload();
       })
-    },
+    }
+    ,
 
 
     // 提交审批
@@ -851,7 +882,8 @@ export default {
           this.$message.error(data.msg)
         }
       })
-    },
+    }
+    ,
 
     // 获取历史审批列表
     getMySubmitApprovalList() {
@@ -878,7 +910,8 @@ export default {
 
 
       })
-    },
+    }
+    ,
 
     taskUpdatePage(taskId) {
       this.$router.push({

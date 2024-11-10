@@ -37,5 +37,7 @@ public interface PlanService extends IService<PlanEntity> {
     PageUtils queryPageGetHistoryPlan(Map<String, Object> params);
 
     void saveAllPlanInfo(PlanDTO planDTO);
+
+    void updateAllPlanInfo(PlanDTO planDTO);
 }
 

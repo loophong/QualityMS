@@ -153,4 +153,32 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         fileService.saveBatch(files);
     }
 
+    /**
+     * @description: 更新计划，直系任务，文件
+     * @param: planDTO
+     * @return: void
+     * @author: hong
+     * @date: 2024/11/10 17:55
+     */
+    @Override
+    public void updateAllPlanInfo(PlanDTO planDTO) {
+        // 更新计划信息
+        PlanEntity plan = new PlanEntity();
+        log.info("plan: " + plan);
+        BeanUtils.copyProperties(planDTO.getPlan(), plan);
+        planDao.updateById(plan);
+
+        // 更新任务信息
+        List<TaskEntity> tasks = planDTO.getTasks();
+        log.info("tasks: " + tasks);
+        taskService.remove(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, plan.getPlanId()));
+        taskService.saveBatch(tasks);
+
+        // 更新附件信息
+        List<FileEntity> files = planDTO.getFiles();
+        log.info("files: " + files);
+        fileService.remove(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, plan.getPlanId()));
+        fileService.saveBatch(files);
+    }
+
 }

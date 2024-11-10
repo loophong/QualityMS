@@ -802,12 +802,12 @@ export default {
     // 移除任务
     removeTask(index) {
       // 弹窗询问用户是否确认删除
-      this.$confirm('此操作将永久删除该任务, 是否继续?', '提示', {
+      this.$confirm('此操作将该任务, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.deleteTaskByTaskId(this.tasks[index].tmTid);
+        // this.deleteTaskByTaskId(this.tasks[index].tmTid);
 
         this.tasks.splice(index, 1);
         this.$message({
@@ -882,17 +882,17 @@ export default {
     //   }
     // },
 
-    deleteTaskByTaskId(tmTid) {
-      console.log("删除任务" + tmTid);
-      this.$http({
-        url: this.$http.adornUrl(`/taskmanagement/task/deleteByTaskId`),
-        method: 'get',
-        params: {
-          tmTid: tmTid
-        }
-      })
-
-    },
+    // deleteTaskByTaskId(tmTid) {
+    //   console.log("删除任务" + tmTid);
+    //   this.$http({
+    //     url: this.$http.adornUrl(`/taskmanagement/task/deleteByTaskId`),
+    //     method: 'get',
+    //     params: {
+    //       tmTid: tmTid
+    //     }
+    //   })
+    //
+    // },
 
 
   },

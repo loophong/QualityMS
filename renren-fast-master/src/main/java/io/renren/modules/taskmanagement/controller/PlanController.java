@@ -187,27 +187,35 @@ public class PlanController {
      * @date: 2024/8/30 16:15
      * @version: 1.0
      */
+//    @RequestMapping("/update")
+//    @RequiresPermissions("taskmanagement:plan:update")
+//    public R update(@RequestBody PlanAndTaskDTO planAndTaskDTO) {
+////        planService.updateById(taskManagementPlan);
+//
+//        PlanEntity plan = planAndTaskDTO.getPlan();
+//        planService.updateById(plan);
+//
+//        List<TaskEntity> tasks = planAndTaskDTO.getTasks();
+//        tasks.forEach(task -> {
+//            log.info("当前task为" + task);
+//            if (taskService.isTaskIdUsed(task.getTaskId())) {
+//                // 如果任务编号已经被使用，则通过taskid更新任务
+//                taskService.updateById(task);
+//
+//
+//            } else {
+//                taskService.save(task);
+//            }
+//        });
+//
+//        return R.ok();
+//    }
+
+
     @RequestMapping("/update")
     @RequiresPermissions("taskmanagement:plan:update")
-    public R update(@RequestBody PlanAndTaskDTO planAndTaskDTO) {
-//        planService.updateById(taskManagementPlan);
-
-        PlanEntity plan = planAndTaskDTO.getPlan();
-        planService.updateById(plan);
-
-        List<TaskEntity> tasks = planAndTaskDTO.getTasks();
-        tasks.forEach(task -> {
-            log.info("当前task为" + task);
-            if (taskService.isTaskIdUsed(task.getTaskId())) {
-                // 如果任务编号已经被使用，则通过taskid更新任务
-                taskService.updateById(task);
-
-
-            } else {
-                taskService.save(task);
-            }
-        });
-
+    public R update(@RequestBody PlanDTO planDTO) {
+        planService.updateAllPlanInfo(planDTO);
         return R.ok();
     }
 

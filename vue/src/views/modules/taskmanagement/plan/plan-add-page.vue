@@ -44,7 +44,7 @@
                                 style="width: 100%;"></el-date-picker>
               </el-form-item>
               <el-form-item label="关联指标" prop="planAssociatedIndicatorsId">
-                <el-select v-model="dataForm.planAssociatedIndicatorsId" placeholder="请选择">
+                <el-select v-model="dataForm.planAssociatedIndicatorsId" clearable placeholder="请选择">
                   <el-option v-for="item in indicatorOptions" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
@@ -72,9 +72,11 @@
                       v-model="dataForm.planContent" maxlength="1000">
             </el-input>
           </el-form-item>
+
           <el-form-item label="上传附件" prop="planFile" required>
             <el-upload ref="file" :file-list="planFileList" :action="uploadUrl"
-                       :on-change="uploadFile" :auto-upload="false">
+                       :on-remove="handleRemove" :before-remove="beforeRemove" :on-change="uploadFile"
+                       :auto-upload="false">
               <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
             </el-upload>
           </el-form-item>
@@ -269,9 +271,9 @@ export default {
         planAuditor: [
           {required: true, message: '审核人不能为空', trigger: ['change', 'blur']}
         ],
-        planAssociatedIndicatorsId: [
-          {required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur']}
-        ],
+        // planAssociatedIndicatorsId: [
+        //   {required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur']}
+        // ],
 
         taskId: [
           {required: true, message: '任务编号不能为空', trigger: 'blur'},
@@ -375,7 +377,8 @@ export default {
 
     // 上传文件
     uploadFile(file) {
-      console.log("文件" + file.raw);
+
+      console.log("文件" + file.name);
 
       const formData = new FormData();
       formData.append('file', file.raw); // 将文件添加到 FormData
@@ -391,6 +394,11 @@ export default {
         if (data && data.code === 0) {
           // 保存后端返回的url到变量中
           this.dataForm.planFile = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+          this.planFileList.push({
+            'planId': this.dataForm.planId,
+            'name': file.name,
+            'url': data.uploadurl
+          });
           console.log('获得的文件地址 ：', data.uploadurl)
           this.$message.success('文件上传成功');
           // 处理成功后的逻辑，例如更新状态
@@ -401,6 +409,16 @@ export default {
         this.$message.error('上传失败');
         console.error(error);
       });
+    },
+
+    // 移除文件之前提示
+    beforeRemove(file, planFileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+
+    // 移除文件
+    handleRemove(file, planFileList) {
+      console.log("移除的文件为: " + JSON.stringify(file));
     },
 
     // 时间校验
@@ -564,7 +582,8 @@ export default {
               method: 'post',
               data: this.$http.adornData({
                 'plan': plan,
-                'tasks': tasksData
+                'tasks': tasksData,
+                'files': this.planFileList
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

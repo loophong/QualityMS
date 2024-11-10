@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import cn.hutool.log.Log;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.renren.modules.taskmanagement.entity.PlanAndTaskDTO;
-import io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto;
-import io.renren.modules.taskmanagement.entity.TaskEntity;
+import io.renren.modules.taskmanagement.dto.PlanDTO;
+import io.renren.modules.taskmanagement.entity.*;
+import io.renren.modules.taskmanagement.service.FileService;
 import io.renren.modules.taskmanagement.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -18,7 +19,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import io.renren.modules.taskmanagement.entity.PlanEntity;
 import io.renren.modules.taskmanagement.service.PlanService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
@@ -41,6 +41,8 @@ public class PlanController {
     private PlanService planService;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private FileService fileService;
 
     /**
      * @description: PlanStatisticsLabelDto
@@ -148,20 +150,34 @@ public class PlanController {
     }
 
     /**
-     * 保存
+     * 保存- 已被下面方法重写
+     */
+//    @PostMapping("/save")
+//    @RequiresPermissions("taskmanagement:plan:save")
+//    public R save(@RequestBody PlanAndTaskDTO planAndTaskDTO) {
+//
+//        log.info("新增计划：" + planAndTaskDTO);
+//
+//        planService.save(planAndTaskDTO.getPlan());
+//
+//        for (int i = 0; i < planAndTaskDTO.getTasks().size(); i++) {
+//            taskService.save(planAndTaskDTO.getTasks().get(i));
+//        }
+//
+//        return R.ok();
+//    }
+    /**
+     * @description: 保存计划，直系任务，文件
+     * @param: planDTO
+     * @return: io.renren.common.utils.R
+     * @author: hong
+     * @date: 2024/11/10 17:20
      */
     @PostMapping("/save")
     @RequiresPermissions("taskmanagement:plan:save")
-    public R save(@RequestBody PlanAndTaskDTO planAndTaskDTO) {
-
-        log.info("新增计划：" + planAndTaskDTO);
-
-        planService.save(planAndTaskDTO.getPlan());
-
-        for (int i = 0; i < planAndTaskDTO.getTasks().size(); i++) {
-            taskService.save(planAndTaskDTO.getTasks().get(i));
-        }
-
+    public R save(@RequestBody PlanDTO planDTO) {
+        log.info("新增计划：" + planDTO);
+        planService.saveAllPlanInfo(planDTO);
         return R.ok();
     }
 
@@ -217,6 +233,7 @@ public class PlanController {
         return R.ok();
     }
 
+
     /**
      * @description: 检查当前planId是否被使用
      * @author: hong
@@ -233,18 +250,41 @@ public class PlanController {
      * @author: hong
      * @date: 2024/7/23 23:15
      **/
+//    @GetMapping("/getPlanAllInfo")
+//    public PlanAndTaskDTO getPlanAllInfo(@RequestParam String planId) {
+//
+//        PlanAndTaskDTO planAndTaskDTO = new PlanAndTaskDTO();
+//        PlanEntity plan = planService.getPlanByPlanName(planId);
+//        planAndTaskDTO.setPlan(plan);
+//
+//        List<TaskEntity> tasks = taskService.getTasksByPlanId(planId);
+//        planAndTaskDTO.setTasks(tasks);
+//
+//        return planAndTaskDTO;
+//    }
+    /**
+     * @description: 查询计划的全部信息、直属任务、文件
+     * @param: planId
+     * @return:
+     * @author: hong
+     * @date: 2024/11/10 17:25
+     */
     @GetMapping("/getPlanAllInfo")
-    public PlanAndTaskDTO getPlanAllInfo(@RequestParam String planId) {
+    public PlanDTO getPlanAllInfo(@RequestParam String planId) {
 
-        PlanAndTaskDTO planAndTaskDTO = new PlanAndTaskDTO();
-        PlanEntity plan = planService.getPlanByPlanName(planId);
-        planAndTaskDTO.setPlan(plan);
+        PlanDTO planDTO = new PlanDTO();
 
-        List<TaskEntity> tasks = taskService.getTasksByPlanId(planId);
-        planAndTaskDTO.setTasks(tasks);
+        PlanEntity plan = planService.getOne(new LambdaQueryWrapper<PlanEntity>().eq(PlanEntity::getPlanId, planId));
+        List<TaskEntity> taskList = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, planId));
+        List<FileEntity> fileList =  fileService.list(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
 
-        return planAndTaskDTO;
+        planDTO.setPlan(plan);
+        planDTO.setTasks(taskList);
+        planDTO.setFiles(fileList);
+
+        return planDTO;
     }
+
 
     /**
      * @description: 通过用户id，查询计划

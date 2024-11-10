@@ -2,6 +2,7 @@ package io.renren.modules.taskmanagement.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
+import io.renren.modules.taskmanagement.dto.PlanDTO;
 import io.renren.modules.taskmanagement.entity.PlanEntity;
 import io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto;
 
@@ -32,5 +33,9 @@ public interface PlanService extends IService<PlanEntity> {
     PageUtils queryPageUnfinishedPlan(Map<String, Object> params);
 
     PageUtils queryPageFinishedPlan(Map<String, Object> params);
+
+    PageUtils queryPageGetHistoryPlan(Map<String, Object> params);
+
+    void saveAllPlanInfo(PlanDTO planDTO);
 }
 

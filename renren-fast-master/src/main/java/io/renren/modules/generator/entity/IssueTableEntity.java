@@ -61,6 +61,10 @@ public class IssueTableEntity implements Serializable {
 	 */
 	private String issueDescription;
 	/**
+	 * 初步分析
+	 */
+	private String peliminaryAnalysis;
+	/**
 	 * 问题照片
 	 */
 	private String issuePhoto;
@@ -136,6 +140,14 @@ public class IssueTableEntity implements Serializable {
 	 * 整改验证情况
 	 */
 	private String rectificationVerificationStatus;
+	/**
+	 * 是否超过截止时间
+	 */
+	private String overDue;
+	/**
+	 * 验证截止时间
+	 */
+	private Date verificationDeadline;
 	/**
 	 * 验证结论
 	 */

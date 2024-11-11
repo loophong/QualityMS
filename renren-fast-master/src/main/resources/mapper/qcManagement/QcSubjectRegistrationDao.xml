@@ -29,12 +29,13 @@
         <result property="examineId" column="examine_id"/>
         <result property="groupName" column="group_name"/>
     </resultMap>
+    <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity"> SELECT * FROM qc_subject_registration WHERE qcsr_id IN (SELECT qc_examine_subject FROM qc_examine_status WHERE qc_status_seven = 1 ) </select>
+
     <select id="ifExistSubjectName" resultType="boolean">
         SELECT EXISTS (
             SELECT * FROM qc_subject_registration WHERE topic_name = #{name}
         )
     </select>
-
     <!--    根据输入动态模糊查询-->
     <select id="fuzzyQueryList"
             resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity">

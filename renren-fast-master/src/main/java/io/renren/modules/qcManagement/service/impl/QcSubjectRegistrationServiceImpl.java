@@ -2,9 +2,11 @@ package io.renren.modules.qcManagement.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.renren.modules.qcManagement.dao.QcGroupMemberDao;
 import io.renren.modules.qcManagement.dao.QcSubjectRegistrationDao;
@@ -16,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-
+@Slf4j
 @Service("qcSubjectRegistrationService")
 public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegistrationDao, QcSubjectRegistrationEntity> implements QcSubjectRegistrationService {
     @Autowired
@@ -28,7 +30,18 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
          return baseMapper.getMembersOfGroup(groupName);
     }
 
+    @Override
+    public PageUtils queryPageFinishedList(Map<String, Object> params) {
+        log.info("param"+params.get("page")+"------"+ params.get("limit"));
 
+        long p = Long.parseLong((String) params.get("page"));
+        long l = Long.parseLong((String) params.get("limit"));
+        Page<QcSubjectRegistrationEntity> page = new Page<QcSubjectRegistrationEntity>(p,l);
+
+        Page<QcSubjectRegistrationEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(page);
+        log.info("result"+result);
+        return new PageUtils(page);
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {

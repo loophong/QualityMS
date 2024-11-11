@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.instrument.dao.InstrumentTestMethodDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.instrument.entity.InstrumentTestMethodEntity" id="instrumentTestMethodMap">
+        <result property="id" column="id"/>
+        <result property="department" column="Department"/>
+        <result property="standardnumber" column="StandardNumber"/>
+        <result property="compilation" column="Compilation"/>
+        <result property="compilationdate" column="CompilationDate"/>
+        <result property="reviewer" column="Reviewer"/>
+        <result property="reviewdate" column="ReviewDate"/>
+        <result property="countersignature" column="Countersignature"/>
+        <result property="approval" column="Approval"/>
+        <result property="inspectionparts" column="InspectionParts"/>
+        <result property="drawingnumber" column="DrawingNumber"/>
+        <result property="inspectionpartcategory" column="InspectionPartCategory"/>
+        <result property="processname" column="ProcessName"/>
+        <result property="inspectioncategory" column="InspectionCategory"/>
+        <result property="inspectionitem" column="InspectionItem"/>
+        <result property="inspectionparametername" column="InspectionParameterName"/>
+        <result property="inspectionlocation" column="InspectionLocation"/>
+        <result property="upperlimit" column="UpperLimit"/>
+        <result property="lowerlimit" column="LowerLimit"/>
+        <result property="measurementinstrument" column="MeasurementInstrument"/>
+        <result property="checkoperationmanual" column="CheckOperationManual"/>
+        <result property="inspector" column="Inspector"/>
+        <result property="inspectionfrequency" column="InspectionFrequency"/>
+        <result property="recordrequirement" column="RecordRequirement"/>
+        <result property="patrolinspector" column="PatrolInspector"/>
+        <result property="calibrationtool" column="CalibrationTool"/>
+        <result property="calibrationfrequency" column="CalibrationFrequency"/>
+        <result property="creatPeople" column="Creat_people"/>
+        <result property="creatTime" column="Creat_time"/>
+        <result property="flag" column="Flag"/>
+        <result property="delteflag" column="delteflag"/>
+    </resultMap>
+
+
+</mapper>

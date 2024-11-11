@@ -1,6 +1,7 @@
 package io.renren.modules.qcManagement.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -18,6 +19,9 @@ import java.util.List;
  */
 @Mapper
 public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrationEntity> {
+
+    Page<QcSubjectRegistrationEntity> selectFinishedSubjectList(Page<QcSubjectRegistrationEntity> page);
+
     //根据小组名称查询小组成员
     @Select({
             "SELECT *",

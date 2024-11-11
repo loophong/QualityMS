@@ -1,11 +1,11 @@
 package io.renren.modules.qcManagement.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.qcManagement.dao.QcGroupMemberDao;
 import io.renren.modules.qcManagement.dao.QcStepDao;
-import io.renren.modules.qcManagement.dto.GroupMemberDTO;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
 import io.renren.modules.qcManagement.entity.QcStepEntity;
 import io.renren.modules.qcManagement.service.QcGroupMemberService;
@@ -94,6 +94,7 @@ public class QcGroupMemberController {
 //
 //        return R.ok();
 //    }
+
     /**
      * 列表
      */

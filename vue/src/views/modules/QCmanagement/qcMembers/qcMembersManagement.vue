@@ -196,12 +196,15 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"
       @refreshCommonList="getGroupList"></add-or-update>
+    <add-group-dialog v-if="AddGroupDialogVisible" ref="AddGroupDialog" @refreshDataList="getDataList"
+      @refreshCommonList="getGroupList"></add-group-dialog>
   </el-tabs>
 
 </template>
 
 <script>
 import AddOrUpdate from './qcMembersManagement-add-or-update'
+import AddGroupDialog from './qcMembersManagement-add-group'
 
 export default {
   data() {
@@ -230,13 +233,22 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
+      // 新增弹窗
+      AddGroupDialogVisible: false,
       map: {},
       GroupMemberList: [],
-      membersOptions: []
+      membersOptions: [],
+
+      // 角色列表
+      roleIdList: [],
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    AddGroupDialog
+  },
+  async created(){
+    await this.getRoleList();
   },
   async activated() {
     this.initActiveName();
@@ -476,14 +488,30 @@ export default {
           name: 'otherToIssue',
         });
     },
+
     // 新增 / 修改
     addOrUpdateHandle(id) {
-      this.addOrUpdateVisible = true
-      this.$nextTick(() => {
-        this.$refs.addOrUpdate.isAddMember = false;
-        this.$refs.addOrUpdate.membersOptions = this.membersOptions;
-        this.$refs.addOrUpdate.init(id)
-      })
+      console.log("传入id为"+id)
+
+
+        if (id === undefined){
+          this.AddGroupDialogVisible = true
+          this.$nextTick(() => {
+            this.$refs.AddGroupDialog.membersOptions = this.membersOptions;
+            this.$refs.AddGroupDialog.roleIdList = this.roleIdList;
+            this.$refs.AddGroupDialog.init(id)
+          })
+        } else {
+          this.addOrUpdateVisible = true
+          this.$nextTick(() => {
+            this.$refs.addOrUpdate.isAddMember = false;
+            this.$refs.addOrUpdate.membersOptions = this.membersOptions;
+            this.$refs.addOrUpdate.init(id)
+          })
+        }
+
+
+
     },
     // 新增成员
     addMemberHandle(id) {
@@ -642,7 +670,18 @@ export default {
           }
         })
       })
-    }
+    },
+
+    // 获取全角色列表
+    async getRoleList() {
+      await this.$http({
+        url: this.$http.adornUrl('/sys/role/select'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({ data }) => {
+        this.roleIdList = data && data.code === 0 ? data.list : []
+      })
+    },
   }
 }
 </script>

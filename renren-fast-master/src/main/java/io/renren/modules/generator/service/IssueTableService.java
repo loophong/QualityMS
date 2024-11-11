@@ -53,6 +53,12 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
     Map<String, Integer> getCurrentMonthCompletionRate();
 
+    boolean checkDuplicateIssue(List<String> vehicleNumbers, String issueCategoryIds);
+
+    IssueTableEntity getByassociate(String associatedRectificationRecords);
+
+    boolean checkReplicateIssue(Integer issueId, String issueCategoryIds);
+
     PageUtils queryPageFinishedList(Map<String, Object> params);
 }
 

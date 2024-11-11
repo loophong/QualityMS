@@ -65,6 +65,23 @@
         label="任务内容">
       </el-table-column>
       <el-table-column
+        prop="handlingScenarios"
+        header-align="center"
+        align="center"
+        label="处理方案">
+      </el-table-column>
+      <el-table-column
+        prop="annex"
+        header-align="center"
+        align="center"
+        label="附件">
+        <template slot-scope="scope">
+          <el-button type="text" @click="handleFileAction(scope.row.annex, scope.row.issuemaskId)">
+            预览
+          </el-button>
+        </template>
+      </el-table-column>
+      <el-table-column
         prop="creator"
         header-align="center"
         align="center"
@@ -166,6 +183,25 @@ export default {
     this.creatorDataList()
   },
   methods: {
+    handleFileAction(fileflag, id) {
+      const token = this.$cookie.get('token'); // 获取当前的 token
+      if (!token) {
+        console.error('Token not found!');
+        return;
+      }
+
+      if (!fileflag) {
+        // 如果没有 fileflag，弹出警告框
+        this.$message({
+          message: '没有文件可预览！',
+          type: 'warning'
+        });
+      } else {
+        // 拼接带有 token 的请求地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+        window.open(url);
+      }
+    },
     executeHandle (id) {
       this.$confirm('是否确认执行此操作?', '提示', {
         confirmButtonText: '确定',

@@ -24,7 +24,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     public PageUtils recipientsqueryPage(Map<String, Object> params) {
         SysUserEntity role = ShiroUtils.getUserEntity();
         String rolename = role.getUsername();
-        System.out.println("当前登录人信息"+role);
+//        System.out.println("当前登录人信息"+role);
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
                 new QueryWrapper<IssueMaskTableEntity>().eq("recipients", rolename)
@@ -53,7 +53,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     public PageUtils AuditqueryPage(Map<String, Object> params) {
         SysUserEntity role = ShiroUtils.getUserEntity();
         String rolename = role.getUsername();
-        System.out.println("当前登录人信息"+role);
+//        System.out.println("当前登录人信息"+role);
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
                 new QueryWrapper<IssueMaskTableEntity>()
@@ -95,7 +95,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
             if (task.getSerialNumber().equals(issueNumber)) {
                 task.setSuperiorMask(String.valueOf(1));
                 task.setState("已派发");
-                System.out.println("派发任务前置数节点修改成功++++++++++++++++++");
+//                System.out.println("派发任务前置数节点修改成功++++++++++++++++++");
                 this.updateById(task); // 更新数据库中的记录
             }
         }
@@ -104,10 +104,36 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
             if (task.getSuperiorMask() != null && task.getSuperiorMask().equals(issueNumber)) {
                 task.setSuperiorMask(serialNumber);
                 this.updateById(task); // 更新数据库中的记录
-                System.out.println("派发任务后续子树节点修改成功++++++++++++++++++");
+//                System.out.println("派发任务后续子树节点修改成功++++++++++++++++++");
             }
         }
         return null;
+    }
+
+    @Override
+    public PageUtils acceptqueryPage(Map<String, Object> params) {
+        SysUserEntity role = ShiroUtils.getUserEntity();
+        String rolename = role.getUsername();
+        System.out.println("当前登录人信息"+role);
+        IPage<IssueMaskTableEntity> page = this.page(
+                new Query<IssueMaskTableEntity>().getPage(params),
+                new QueryWrapper<IssueMaskTableEntity>().eq("recipients", rolename)
+                        .ne("state", "已派发") // 筛选state不为“已派发”的数据
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils distributequeryPage(Map<String, Object> params) {
+        SysUserEntity role = ShiroUtils.getUserEntity();
+        String rolename = role.getUsername();
+        System.out.println("当前登录人信息"+role);
+        IPage<IssueMaskTableEntity> page = this.page(
+                new Query<IssueMaskTableEntity>().getPage(params),
+                new QueryWrapper<IssueMaskTableEntity>().eq("recipients", rolename)
+                        .eq("state", "已派发") // 筛选state为“已派发”的数据
+        );
+        return new PageUtils(page);
     }
 
 }

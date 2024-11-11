@@ -6,133 +6,134 @@
 <!--      </el-form-item>-->
       <el-form-item>
 <!--        <el-button @click="recigetDataList()">查询</el-button>-->
-<!--        <el-button v-if="isAuth('generator:issuemasktable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
-<!--        <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
+        <el-button v-if="isAuth('generator:issuemasktable:info')" type="primary" @click="accepttasklist()">接受任务列表</el-button>
+        <el-button v-if="isAuth('generator:issuemasktable:info')" type="danger" @click="distributetasklist()">派发任务列表</el-button>
       </el-form-item>
     </el-form>
-    <el-table
-      :data="dataList"
-      border
-      v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
-      style="width: 100%;">
-      <el-table-column
-        type="selection"
-        header-align="center"
-        align="center"
-        width="50">
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="issuemaskId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="serialNumber"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="序号">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="issueNumber"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题编号(所属问题)">-->
-<!--      </el-table-column>-->
-      <el-table-column
-        prop="issueNumber"
-        header-align="center"
-        align="center"
-        label="问题编号(所属问题)">
-        <template slot-scope="scope">
-    <span @click="handleIssueClick(scope.row.issueNumber)" style="cursor: pointer; color: blue; text-decoration: underline;">
-      {{ scope.row.issueNumber }}
-    </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="reviewers"
-        header-align="center"
-        align="center"
-        label="审核人">
-      </el-table-column>
-      <el-table-column
-        prop="reviewerOpinion"
-        header-align="center"
-        align="center"
-        label="审核意见">
-      </el-table-column>
-      <el-table-column
-        prop="recipients"
-        header-align="center"
-        align="center"
-        label="接收人">
-      </el-table-column>
-      <el-table-column
-        prop="maskcontent"
-        header-align="center"
-        align="center"
-        label="任务内容">
-      </el-table-column>
-      <el-table-column
-        prop="creator"
-        header-align="center"
-        align="center"
-        label="任务发起人">
-      </el-table-column>
-      <el-table-column
-        prop="creationTime"
-        header-align="center"
-        align="center"
-        label="发起时间">
-      </el-table-column>
-      <el-table-column
-        prop="requiredCompletionTime"
-        header-align="center"
-        align="center"
-        label="要求完成时间">
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="state"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="状态">-->
-<!--      </el-table-column>-->
-      <el-table-column prop="state" header-align="center" align="center" label="状态">
-        <template slot-scope="scope">
-    <span v-if="scope.row.state === '审核中'">
-      <el-tag type="info" disable-transitions>审核中</el-tag>
-    </span>
-          <span v-else-if="scope.row.state === '执行中'">
-      <el-tag type="primary" disable-transitions>执行中</el-tag>
-    </span>
-          <span v-else-if="scope.row.state === '未通过审核'">
-      <el-tag type="danger" disable-transitions>未通过审核</el-tag>
-    </span>
-          <span v-else-if="scope.row.state === '已派发'">
-      <el-tag type="warning" disable-transitions>已派发</el-tag>
-    </span>
-          <span v-else-if="scope.row.state === '已完成'">
-      <el-tag type="success" disable-transitions>已完成</el-tag>
-    </span>
-          <span v-else>-</span> <!-- 处理未知状态 -->
-        </template>
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="150"
-        label="操作">
-        <template slot-scope="scope">
-<!--          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>-->
-<!--          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>-->
-          <el-button v-if="showButtons" type="text" size="small" @click="completeHandle(scope.row.issuemaskId,scope.row)">完成</el-button>
-          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId,scope.row)">派发</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+      <el-table
+        :data="dataList"
+        border
+        v-loading="dataListLoading"
+        @selection-change="selectionChangeHandle"
+        style="width: 100%;">
+        <el-table-column
+          type="selection"
+          header-align="center"
+          align="center"
+          width="50">
+        </el-table-column>
+        <el-table-column
+          prop="issueNumber"
+          header-align="center"
+          align="center"
+          label="问题编号(所属问题)">
+          <template slot-scope="scope">
+      <span @click="handleIssueClick(scope.row.issueNumber)" style="cursor: pointer; color: blue; text-decoration: underline;">
+        {{ scope.row.issueNumber }}
+      </span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="reviewers"
+          header-align="center"
+          align="center"
+          label="审核人">
+        </el-table-column>
+        <el-table-column
+          prop="reviewerOpinion"
+          header-align="center"
+          align="center"
+          label="审核意见">
+        </el-table-column>
+        <el-table-column
+          prop="recipients"
+          header-align="center"
+          align="center"
+          label="接收人">
+        </el-table-column>
+        <el-table-column
+          prop="maskcontent"
+          header-align="center"
+          align="center"
+          label="任务内容">
+        </el-table-column>
+        <el-table-column
+          prop="handlingScenarios"
+          header-align="center"
+          align="center"
+          label="处理方案">
+        </el-table-column>
+        <el-table-column
+          prop="annex"
+          header-align="center"
+          align="center"
+          label="附件">
+          <template slot-scope="scope">
+            <el-button type="text" @click="handleFileAction(scope.row.annex, scope.row.issuemaskId)">
+              预览
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="creator"
+          header-align="center"
+          align="center"
+          label="任务发起人">
+        </el-table-column>
+        <el-table-column
+          prop="creationTime"
+          header-align="center"
+          align="center"
+          label="发起时间">
+        </el-table-column>
+        <el-table-column
+          prop="requiredCompletionTime"
+          header-align="center"
+          align="center"
+          label="要求完成时间">
+        </el-table-column>
+  <!--      <el-table-column-->
+  <!--        prop="state"-->
+  <!--        header-align="center"-->
+  <!--        align="center"-->
+  <!--        label="状态">-->
+  <!--      </el-table-column>-->
+        <el-table-column prop="state" header-align="center" align="center" label="状态">
+          <template slot-scope="scope">
+      <span v-if="scope.row.state === '审核中'">
+        <el-tag type="info" disable-transitions>审核中</el-tag>
+      </span>
+            <span v-else-if="scope.row.state === '执行中'">
+        <el-tag type="primary" disable-transitions>执行中</el-tag>
+      </span>
+            <span v-else-if="scope.row.state === '未通过审核'">
+        <el-tag type="danger" disable-transitions>未通过审核</el-tag>
+      </span>
+            <span v-else-if="scope.row.state === '已派发'">
+        <el-tag type="warning" disable-transitions>已派发</el-tag>
+      </span>
+            <span v-else-if="scope.row.state === '已完成'">
+        <el-tag type="success" disable-transitions>已完成</el-tag>
+      </span>
+            <span v-else>-</span> <!-- 处理未知状态 -->
+          </template>
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          header-align="center"
+          align="center"
+          width="150"
+          label="操作">
+          <template slot-scope="scope">
+  <!--          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>-->
+  <!--          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>-->
+            <el-button v-if="showButtons" type="text" size="small" @click="completeHandle(scope.row.issuemaskId,scope.row)">完成</el-button>
+            <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId,scope.row)">派发</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -142,6 +143,7 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
+
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="recigetDataList"></add-or-update>
     <add-or-updateD v-if="addOrUpdateVisibleD" ref="addOrUpdateD" @refreshDataList="recigetDataList"></add-or-updateD>
@@ -182,6 +184,32 @@
       this.recigetDataList()
     },
     methods: {
+      getImageUrl(fileflag) {
+        const token = this.$cookie.get('token'); // 获取当前的 token
+        if (!token) {
+          console.error('Token not found!');
+          return '';
+        }
+        return `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+      },
+      handleFileAction(fileflag, id) {
+        const token = this.$cookie.get('token'); // 获取当前的 token
+        if (!token) {
+          console.error('Token not found!');
+          return;
+        }
+        if (!fileflag) {
+          // 如果没有 fileflag，弹出警告框
+          this.$message({
+            message: '没有文件可预览！',
+            type: 'warning'
+          });
+        } else {
+          // 拼接带有 token 的请求地址
+          const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+          window.open(url);
+        }
+      },
       handleIssueClick(issueNumber){
         this.addOrUpdateVisibleD = true
         this.$nextTick(() => {
@@ -206,6 +234,50 @@
             this.$refs.assetOrUpdate.init1(id)
           })
         }
+      },
+      //接受列表
+      accepttasklist () {
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuemasktable/accepttasklist'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.dataForm.key
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
+      },
+      //派发列表
+      distributetasklist () {
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuemasktable/distributetasklist'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.dataForm.key
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
       },
       // 获取数据列表，接收人可以看见的数据
       recigetDataList () {

@@ -75,6 +75,9 @@
         <el-form-item label="问题描述" prop="issueDescription">
           <el-input v-model="dataForm.issueDescription" placeholder="问题描述"></el-input>
         </el-form-item>
+        <el-form-item label="初步分析" prop="peliminaryAnalysis">
+          <el-input v-model="dataForm.peliminaryAnalysis" placeholder="初步分析"></el-input>
+        </el-form-item>
         <!--    <el-form-item label="问题照片" prop="issuePhoto">-->
         <!--      <img v-if="dataForm.issuePhoto" :src="dataForm.issuePhoto" alt="问题照片" style="max-width: 100%;">-->
         <!--    </el-form-item>-->
@@ -172,6 +175,34 @@
         >
           <el-button type="primary">上传图片</el-button>
         </el-upload>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancel()">取消</el-button>
+        <el-button type="primary" @click="dataFormSubmitR()">确定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      :title="'验证指定'"
+      :close-on-click-modal="false"
+      :visible.sync="visibleVE">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmitR()" label-width="150px">
+        <el-form-item label="验证人" prop="verifier">
+          <el-select v-model="dataForm.verifier" filterable placeholder="请选择验证人">
+            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.label">
+              </el-option>
+            </el-option-group>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="验证截止日期" prop="verificationDeadline">
+          <el-date-picker
+            v-model="dataForm.verificationDeadline"
+            type="date"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="请选择日期">
+          </el-date-picker>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancel()">取消</el-button>
@@ -451,6 +482,7 @@ export default {
       visible1: false,
       visibleR: false,
       visibleT: false,
+      visibleVE: false,
       visibleAs: false,
       revisible: false,
       retimevisible: false,
@@ -481,6 +513,9 @@ export default {
         issueCategoryId: '',
         vehicleTypeId: '',
         vehicleNumberId: '',
+        peliminaryAnalysis: '',
+        verificationDeadline: '',
+        overDue: '',
         issueDescription: '',
         vehicleTypeOptions: [],
         vehicleNumberOptions: [],
@@ -681,6 +716,7 @@ export default {
       this.vehicleNumberOptions = []
       this.visible = false // 关闭对话框或重置其他状态
       this.visibleR = false // 关闭对话框或重置其他状态
+      this.visibleVE = false // 关闭对话框或重置其他状态
     },
     cancel1 () {
       // 重置 subtasks 数组，只保留一个初始组合
@@ -860,6 +896,7 @@ export default {
                   'issueDescription': this.dataForm.issueDescription,
                   'issuePhoto': this.dataForm.issuePhoto,
                   'rectificationRequirement': this.dataForm.rectificationRequirement,
+                  'peliminaryAnalysis': this.dataForm.peliminaryAnalysis,
                   'requiredCompletionTime': this.dataForm.requiredCompletionTime,
                   'responsibleDepartment': this.dataForm.responsibleDepartment,
                   'rectificationStatus': this.dataForm.rectificationStatus,
@@ -893,6 +930,24 @@ export default {
                       this.visible = false;
                       this.visibleR = false;
                       this.$emit('refreshDataList');
+                      // 新增的请求，发送问题ID和问题类型到后端
+                      this.$http({
+                        url: this.$http.adornUrl('/generator/issuetable/checkReplicateIssue'),
+                        method: 'post',
+                        data: this.$http.adornData({
+                          issueId: this.dataForm.issueId,
+                          issueCategoryId: this.dataForm.issueCategoryId
+                        })
+                      }).then(({ data }) => {
+                        console.log('checkreplicateIssue', data);
+                        if (data && data.code === 0) {
+                          this.$message.success("附加操作成功");
+                        } else {
+                          this.$message.error("附加操作失败: " + data.msg);
+                        }
+                      }).catch(error => {
+                        console.error('附加请求失败：', error);
+                      });
                     }
                   });
                 } else {
@@ -1034,6 +1089,7 @@ export default {
               this.dataForm.issueDescription = data.issueTable.issueDescription
               this.dataForm.issuePhoto = data.issueTable.issuePhoto
               this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+              this.dataForm.peliminaryAnalysis = data.issueTable.peliminaryAnalysis
               this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
               this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
               this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
@@ -1089,6 +1145,62 @@ export default {
               this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
               this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
               this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+              this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
+              this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
+              this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
+              this.dataForm.remark = data.issueTable.remark
+              this.dataForm.creationTime = data.issueTable.creationTime
+              this.dataForm.lastModifier = data.issueTable.lastModifier
+              this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
+              this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
+              this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
+              this.dataForm.creationDuration = data.issueTable.creationDuration
+              this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
+              this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
+              this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
+              this.dataForm.verifier = data.issueTable.verifier
+              this.dataForm.superiorMask = data.issueMaskTable.superiorMask
+              this.dataForm.nextMask = data.issueMaskTable.nextMask
+              this.dataForm.formula = data.issueTable.formula
+              // 设置关联问题
+              // this.dataForm.associatedIssueIds = data.issueTable.associatedIssueAddition ? data.issueTable.associatedIssueAddition.split(',') : [] // 将逗号分隔的字符串转换为数组
+            }
+          })
+        }
+      })
+    },
+    initVE (id) {
+      this.fetchuserinform() //获取用户名
+      this.dataForm.issueId = id || 0
+      console.log("成功获取ID：" ,this.dataForm.issueId)
+      this.visibleVE = true
+      // console.log("成功获取用户名：" ,this.dataForm.userinfo)
+      this.$nextTick(() => {
+        this.$refs['dataForm'].resetFields()
+        if (this.dataForm.issueId) {
+          this.$http({
+            url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.dataForm.serialNumber = data.issueTable.serialNumber
+              this.dataForm.issueNumber = data.issueTable.issueNumber
+              this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
+              this.dataForm.inspectionDate = data.issueTable.inspectionDate
+              this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
+              this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
+              this.dataForm.vehicleTypeIds = data.issueTable.vehicleTypeId ? data.issueTable.vehicleTypeId.split(',') : [] // 将逗号分隔的字符串转换为数组
+              this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
+              this.dataForm.issueDescription = data.issueTable.issueDescription
+              this.dataForm.issuePhoto = data.issueTable.issuePhoto
+              this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+              this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
+              this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
+              this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
+              this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+              this.dataForm.overDue = data.issueTable.overDue
+              this.dataForm.verificationDeadline = data.issueTable.verificationDeadline
               this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
               this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
               this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
@@ -1454,6 +1566,9 @@ export default {
               'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,
               'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
               'causeAnalysis': this.dataForm.causeAnalysis,
+              'verificationDeadline': this.dataForm.verificationDeadline,
+              'verifier': this.dataForm.verifier,
+              'overDue':'false',
               'state': '持续',
             })
           }).then(({data}) => {
@@ -1464,6 +1579,7 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visibleR = false
+                  this.visibleVE = false
                   this.$emit('refreshDataList')
                 }
               })

@@ -46,6 +46,7 @@
       </div>
       <div id="task-chart" style="width: 100%; height: 400px;"></div> <!-- 用于echarts图表 -->
       <div slot="footer">
+        <el-button v-if="isAuth('generator:issuemasktable:admin')" @click="openTaskList">任务列表</el-button>
         <el-button @click="taskDetailVisible = false">关闭</el-button>
       </div>
     </el-dialog>
@@ -127,6 +128,12 @@
         header-align="center"
         align="center"
         label="问题描述">
+      </el-table-column>
+      <el-table-column
+        prop="peliminaryAnalysis"
+        header-align="center"
+        align="center"
+        label="初步分析">
       </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="issuePhoto"-->
@@ -347,7 +354,7 @@
         label="操作">
         <template slot-scope="scope">
 <!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.issueId)">修改</el-button>-->
-          <el-button type="text" size="small" @click="showTaskDetails(scope.row.issueNumber)">问题详情</el-button>
+          <el-button type="text" size="small" @click="showTaskDetails(scope.row.issueNumber, scope.row.issueId)">完成情况</el-button>
           <el-button type="text" size="small" @click="reuseTask(scope.row.issueId)">问题重写</el-button>
           <el-button type="text" size="small" @click="closeRelatedTasks(scope.row.issueId)">问题关闭</el-button>
           <el-button type="text" size="small" @click="showAssociatedIssues(scope.row.associatedRectificationRecords)">关联问题</el-button>
@@ -404,6 +411,10 @@
           vehicleTypeId: '',
           responsibleDepartment: '',
         },
+        tempParams:{
+          issueId: '',
+          issueNumber: '',
+        },
         issueCategoryOptions: [],
         vehicleTypeOptions: [],
         departmentOptions: [
@@ -459,6 +470,18 @@
       this.fetchData()
     },
     methods: {
+      openTaskList() {
+        console.log('打开任务列表', this.tempParams.issueId)
+        console.log('打开任务列表', this.tempParams.issueNumber)
+        this.taskDetailVisible = false;
+        this.$router.push({
+          name: 'issue-issuemask',
+          params: {
+            issueId: this.tempParams.issueId,
+            issueNumber: this.tempParams.issueNumber
+          }
+        })
+      },
       getImageUrl(fileflag) {
         const token = this.$cookie.get('token'); // 获取当前的 token
         if (!token) {
@@ -486,8 +509,10 @@
         // 按照逗号分隔，并去除多余的空格
         return verificationConclusion.split(',').map(state => state.trim());
       },
-      showTaskDetails(issueNumber) {
+      showTaskDetails(issueNumber,issueId) {
         this.fetchTaskDetails(issueNumber);
+        this.tempParams.issueId = issueId;
+        this.tempParams.issueNumber = issueNumber;
         this.taskDetailVisible = true; // 显示弹窗
       },
       fetchTaskDetails(issueNumber) {

@@ -4,9 +4,15 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+      <el-form-item label="问题等级" prop="issueGrade">
+        <el-input v-model="dataForm.issueGrade" placeholder="问题等级"></el-input>
+      </el-form-item>
     <el-form-item label="问题类别" prop="concreteIssueCategory">
       <el-input v-model="dataForm.concreteIssueCategory" placeholder="具体问题类别"></el-input>
     </el-form-item>
+      <el-form-item label="等级说明" prop="gradeIllustrate">
+        <el-input v-model="dataForm.gradeIllustrate" placeholder="等级说明"></el-input>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -22,7 +28,9 @@
         visible: false,
         dataForm: {
           issueCategoryId: 0,
-          concreteIssueCategory: ''
+          issueGrade: '',
+          concreteIssueCategory: '',
+          gradeIllustrate: '',
         },
         dataRule: {
           concreteIssueCategory: [
@@ -44,6 +52,8 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
+                this.dataForm.issueGrade = data.issueTypeTable.issueGrade
+                this.dataForm.gradeIllustrate = data.issueTypeTable.gradeIllustrate
                 this.dataForm.concreteIssueCategory = data.issueTypeTable.concreteIssueCategory
               }
             })
@@ -59,6 +69,8 @@
               method: 'post',
               data: this.$http.adornData({
                 'issueCategoryId': this.dataForm.issueCategoryId || undefined,
+                'issueGrade': this.dataForm.issueGrade,
+                'gradeIllustrate': this.dataForm.gradeIllustrate,
                 'concreteIssueCategory': this.dataForm.concreteIssueCategory
               })
             }).then(({data}) => {

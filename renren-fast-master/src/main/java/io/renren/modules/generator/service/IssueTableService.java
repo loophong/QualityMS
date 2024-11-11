@@ -56,5 +56,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     boolean checkDuplicateIssue(List<String> vehicleNumbers, String issueCategoryIds);
 
     IssueTableEntity getByassociate(String associatedRectificationRecords);
+
+    boolean checkReplicateIssue(Integer issueId, String issueCategoryIds);
 }
 

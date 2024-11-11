@@ -223,6 +223,23 @@ public class IssueTableController {
         return R.ok();
     }
 
+    @RequestMapping("/checkReplicateIssue")
+    @RequiresPermissions("generator:issuetable:list")
+    public R checkReplicateIssue(@RequestBody Map<String, Object> params) {
+        // 获取前端传递的车号列表和问题类别ID字符串
+        Integer issueId = (Integer) params.get("issueId"); // 问题ID是一个整数
+        String issueCategoryIds = (String) params.get("issueCategoryId"); // 问题类别ID是一个字符串
+
+        // 调用服务层方法检查是否有重复的车号和问题类别
+        boolean isDuplicate = issueTableService.checkReplicateIssue(issueId, issueCategoryIds);
+//        System.out.println("结束检查车号和问题类别是否重复"+isDuplicate);
+        if (isDuplicate) {
+            return R.ok("相同问题已发生");
+        }
+
+        return R.ok();
+    }
+
 
 
 

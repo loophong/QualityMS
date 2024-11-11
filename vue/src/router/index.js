@@ -129,13 +129,13 @@ const mainRoutes = {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/creatorissuemask'),
       name: 'issue-issuemask',
-      meta: { title: '任务详情', isDynamic: true, isTab: true }
+      meta: { title: '任务详情', isDynamic: true, isTab: false }
     },
     {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/issuemaskflow'),
       name: 'issue-issueflow',
-      meta: { title: '任务流程', isDynamic: true, isTab: true }
+      meta: { title: '任务流程', isDynamic: true, isTab: false }
     },
     {
       path: '/otherToIssue',

@@ -28,6 +28,8 @@
         <result property="remark" column="remark"/>
         <result property="creator" column="creator"/>
         <result property="creationTime" column="creation_time"/>
+        <result property="verificationDeadline" column="Verification_deadline"/>
+        <result property="overDue" column="over_due"/>
         <result property="lastModifier" column="last_modifier"/>
         <result property="lastModificationTime" column="last_modification_time"/>
         <result property="associatedRectificationRecords" column="associated_rectification_records"/>

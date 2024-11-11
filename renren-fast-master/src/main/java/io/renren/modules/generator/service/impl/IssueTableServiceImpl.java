@@ -770,23 +770,43 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
 
     @Override
     public boolean checkDuplicateIssue(List<String> vehicleNumbers, String issueCategoryIds) {
-        // 构建查询条件：查询 issue_category_id 和 vehicle_number_id
+        // 1. 查询与问题类别相同的所有记录
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
-
-        // 1. 使用 in 查询 issue_category_id
         queryWrapper.eq("issue_category_id", issueCategoryIds);
 
-        // 2. 通过 vehicle_number_id 字段模糊匹配车号
-        for (String vehicleNumber : vehicleNumbers) {
-            queryWrapper.or().like("vehicle_number_id", "%" + vehicleNumber + "%"); // 添加模糊查询条件
+        List<IssueTableEntity> issueList = this.list(queryWrapper); // 获取所有符合条件的记录
+        Set<String> vehicleNumbersFromDb = new HashSet<>();  // 用于存储从数据库中提取的车号
+
+        // 2. 处理每条记录的 vehicle_number_id 字段，按逗号分割并保存到集合中
+        for (IssueTableEntity issue : issueList) {
+            String vehicleNumberId = issue.getVehicleNumberId();  // 获取车号字段
+            if (vehicleNumberId != null) {
+                String[] vehicleNumberArray = vehicleNumberId.split(","); // 按逗号分隔车号
+                for (String vehicleNumber : vehicleNumberArray) {
+                    vehicleNumbersFromDb.add(vehicleNumber.trim());  // 添加到集合中，去除前后空格
+                }
+            }
         }
 
-        // 执行查询，查找是否存在相同的记录
-        int count = this.count(queryWrapper); // 使用 count 查询符合条件的记录数
+        System.out.println("从数据库中提取的车号: " + vehicleNumbersFromDb);
 
-        // 如果查询结果为 0，说明没有符合条件的记录
-        return count > 0; // 如果 count 大于 0，说明存在相同的记录
+        // 3. 用传入的车号列表与从数据库中提取的车号进行匹配
+        int count = 0;
+        for (String vehicleNumber : vehicleNumbers) {
+            if (vehicleNumbersFromDb.contains(vehicleNumber)) {
+                count++; // 如果传入的车号在数据库中存在，计数加一
+            }
+        }
+
+        System.out.println("匹配到的车号数量: " + count);
+        // 如果有至少一个车号匹配，则返回 true
+        return count > 0;
     }
+
+
+
+
+
 
     @Override
     public IssueTableEntity getByassociate(String associatedRectificationRecords) {
@@ -798,6 +818,28 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
         // 调用 MyBatis-Plus 的方法查找对应的实体
         return this.getOne(queryWrapper, false); // 这里的 false 表示如果没有找到记录不会抛出异常
     }
+
+    @Override
+    public boolean checkReplicateIssue(Integer issueId, String issueCategoryIds) {
+        // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("issue_category_id", issueCategoryIds);
+
+        // 查询符合条件的记录
+        List<IssueTableEntity> issues = this.list(queryWrapper);
+
+        // 判断是否存在重复记录
+        boolean isDuplicate = !issues.isEmpty();
+
+        // 更新 overdue 属性为 true
+        for (IssueTableEntity issue : issues) {
+            issue.setOverDue("true");
+            this.updateById(issue);
+        }
+
+        return isDuplicate; // 返回是否存在重复记录
+    }
+
 
 
     private Integer countAllIssues() {

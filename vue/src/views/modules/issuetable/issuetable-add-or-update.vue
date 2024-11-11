@@ -199,6 +199,7 @@
           serialNumber: '',
           issueNumber: '',
           inspectionDepartment: '',
+          peliminaryAnalysis: '',
           inspectionDate: '',
           issueCategoryId: '',
           vehicleTypeId: '',
@@ -300,6 +301,7 @@
                 this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
                 this.dataForm.issueDescription = data.issueTable.issueDescription
                 this.dataForm.issuePhoto = data.issueTable.issuePhoto
+                this.dataForm.peliminaryAnalysis = data.issueTable.peliminaryAnalysis
                 this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
                 this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
                 this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
@@ -366,6 +368,7 @@
                 'rectificationRequirement': this.dataForm.rectificationRequirement,
                 'requiredCompletionTime': this.dataForm.requiredCompletionTime,
                 'responsibleDepartment': this.dataForm.responsibleDepartment,
+                'peliminaryAnalysis': this.dataForm.peliminaryAnalysis,
                 'rectificationStatus': this.dataForm.rectificationStatus,
                 'actualCompletionTime': this.dataForm.actualCompletionTime,
                 'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,

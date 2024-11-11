@@ -52,6 +52,8 @@
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
                 @click="deleteHandle(scope.row.id)">删除</el-button>
+              <!-- <el-button type="text" size="small" v-if="scope.row.parentId&&isAuth('qcMembers:leader:change')"
+                @click="leaderChangeHandle(scope.row.id, scope.row.parentId)">移交组长</el-button> -->
             </template>
           </el-table-column>
         </el-table>

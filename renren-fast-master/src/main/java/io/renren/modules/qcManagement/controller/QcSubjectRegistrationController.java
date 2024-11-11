@@ -9,15 +9,14 @@ import io.renren.modules.qcManagement.entity.QcExamineStatusEntity;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.service.QcSubjectRegistrationService;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -89,15 +88,33 @@ public class QcSubjectRegistrationController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 我开展的列表
+     */
+    @RequestMapping("/leadList")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R myListLeader(@RequestParam Map<String, Object> params){
 
+        PageUtils page = qcSubjectRegistrationService.queryPage(params);
+        String userName= ShiroUtils.getUserEntity().getUsername();
+        List<QcSubjectRegistrationEntity> resultList = (List<QcSubjectRegistrationEntity>) page.getList();
+        // 过滤结果列表,查询只与当前角色相关的
+        List<QcSubjectRegistrationEntity> filteredResultList = resultList.stream()
+                .filter(entity -> entity.getTopicLeader().contains(userName))
+                .collect(Collectors.toList());
+        page.setList(filteredResultList);
+        page.setTotalCount(filteredResultList.size());
+        return R.ok().put("page", page);
+    }
 
 
     /**
-     * 我的列表
+     * 我参与的列表
      */
     @RequestMapping("/myList")
     @RequiresPermissions("qcSubject:registration:list")
     public R myList(@RequestParam Map<String, Object> params){
+        log.info("查询查询："+params);
         PageUtils page = qcSubjectRegistrationService.queryPage(params);
         String userName= ShiroUtils.getUserEntity().getUsername();
 //        String userName= "95";
@@ -111,16 +128,24 @@ public class QcSubjectRegistrationController {
         page.setTotalCount(filteredResultList.size());
         return R.ok().put("page", page);
     }
-//    /**
-//     * 根据组名获得成员
-//     */
-//    @RequestMapping("/getMembers")
-//    @RequiresPermissions("qcSubject:registration:list")
-//    public R getMembers(@RequestParam String groupName){
-//        List<QcGroupMemberEntity> qcGroupMemberEntityList = qcSubjectRegistrationService.getMembersOfGroup(groupName);
-//        return R.ok().put("成员",qcGroupMemberEntityList);
-//    }
-
+    /**
+     * 获取当前登录用户名
+     */
+    @RequestMapping("/user")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R getUerName(){
+        String userName= ShiroUtils.getUserEntity().getUsername();
+        return R.ok().put("userName",userName);
+    }
+    /**
+     * 课题名称重复性检查
+     */
+    @RequestMapping("/exist")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R existName(@RequestParam String topicName){
+        boolean exist=qcSubjectRegistrationDao.ifExistSubjectName(topicName);
+        return R.ok().put("exist",exist);
+    }
     /**
      * 信息
      */
@@ -138,7 +163,15 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/save")
     @RequiresPermissions("qcSubject:registration:save")
     public R save(@RequestBody QcSubjectRegistrationEntity qcSubjectRegistration){
-		qcSubjectRegistrationService.save(qcSubjectRegistration);
+        Integer tmpId = qcSubjectRegistrationDao.maxOfId();
+        // 获取当前年份
+        Date currentDate = new Date();
+        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+        String currentYear = yearFormat.format(currentDate);
+        String topicNumber = "PJHLQCKT-"+currentYear +"-"+(tmpId+1);
+        log.info("课题编号:"+topicNumber);
+        qcSubjectRegistration.setTopicNumber(topicNumber);
+        qcSubjectRegistrationService.save(qcSubjectRegistration);
         return R.ok().put("id", qcSubjectRegistration.getQcsrId());
     }
 

@@ -44,6 +44,17 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
             "WHERE result_type  != null|| result_type != ''",
     })
     Integer countSubmitted();
+
+    //查询编号最大值
+    @Select({
+            "SELECT MAX(qcsr_id)",
+            "FROM qc_subject_registration",
+    })
+    Integer maxOfId();
+
+    //查询课题名称是否重复
+
+    boolean ifExistSubjectName(String name);
     //计算课题活动状态
 //    @Select({
 //            "SELECT *",

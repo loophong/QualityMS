@@ -77,7 +77,17 @@ public class QcGroupMemberController {
         result.put("registrationNum", registrationNum);
         return R.ok().put("result", result);
     }
-
+    /**
+     * 移交组长
+     */
+//    @RequestMapping("/change")
+//    @RequiresPermissions("qcMembers:leader:change")
+//    public R leaderChange(@RequestParam Map<String, Object> params){
+//        QcGroupMemberEntity member= qcGroupMemberDao.selectMemberById((Integer) params.get("id"));
+//        QcGroupMemberEntity parent= qcGroupMemberDao.selectMemberById((Integer) params.get("ParentId"));
+//
+//        return R.ok();
+//    }
     /**
      * 列表
      */
@@ -119,7 +129,7 @@ public class QcGroupMemberController {
     @RequestMapping("/info/{qcgmId}")
     @RequiresPermissions("qcMembers:qcGroupMember:update")
     public R info(@PathVariable("qcgmId") Long qcgmId){
-		QcGroupMemberEntity qcGroupMember = qcGroupMemberService.getById(qcgmId);
+        QcGroupMemberEntity qcGroupMember = qcGroupMemberService.getById(qcgmId);
 
         return R.ok().put("qcGroupMember", qcGroupMember);
     }
@@ -130,7 +140,7 @@ public class QcGroupMemberController {
     @RequestMapping("/save")
     @RequiresPermissions("qcMembers:qcGroupMember:save")
     public R save(@RequestBody QcGroupMemberEntity qcGroupMember){
-		qcGroupMemberService.save(qcGroupMember);
+        qcGroupMemberService.save(qcGroupMember);
         return R.ok().put("id", qcGroupMember.getQcgmId());
     }
 
@@ -176,7 +186,7 @@ public class QcGroupMemberController {
     @RequestMapping("/delete")
     @RequiresPermissions("qcMembers:qcGroupMember:delete")
     public R delete(@RequestBody Long[] qcgmIds){
-		qcGroupMemberService.removeByIds(Arrays.asList(qcgmIds));
+        qcGroupMemberService.removeByIds(Arrays.asList(qcgmIds));
         return R.ok();
     }
 }

@@ -452,9 +452,7 @@
         console.log('获取的地址 ' ,fileflag)
         // 拼接带有 token 的请求地址
         const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
-
           window.open(url);
-
       },
 
       getStates(verificationConclusion) {

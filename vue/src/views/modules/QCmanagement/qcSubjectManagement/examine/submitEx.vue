@@ -8,10 +8,11 @@
       <span style="color:#1e1e1e; font-size: 24px;"> --跳过</span>
     </div>
     <div ref="treeChart" style="width: 100%; height: 500px;"></div>
-    <el-dialog title="课题提交" :visible.sync="showDialog1">
+    <el-dialog title="科室审核" :visible.sync="showDialog1">
       <el-form :model="form1">
         <el-form-item label="审核结果" :label-width="formLabelWidth">
-          <el-select v-model="form1.result" placeholder="" :disabled="!isAuth('qcSubject:plan:submit')">
+          <el-select v-model="form1.result" placeholder=""
+            :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B'">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
@@ -22,7 +23,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog1 = false">取 消</el-button>
-        <el-button type="primary" @click="showDialog1 = false">确 定</el-button>
+        <el-button type="primary" @click="dataFormSubmitEx(form1.id)">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog title="成果认定" :visible.sync="showDialog2">
@@ -62,7 +63,6 @@
         <el-button type="primary" @click="dataFormSubmitEx(form3.id)">确 定</el-button>
       </div>
     </el-dialog>
-    <!-- TODO 表格内容动态 -->
     <el-dialog title="成果初评" :visible.sync="showDialog4" width="60%">
       <el-form :model="form4">
         <table width="100%">
@@ -82,8 +82,8 @@
             <tr>
               <td rowspan="5">1</td>
               <td rowspan="5">活动过程<br />的规范性</td>
-              <td>{{ commentTable[0].tableNumber }}</td>
-              <td>{{ commentTable[0].tableTag }}</td>
+              <td v-if="commentTable && commentTable[0]">{{ commentTable[0].tableNumber }}</td>
+              <td v-if="commentTable && commentTable[0]">{{ commentTable[0].tableTag }}</td>
               <td>
                 <ul>
                   <li v-for="(item, index) in commentTableFirst[0]" :key="index">{{ item }}</li>
@@ -93,8 +93,8 @@
               <td></td>
             </tr>
             <tr>
-              <td>{{ commentTable[1].tableNumber }}</td>
-              <td>{{ commentTable[1].tableTag }}</td>
+              <td v-if="commentTable && commentTable[0]">{{ commentTable[1].tableNumber }}</td>
+              <td v-if="commentTable && commentTable[0]">{{ commentTable[1].tableTag }}</td>
               <td>
                 <ul>
                   <li v-for="(item, index) in commentTableFirst[1]" :key="index">{{ item }}</li>
@@ -109,8 +109,8 @@
               <td rowspan="4">推进组</td>
             </tr>
             <tr>
-              <td>{{ commentTable[2].tableNumber }}</td>
-              <td>{{ commentTable[2].tableTag }}</td>
+              <td v-if="commentTable && commentTable[0]">{{ commentTable[2].tableNumber }}</td>
+              <td v-if="commentTable && commentTable[0]">{{ commentTable[2].tableTag }}</td>
               <td>
                 <ul>
                   <li v-for="(item, index) in commentTableFirst[2]" :key="index">{{ item }}</li>
@@ -124,8 +124,8 @@
               </td>
             </tr>
             <tr>
-              <td>{{ commentTable[3].tableNumber }}</td>
-              <td>{{ commentTable[3].tableTag }}</td>
+              <td v-if="commentTable && commentTable[0]"> {{ commentTable[3].tableNumber }}</td>
+              <td v-if="commentTable && commentTable[0]">{{ commentTable[3].tableTag }}</td>
               <td>
                 <ul>
                   <li v-for="(item, index) in commentTableFirst[3]" :key="index">{{ item }}</li>
@@ -139,8 +139,8 @@
               </td>
             </tr>
             <tr>
-              <td>{{ commentTable[4].tableNumber }}</td>
-              <td>{{ commentTable[4].tableTag }}</td>
+              <td v-if="commentTable && commentTable[0]">{{ commentTable[4].tableNumber }}</td>
+              <td v-if="commentTable && commentTable[0]">{{ commentTable[4].tableTag }}</td>
               <td>
                 <ul>
                   <li v-for="(item, index) in commentTableFirst[4]" :key="index">{{ item }}</li>
@@ -200,8 +200,8 @@
         </thead>
         <tbody>
           <tr>
-            <td>{{ commentTable[5].tableNumber }}</td>
-            <td colspan="3">{{ commentTable[5].tableTag }}</td>
+            <td v-if="commentTable && commentTable[0]">{{ commentTable[5].tableNumber }}</td>
+            <td colspan="3" v-if="commentTable && commentTable[0]">{{ commentTable[5].tableTag }}</td>
             <td>
               <ul>
                 <li v-for="(item, index) in commentTableSecond[0]" :key="index">{{ item }}</li>
@@ -216,8 +216,8 @@
             <td>评价组</td>
           </tr>
           <tr>
-            <td>{{ commentTable[6].tableNumber }}</td>
-            <td colspan="3">{{ commentTable[6].tableTag }}</td>
+            <td v-if="commentTable && commentTable[0]">{{ commentTable[6].tableNumber }}</td>
+            <td colspan="3" v-if="commentTable && commentTable[0]">{{ commentTable[6].tableTag }}</td>
             <td>
               <ul>
                 <li v-for="(item, index) in commentTableSecond[1]" :key="index">{{ item }}</li>
@@ -232,8 +232,8 @@
             <td>评价组</td>
           </tr>
           <tr>
-            <td>{{ commentTable[7].tableNumber }}</td>
-            <td colspan="3">{{ commentTable[7].tableTag }}</td>
+            <td v-if="commentTable && commentTable[0]">{{ commentTable[7].tableNumber }}</td>
+            <td colspan="3" v-if="commentTable && commentTable[0]">{{ commentTable[7].tableTag }}</td>
             <td>
               <ul>
                 <li v-for="(item, index) in commentTableSecond[2]" :key="index">{{ item }}</li>
@@ -248,8 +248,8 @@
             <td>评价组</td>
           </tr>
           <tr>
-            <td>{{ commentTable[8].tableNumber }}</td>
-            <td colspan="3">{{ commentTable[8].tableTag }}</td>
+            <td v-if="commentTable && commentTable[0]">{{ commentTable[8].tableNumber }}</td>
+            <td colspan="3" v-if="commentTable && commentTable[0]">{{ commentTable[8].tableTag }}</td>
             <td>
               <ul>
                 <li v-for="(item, index) in commentTableSecond[3]" :key="index">{{ item }}</li>
@@ -398,7 +398,7 @@ export default {
         {
           id: 2,
           name: '成果认定',
-          parentName: '课题提交',
+          parentName: '科室审核',
           status: '',
         },
         {
@@ -432,6 +432,13 @@ export default {
           status: 'B',
         }
       ],
+      rootNode: {
+        id: 1,
+        name: '科室审核',
+        parentName: '',
+        url: '',
+        status: 'B',
+      },
       routerParam: {
         qcsrId: '',
         topicName: '',
@@ -475,12 +482,9 @@ export default {
   async mounted() {
 
     this.initRouterParam()
-    this.getCommentTable()
+    await this.getCommentTable()
     await this.getStatusList()
-    const tmp = this.ifSelectedPart()
-    console.log(tmp)
-    console.log('-----')
-    console.log(this.dataFormEx)
+    console.log(this.commentTable)
   },
   computed: {
 
@@ -512,10 +516,11 @@ export default {
           })
           this.commentTableFirst = this.commentTable.filter(item => item.tableType === '初评').map(item => item.tableComment)
           this.commentTableSecond = this.commentTable.filter(item => item.tableType === '复评').map(item => item.tableComment)
-          console.log(this.commentTableFirst)
-          console.log(this.commentTableSecond)
+          // console.log(this.commentTableFirst)
+          // console.log(this.commentTableSecond)
 
           console.log(this.commentTable)
+          console.log(this.commentTable[8].tableNumber)
         } else {
           this.commentTable = {}
           console.log('获取评论表失败')
@@ -578,64 +583,69 @@ export default {
     },
     //初始化节点状态
     initStatus(statusId) {
-
-      if (statusId === '1') {
-        this.dataList[0].status = 'B'
-        this.dataList[1].status = 'A'
-      } else if (statusId === '2') {
-        if (this.routerParam[0].resultType.includes('其他')) {
-          this.dataList[0].status = 'C'
-          this.dataList[1].status = 'E'
-          this.dataList[2].status = 'B'
-          this.dataList[3].status = 'A'
-        } else {
-          this.dataList[0].status = 'C'
-          this.dataList[1].status = 'B'
-          this.dataList[2].status = 'A'
-        }
-      } else if (statusId === '3') {
-        this.dataList[0].status = 'C'
-        this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
-        this.dataList[2].status = 'B'
-        this.dataList[3].status = 'A'
-      } else if (statusId === '4') {
-        this.dataList[0].status = 'C'
-        this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
-        this.dataList[2].status = 'C'
-        this.dataList[3].status = 'B'
-        this.dataList[4].status = 'B'
-        this.dataList[5].status = 'A'
-      } else if (statusId === '4.1' || statusId === '4.2') {
-        if (statusId === '4.1') {
+      if (statusId === '0') {
+        this.dataList[0].status = 'A'
+      } else {
+        this.rootNode.status = 'C'
+        if (statusId === '1') {
+          this.dataList[0].status = 'B'
+          this.dataList[1].status = 'A'
+        } else if (statusId === '2') {
+          if (this.routerParam[0].resultType.includes('其他')) {
+            this.dataList[0].status = 'C'
+            this.dataList[1].status = 'E'
+            this.dataList[2].status = 'B'
+            this.dataList[3].status = 'A'
+          } else {
+            this.dataList[0].status = 'C'
+            this.dataList[1].status = 'B'
+            this.dataList[2].status = 'A'
+          }
+        } else if (statusId === '3') {
           this.dataList[0].status = 'C'
           this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
-          this.dataList[2].status = 'C'
-          this.dataList[3].status = 'C'
-          this.dataList[4].status = 'B'
-          this.dataList[5].status = 'A'
-        } else {
+          this.dataList[2].status = 'B'
+          this.dataList[3].status = 'A'
+        } else if (statusId === '4') {
           this.dataList[0].status = 'C'
           this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
           this.dataList[2].status = 'C'
           this.dataList[3].status = 'B'
-          this.dataList[4].status = 'C'
+          this.dataList[4].status = 'B'
           this.dataList[5].status = 'A'
+        } else if (statusId === '4.1' || statusId === '4.2') {
+          if (statusId === '4.1') {
+            this.dataList[0].status = 'C'
+            this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
+            this.dataList[2].status = 'C'
+            this.dataList[3].status = 'C'
+            this.dataList[4].status = 'B'
+            this.dataList[5].status = 'A'
+          } else {
+            this.dataList[0].status = 'C'
+            this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
+            this.dataList[2].status = 'C'
+            this.dataList[3].status = 'B'
+            this.dataList[4].status = 'C'
+            this.dataList[5].status = 'A'
+          }
+        } else if (statusId === '5') {
+          this.dataList[0].status = 'C'
+          this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
+          this.dataList[2].status = 'C'
+          this.dataList[3].status = 'C'
+          this.dataList[4].status = 'C'
+          this.dataList[5].status = 'B'
+        } else {
+          this.dataList[0].status = 'C'
+          this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
+          this.dataList[2].status = 'C'
+          this.dataList[3].status = 'C'
+          this.dataList[4].status = 'C'
+          this.dataList[5].status = 'C'
         }
-      } else if (statusId === '5') {
-        this.dataList[0].status = 'C'
-        this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
-        this.dataList[2].status = 'C'
-        this.dataList[3].status = 'C'
-        this.dataList[4].status = 'C'
-        this.dataList[5].status = 'B'
-      } else {
-        this.dataList[0].status = 'C'
-        this.dataList[1].status = this.routerParam[0].resultType.includes('其他') ? 'E' : 'C'
-        this.dataList[2].status = 'C'
-        this.dataList[3].status = 'C'
-        this.dataList[4].status = 'C'
-        this.dataList[5].status = 'C'
       }
+
     },
     //渲染审核流程树
     renderTree() {
@@ -643,7 +653,7 @@ export default {
       // 创建根节点
       const rootNode = {
         id: 1,
-        name: '课题提交',
+        name: '科室审核',
         parentName: '',
         url: '',
         status: this.routerParam[0].resultType ? 'C' : 'A',
@@ -660,7 +670,7 @@ export default {
           foundA = true;
         }
       });
-      const formattedData = [rootNode, ...this.dataList.map(item => ({
+      const formattedData = [this.rootNode, ...this.dataList.map(item => ({
         id: item.id,
         name: item.name,
         parentName: item.parentName,
@@ -727,7 +737,7 @@ export default {
         })
         .on('click', (event, d) => {
           console.log('Clicked on1:', d); // 打印节点数据
-          if (d.data.name === '课题提交') {
+          if (d.data.name === '科室审核') {
             this.showDialog1 = true;
             // console.log('++++++++++');
           } else if (d.data.name === '成果认定') {
@@ -805,14 +815,55 @@ export default {
     },
     // 表单提交
     dataFormSubmitEx(formId) {
-      if (formId === 2) {
+      if (formId === 1) {
         this.$http({
           url: this.$http.adornUrl(`/qcManagement/examineStatus/update`),
           method: 'post',
           data: this.$http.adornData({
             'qcExamineId': this.routerParam[0].examineId || undefined,
             'qcExamineSubject': this.routerParam[0].qcsrId,
-            'qcExamineCurrent': this.form2.result === '1' ? '2' : '1',
+            'qcExamineCurrent': this.form1.result === '1' ? '1' : '0',
+            'qcStatusOne': this.form1.result,
+            'qcOneContent': this.form1.comment,
+          })
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.renderTree()
+                this.showDialog1 = false
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+          if (this.form1.result != '1') {
+            this.$http({
+              url: this.$http.adornUrl(`/qcSubject/registration/update`),
+              method: 'post',
+              data: this.$http.adornData({
+                'qcsrId': this.routerParam[0].qcsrId,
+                'topicReviewStatus': 3,
+                'resultType': null,
+              })
+            })
+          }
+        }).catch((error) => {
+          console.log(error)
+        })
+      }
+
+      else if (formId === 2) {
+        this.$http({
+          url: this.$http.adornUrl(`/qcManagement/examineStatus/update`),
+          method: 'post',
+          data: this.$http.adornData({
+            'qcExamineId': this.routerParam[0].examineId || undefined,
+            'qcExamineSubject': this.routerParam[0].qcsrId,
+            'qcExamineCurrent': this.form2.result === '1' ? '2' : '0',
             'qcStatusTwo': this.form2.result,
             'qcTwoContent': this.form2.comment,
           })
@@ -845,7 +896,7 @@ export default {
           data: this.$http.adornData({
             'qcExamineId': this.routerParam[0].examineId || undefined,
             'qcExamineSubject': this.routerParam[0].qcsrId,
-            'qcExamineCurrent': this.form3.result === '1' ? '3' : '1',
+            'qcExamineCurrent': this.form3.result === '1' ? '3' : '0',
             'qcStatusThree': this.form3.result,
             'qcThreeContent': this.form3.comment,
           })
@@ -871,7 +922,7 @@ export default {
           data: this.$http.adornData({
             'qcExamineId': this.routerParam[0].examineId || undefined,
             'qcExamineSubject': this.routerParam[0].qcsrId,
-            'qcExamineCurrent': this.form4.result === '1' ? '4' : '1',
+            'qcExamineCurrent': this.form4.result === '1' ? '4' : '0',
             'qcFirstScore': `${this.tableData}`,
             'qcFirstLevel': this.form4.level,
             'qcStatusFour': this.form4.result,
@@ -984,7 +1035,7 @@ export default {
             data: this.$http.adornData({
               'qcExamineId': this.routerParam[0].examineId || undefined,
               'qcExamineSubject': this.routerParam[0].qcsrId,
-              'qcExamineCurrent': '1',
+              'qcExamineCurrent': '0',
               'qcStatusSix': this.form6.result,
               'qcStatusFive': '0',
               'qcSixContent': this.form6.comment,
@@ -1047,7 +1098,7 @@ export default {
             data: this.$http.adornData({
               'qcExamineId': this.routerParam[0].examineId || undefined,
               'qcExamineSubject': this.routerParam[0].qcsrId,
-              'qcExamineCurrent': '1',
+              'qcExamineCurrent': '0',
               'qcStatusSeven': this.form7.result,
               'qcStatusFive': this.form7.result,
               'qcStatusSix': this.form7.result,

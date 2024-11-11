@@ -1,7 +1,7 @@
 <template>
   <div>
     <span>
-      <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+      <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
@@ -24,7 +24,7 @@
       <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
     </span>
 
-    
+
     <el-dialog title="模版名" :visible.sync="dialogFormVisible">
       <el-input v-model="inputName" placeholder="请输入模版名" style="width:50%"></el-input>
       <div slot="footer" class="dialog-footer">

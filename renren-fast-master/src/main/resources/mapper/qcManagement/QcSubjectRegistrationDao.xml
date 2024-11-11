@@ -29,6 +29,11 @@
         <result property="examineId" column="examine_id"/>
         <result property="groupName" column="group_name"/>
     </resultMap>
+    <select id="ifExistSubjectName" resultType="boolean">
+        SELECT EXISTS (
+            SELECT * FROM qc_subject_registration WHERE topic_name = #{name}
+        )
+    </select>
 
     <!--    根据输入动态模糊查询-->
     <select id="fuzzyQueryList"

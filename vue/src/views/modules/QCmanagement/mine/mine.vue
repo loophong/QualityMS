@@ -133,17 +133,63 @@
             </template>
           </el-table-column> -->
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
           :page-sizes="[10, 20, 50, 100, 999]" :page-size="999" :total="totalPageGroup"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination>
+        </el-pagination> -->
         <!-- 弹窗, 新增 / 修改
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update> -->
       </div>
     </el-tab-pane>
-    <!-- <el-tab-pane label="我的审核" name="3">
-
-    </el-tab-pane> -->
+    <el-tab-pane label="我的审核" name="3">
+      <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
+        <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+        </el-table-column>
+        <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
+        </el-table-column>
+        <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column> -->
+        <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+        </el-table-column>
+        <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+        </el-table-column>
+        <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+        </el-table-column>
+        <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+        </el-table-column>
+        <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+        </el-table-column>
+        <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <template slot-scope="scope">
+            <span>{{
+              toStatus(scope.row.topicActivityStatus, scope.row.topicType)
+            }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+        </el-table-column>
+        <el-table-column prop="note" header-align="center" align="center" label="备注">
+        </el-table-column>
+        <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628">未通过</span>
+            <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray">未开始</span>
+            <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb">审核中</span>
+            <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146">已通过</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
+              @click="messagePlanHandle(scope.row.qcsrId)">关联计划</el-button>
+            <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
+              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              ">审核状态</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
     <el-dialog title="消息详情" :visible.sync="dialogMessageVisible">
       <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
@@ -173,16 +219,15 @@
         </el-table-column>
         <el-table-column prop="note" header-align="center" align="center" label="备注">
         </el-table-column>
-        <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+        <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
           <template slot-scope="scope">
             <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628">未通过</span>
             <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray">未开始</span>
             <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb">审核中</span>
             <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146">已通过</span>
             <span v-else>-</span>
-            <!-- 处理未知状态 -->
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
@@ -417,7 +462,11 @@ export default {
       let tipSubjectList = [];
       examineList.forEach((item) => {
         if (item.qcExamineCurrent !== "完成") {
-          if (item.qcExamineCurrent == "1" && this.isAuth("qcExamine:Achievement:recognition")) {
+          if (item.qcExamineCurrent == "0" && this.isAuth("qcExamine:department:submit")) {
+            tipList.push(item);
+            this.showNotification("科室审核");
+          }
+          else if (item.qcExamineCurrent == "1" && this.isAuth("qcExamine:Achievement:recognition")) {
             tipList.push(item);
             this.showNotification("成果认定");
           } else if (item.qcExamineCurrent == "2") {

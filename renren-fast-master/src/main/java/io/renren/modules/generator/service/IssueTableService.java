@@ -52,5 +52,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     void removeAll(Integer[] issueIds);
 
     Map<String, Integer> getCurrentMonthCompletionRate();
+
+    PageUtils queryPageFinishedList(Map<String, Object> params);
 }
 

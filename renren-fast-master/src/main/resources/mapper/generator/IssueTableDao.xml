@@ -42,5 +42,5 @@
         <result property="formula" column="formula"/>
     </resultMap>
 
-
+    <select id="selectFinishedSubjectList" resultType="io.renren.modules.generator.entity.IssueTableEntity"> SELECT * FROM issue_table WHERE verification_conclusion='已完成' </select>
 </mapper>

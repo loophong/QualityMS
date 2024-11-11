@@ -173,6 +173,17 @@ public class QcSubjectRegistrationController {
             QcSubjectRegistrationEntity qcSubjectRegistration = qcSubjectRegistrationService.getById(qcsrId);
             return R.ok().put("resultType", qcSubjectRegistration.getResultType());
         }
+
+    /**
+     * QC知识库
+     */
+
+    @RequestMapping("/finishedList")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R finishedList(@RequestParam Map<String, Object> params){
+        PageUtils page =  qcSubjectRegistrationService.queryPageFinishedList(params);
+        return R.ok().put("page", page);
+    }
     }
 
 

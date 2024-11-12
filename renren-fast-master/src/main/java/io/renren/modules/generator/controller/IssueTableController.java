@@ -203,7 +203,7 @@ public class IssueTableController {
         List<String> vehicleNumbers = (List<String>) params.get("vehicleNumbers"); // 车号是一个数组
         String issueCategoryIds = (String) params.get("issueCategoryId"); // 问题类别ID是一个字符串
 
-        System.out.println("开始检查车号和问题类别是否重复"+issueCategoryIds+","+vehicleNumbers);
+//        System.out.println("开始检查车号和问题类别是否重复"+issueCategoryIds+","+vehicleNumbers);
 
         // 参数校验
         if (vehicleNumbers == null || issueCategoryIds == null) {
@@ -215,7 +215,7 @@ public class IssueTableController {
 
         // 调用服务层方法检查是否有重复的车号和问题类别
         boolean isDuplicate = issueTableService.checkDuplicateIssue(vehicleNumbers, issueCategoryIds);
-        System.out.println("结束检查车号和问题类别是否重复"+isDuplicate);
+//        System.out.println("结束检查车号和问题类别是否重复"+isDuplicate);
         if (isDuplicate) {
             return R.error("此车已发生过相同问题");
         }

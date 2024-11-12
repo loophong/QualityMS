@@ -1,9 +1,13 @@
 package io.renren.modules.taskmanagement.service.impl;
 
+import cn.hutool.core.util.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.renren.common.utils.DateUtils;
+import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.taskmanagement.dao.TaskDao;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
+import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.FileService;
 import io.renren.modules.taskmanagement.service.TaskService;
@@ -111,6 +115,26 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         return new PageUtils(page);
     }
 
+    @Override
+    public PageUtils queryPageFinishedPlan(PlanQueryParamDTO planQueryParamDTO) {
+//        Map<String, Object> params = new HashMap<>();
+//        params.put("page", planQueryParamDTO.getPage().toString());
+//        params.put("limit", planQueryParamDTO.getLimit().toString());
+//        IPage<PlanEntity> page = this.page(
+//                new Query<PlanEntity>().getPage(params),
+//                new QueryWrapper<PlanEntity>()
+//                        .eq("plan_current_state", TaskStatus.COMPLETED)
+//                        .eq("plan_id", planQueryParamDTO.getPlan().getPlanId())
+//                        .eq("plan_name", planQueryParamDTO.getPlan().getPlanName())
+//        );
+        PlanEntity plan = new PlanEntity();
+        BeanUtils.copyProperties(planQueryParamDTO.getPlan(), plan);
+        plan.setPlanCurrentState(TaskStatus.COMPLETED);
+        Page<PlanEntity> page = new Page<>(planQueryParamDTO.getPage(), planQueryParamDTO.getLimit());
+        Page<PlanEntity> result = planDao.queryPageByParams(page,plan);
+        return new PageUtils(result);
+    }
+
     /**
      * @description: 获取任务-知识库
      * @param: params
@@ -180,5 +204,19 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         fileService.remove(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, plan.getPlanId()));
         fileService.saveBatch(files);
     }
+
+    @Override
+    public PageUtils queryPageByParams(PlanQueryParamDTO planQueryParamDTO) {
+        PlanEntity plan = new PlanEntity();
+        BeanUtils.copyProperties(planQueryParamDTO.getPlan(), plan);
+        plan.setPlanIsCompleted(0);
+        Page<PlanEntity> page = new Page<>(planQueryParamDTO.getPage(), planQueryParamDTO.getLimit());
+        Page<PlanEntity> result = planDao.queryPageByParams(page,plan);
+        // 封装分页结果
+        return new PageUtils(result);
+
+    }
+
+
 
 }

@@ -9,6 +9,7 @@ import cn.hutool.log.Log;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
+import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.FileService;
 import io.renren.modules.taskmanagement.service.TaskService;
@@ -108,6 +109,15 @@ public class PlanController {
         System.out.println(page.getList().toString());
         return R.ok().put("page", page);
     }
+    @RequestMapping("/queryUnfinished")
+    @RequiresPermissions("taskmanagement:plan:list")
+    public R queryUnfinished(@RequestBody PlanQueryParamDTO planQueryParamDTO) {
+        log.info("计划查询条件：" + planQueryParamDTO);
+        PageUtils page = planService.queryPageByParams(planQueryParamDTO);
+//        PageUtils page = planService.queryPageUnfinishedPlan(params);
+//        System.out.println(page.getList().toString());
+        return R.ok().put("page", page);
+    }
 
     /**
      * @description: 查询已完成-历史计划
@@ -117,11 +127,18 @@ public class PlanController {
      */
     @RequestMapping("/finished")
     @RequiresPermissions("taskmanagement:plan:list")
-    public R finishedList(@RequestParam Map<String, Object> params) {
-        PageUtils page = planService.queryPageFinishedPlan(params);
-        System.out.println(page.getList().toString());
+    public R finishedList(@RequestBody PlanQueryParamDTO planQueryParamDTO) {
+        log.info("计划查询条件：" + planQueryParamDTO);
+        PageUtils page = planService.queryPageFinishedPlan(planQueryParamDTO);
         return R.ok().put("page", page);
     }
+//    @RequestMapping("/finished")
+//    @RequiresPermissions("taskmanagement:plan:list")
+//    public R finishedList(@RequestParam Map<String, Object> params) {
+//        PageUtils page = planService.queryPageFinishedPlan(params);
+//        System.out.println(page.getList().toString());
+//        return R.ok().put("page", page);
+//    }
 
 
     /**
@@ -312,6 +329,19 @@ public class PlanController {
     @GetMapping("/getTasksByUserId")
     public List<TaskEntity> getTasksByUserId(@RequestParam Long userId) {
         return taskService.getTasksByUserId(userId);
+    }
+    
+    /** 
+     * @description: 获取当前计划的全部附件
+     * @param: planId 
+     * @return: java.util.List<io.renren.modules.taskmanagement.entity.FileEntity> 
+     * @author: hong
+     * @date: 2024/11/12 10:50
+     */ 
+    @GetMapping("/files/{planId}")
+    public R getFiles(@PathVariable String planId) {
+        List<FileEntity> list = fileService.list(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
+        return R.ok().put("files", list);
     }
 
 }

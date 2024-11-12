@@ -389,7 +389,8 @@ export default {
       formData.append('file', file.raw); // 将文件添加到 FormData
 
       this.$http({
-        url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        // url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        url: this.$http.adornUrl('/generator/issuetable/upload'), // 替换为实际上传接口
         method: 'post',
         data: formData,
         headers: {
@@ -773,7 +774,8 @@ export default {
       let pre;
       let nowDate = moment(new Date()).format('YYYYMMDD');
 
-      if (this.dataForm.planAssociatedIndicatorsId !== null) {
+      if (this.dataForm.planAssociatedIndicatorsId !== '') {
+        console.log("关联指标id" + this.dataForm.planAssociatedIndicatorsId)
         pre = "ZL" + '-' + "ZB" + '-';
       } else {
         pre = "ZL" + '-' + "RW" + '-';

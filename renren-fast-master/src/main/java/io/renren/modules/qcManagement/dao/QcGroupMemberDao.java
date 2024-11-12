@@ -85,4 +85,8 @@ public interface QcGroupMemberDao extends BaseMapper<QcGroupMemberEntity> {
             "WHERE qcgm_id =  #{id}"
     })
     QcGroupMemberEntity selectMemberById(Integer id);
+
+    //检查成员是否重复
+
+    Boolean checkRepeat(Integer parentId,String name);
 }

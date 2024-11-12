@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static jdk.nashorn.internal.objects.Global.undefined;
+
 
 /**
  * QC小组成员信息表
@@ -189,6 +191,15 @@ public class QcGroupMemberController {
     @RequestMapping("/save")
     @RequiresPermissions("qcMembers:qcGroupMember:save")
     public R save(@RequestBody QcGroupMemberEntity qcGroupMember){
+        Integer parentId = qcGroupMember.getParentId();
+        String name=qcGroupMember.getName();
+        if(parentId != null){
+           Boolean result = qcGroupMemberDao.checkRepeat(parentId,name);
+           if(result){
+               return R.error("请检查是否有重复成员");
+           }
+        }
+
         qcGroupMemberService.save(qcGroupMember);
         return R.ok().put("id", qcGroupMember.getQcgmId());
     }

@@ -238,11 +238,8 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false;
-                  if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
-                    this.$emit('refreshDataList');
-                  } else {
-                    this.$emit('refreshCommonList');
-                  }
+                  this.$emit('refreshDataList');
+                  this.$emit('refreshCommonList');
                 }
               });
 

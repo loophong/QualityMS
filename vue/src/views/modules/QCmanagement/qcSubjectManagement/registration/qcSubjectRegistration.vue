@@ -75,7 +75,8 @@
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
-              <el-button type="text" size="small" @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
+              <el-button type="text" size="small" v-if="scope.row.topicReviewStatus != 3"
+                @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -84,7 +85,7 @@
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
         <!-- 弹窗, 新增 / 修改 -->
-        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+        <!-- <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update> -->
       </div>
     </el-tab-pane>
     <el-tab-pane label="我创办的课题" name="2">
@@ -147,7 +148,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-              }}</span>
+                }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -170,7 +171,7 @@
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination> -->
         <!-- 弹窗, 新增 / 修改 -->
-        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getSubjectList"></add-or-update>
+        <!-- <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshLeadList="getLeadList()"></add-or-update> -->
       </div>
     </el-tab-pane>
     <el-tab-pane label="我参与的课题" name="3">
@@ -231,7 +232,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-              }}</span>
+                }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -240,7 +241,6 @@
           </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
-
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
@@ -253,10 +253,12 @@
           :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPageSubject"
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination> -->
-        <!-- 弹窗, 新增 / 修改 -->
-        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getSubjectList"></add-or-update>
+
       </div>
     </el-tab-pane>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList()"
+      @refreshJoinList="getJoinList()" @refreshLeadList="getLeadList()"></add-or-update>
   </el-tabs>
 </template>
 
@@ -279,6 +281,7 @@ export default {
       subjectDataList: [],
       subjectLeadList: [],
       subjectJoinList: [],
+      membersOptions: [],
       addOrUpdateVisible: false,
       groupMemberList: [],
       myQueryParam: {
@@ -291,14 +294,23 @@ export default {
   components: {
     AddOrUpdate
   },
-  activated() {
+  async activated() {
     this.getDataList()
     this.getJoinList();
     this.getLeadList();
     this.getGroupMemberData().then(groupList => {
-      this.groupMemberList = groupList;
+      this.groupMemberList = Object.values(groupList).filter(item => item.examineStatus === "通过").reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {});
     });
-
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.membersOptions = data;
+    });
   },
   methods: {
 
@@ -407,6 +419,7 @@ export default {
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
+        this.$refs.addOrUpdate.membersOptions = this.membersOptions;
         this.$refs.addOrUpdate.groupMemberList = this.groupMemberList
         this.$refs.addOrUpdate.updateOptions()
         this.$refs.addOrUpdate.init(id)
@@ -430,8 +443,8 @@ export default {
             type: 'success',
             duration: 1500,
             onClose: () => {
+              this.getDataList();
               this.visible = false
-              this.$emit('refreshDataList')
             }
           })
         } else {
@@ -454,7 +467,10 @@ export default {
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
-            this.groupMemberList = data.page.list;
+            this.groupMemberList = data.page.list
+            this.groupMemberList.filter(item => {
+              item.examineStatus == '通过'
+            });
             // this.totalPage = data.page.totalCount;
             groupList = this.groupMemberList;
             // 分组
@@ -468,6 +484,7 @@ export default {
                   number: item.number,
                   groupName: item.groupName,
                   roleInTopic: '组长',
+                  examineStatus: item.examineStatus,
                   children: []
                 };
               }

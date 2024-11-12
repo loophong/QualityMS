@@ -17,7 +17,7 @@
           style="width: 100%;" row-key="id">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
-          <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
+          <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="120">
             <template slot-scope="scope">
               <span v-if="scope.row.examineStatus === '待审核'" style="color: blue;">{{ scope.row.examineStatus }}</span>
               <span v-else-if="scope.row.examineStatus === '未通过'" style="color: red;">{{ scope.row.examineStatus
@@ -39,12 +39,12 @@
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
-          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
+          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="160">
           </el-table-column>
           <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="180">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
-            align="center" label="操作" width="160">
+            align="center" label="操作">
             <template slot-scope="scope">
               <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
                 @click="addMemberHandle(scope.row.id)">新增成员</el-button>
@@ -57,10 +57,10 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
           :page-sizes="[10, 20, 50, 100, 1000]" :page-size="1000" :total="totalPage"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination>
+        </el-pagination> -->
 
       </div>
     </el-tab-pane>
@@ -119,10 +119,10 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
           :page-sizes="[10, 20, 50, 100, 999]" :page-size="999" :total="totalPageGroup"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination>
+        </el-pagination> -->
         <!-- 弹窗, 新增 / 修改 -->
         <!-- <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update> -->
       </div>
@@ -147,19 +147,19 @@
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
-          <el-table-column prop="name" header-align="center" align="center" label="姓名" width="120">
+          <el-table-column prop="name" header-align="center" align="center" label="姓名" width="160">
           </el-table-column>
           <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column>
-          <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="140">
+          <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="160">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="140">
+          <el-table-column prop="department" header-align="center" align="center" label="单位" width="160">
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
-          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
-          </el-table-column>
-          <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="180">
+          <!-- <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
+          </el-table-column> -->
+          <el-table-column prop="date" header-align="center" align="center" label="加入小组时间">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作" width="160">
@@ -173,10 +173,10 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
           :page-sizes="[10, 20, 50, 100, 1000]" :page-size="1000" :total="totalPageExamine"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination>
+        </el-pagination> -->
         <el-dialog :title="'处理审核'" :close-on-click-modal="false" :visible.sync="dialogFormVisible">
           <el-form :model="examineFrom">
             <el-form-item label="审核结果">
@@ -269,7 +269,6 @@ export default {
       method: 'get',
     }).then(({ data }) => {
       this.membersOptions = data;
-      // console.log(this.membersOptions);
     });
   },
   computed: {
@@ -353,6 +352,7 @@ export default {
                 team: item.team,
                 department: item.department,
                 examineStatus: item.examineStatus,
+                registrationNum: item.registrationNum,
                 children: []
               };
             }
@@ -430,6 +430,7 @@ export default {
                   team: item.team,
                   department: item.department,
                   examineStatus: item.examineStatus,
+                  registrationNum: item.registrationNum,
                   children: []
                 };
               }
@@ -570,7 +571,6 @@ export default {
               this.getDataList();
               this.examineList = this.tableData.filter(item => item.examineStatus === '待审核');
               this.totalPageExamine = this.examineList.length;
-
             }
           })
         } else {

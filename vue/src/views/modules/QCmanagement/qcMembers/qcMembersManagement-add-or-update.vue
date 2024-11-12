@@ -9,7 +9,7 @@
           </el-form-item>
           <el-form-item prop="mainName" label="组长姓名">
             <!-- <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input> -->
-            <el-select v-model="dataForm.mainName" placeholder="请选择角色">
+            <el-select v-model="dataForm.mainName" filterable placeholder="请选择角色">
               <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
                 <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
                 </el-option>
@@ -33,15 +33,10 @@
           <el-form-item v-if="!isAdmin" label="组内角色" prop="roleInTopic">
             <el-select v-model="dataForm.roleInTopic" placeholder="请选择组内角色">
               <el-option label="成员" value="成员"></el-option>
-              <el-option label="顾问" value="顾问"></el-option>
-              <el-option label="评审员" value="评审员"></el-option>
-              <el-option label="相关方评审员" value="相关方评审员"></el-option>
-              <el-option label="成果初评管理员" value="成果初评管理员"></el-option>
-              <el-option label="财务科评审员" value="财务科评审员"></el-option>
-              <el-option label="成果复评管理员" value="成果复评管理员"></el-option>
+              <el-option label="组长" value="组长"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item prop="participationDate" label="参加QC时间">
+          <el-form-item prop="participationDate" label="创建QC小组时间">
             <el-date-picker v-model="dataForm.participationDate" type="date" value-format="yyyy-MM-dd"
               placeholder="请选择日期" clearable></el-date-picker>
           </el-form-item>
@@ -63,7 +58,7 @@
             <el-col :span="12">
               <el-form-item label="姓名" prop="name">
                 <!-- <el-input v-model="member.name" placeholder="请输入姓名"></el-input> -->
-                <el-select v-model="member.name" placeholder="请选择角色">
+                <el-select v-model="member.name" filterable placeholder="请选择角色">
                   <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
                     <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
                     </el-option>
@@ -76,12 +71,12 @@
               <el-form-item label="组内角色" prop="roleInTopic">
                 <el-select v-model="member.roleInTopic" placeholder="请选择组内角色">
                   <el-option label="成员" value="成员"></el-option>
-                  <el-option label="顾问" value="顾问"></el-option>
+                  <!-- <el-option label="顾问" value="顾问"></el-option>
                   <el-option label="评审员" value="评审员"></el-option>
                   <el-option label="相关方评审员" value="相关方评审员"></el-option>
                   <el-option label="成果初评管理员" value="成果初评管理员"></el-option>
                   <el-option label="财务科评审员" value="财务科评审员"></el-option>
-                  <el-option label="成果复评管理员" value="成果复评管理员"></el-option>
+                  <el-option label="成果复评管理员" value="成果复评管理员"></el-option> -->
                 </el-select>
               </el-form-item>
               <el-form-item label="参加时间" prop="participationDate">
@@ -243,11 +238,8 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false;
-                  if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
-                    this.$emit('refreshDataList');
-                  } else {
-                    this.$emit('refreshCommonList');
-                  }
+                  this.$emit('refreshDataList');
+                  this.$emit('refreshCommonList');
                 }
               });
 

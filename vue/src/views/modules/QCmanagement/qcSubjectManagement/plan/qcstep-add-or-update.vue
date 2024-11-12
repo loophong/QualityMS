@@ -59,7 +59,7 @@ export default {
       visible: false,
       dataForm: {
         stepId: 0,
-        stepSubjectId: '',
+        stepSubjectId: '1',
         stepType: '',
         stepProcess: '',
         stageName: '',
@@ -75,48 +75,7 @@ export default {
         stageConsolidate: ''
       },
       dataRule: {
-        stepSubjectId: [
-          { required: true, message: '关联课题id不能为空', trigger: 'blur' }
-        ],
-        stepType: [
-          { required: true, message: '课题类型不能为空', trigger: 'blur' }
-        ],
-        stepProcess: [
-          { required: true, message: '步骤id不能为空', trigger: 'blur' }
-        ],
-        stageName: [
-          { required: true, message: '阶段名称不能为空', trigger: 'blur' }
-        ],
-        stagePlanStart: [
-          { required: true, message: '计划开始时间不能为空', trigger: 'blur' }
-        ],
-        stagePlanEnd: [
-          { required: true, message: '计划结束时间不能为空', trigger: 'blur' }
-        ],
-        stageActualStart: [
-          { required: true, message: '实际开始时间不能为空', trigger: 'blur' }
-        ],
-        stageActualEnd: [
-          { required: true, message: '实际结束时间不能为空', trigger: 'blur' }
-        ],
-        stagePeople: [
-          { required: true, message: '参与人员不能为空', trigger: 'blur' }
-        ],
-        stageDescribe: [
-          { required: true, message: '步骤描述不能为空', trigger: 'blur' }
-        ],
-        stageExtra: [
-          { required: true, message: '备注不能为空', trigger: 'blur' }
-        ],
-        stageBefore: [
-          { required: true, message: '活动前现状不能为空', trigger: 'blur' }
-        ],
-        stageAfter: [
-          { required: true, message: '活动后现状不能为空', trigger: 'blur' }
-        ],
-        stageConsolidate: [
-          { required: true, message: '巩固措施不能为空', trigger: 'blur' }
-        ]
+
       }
     }
   },
@@ -151,6 +110,84 @@ export default {
           })
         }
       })
+    },
+    exportForm() {
+      const form = this.dataForm;
+      let tableData = [];
+      let titles = [];
+
+      // 遍历表单元素
+      form.$children.forEach((item) => {
+        if (item.$options._componentTag === 'el-input') {
+          tableData.push({
+            name: item.$attrs.title,
+            value: item.$attrs.value || item.$attrs.modelValue
+          });
+          titles.push(item.$attrs.title);
+        } else if (item.$options._componentTag === 'el-input-number') {
+          tableData.push({
+            name: item.$attrs.title,
+            value: item.$attrs.value || item.$attrs.modelValue
+          });
+          titles.push(item.$attrs.title);
+        } else if (item.$options._componentTag === 'el-radio-group') {
+          tableData.push({
+            name: item.$attrs.title,
+            value: item.$attrs.value || item.$attrs.modelValue
+          });
+          titles.push(item.$attrs.title);
+        } else if (item.$options._componentTag === 'el-checkbox-group') {
+          const values = item.$attrs.value || item.$attrs.modelValue;
+          if (values && values.length > 0) {
+            tableData.push({
+              name: item.$attrs.title,
+              value: values.join(', ')
+            });
+            titles.push(item.$attrs.title);
+          }
+        } else if (item.$options._componentTag === 'el-select') {
+          tableData.push({
+            name: item.$attrs.title,
+            value: item.$attrs.value || item.$attrs.modelValue
+          });
+          titles.push(item.$attrs.title);
+        }
+      });
+
+      // 构建表格HTML
+      let tr = '';
+      tableData.forEach((item) => {
+        tr += `<tr><td style="padding:5px 10px;background:#efefef;">${item.name}</td><td style="padding:5px 10px;">${item.value}</td></tr>`;
+      });
+      const htmls = `<table style="width:500px;margin:0 auto;border:1px solid #efefef" border="0" cellspacing="0" cellpadding="0">${tr}</table>`;
+
+      // 导出HTML
+      this.exportHtmls(htmls, 'doc', '人员信息.doc', '人员信息');
+    },
+    exportHtmls(htmls, type, fileName, title) {
+      let a = document.createElement('a');
+      let mimeType = '';
+      let fileExtension = '';
+
+      switch (type) {
+        case 'doc':
+          mimeType = 'application/msword';
+          fileExtension = '.doc';
+          break;
+        case 'xls':
+          mimeType = 'application/vnd.ms-excel';
+          fileExtension = '.xls';
+          break;
+      }
+
+      const fullHtml = `<html><head><meta charset='utf-8' /></head><body><h1 style='text-align:center'>${title}</h1>${htmls}</body></html>`;
+      const blob = new Blob([fullHtml], { type: mimeType });
+
+      a.href = URL.createObjectURL(blob);
+      a.download = fileName + fileExtension;
+      document.querySelector('body').appendChild(a);
+      a.click();
+      a.remove();
     },
     // 表单提交
     dataFormSubmit() {

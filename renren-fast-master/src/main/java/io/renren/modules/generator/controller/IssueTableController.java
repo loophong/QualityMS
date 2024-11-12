@@ -53,8 +53,15 @@ public class IssueTableController {
 
     private static final String uploadDir = System.getProperty("user.dir") + "/file/"; // 请确保这个路径已存在或可写
 
-
-
+    /**
+     * 问题知识库
+     */
+    @RequestMapping("/verlist")
+    @RequiresPermissions("generator:issuetable:list")
+    public R finishedList(@RequestParam Map<String, Object> params){
+        PageUtils page =  issueTableService.queryPageFinishedList(params);
+        return R.ok().put("page", page);
+    }
     /**
      * 上传图片
      */

@@ -2,7 +2,7 @@
   <div>
     <div>
       <span>
-        <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+        <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
@@ -42,50 +42,50 @@ export default {
         id: '0',
         label: "直拉钢丝亮丝不良",
         children: [
-          {
-            id: '1',
-            label: "粗拉钢丝表面涂硼不良",
-            children: [
-              {
-                id: '1-1',
-                label: "涂硼液位偏低"
-              },
-              {
-                id: '1-2',
-                label: "涂硼温度低"
-              },
-              {
-                id: '1-3',
-                label: "涂硼浓度偏低"
-              },
-              {
-                id: '1-4',
-                label: "涂硼后钢丝表面潮湿"
-              }
-            ]
-          },
-          {
-            id: '2',
-            label: "拉拔工艺不合理",
-            children: [
-              {
-                id: '2-1',
-                label: "拉拔压缩率不合理"
-              },
-              {
-                id: '2-2',
-                label: "进线规格不合理"
-              },
-              {
-                id: '2-3',
-                label: "拉拔速度过大"
-              },
-              {
-                id: '2-4',
-                label: "涂硼浓度标准不合理"
-              }
-            ]
-          }
+          // {
+          //   id: '1',
+          //   label: "粗拉钢丝表面涂硼不良",
+          //   children: [
+          //     {
+          //       id: '1-1',
+          //       label: "涂硼液位偏低"
+          //     },
+          //     {
+          //       id: '1-2',
+          //       label: "涂硼温度低"
+          //     },
+          //     {
+          //       id: '1-3',
+          //       label: "涂硼浓度偏低"
+          //     },
+          //     {
+          //       id: '1-4',
+          //       label: "涂硼后钢丝表面潮湿"
+          //     }
+          //   ]
+          // },
+          // {
+          //   id: '2',
+          //   label: "拉拔工艺不合理",
+          //   children: [
+          //     {
+          //       id: '2-1',
+          //       label: "拉拔压缩率不合理"
+          //     },
+          //     {
+          //       id: '2-2',
+          //       label: "进线规格不合理"
+          //     },
+          //     {
+          //       id: '2-3',
+          //       label: "拉拔速度过大"
+          //     },
+          //     {
+          //       id: '2-4',
+          //       label: "涂硼浓度标准不合理"
+          //     }
+          //   ]
+          // }
         ]
       },
       options: [],

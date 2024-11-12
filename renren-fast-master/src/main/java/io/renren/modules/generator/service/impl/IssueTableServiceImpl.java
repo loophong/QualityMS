@@ -3,6 +3,7 @@ package io.renren.modules.generator.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
@@ -15,6 +16,7 @@ import io.renren.modules.generator.entity.IssueMaskTableEntity;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
+import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -35,10 +37,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service("issueTableService")
 public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTableEntity> implements IssueTableService {
     private final String uploadDir;
-
+    @Autowired
+    private IssueTableDao issueTableDao;
 //    @Value("${file.upload.dir}")
     private String uploadPath;
 
@@ -54,6 +58,18 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     @Autowired
     public IssueTableServiceImpl(FileUploadProperties fileUploadProperties) {
         this.uploadDir = fileUploadProperties.getUploadDir();
+    }
+    @Override
+    public PageUtils queryPageFinishedList(Map<String, Object> params) {
+        log.info("param"+params.get("page")+"------"+ params.get("limit"));
+
+        long p = Long.parseLong((String) params.get("page"));
+        long l = Long.parseLong((String) params.get("limit"));
+        Page<IssueTableEntity> page = new Page<IssueTableEntity>(p,l);
+
+        Page<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(page);
+        log.info("result"+result);
+        return new PageUtils(page);
     }
 
     @Autowired

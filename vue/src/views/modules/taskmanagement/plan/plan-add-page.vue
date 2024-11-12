@@ -44,7 +44,8 @@
                                 style="width: 100%;"></el-date-picker>
               </el-form-item>
               <el-form-item label="关联指标" prop="planAssociatedIndicatorsId">
-                <el-select v-model="dataForm.planAssociatedIndicatorsId" placeholder="请选择">
+                <el-select v-model="dataForm.planAssociatedIndicatorsId" clearable placeholder="请选择"
+                           ref="transferName">
                   <el-option v-for="item in indicatorOptions" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
@@ -72,9 +73,11 @@
                       v-model="dataForm.planContent" maxlength="1000">
             </el-input>
           </el-form-item>
+
           <el-form-item label="上传附件" prop="planFile" required>
             <el-upload ref="file" :file-list="planFileList" :action="uploadUrl"
-                       :on-change="uploadFile" :auto-upload="false">
+                       :on-remove="handleRemove" :before-remove="beforeRemove" :on-change="uploadFile"
+                       :auto-upload="false">
               <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
             </el-upload>
           </el-form-item>
@@ -174,6 +177,9 @@ import moment from 'moment'
 export default {
   data() {
     return {
+
+      planIdIsUsed: true,
+
       title: '新建计划',
       visible: false,
 
@@ -269,9 +275,9 @@ export default {
         planAuditor: [
           {required: true, message: '审核人不能为空', trigger: ['change', 'blur']}
         ],
-        planAssociatedIndicatorsId: [
-          {required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur']}
-        ],
+        // planAssociatedIndicatorsId: [
+        //   {required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur']}
+        // ],
 
         taskId: [
           {required: true, message: '任务编号不能为空', trigger: 'blur'},
@@ -344,7 +350,7 @@ export default {
 
   async created() {
     // 获取分组后的员工数据
-    this.$http({
+    await this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
     }).then(({data}) => {
@@ -353,7 +359,7 @@ export default {
     })
 
     // 获取指标列表
-    this.$http({
+    await this.$http({
       url: this.$http.adornUrl(`/indicator/indicatordatadictionary/getIndicatorsList`),
       method: 'get',
     }).then(response => {
@@ -365,8 +371,9 @@ export default {
       this.indicatorOptions = opt;
     })
 
+
     // 初始化计划编号
-    this.getPlanId()
+    await this.getPlanId()
 
   },
 
@@ -375,7 +382,8 @@ export default {
 
     // 上传文件
     uploadFile(file) {
-      console.log("文件" + file.raw);
+
+      console.log("文件" + file.name);
 
       const formData = new FormData();
       formData.append('file', file.raw); // 将文件添加到 FormData
@@ -391,6 +399,11 @@ export default {
         if (data && data.code === 0) {
           // 保存后端返回的url到变量中
           this.dataForm.planFile = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+          this.planFileList.push({
+            'planId': this.dataForm.planId,
+            'name': file.name,
+            'url': data.uploadurl
+          });
           console.log('获得的文件地址 ：', data.uploadurl)
           this.$message.success('文件上传成功');
           // 处理成功后的逻辑，例如更新状态
@@ -401,6 +414,16 @@ export default {
         this.$message.error('上传失败');
         console.error(error);
       });
+    },
+
+    // 移除文件之前提示
+    beforeRemove(file, planFileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+
+    // 移除文件
+    handleRemove(file, planFileList) {
+      console.log("移除的文件为: " + JSON.stringify(file));
     },
 
     // 时间校验
@@ -564,7 +587,8 @@ export default {
               method: 'post',
               data: this.$http.adornData({
                 'plan': plan,
-                'tasks': tasksData
+                'tasks': tasksData,
+                'files': this.planFileList
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -710,40 +734,79 @@ export default {
       }
     },
 
-    // 生成随机编号，并回显到planId
-    getPlanId() {
-      // 生成四位随机数字
-      let randomId = Math.floor(Math.random() * 9000) + 1000;
+    // 生成编号，并回显到planId
+    async getPlanId() {
 
-      let nowDate = moment(new Date()).format('YYYYMMDD');
-      randomId = nowDate + randomId;
+      // 判断是否由指标跳转，如果是获取指标id，并将其回显到关联指标列表
+      if (this.$route.query.indicatorId !== undefined) {
+        console.log("指标id" + this.$route.query.indicatorId)
 
-      if (this.dataForm.planAssociatedIndicatorsId === null) {
-        randomId = "zl" + "zb" + randomId.toString();
-      } else {
-        randomId = "zl" + "rw" + randomId.toString();
+
+        // 赋值给 dataForm.planAssociatedIndicatorsId
+        this.dataForm.planAssociatedIndicatorsId = this.$route.query.indicatorId
+
+        // 查找对应的 label
+        let indicatorName;
+        this.indicatorOptions.forEach(item => {
+          // console.log("指标："+JSON.stringify(item) + "指标id：" + this.dataForm.planAssociatedIndicatorsId)
+
+          if (item.value === this.dataForm.planAssociatedIndicatorsId.toString()) {
+            indicatorName = item;
+            console.log("找到了指标名"+JSON.stringify(item))
+          }
+        })
+
+        // 如果找到了对应的 label，则手动设置 el-select 的 label
+        if (indicatorName) {
+          this.$nextTick(() => {
+            const elSelect = this.$refs.transferName;
+            if (elSelect) {
+              elSelect.$emit('input', indicatorName.value);
+            }
+          });
+        }
       }
 
-      console.log("生成的计划编号为" + randomId)
-      // 向后端发送请求，校验Id
-      this.$http({
-        url: this.$http.adornUrl(`/taskmanagement/plan/checkPlanNumber`),
-        method: 'get',
-        params: {
-          planId: randomId
-        }
-      }).then(response => {
-        if (response.data) {
-          this.getPlanId()
-        } else {
-          this.dataForm.planId = randomId;
-        }
-      })
 
+      // 生成四位随机数字
+      let id;
+      let pre;
+      let nowDate = moment(new Date()).format('YYYYMMDD');
 
-    }
+      if (this.dataForm.planAssociatedIndicatorsId !== null) {
+        pre = "ZL" + '-' + "ZB" + '-';
+      } else {
+        pre = "ZL" + '-' + "RW" + '-';
+      }
+
+      for (let i = 1; i < 10; i++) {
+        id = pre + nowDate + '-' + i;
+
+        console.log("生成的计划编号为" + id)
+
+        // 向后端发送请求，校验Id
+        await this.$http({
+          url: this.$http.adornUrl(`/taskmanagement/plan/checkPlanNumber`),
+          method: 'get',
+          params: {
+            planId: id
+          }
+        }).then(response => {
+          this.planIdIsUsed = response.data
+        });
+
+        if (this.planIdIsUsed === false) {
+          console.log("生成的计划编号未被使用" + this.planIdIsUsed)
+          this.dataForm.planId = id;
+          this.planIdIsUsed = true;
+          break;
+        }
+      }
+
+    },
 
   },
+
 
   computed: {
     planScheduleDays() {

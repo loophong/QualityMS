@@ -1,6 +1,7 @@
 package io.renren.modules.qcManagement.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -18,6 +19,9 @@ import java.util.List;
  */
 @Mapper
 public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrationEntity> {
+
+    Page<QcSubjectRegistrationEntity> selectFinishedSubjectList(Page<QcSubjectRegistrationEntity> page);
+
     //根据小组名称查询小组成员
     @Select({
             "SELECT *",
@@ -44,6 +48,17 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
             "WHERE result_type  != null|| result_type != ''",
     })
     Integer countSubmitted();
+
+    //查询编号最大值
+    @Select({
+            "SELECT MAX(qcsr_id)",
+            "FROM qc_subject_registration",
+    })
+    Integer maxOfId();
+
+    //查询课题名称是否重复
+
+    boolean ifExistSubjectName(String name);
     //计算课题活动状态
 //    @Select({
 //            "SELECT *",

@@ -2208,14 +2208,14 @@ export default {
     //文件预览
     previewDoc(fileflag) {
       const token = this.$cookie.get('token'); // 获取当前的 token
-        if (!token) {
-          console.error('Token not found!');
-          return;
-        }
-        console.log('获取的地址 ' ,fileflag)
-        // 拼接带有 token 的请求地址
-        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
-          window.open(url);
+      if (!token) {
+        console.error('Token not found!');
+        return;
+      }
+      console.log('获取的地址 ', fileflag)
+      // 拼接带有 token 的请求地址
+      const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+      window.open(url);
     },
 
 
@@ -2267,7 +2267,7 @@ export default {
     // 表单提交
     dataFormSubmit(id) {
       let tmpListString = []
-      if(this.tmpAllList.length){
+      if (this.tmpAllList.length) {
         tmpListString = JSON.stringify(this.tmpAllList)
       }
       const tmpStagePeople = JSON.stringify(this.form.stagePeople)
@@ -2279,17 +2279,17 @@ export default {
           'stepSubjectId': this.routerParam[0].qcsrId,
           'stepType': this.routerParam[0].topicType,
           'stepProcess': id,
-          'stageName': this.form.stageName ? this.form.stageName : undefined,
+          'stageName': this.form.stageName ? this.form.stageName : '',
           'stagePlanStart': this.form.planDate[0],
           'stagePlanEnd': this.form.planDate[1],
-          'stageActualStart': this.form.actualDate[0] ? this.form.actualDate[0] : undefined,
-          'stageActualEnd': this.form.actualDate[1] ? this.form.actualDate[1] : undefined,
-          'stagePeople': this.form.stagePeople ? tmpStagePeople : undefined,
-          'stageDescribe': this.form.stageDescribe || undefined,
-          'stageExtra': this.form.stageExtra || undefined,
-          'stageBefore': this.form.stageBefore || undefined,
-          'stageAfter': this.form.stageAfter || undefined,
-          'stageConsolidate': this.form.stageConsolidate || undefined,
+          'stageActualStart': this.form.actualDate[0] ? this.form.actualDate[0] : '',
+          'stageActualEnd': this.form.actualDate[1] ? this.form.actualDate[1] : '',
+          'stagePeople': this.form.stagePeople ? tmpStagePeople : '',
+          'stageDescribe': this.form.stageDescribe || '',
+          'stageExtra': this.form.stageExtra || '',
+          'stageBefore': this.form.stageBefore || '',
+          'stageAfter': this.form.stageAfter || '',
+          'stageConsolidate': this.form.stageConsolidate || '',
           'stageAttachment': this.tmpAllList.length ? tmpListString : this.form.stepAttachment,
         })
       }).then(({ data }) => {

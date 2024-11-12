@@ -249,6 +249,9 @@
         header-align="center"
         align="center"
         label="创建人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.creator) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="creationTime"
@@ -344,6 +347,9 @@
         header-align="center"
         align="center"
         label="验证人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.verifier) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="formula"
@@ -411,6 +417,7 @@
     data () {
       return {
         //查询参数
+        options:[],
         queryParams:{
           issueCategoryId: '',
           vehicleTypeId: '',
@@ -468,6 +475,16 @@
       AddOrUpdateD,
       AddOrUpdate
     },
+    async created(){
+      // 获取分组后的员工数据
+      this.$http({
+        url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+        method: 'get',
+      }).then(({data}) => {
+        this.options = data;
+        console.log(this.options);
+      });
+    },
     activated () {
       this.fetchIssueCategories()
       this.fetchVehicleTypes()
@@ -475,6 +492,16 @@
       // this.fetchData()
     },
     methods: {
+      getUsernameByUserId(auditorId) {
+        for (const category of this.options) {
+          for (const auditor of category.options) {
+            if (auditor.value === auditorId) {
+              return auditor.label;
+            }
+          }
+        }
+        return "-";
+      },
       // rowStyle({ row }) {
       //   console.log("染色")
       //   return row.overDue === 'true' ? { color: 'red' } : {};

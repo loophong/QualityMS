@@ -378,9 +378,9 @@ public class IssueTableController {
         System.out.println("=====获取用户信息----开始");
         String userinfo = issueTableService.getuserinfo();
         Map<String, Object> response = new HashMap<>();
-        response.put("code", 0);
-        response.put("issueTable", userinfo);
-        System.out.println(response);
+//        response.put("code", 0);
+//        response.put("issueTable", userinfo);
+        System.out.println(userinfo);
         System.out.println("=====获取用户信息----结束");
         return R.ok().put("userinfo", userinfo);
     }

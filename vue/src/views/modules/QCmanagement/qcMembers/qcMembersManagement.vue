@@ -3,11 +3,11 @@
     <el-tab-pane label="管理员" name="1" v-if="isAuth('qcManagement:group:admin')">
       <div class="mod-config">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-          <el-form-item>
+          <!-- <el-form-item>
             <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
-            <el-button @click="getDataList()">查询</el-button>
+            <!-- <el-button @click="getDataList()">查询</el-button> -->
             <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
@@ -247,7 +247,7 @@ export default {
     AddOrUpdate,
     AddGroupDialog
   },
-  async created(){
+  async created() {
     await this.getRoleList();
   },
   async activated() {
@@ -492,24 +492,24 @@ export default {
 
     // 新增 / 修改
     addOrUpdateHandle(id) {
-      console.log("传入id为"+id)
+      console.log("传入id为" + id)
 
 
-        if (id === undefined){
-          this.AddGroupDialogVisible = true
-          this.$nextTick(() => {
-            this.$refs.AddGroupDialog.membersOptions = this.membersOptions;
-            this.$refs.AddGroupDialog.roleIdList = this.roleIdList;
-            this.$refs.AddGroupDialog.init(id)
-          })
-        } else {
-          this.addOrUpdateVisible = true
-          this.$nextTick(() => {
-            this.$refs.addOrUpdate.isAddMember = false;
-            this.$refs.addOrUpdate.membersOptions = this.membersOptions;
-            this.$refs.addOrUpdate.init(id)
-          })
-        }
+      if (id === undefined) {
+        this.AddGroupDialogVisible = true
+        this.$nextTick(() => {
+          this.$refs.AddGroupDialog.membersOptions = this.membersOptions;
+          this.$refs.AddGroupDialog.roleIdList = this.roleIdList;
+          this.$refs.AddGroupDialog.init(id)
+        })
+      } else {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.isAddMember = false;
+          this.$refs.addOrUpdate.membersOptions = this.membersOptions;
+          this.$refs.addOrUpdate.init(id)
+        })
+      }
 
 
 

@@ -63,12 +63,8 @@ import JSZipUtils from 'jszip-utils'
 import JSZip from 'pizzip'
 import Docxtemplater from 'docxtemplater'
 import AddOrUpdate from './qcstep-add-or-update'
-import htmlDocx from 'html-docx-js/dist/html-docx';
-import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import FileSaver from 'file-saver';
-import { which } from 'shelljs';
-import { options } from 'less';
+
 
 export default {
   data() {

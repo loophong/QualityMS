@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="!dataForm.qcgmId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form v-if="!dataForm.qcgmId || !isEditingMember" :model="dataForm" :rules="dataRule" ref="dataForm"
-      @keyup.enter.native="dataFormSubmit()" label-width="120px">
+      @keyup.enter.native="dataFormSubmit()" label-width="140px">
       <el-row :gutter="20" v-show="!isAddMember">
         <el-col :span="12">
           <el-form-item v-if="isAdmin" prop="groupName" label="小组名称">
@@ -142,7 +142,7 @@ export default {
         mainName: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
-        name: [
+        memberName: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
         // number: [
@@ -186,7 +186,7 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 0) {
-              this.dataForm.mainName = data.qcGroupMember.name;
+              this.dataForm.mainName = data.qcGroupMember.memberName;
               this.dataForm.gender = data.qcGroupMember.gender;
               this.dataForm.telNumber = data.qcGroupMember.telNumber;
               this.dataForm.number = data.qcGroupMember.number;
@@ -215,7 +215,7 @@ export default {
             method: 'post',
             data: this.$http.adornData({
               'qcgmId': this.dataForm.qcgmId || undefined,
-              'name': this.dataForm.mainName,
+              'memberName': this.dataForm.mainName,
               'gender': this.dataForm.gender,
               'telNumber': this.dataForm.telNumber,
               'number': this.dataForm.number,
@@ -254,7 +254,7 @@ export default {
                   method: 'post',
                   data: this.$http.adornData({
                     'qcgmId': member.qcgmId || undefined,
-                    'name': member.name,
+                    'memberName': member.name,
                     'team': member.team,
                     'number': member.number,
                     'participationDate': member.participationDate,
@@ -294,7 +294,7 @@ export default {
           method: 'post',
           data: this.$http.adornData({
             'qcgmId': member.qcgmId || undefined,
-            'name': member.name,
+            'memberName': member.name,
             'team': member.team,
             'number': member.number,
             'participationDate': member.participationDate,
@@ -307,19 +307,30 @@ export default {
         });
       })).then(responses => {
         console.log('所有成员数据提交完成:', responses);
-        this.$message({
-          message: '操作成功',
-          type: 'success',
-          duration: 1500,
-          onClose: () => {
-            this.visible = false;
-            if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
+        if (responses && responses[0].data.code == 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.visible = false;
               this.$emit('refreshDataList');
-            } else {
               this.$emit('refreshCommonList');
             }
-          }
-        });
+          });
+        } else {
+          this.$message({
+            message: responses[0].data.msg,
+            type: 'warning',
+            duration: 1500,
+            onClose: () => {
+              // this.visible = false;
+              // this.$emit('refreshDataList');
+              // this.$emit('refreshCommonList');
+            }
+          });
+        }
+
       }).catch(error => {
         console.error('成员数据提交时发生错误:', error);
       });

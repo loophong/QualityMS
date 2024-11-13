@@ -29,7 +29,7 @@ public class QcGroupMemberEntity implements Serializable {
 	/**
 	 * 姓名
 	 */
-	private String name;
+	private String memberName;
 	/**
 	 * 性别
 	 */

@@ -29,7 +29,7 @@
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
-          <el-table-column prop="name" header-align="center" align="center" label="姓名" width="120">
+          <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="120">
           </el-table-column>
           <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column>
@@ -47,7 +47,7 @@
             align="center" label="操作">
             <template slot-scope="scope">
               <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
-                @click="addMemberHandle(scope.row.id)">新增成员</el-button>
+                @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:update')"
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
@@ -90,7 +90,7 @@
               <span v-else>-</span> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
-          <el-table-column prop="name" header-align="center" align="center" label="姓名" width="120">
+          <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="120">
           </el-table-column>
           <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column>
@@ -100,7 +100,7 @@
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
-          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
+          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="160">
           </el-table-column>
           <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="180">
           </el-table-column>
@@ -108,7 +108,7 @@
             align="center" label="操作">
             <template slot-scope="scope">
               <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
-                @click="addMemberHandle(scope.row.id)">新增成员</el-button>
+                @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
               <el-button
                 v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus === '未通过')"
                 type="text" size="small" @click="handleReexamine(scope.row.id)">提交审核</el-button>
@@ -116,6 +116,9 @@
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
                 @click="deleteHandle(scope.row.id)">删除</el-button>
+              <el-button type="text" size="small" v-if="scope.row.parentId && scope.row.management"
+                @click="changeHandle(scope.row.id, scope.row.parentId)">移交组长</el-button>
+              <!-- <el-button type="text" size="small" @click="ad(scope.row)">移交组长</el-button> -->
             </template>
           </el-table-column>
         </el-table>
@@ -221,6 +224,7 @@ export default {
       },
       dialogFormVisible: false,
       dataList: [],
+      tmpList: [],
       groupList: [],
       examineList: [],
       originList: [],
@@ -252,7 +256,7 @@ export default {
   },
   async activated() {
     this.initActiveName();
-    if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
+    if ((this.isAuth('qcManagement:group:admin')) || (this.isAuth('qcManagement:group:examine'))) {
       await this.getDataList().then(groupList => {
         this.groupList = groupList;
       });
@@ -260,9 +264,12 @@ export default {
       this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
       this.totalPageExamine = this.examineList.length;
       console.log(this.examineList.length)
-    } else {
+    }
+    if (!this.isAuth('qcManagement:group:admin')) {
       await this.getGroupList();
     }
+
+
     // 获取分组后的员工数据
     await this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
@@ -293,8 +300,10 @@ export default {
     }
   },
   methods: {
-
-    // 获取小组数据列表
+    ad(s) {
+      console.log(s)
+    },
+    // 获取我的小组数据列表
     async getGroupList() {
       this.dataListLoading = true
       await this.$http({
@@ -302,36 +311,43 @@ export default {
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
-          'limit': this.pageSize,
+          'limit': 1000,
           // 'key': 1,
           // 'reuseStepId': 5
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
+          console.log(data)
           const sameList = [];
           // this.dataList = data.page.list
-          data.username = '管理22'
           data.page.list.forEach(item => {
-            if (item.name == data.username) {
+            if (item.memberName == data.userName) {
               sameList.push(item)
             }
           });
           console.log(sameList)
           const resultList = [];
+          const seen = new Set(); // 用于去重
+
           sameList.forEach(item => {
-            resultList.push(item)
+            if (!seen.has(item.qcgmId)) {
+              resultList.push(item);
+              seen.add(item.qcgmId);
+            }
+
             if (item.parentId) {
               data.page.list.forEach(row => {
-                if (row.parentId == item.parentId) {
-                  resultList.push(row)
-                } else if (row.qcgmId == item.parentId) {
-                  resultList.push(row)
+                if ((row.parentId == item.parentId || row.qcgmId == item.parentId) && !seen.has(row.qcgmId)) {
+                  resultList.push(row);
+                  seen.add(row.qcgmId);
                 }
               });
             } else {
               data.page.list.forEach(row => {
-                if (row.parentId == item.qcgmId) {
-                  resultList.push(row)
+                if (row.parentId == item.qcgmId && !seen.has(row.qcgmId)) {
+                  row.management = 1 //标识当前角色为组长，可以移交组长
+                  resultList.push(row);
+                  seen.add(row.qcgmId);
                 }
               });
             }
@@ -345,7 +361,7 @@ export default {
               map[item.qcgmId] = {
                 id: item.qcgmId,
                 date: item.participationDate,
-                name: item.name,
+                memberName: item.memberName,
                 number: item.number,
                 groupName: item.groupName,
                 roleInTopic: '组长',
@@ -362,8 +378,10 @@ export default {
               map[item.parentId].children.push({
                 id: item.qcgmId,
                 date: item.participationDate,
-                name: item.name,
+                memberName: item.memberName,
                 number: item.number,
+                management: item.management,
+                department: item.department,
                 roleInTopic: item.roleInTopic,
                 parentId: item.parentId,
               });
@@ -409,9 +427,9 @@ export default {
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
-            this.dataList = data.page.list;
+            this.tmpList = data.page.list;
             this.totalPage = data.page.totalCount;
-            groupList = this.dataList.filter(function (item) {
+            groupList = this.tmpList.filter(function (item) {
               return item.deleteFlag !== 1;
             });
             console.log(groupList);
@@ -423,7 +441,7 @@ export default {
                 map[item.qcgmId] = {
                   id: item.qcgmId,
                   date: item.participationDate,
-                  name: item.name,
+                  memberName: item.memberName,
                   number: item.number,
                   groupName: item.groupName,
                   roleInTopic: '组长',
@@ -440,23 +458,25 @@ export default {
                 map[item.parentId].children.push({
                   id: item.qcgmId,
                   date: item.participationDate,
-                  name: item.name,
+                  memberName: item.memberName,
                   number: item.number,
                   roleInTopic: item.roleInTopic,
+                  department: item.department,
                   parentId: item.parentId,
                 });
               }
             });
+            console.log(map)
             this.tableData = Object.values(map);
           } else {
-            this.dataList = [];
+            this.tmpList = [];
             this.totalPage = 0;
           }
           this.dataListLoading = false;
           resolve(groupList);
         }).catch(error => {
           console.error('Error fetching data:', error);
-          this.dataList = [];
+          this.tmpList = [];
           this.totalPage = 0;
           this.dataListLoading = false;
           reject(error);
@@ -464,7 +484,33 @@ export default {
       });
 
     },
-
+    //移交组长
+    async changeHandle(id, parentId) {
+      console.log("传入id为" + id + "父节点为" + parentId)
+      await this.$http({
+        url: this.$http.adornUrl('/qcMembers/qcGroupMember/change'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'id': id,
+          'parentId': parentId,
+          // 'key': 1,
+          // 'reuseStepId': 5
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getDataList()
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
     parseTime(time) {
       return new Date(time).toLocaleString();
     },
@@ -494,7 +540,6 @@ export default {
     addOrUpdateHandle(id) {
       console.log("传入id为" + id)
 
-
       if (id === undefined) {
         this.AddGroupDialogVisible = true
         this.$nextTick(() => {
@@ -511,13 +556,16 @@ export default {
         })
       }
 
-
-
     },
     // 新增成员
-    addMemberHandle(id) {
+    addMemberHandle(id, name) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
+        let tmp = this.membersOptions
+        tmp.forEach(item => {
+          item.options = item.options.filter(row => row.label !== name);
+        });
+        this.$refs.addOrUpdate.membersOptions = tmp
         this.$refs.addOrUpdate.isAddMember = true;
         this.$refs.addOrUpdate.init(id)
       })

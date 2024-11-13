@@ -1,7 +1,12 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-select v-model="which" filterable @change="handleSelectChange" placeholder="请选择课题">
+      <el-select v-model="which" filterable @change="handleAllSelectChange" placeholder="请选择课题"
+        v-if="isAuth('qcManagement:group:admin')">
+        <el-option v-for="item in allOptions" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <el-select v-model="which" filterable @change="handleSelectChange" placeholder="请选择课题" v-else>
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
@@ -86,6 +91,7 @@ export default {
       form: {},
       options: [],
       options2: [],
+      allOptions: [],
       form2: {
         topicType: '',
         tableTitle: "过程表",
@@ -100,6 +106,7 @@ export default {
     // this.getDataList()
     await this.getJoinList()
     await this.getLeadList()
+    await this.getAllList()
     console.log(this.options)
     console.log(this.options2)
     //合并两个数组
@@ -112,6 +119,10 @@ export default {
   methods: {
     handleSelectChange() {
       this.name = this.options.find(item => item.value === this.which).label
+      this.getDataList()
+    },
+    handleAllSelectChange() {
+      this.name = this.allOptions.find(item => item.value === this.which).label
       this.getDataList()
     },
     // 获取数据列表
@@ -137,6 +148,29 @@ export default {
         }
         this.dataListLoading = false
       })
+    },
+    // 获取所有课题数据列表
+    async getAllList() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/list"),
+        method: "get",
+        params: this.$http.adornParams({
+          'page': 1,
+          'limit': 1000,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.subjectJoinList = data.page.list;
+          this.allOptions = data.page.list.map(item => ({
+            value: item.qcsrId,
+            label: item.topicName
+          }))
+          console.log(this.allOptions)
+        } else {
+          this.subjectJoinList = [];
+          this.totalPageSubject = 0;
+        }
+      });
     },
     // 获取我参与课题数据列表
     async getJoinList() {

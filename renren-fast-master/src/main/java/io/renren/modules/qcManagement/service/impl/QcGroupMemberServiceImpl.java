@@ -41,7 +41,7 @@ public class QcGroupMemberServiceImpl extends ServiceImpl<QcGroupMemberDao, QcGr
         log.info("记录："+page.getRecords().toString());
 
         try {
-            List<QcGroupMemberEntity> resultList = page.getRecords().stream().filter(e -> e.getName().equals(username)).collect(Collectors.toList());
+            List<QcGroupMemberEntity> resultList = page.getRecords().stream().filter(e -> e.getMemberName().equals(username)).collect(Collectors.toList());
             page.setRecords(resultList);
 //            // 创建一个新的结果列表用于存储最终结果
 //            List<QcGroupMemberEntity> finalResultList = new ArrayList<>(resultList);

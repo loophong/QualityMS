@@ -107,7 +107,7 @@
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名">
           </el-table-column>
-          <el-table-column prop="name" header-align="center" align="center" label="姓名">
+          <el-table-column prop="memberName" header-align="center" align="center" label="姓名">
           </el-table-column>
           <el-table-column prop="number" header-align="center" align="center" label="员工编号">
           </el-table-column>
@@ -442,49 +442,35 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           const sameList = [];
-          console.log(data.userName);
-          const tmpList = data.page.list;
-          try {
-            data.page.list.forEach((item) => {
-              if (item.name === data.userName) {
-                if (item.parentId) {
-                  tmpList.some((row) => {
-                    if (
-                      row.examineStatus === "通过" &&
-                      item.parentId === row.qcgmId
-                    ) {
-                      sameList.push(item);
-                      return true; // 找到匹配项
-                    }
-                  });
-                } else {
-                  if (item.examineStatus === "通过") {
-                    sameList.push(item);
-                  }
-                }
-              }
-            });
-          } catch (error) {
-            console.log(error);
-          }
-
-          // console.log()
-          console.log(sameList);
+          // this.dataList = data.page.list
+          data.page.list.forEach(item => {
+            if (item.memberName == data.userName) {
+              sameList.push(item)
+            }
+          });
+          console.log(sameList)
           const resultList = [];
-          sameList.forEach((item) => {
+          const seen = new Set(); // 用于去重
+
+          sameList.forEach(item => {
+            if (!seen.has(item.qcgmId)) {
+              resultList.push(item);
+              seen.add(item.qcgmId);
+            }
+
             if (item.parentId) {
-              data.page.list.forEach((row) => {
-                if (row.parentId == item.parentId) {
+              data.page.list.forEach(row => {
+                if ((row.parentId == item.parentId || row.qcgmId == item.parentId) && !seen.has(row.qcgmId)) {
                   resultList.push(row);
-                } else if (row.qcgmId == item.parentId) {
-                  resultList.push(row);
+                  seen.add(row.qcgmId);
                 }
               });
             } else {
-              resultList.push(item);
-              data.page.list.forEach((row) => {
-                if (row.parentId == item.qcgmId) {
+              data.page.list.forEach(row => {
+                if (row.parentId == item.qcgmId && !seen.has(row.qcgmId)) {
+                  row.management = 1 //标识当前角色为组长，可以移交组长
                   resultList.push(row);
+                  seen.add(row.qcgmId);
                 }
               });
             }
@@ -498,7 +484,7 @@ export default {
               map[item.qcgmId] = {
                 id: item.qcgmId,
                 date: item.participationDate,
-                name: item.name,
+                memberName: item.memberName,
                 number: item.number,
                 groupName: item.groupName,
                 roleInTopic: "组长",
@@ -514,8 +500,9 @@ export default {
               map[item.parentId].children.push({
                 id: item.qcgmId,
                 date: item.participationDate,
-                name: item.name,
+                memberName: item.memberName,
                 number: item.number,
+                department: item.department,
                 roleInTopic: item.roleInTopic,
                 parentId: item.parentId,
               });
@@ -542,8 +529,8 @@ export default {
         url: this.$http.adornUrl("/qcSubject/registration/list"),
         method: "get",
         params: this.$http.adornParams({
-          page: this.pageIndex,
-          limit: 900000,
+          'page': this.pageIndex,
+          'limit': 900000,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -556,8 +543,8 @@ export default {
         url: this.$http.adornUrl("/qcManagement/examineStatus/list"),
         method: "get",
         params: this.$http.adornParams({
-          page: this.pageIndex,
-          limit: 900000,
+          'page': this.pageIndex,
+          'limit': 900000,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -638,13 +625,13 @@ export default {
       this.dataListLoading = true;
       await this.$http({
         url: this.$http.adornUrl("/qcSubject/registration/myList"),
-        // url: this.$http.adornUrl('/qcSubject/registration/myList'),
-        // url: this.$http.adornUrl('/qcPlan/step/reuse'),
         method: "get",
         params: this.$http.adornParams({
-          page: this.pageIndex,
-          limit: this.pageSize,
-          // 'key': 1,
+          'page': this.pageIndex,
+          'limit': this.pageSize,
+          'key': {
+            join: '',
+          },
           // 'reuseStepId': 5
         }),
       }).then(({ data }) => {

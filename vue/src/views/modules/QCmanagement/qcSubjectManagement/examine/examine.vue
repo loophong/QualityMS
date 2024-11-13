@@ -3,11 +3,11 @@
     <el-tab-pane label="开题审核" name="1" v-if="isAuth('qc:first:examine')">
       <div class="mod-config">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getFIR()">
-          <el-form-item>
+          <!-- <el-form-item>
             <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
-            <el-button @click="getFirstList()">查询</el-button>
+            <!-- <el-button @click="getFirstList()">查询</el-button> -->
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->

@@ -93,8 +93,10 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
         // 构建查询条件
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
-        // 添加条件：查询创建人为 rolename 的数据
-        queryWrapper.eq("creator", rolename); // 假设 "creator" 是 IssueTableEntity 中表示创建人的字段名
+        // 添加条件：查询创建人、rectificationResponsiblePerson 或 verifier 为 rolename 的数据
+        queryWrapper.eq("creator", rolename)
+                .or().eq("rectification_responsible_person", rolename)
+                .or().eq("verifier", rolename);
 
         // 执行分页查询
         IPage<IssueTableEntity> page = this.page(
@@ -339,14 +341,17 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 // 读取车辆号码ID
                 issue.setVehicleNumberId(getCellValueAsString(row.getCell(6)));
 
+                // 读取初步分析
+                issue.setPeliminaryAnalysis(getCellValueAsString(row.getCell(7)));
+
                 // 读取问题描述
-                issue.setIssueDescription(getCellValueAsString(row.getCell(7)));
+                issue.setIssueDescription(getCellValueAsString(row.getCell(8)));
 
                 // 读取整改要求
-                issue.setRectificationRequirement(getCellValueAsString(row.getCell(8)));
+                issue.setRectificationRequirement(getCellValueAsString(row.getCell(9)));
 
                 // 读取要求完成时间
-                Cell requiredCompletionTimeCell = row.getCell(9);
+                Cell requiredCompletionTimeCell = row.getCell(10);
                 if (requiredCompletionTimeCell != null && requiredCompletionTimeCell.getCellType() == CellType.NUMERIC
                         && DateUtil.isCellDateFormatted(requiredCompletionTimeCell)) {
                     Date requiredCompletionTime = requiredCompletionTimeCell.getDateCellValue();
@@ -356,13 +361,13 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 }
 
                 // 读取责任部门
-                issue.setResponsibleDepartment(getCellValueAsString(row.getCell(10)));
+                issue.setResponsibleDepartment(getCellValueAsString(row.getCell(11)));
 
                 // 读取整改状态
-                issue.setRectificationStatus(getCellValueAsString(row.getCell(11)));
+                issue.setRectificationStatus(getCellValueAsString(row.getCell(12)));
 
                 // 读取实际完成时间
-                Cell actualCompletionTimeCell = row.getCell(12);
+                Cell actualCompletionTimeCell = row.getCell(13);
                 if (actualCompletionTimeCell != null && actualCompletionTimeCell.getCellType() == CellType.NUMERIC
                         && DateUtil.isCellDateFormatted(actualCompletionTimeCell)) {
                     Date actualCompletionTime = actualCompletionTimeCell.getDateCellValue();
@@ -372,17 +377,17 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 }
 
                 // 读取整改责任人
-                issue.setRectificationResponsiblePerson(getCellValueAsString(row.getCell(13)));
+                issue.setRectificationResponsiblePerson(getCellValueAsString(row.getCell(14)));
 
                 // 读取要求二次整改时间
-                Cell requiredSecondRectificationTimeCell = row.getCell(14);
-                if (requiredSecondRectificationTimeCell != null && requiredSecondRectificationTimeCell.getCellType() == CellType.NUMERIC
-                        && DateUtil.isCellDateFormatted(requiredSecondRectificationTimeCell)) {
-                    Date requiredSecondRectificationTime = requiredSecondRectificationTimeCell.getDateCellValue();
-                    issue.setRequiredSecondRectificationTime(requiredSecondRectificationTime);
-                } else {
-                    issue.setRequiredSecondRectificationTime(null);
-                }
+//                Cell requiredSecondRectificationTimeCell = row.getCell(14);
+//                if (requiredSecondRectificationTimeCell != null && requiredSecondRectificationTimeCell.getCellType() == CellType.NUMERIC
+//                        && DateUtil.isCellDateFormatted(requiredSecondRectificationTimeCell)) {
+//                    Date requiredSecondRectificationTime = requiredSecondRectificationTimeCell.getDateCellValue();
+//                    issue.setRequiredSecondRectificationTime(requiredSecondRectificationTime);
+//                } else {
+//                    issue.setRequiredSecondRectificationTime(null);
+//                }
 
                 // 读取备注
                 issue.setRemark(getCellValueAsString(row.getCell(15)));
@@ -401,10 +406,10 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 }
 
                 // 读取最后修改人
-                issue.setLastModifier(getCellValueAsString(row.getCell(18)));
+//                issue.setLastModifier(getCellValueAsString(row.getCell(18)));
 
                 // 读取最后修改时间
-                Cell lastModificationTimeCell = row.getCell(19);
+                Cell lastModificationTimeCell = row.getCell(18);
                 if (lastModificationTimeCell != null && lastModificationTimeCell.getCellType() == CellType.NUMERIC
                         && DateUtil.isCellDateFormatted(lastModificationTimeCell)) {
                     Date lastModificationTime = lastModificationTimeCell.getDateCellValue();
@@ -414,28 +419,38 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 }
 
                 // 读取关联整改记录
-                issue.setAssociatedRectificationRecords(getCellValueAsString(row.getCell(20)));
+                issue.setAssociatedRectificationRecords(getCellValueAsString(row.getCell(19)));
 
                 // 读取关联问题编号
-                issue.setAssociatedIssueAddition(getCellValueAsString(row.getCell(21)));
+//                issue.setAssociatedIssueAddition(getCellValueAsString(row.getCell(21)));
+
+                // 读取实际完成时间
+                Cell VerificationDeadline = row.getCell(20);
+                if (VerificationDeadline != null && VerificationDeadline.getCellType() == CellType.NUMERIC
+                        && DateUtil.isCellDateFormatted(VerificationDeadline)) {
+                    Date actualCompletionTime = VerificationDeadline.getDateCellValue();
+                    issue.setVerificationDeadline(actualCompletionTime);
+                } else {
+                    issue.setVerificationDeadline(null);
+                }
 
                 // 读取创建时长
-                issue.setCreationDuration(getCellValueAsString(row.getCell(22)));
+                issue.setCreationDuration(getCellValueAsString(row.getCell(21)));
 
                 // 读取原因分析
-                issue.setCauseAnalysis(getCellValueAsString(row.getCell(23)));
+                issue.setCauseAnalysis(getCellValueAsString(row.getCell(22)));
 
                 // 读取整改验证状态
-                issue.setRectificationVerificationStatus(getCellValueAsString(row.getCell(24)));
+                issue.setRectificationVerificationStatus(getCellValueAsString(row.getCell(23)));
 
                 // 读取验证结论
-                issue.setVerificationConclusion(getCellValueAsString(row.getCell(25)));
+                issue.setVerificationConclusion(getCellValueAsString(row.getCell(24)));
 
                 // 读取验证人
-                issue.setVerifier(getCellValueAsString(row.getCell(26)));
+                issue.setVerifier(getCellValueAsString(row.getCell(25)));
 
                 // 读取公式
-                issue.setFormula(getCellValueAsString(row.getCell(27)));
+                issue.setFormula(getCellValueAsString(row.getCell(26)));
 
                 // 将 issue 对象添加到列表中
                 issueList.add(issue);
@@ -661,6 +676,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         fieldDescriptionMap.put("issueCategoryId", "问题类别");
         fieldDescriptionMap.put("vehicleTypeId", "车型");
         fieldDescriptionMap.put("vehicleNumberId", "车号");
+        fieldDescriptionMap.put("peliminaryAnalysis", "初步要求");
         fieldDescriptionMap.put("issueDescription", "问题描述");
         fieldDescriptionMap.put("rectificationRequirement", "整改要求");
         fieldDescriptionMap.put("requiredCompletionTime", "要求完成时间");
@@ -668,15 +684,16 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         fieldDescriptionMap.put("rectificationStatus", "整改情况");
         fieldDescriptionMap.put("actualCompletionTime", "实际完成时间");
         fieldDescriptionMap.put("rectificationResponsiblePerson", "整改责任人");
-        fieldDescriptionMap.put("requiredSecondRectificationTime", "要求二次整改时间");
+//        fieldDescriptionMap.put("requiredSecondRectificationTime", "要求二次整改时间");
         fieldDescriptionMap.put("remark", "备注");
         fieldDescriptionMap.put("creator", "创建人");
         fieldDescriptionMap.put("creationTime", "创建时间");
-        fieldDescriptionMap.put("lastModifier", "最后修改人");
+//        fieldDescriptionMap.put("lastModifier", "最后修改人");
         fieldDescriptionMap.put("lastModificationTime", "最后修改时间");
         fieldDescriptionMap.put("associatedRectificationRecords", "关联问题整改记录");
-        fieldDescriptionMap.put("associatedIssueAddition", "关联问题添加");
-        fieldDescriptionMap.put("creationDuration", "创建时长");
+//        fieldDescriptionMap.put("associatedIssueAddition", "关联问题添加");
+        fieldDescriptionMap.put("verificationDeadline", "要求二次整改时间");
+        fieldDescriptionMap.put("creationDuration", "整改时长");
         fieldDescriptionMap.put("causeAnalysis", "原因分析");
         fieldDescriptionMap.put("rectificationVerificationStatus", "整改验证情况");
         fieldDescriptionMap.put("verificationConclusion", "验证结论");

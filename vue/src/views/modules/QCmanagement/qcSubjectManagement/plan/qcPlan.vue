@@ -355,6 +355,8 @@ export default {
     },
     //创建计划跳转
     newPlanHandle(id) {
+      let qcsrId = id;
+      // console.log("qcsrId======xht=======>"+qcsrId);
       let filteredArray = [];
       // 遍历原始数组
       for (let i = 0; i < this.dataList.length; i++) {
@@ -367,7 +369,8 @@ export default {
         {
           name: 'qcPlanNew',
           query: {
-            data: JSON.stringify(filteredArray)
+            data: JSON.stringify(filteredArray),
+            qcsrId: qcsrId,
           }
         });
     },

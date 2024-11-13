@@ -118,7 +118,7 @@ const mainRoutes = {
       meta: { title: 'QC工具', isDynamic: true, isTab: false }
     },
 
-    //任务
+    //问题
     {
       path: '/issue-issuetable',
       component: _import('modules/issueRectification/Rectificationissue'),
@@ -142,6 +142,12 @@ const mainRoutes = {
       component: _import('modules/issuefind/findissue'),
       name: 'otherToIssue',
       meta: { title: '任务流程', isDynamic: true, isTab: true }
+    },
+    {
+      path: '/issue-issueView',
+      component: _import('modules/issuetable/issueView'),
+      name: 'issue-issueView',
+      meta: { title: '问题展示', isDynamic: true, isTab: false }
     },
     //指标
     // 指标

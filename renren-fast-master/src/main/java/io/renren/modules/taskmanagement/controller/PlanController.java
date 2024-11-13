@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
 import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
+import io.renren.modules.taskmanagement.service.ApprovalService;
 import io.renren.modules.taskmanagement.service.FileService;
 import io.renren.modules.taskmanagement.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,8 @@ public class PlanController {
     private TaskService taskService;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private ApprovalService approvalService;
 
     /**
      * @description: PlanStatisticsLabelDto
@@ -248,12 +251,18 @@ public class PlanController {
         QueryWrapper<PlanEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("plan_id", planId);
         planService.remove(queryWrapper);
-//        planService.remove();
+
         // 当任务关联计划编号=planId的任务全部删除
         QueryWrapper<TaskEntity> taskQueryWrapper = new QueryWrapper<>();
         taskQueryWrapper.eq("task_associated_plan_id", planId);
         taskService.remove(taskQueryWrapper);
-//        taskService.remove()
+
+        // 删除所有的文件
+        fileService.remove(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
+
+        // 删除所有的审批信息
+        approvalService.remove(new LambdaQueryWrapper<ApprovalEntity>().eq(ApprovalEntity::getTaskAssociatedIndicatorsId, planId));
+
 
         return R.ok();
     }

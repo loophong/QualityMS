@@ -129,7 +129,8 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
 //        );
         PlanEntity plan = new PlanEntity();
         BeanUtils.copyProperties(planQueryParamDTO.getPlan(), plan);
-        plan.setPlanCurrentState(TaskStatus.COMPLETED);
+//        plan.setPlanCurrentState(TaskStatus.COMPLETED);
+        plan.setPlanIsCompleted(1);
         Page<PlanEntity> page = new Page<>(planQueryParamDTO.getPage(), planQueryParamDTO.getLimit());
         Page<PlanEntity> result = planDao.queryPageByParams(page,plan);
         return new PageUtils(result);
@@ -210,6 +211,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         PlanEntity plan = new PlanEntity();
         BeanUtils.copyProperties(planQueryParamDTO.getPlan(), plan);
         plan.setPlanIsCompleted(0);
+        log.info("查询前的plan: " + plan);
         Page<PlanEntity> page = new Page<>(planQueryParamDTO.getPage(), planQueryParamDTO.getLimit());
         Page<PlanEntity> result = planDao.queryPageByParams(page,plan);
         // 封装分页结果

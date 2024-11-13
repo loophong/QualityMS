@@ -47,17 +47,12 @@
     <select id="queryPageByParams" resultType="io.renren.modules.taskmanagement.entity.PlanEntity">
         SELECT * FROM task_management_plan
         <where>
+            plan_is_completed = #{plan.planIsCompleted}
             <if test="plan.planName != null and plan.planName != ''">
                 and plan_name like concat('%',#{plan.planName},'%')
             </if>
             <if test="plan.planId != null and plan.planId != ''">
                 and plan_id like concat('%',#{plan.planId},'%')
-            </if>
-            <if test="plan.planIsCompleted != null and plan.planIsCompleted != ''">
-                and plan_is_completed = #{plan.planIsCompleted}
-            </if>
-            <if test="plan.planCurrentState != null">
-                and plan_current_state = #{plan.planCurrentState}
             </if>
         </where>
     </select>

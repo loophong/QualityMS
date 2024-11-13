@@ -199,14 +199,14 @@
           </el-table-column>
           <el-table-column prop="planActualCompletionDate" header-align="center" align="center" label="实际完成日期"
                            width="110">
-            <template slot-scope="scope">
-              <span v-if="scope.row.planActualCompletionDate === null" style="color: gray;">-</span>
-            </template>
+<!--            <template slot-scope="scope">-->
+<!--              <span v-if="scope.row.planActualCompletionDate === null" style="color: gray;">-</span>-->
+<!--            </template>-->
           </el-table-column>
           <el-table-column prop="planActualDays" header-align="center" align="center" label="实际天数">
-            <template slot-scope="scope">
-              <span v-if="scope.row.planActualDays === null" style="color: gray;">-</span>
-            </template>
+<!--            <template slot-scope="scope">-->
+<!--              <span v-if="scope.row.planActualDays === null" style="color: gray;">-</span>-->
+<!--            </template>-->
           </el-table-column>
           <el-table-column prop="planTasksAssignment" header-align="center" align="center" label="任务派发">
           </el-table-column>

@@ -2,6 +2,7 @@ package io.renren.modules.taskmanagement.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
+import io.renren.modules.taskmanagement.dto.TaskQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.TaskDetailDTO;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.entity.TaskLineChartDTO;
@@ -33,7 +34,13 @@ public interface TaskService extends IService<TaskEntity> {
 
     PageUtils queryPageGetUnfinishedTasks(Map<String, Object> params, Long userId);
 
+    PageUtils queryPageGetUnfinishedTasks(TaskQueryParamDTO taskQueryParamDTO, Long userId);
+
+
     PageUtils queryPageGetCompletedTasksList(Map<String, Object> params, Long userId);
+
+    PageUtils queryPageGetCompletedTasksList(TaskQueryParamDTO taskQueryParamDTO, Long userId);
+
 
     TaskDetailDTO getTaskDetailInfo(String taskId);
 
@@ -48,6 +55,7 @@ public interface TaskService extends IService<TaskEntity> {
     List<Map<String, Integer>> home();
 
     List<TaskLineChartDTO> taskLineDisplay(String planId);
+
 
 
 //    void selectAllTasksByPlanId(String planId);

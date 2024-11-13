@@ -74,7 +74,7 @@
             </el-input>
           </el-form-item>
 
-          <el-form-item label="上传附件" prop="planFile" required>
+          <el-form-item label="上传附件" prop="planFile">
             <el-upload ref="file" :file-list="planFileList" :action="uploadUrl"
                        :on-remove="handleRemove" :before-remove="beforeRemove" :on-change="uploadFile"
                        :auto-upload="false">

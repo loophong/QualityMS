@@ -33,6 +33,8 @@
       <br>
       <br>
       <el-card class="formZone" shadow="hover">
+
+
         <div v-if="active1 === 1">
           <el-form>
             <br>
@@ -94,6 +96,9 @@
             </el-form-item>
           </el-form>
         </div>
+
+
+
         <div v-if="active1 === 2">
           <br>
           <el-form>
@@ -633,6 +638,8 @@
         </div>
       </el-card>
     </div>
+
+
     <div class="plan2" v-if="value === '问题解决型(指令型)'">
       <br>
       <el-steps :active="active2" align-center>
@@ -1241,6 +1248,9 @@
         </div>
       </el-card>
     </div>
+
+
+
     <div class="plan3" v-if="value === '创新型'">
       <br>
       <el-steps :active="active3" align-center>
@@ -1744,44 +1754,49 @@
         </div>
       </el-card>
     </div>
-    <el-dialog title="折柱混合图" :close-on-click-modal="false" :visible.sync="dialogVisible" width="80%">
+
+
+    <!-- 引用的组件s -->
+    <el-dialog title="折柱混合图" :close-on-click-modal="false" :visible.sync="dialogVisible" width="80%" v-if="dialogVisible">
       <div style="width: 100%; height: 100%;">
-        <line-and-bar ref="qcChart"></line-and-bar>
-      </div>
-    </el-dialog>
-    <el-dialog title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible" width="80%">
-      <div style="width: 100%; height: 100%;">
-        <fish-bone ref="fishBone"></fish-bone>
+        <!-- <line-and-bar ref="qcChart"></line-and-bar> -->
+        <line-and-bar ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></line-and-bar>
       </div>
     </el-dialog>
 
-    <el-dialog title="控制图" :visible.sync="dialogVisibleControl" :close-on-click-modal="false" width="80%">
+    <el-dialog title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible" width="80%" v-if="fishBonedialogVisible">
       <div style="width: 100%; height: 100%;">
-        <control ref="qcChart"></control>
+        <fish-bone ref="fishBone" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></fish-bone>
       </div>
     </el-dialog>
 
-    <el-dialog title="系统图" :visible.sync="dialogVisibleSystem" :close-on-click-modal="false" width="80%">
+    <el-dialog title="控制图" :visible.sync="dialogVisibleControl" :close-on-click-modal="false" width="80%" v-if="dialogVisibleControl">
       <div style="width: 100%; height: 100%;">
-        <system ref="qcChart"></system>
+        <control ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></control>
       </div>
     </el-dialog>
 
-    <el-dialog title="散点图" :visible.sync="dialogVisibleScatter" :close-on-click-modal="false" width="80%">
+    <el-dialog title="系统图" :visible.sync="dialogVisibleSystem" :close-on-click-modal="false" width="80%" v-if="dialogVisibleSystem">
       <div style="width: 100%; height: 100%;">
-        <Scatter ref="qcChart"></Scatter>
+        <system ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></system>
       </div>
     </el-dialog>
 
-    <el-dialog title="关联图" :visible.sync="dialogVisibleRelation" :close-on-click-modal="false" width="80%">
+    <el-dialog title="散点图" :visible.sync="dialogVisibleScatter" :close-on-click-modal="false" width="80%" v-if="dialogVisibleScatter">
       <div style="width: 100%; height: 100%;">
-        <RelationGraph ref="qcChart"></RelationGraph>
+        <Scatter ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></Scatter>
       </div>
     </el-dialog>
 
-    <el-dialog title="直方图" :visible.sync="dialogVisibleHistogram" :close-on-click-modal="false" width="80%">
+    <el-dialog title="关联图" :visible.sync="dialogVisibleRelation" :close-on-click-modal="false" width="80%" v-if="dialogVisibleRelation">
       <div style="width: 100%; height: 100%;">
-        <histogram ref="qcChart"></histogram>
+        <RelationGraph ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></RelationGraph>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="直方图" :visible.sync="dialogVisibleHistogram" :close-on-click-modal="false" width="80%" v-if="dialogVisibleHistogram">
+      <div style="width: 100%; height: 100%;">
+        <histogram ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></histogram>
       </div>
     </el-dialog>
 
@@ -1813,7 +1828,7 @@ import histogram from '@/views/modules/QCmanagement/qcTools/histogram.vue';
 import RelationGraph from '@/views/modules/QCmanagement/qcTools/RelationGraph.vue';
 import Scatter from '@/views/modules/QCmanagement/qcTools/Scatter.vue';
 import system from '@/views/modules/QCmanagement/qcTools/system.vue';
-import lineAndBar from '@/views/modules/QCmanagement/qcTools/lineAndBar.vue';
+import lineAndBar from '@/views/modules/QCmanagement/qcTools/lineAndBar.vue'; //折柱混合图 引用组件
 export default {
   components: {
     fishBone,
@@ -1852,7 +1867,7 @@ export default {
         stageConsolidate: '',
         key: ''
       },
-      dialogVisible: false,
+      dialogVisible: false, //折线柱状混合图
       dialogVisibleControl: false, //控制图弹窗
       dialogVisibleSystem: false, //系统图弹窗
       dialogVisibleRelation: false, //关联图弹窗
@@ -1900,11 +1915,16 @@ export default {
         topicLeader: '',
         topicType: '',
       },
+
+      //ref 传递参数
+      conplanSubject: 0,  // 示例默认数据
+      conplanProcess: 0,   // 示例默认数据
+
     }
   },
 
   mounted() {
-
+    
   },
   activated() {
     this.initRouterParam()
@@ -1971,7 +1991,17 @@ export default {
     initRouterParam() {
       const res = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', teamNumberIds: '', topicLeader: '', topicType: '' };
       this.routerParam = res
-      // console.log(this.routerParam)
+
+      //==================2024.11.11新增调整================================
+      // console.log("this.routerParam===xht==>"+ this.routerParam[0].qcsrId);
+      //在init的时候 将qcsrId赋值传递 
+      this.conplanSubject = this.routerParam[0].qcsrId;
+      // console.log("this.routerParam===xht==>"+this.routerParam);
+      // console.log("this.this.active1 ===xht==>"+this.active1);
+      this.conplanProcess = this.active1;
+      //==================2024.11.11新增调整================================
+
+
       const tmp = this.routerParam[0].teamNumberIds.split(',');
       this.participantOptions = tmp.map(id => ({
         value: id.trim(),
@@ -2069,6 +2099,9 @@ export default {
 
     toggleLineAndBar() {
       this.dialogVisible = !this.dialogVisible;
+      // this.$refs.lineAndBar.conplanSubject = 1;
+      // this.$refs.lineAndBar.conplanProcess = 11;
+
     },
     // 鱼骨图弹窗
     fishBonetoggleLineAndBar() {
@@ -2102,39 +2135,50 @@ export default {
         })
         .catch(_ => { });
     },
+    //上一步
     lastStep1() {
       if (this.active1 > 1) {
         this.active1--;
+        this.conplanProcess = this.active1;
+        console.log("this.this.active1 ===xht==>"+this.active1);
       }
       this.findMatchingItem(this.active1)
     },
+    //下一步
     nextStep1() {
       if (this.active1 < 10) {
         this.active1++;
+        this.conplanProcess = this.active1;
+        console.log("this.this.active1 ===xht==>"+this.active1);
       }
       this.findMatchingItem(this.active1)
+
     },
     lastStep2() {
       if (this.active2 > 1) {
         this.active2--;
+        this.conplanProcess = this.active2;
       }
       this.findMatchingItem(this.active2)
     },
     nextStep2() {
       if (this.active2 < 10) {
         this.active2++;
+        this.conplanProcess = this.active2;
       }
       this.findMatchingItem(this.active2)
     },
     lastStep3() {
       if (this.active3 > 1) {
         this.active3--;
+        this.conplanProcess = this.active3;
       }
       this.findMatchingItem(this.active3)
     },
     nextStep3() {
       if (this.active3 < 8) {
         this.active3++;
+        this.conplanProcess = this.active3;
       }
       this.findMatchingItem(this.active3)
     },
@@ -2208,14 +2252,14 @@ export default {
     //文件预览
     previewDoc(fileflag) {
       const token = this.$cookie.get('token'); // 获取当前的 token
-        if (!token) {
-          console.error('Token not found!');
-          return;
-        }
-        console.log('获取的地址 ' ,fileflag)
-        // 拼接带有 token 的请求地址
-        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
-          window.open(url);
+      if (!token) {
+        console.error('Token not found!');
+        return;
+      }
+      console.log('获取的地址 ', fileflag)
+      // 拼接带有 token 的请求地址
+      const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
+      window.open(url);
     },
 
 
@@ -2267,7 +2311,7 @@ export default {
     // 表单提交
     dataFormSubmit(id) {
       let tmpListString = []
-      if(this.tmpAllList.length){
+      if (this.tmpAllList.length) {
         tmpListString = JSON.stringify(this.tmpAllList)
       }
       const tmpStagePeople = JSON.stringify(this.form.stagePeople)
@@ -2279,17 +2323,17 @@ export default {
           'stepSubjectId': this.routerParam[0].qcsrId,
           'stepType': this.routerParam[0].topicType,
           'stepProcess': id,
-          'stageName': this.form.stageName ? this.form.stageName : undefined,
+          'stageName': this.form.stageName ? this.form.stageName : '',
           'stagePlanStart': this.form.planDate[0],
           'stagePlanEnd': this.form.planDate[1],
-          'stageActualStart': this.form.actualDate[0] ? this.form.actualDate[0] : undefined,
-          'stageActualEnd': this.form.actualDate[1] ? this.form.actualDate[1] : undefined,
-          'stagePeople': this.form.stagePeople ? tmpStagePeople : undefined,
-          'stageDescribe': this.form.stageDescribe || undefined,
-          'stageExtra': this.form.stageExtra || undefined,
-          'stageBefore': this.form.stageBefore || undefined,
-          'stageAfter': this.form.stageAfter || undefined,
-          'stageConsolidate': this.form.stageConsolidate || undefined,
+          'stageActualStart': this.form.actualDate[0] ? this.form.actualDate[0] : '',
+          'stageActualEnd': this.form.actualDate[1] ? this.form.actualDate[1] : '',
+          'stagePeople': this.form.stagePeople ? tmpStagePeople : '',
+          'stageDescribe': this.form.stageDescribe || '',
+          'stageExtra': this.form.stageExtra || '',
+          'stageBefore': this.form.stageBefore || '',
+          'stageAfter': this.form.stageAfter || '',
+          'stageConsolidate': this.form.stageConsolidate || '',
           'stageAttachment': this.tmpAllList.length ? tmpListString : this.form.stepAttachment,
         })
       }).then(({ data }) => {

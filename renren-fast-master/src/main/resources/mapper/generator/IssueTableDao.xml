@@ -15,6 +15,7 @@
         <result property="vehicleTypeId" column="vehicle_type_id"/>
         <result property="vehicleNumberId" column="vehicle_number_id"/>
         <result property="issueDescription" column="issue_description"/>
+        <result property="peliminaryAnalysis" column="peliminary_analysis"/>
         <result property="issuePhoto" column="issue_photo"/>
         <result property="rectificationRequirement" column="rectification_requirement"/>
         <result property="requiredCompletionTime" column="required_completion_time"/>
@@ -27,6 +28,8 @@
         <result property="remark" column="remark"/>
         <result property="creator" column="creator"/>
         <result property="creationTime" column="creation_time"/>
+        <result property="verificationDeadline" column="Verification_deadline"/>
+        <result property="overDue" column="over_due"/>
         <result property="lastModifier" column="last_modifier"/>
         <result property="lastModificationTime" column="last_modification_time"/>
         <result property="associatedRectificationRecords" column="associated_rectification_records"/>
@@ -42,5 +45,5 @@
         <result property="formula" column="formula"/>
     </resultMap>
 
-
+    <select id="selectFinishedSubjectList" resultType="io.renren.modules.generator.entity.IssueTableEntity"> SELECT * FROM issue_table WHERE verification_conclusion='已完成' </select>
 </mapper>

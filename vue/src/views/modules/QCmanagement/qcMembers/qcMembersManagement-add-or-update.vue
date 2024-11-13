@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="!dataForm.qcgmId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form v-if="!dataForm.qcgmId || !isEditingMember" :model="dataForm" :rules="dataRule" ref="dataForm"
-      @keyup.enter.native="dataFormSubmit()" label-width="120px">
+      @keyup.enter.native="dataFormSubmit()" label-width="140px">
       <el-row :gutter="20" v-show="!isAddMember">
         <el-col :span="12">
           <el-form-item v-if="isAdmin" prop="groupName" label="小组名称">
@@ -9,7 +9,7 @@
           </el-form-item>
           <el-form-item prop="mainName" label="组长姓名">
             <!-- <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input> -->
-            <el-select v-model="dataForm.mainName" placeholder="请选择角色">
+            <el-select v-model="dataForm.mainName" filterable placeholder="请选择角色">
               <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
                 <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
                 </el-option>
@@ -33,15 +33,10 @@
           <el-form-item v-if="!isAdmin" label="组内角色" prop="roleInTopic">
             <el-select v-model="dataForm.roleInTopic" placeholder="请选择组内角色">
               <el-option label="成员" value="成员"></el-option>
-              <el-option label="顾问" value="顾问"></el-option>
-              <el-option label="评审员" value="评审员"></el-option>
-              <el-option label="相关方评审员" value="相关方评审员"></el-option>
-              <el-option label="成果初评管理员" value="成果初评管理员"></el-option>
-              <el-option label="财务科评审员" value="财务科评审员"></el-option>
-              <el-option label="成果复评管理员" value="成果复评管理员"></el-option>
+              <el-option label="组长" value="组长"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item prop="participationDate" label="参加QC时间">
+          <el-form-item prop="participationDate" label="创建QC小组时间">
             <el-date-picker v-model="dataForm.participationDate" type="date" value-format="yyyy-MM-dd"
               placeholder="请选择日期" clearable></el-date-picker>
           </el-form-item>
@@ -63,7 +58,7 @@
             <el-col :span="12">
               <el-form-item label="姓名" prop="name">
                 <!-- <el-input v-model="member.name" placeholder="请输入姓名"></el-input> -->
-                <el-select v-model="member.name" placeholder="请选择角色">
+                <el-select v-model="member.name" filterable placeholder="请选择角色">
                   <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
                     <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
                     </el-option>
@@ -76,12 +71,12 @@
               <el-form-item label="组内角色" prop="roleInTopic">
                 <el-select v-model="member.roleInTopic" placeholder="请选择组内角色">
                   <el-option label="成员" value="成员"></el-option>
-                  <el-option label="顾问" value="顾问"></el-option>
+                  <!-- <el-option label="顾问" value="顾问"></el-option>
                   <el-option label="评审员" value="评审员"></el-option>
                   <el-option label="相关方评审员" value="相关方评审员"></el-option>
                   <el-option label="成果初评管理员" value="成果初评管理员"></el-option>
                   <el-option label="财务科评审员" value="财务科评审员"></el-option>
-                  <el-option label="成果复评管理员" value="成果复评管理员"></el-option>
+                  <el-option label="成果复评管理员" value="成果复评管理员"></el-option> -->
                 </el-select>
               </el-form-item>
               <el-form-item label="参加时间" prop="participationDate">
@@ -147,7 +142,7 @@ export default {
         mainName: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
-        name: [
+        memberName: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
         // number: [
@@ -191,7 +186,7 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 0) {
-              this.dataForm.mainName = data.qcGroupMember.name;
+              this.dataForm.mainName = data.qcGroupMember.memberName;
               this.dataForm.gender = data.qcGroupMember.gender;
               this.dataForm.telNumber = data.qcGroupMember.telNumber;
               this.dataForm.number = data.qcGroupMember.number;
@@ -220,7 +215,7 @@ export default {
             method: 'post',
             data: this.$http.adornData({
               'qcgmId': this.dataForm.qcgmId || undefined,
-              'name': this.dataForm.mainName,
+              'memberName': this.dataForm.mainName,
               'gender': this.dataForm.gender,
               'telNumber': this.dataForm.telNumber,
               'number': this.dataForm.number,
@@ -243,11 +238,8 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false;
-                  if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
-                    this.$emit('refreshDataList');
-                  } else {
-                    this.$emit('refreshCommonList');
-                  }
+                  this.$emit('refreshDataList');
+                  this.$emit('refreshCommonList');
                 }
               });
 
@@ -262,7 +254,7 @@ export default {
                   method: 'post',
                   data: this.$http.adornData({
                     'qcgmId': member.qcgmId || undefined,
-                    'name': member.name,
+                    'memberName': member.name,
                     'team': member.team,
                     'number': member.number,
                     'participationDate': member.participationDate,
@@ -302,7 +294,7 @@ export default {
           method: 'post',
           data: this.$http.adornData({
             'qcgmId': member.qcgmId || undefined,
-            'name': member.name,
+            'memberName': member.name,
             'team': member.team,
             'number': member.number,
             'participationDate': member.participationDate,
@@ -315,19 +307,30 @@ export default {
         });
       })).then(responses => {
         console.log('所有成员数据提交完成:', responses);
-        this.$message({
-          message: '操作成功',
-          type: 'success',
-          duration: 1500,
-          onClose: () => {
-            this.visible = false;
-            if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
+        if (responses && responses[0].data.code == 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.visible = false;
               this.$emit('refreshDataList');
-            } else {
               this.$emit('refreshCommonList');
             }
-          }
-        });
+          });
+        } else {
+          this.$message({
+            message: responses[0].data.msg,
+            type: 'warning',
+            duration: 1500,
+            onClose: () => {
+              // this.visible = false;
+              // this.$emit('refreshDataList');
+              // this.$emit('refreshCommonList');
+            }
+          });
+        }
+
       }).catch(error => {
         console.error('成员数据提交时发生错误:', error);
       });

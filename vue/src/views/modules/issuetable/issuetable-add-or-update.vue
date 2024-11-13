@@ -199,6 +199,7 @@
           serialNumber: '',
           issueNumber: '',
           inspectionDepartment: '',
+          peliminaryAnalysis: '',
           inspectionDate: '',
           issueCategoryId: '',
           vehicleTypeId: '',
@@ -232,53 +233,53 @@
       }
     },
     methods: {
-      reuse (id) {
-        this.dataForm.issueId = id || 0
-        this.revisible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-          if (this.dataForm.issueId) {
-            this.$http({
-              url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.dataForm.serialNumber = data.issueTable.serialNumber
-                this.dataForm.issueNumber = data.issueTable.issueNumber
-                this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
-                this.dataForm.inspectionDate = data.issueTable.inspectionDate
-                this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
-                this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
-                this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
-                this.dataForm.issueDescription = data.issueTable.issueDescription
-                this.dataForm.issuePhoto = data.issueTable.issuePhoto
-                this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
-                this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
-                this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
-                this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
-                this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
-                this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
-                this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
-                this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
-                this.dataForm.remark = data.issueTable.remark
-                this.dataForm.creator = data.issueTable.creator
-                this.dataForm.creationTime = data.issueTable.creationTime
-                this.dataForm.lastModifier = data.issueTable.lastModifier
-                this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
-                this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
-                this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
-                this.dataForm.creationDuration = data.issueTable.creationDuration
-                this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
-                this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
-                this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
-                this.dataForm.verifier = data.issueTable.verifier
-                this.dataForm.formula = data.issueTable.formula
-              }
-            })
-          }
-        })
-      },
+      // reuse (id) {
+      //   this.dataForm.issueId = id || 0
+      //   this.revisible = true
+      //   this.$nextTick(() => {
+      //     this.$refs['dataForm'].resetFields()
+      //     if (this.dataForm.issueId) {
+      //       this.$http({
+      //         url: this.$http.adornUrl(`/generator/issuetable/info/${this.dataForm.issueId}`),
+      //         method: 'get',
+      //         params: this.$http.adornParams()
+      //       }).then(({data}) => {
+      //         if (data && data.code === 0) {
+      //           this.dataForm.serialNumber = data.issueTable.serialNumber
+      //           this.dataForm.issueNumber = data.issueTable.issueNumber
+      //           this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
+      //           this.dataForm.inspectionDate = data.issueTable.inspectionDate
+      //           this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
+      //           this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
+      //           this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
+      //           this.dataForm.issueDescription = data.issueTable.issueDescription
+      //           this.dataForm.issuePhoto = data.issueTable.issuePhoto
+      //           this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
+      //           this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
+      //           this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
+      //           this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
+      //           this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+      //           this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
+      //           this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
+      //           this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime
+      //           this.dataForm.remark = data.issueTable.remark
+      //           this.dataForm.creator = data.issueTable.creator
+      //           this.dataForm.creationTime = data.issueTable.creationTime
+      //           this.dataForm.lastModifier = data.issueTable.lastModifier
+      //           this.dataForm.lastModificationTime = data.issueTable.lastModificationTime
+      //           this.dataForm.associatedRectificationRecords = data.issueTable.associatedRectificationRecords
+      //           this.dataForm.associatedIssueAddition = data.issueTable.associatedIssueAddition
+      //           this.dataForm.creationDuration = data.issueTable.creationDuration
+      //           this.dataForm.causeAnalysis = data.issueTable.causeAnalysis
+      //           this.dataForm.rectificationVerificationStatus = data.issueTable.rectificationVerificationStatus
+      //           this.dataForm.verificationConclusion = data.issueTable.verificationConclusion
+      //           this.dataForm.verifier = data.issueTable.verifier
+      //           this.dataForm.formula = data.issueTable.formula
+      //         }
+      //       })
+      //     }
+      //   })
+      // },
       init (id) {
         this.dataForm.issueId = id || 0
         this.visible = true
@@ -300,6 +301,7 @@
                 this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
                 this.dataForm.issueDescription = data.issueTable.issueDescription
                 this.dataForm.issuePhoto = data.issueTable.issuePhoto
+                this.dataForm.peliminaryAnalysis = data.issueTable.peliminaryAnalysis
                 this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
                 this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime
                 this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
@@ -326,6 +328,7 @@
           }
         })
       },
+
       // 新增根据问题编号查询并显示数据的函数
       showDataByIssueNumber(issueNumber) {
         this.visible1 = true;
@@ -365,6 +368,7 @@
                 'rectificationRequirement': this.dataForm.rectificationRequirement,
                 'requiredCompletionTime': this.dataForm.requiredCompletionTime,
                 'responsibleDepartment': this.dataForm.responsibleDepartment,
+                'peliminaryAnalysis': this.dataForm.peliminaryAnalysis,
                 'rectificationStatus': this.dataForm.rectificationStatus,
                 'actualCompletionTime': this.dataForm.actualCompletionTime,
                 'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,

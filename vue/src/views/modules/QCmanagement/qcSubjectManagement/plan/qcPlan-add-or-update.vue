@@ -143,8 +143,8 @@ export default {
                 data: this.$http.adornData({
                   'qcExamineId': this.dataFormEx.qcExamineId || undefined,
                   'qcExamineSubject': this.dataForm.qcsrId,
-                  'qcExamineCurrent': '1',
-                  'qcStatusOne': '1',
+                  'qcExamineCurrent': '0',
+                  'qcStatusOne': '0',
                 })
               }).then(({ data }) => {
                 if (data && data.code === 0) {

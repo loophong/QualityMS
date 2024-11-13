@@ -2,12 +2,12 @@
   <el-tabs v-model="activeName" type="border-card">
     <el-tab-pane label="开题审核" name="1" v-if="isAuth('qc:first:examine')">
       <div class="mod-config">
-        <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-          <el-form-item>
+        <el-form :inline="true" :model="dataForm" @keyup.enter.native="getFIR()">
+          <!-- <el-form-item>
             <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
-            <el-button @click="getDataList()">查询</el-button>
+            <!-- <el-button @click="getFirstList()">查询</el-button> -->
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
@@ -74,14 +74,14 @@
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
         <!-- 弹窗, 新增 / 修改 -->
-        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getFirstList"></add-or-update>
       </div>
     </el-tab-pane>
   </el-tabs>
 </template>
 
 <script>
-import AddOrUpdate from './examine-add-or-update'
+import firstUpdate from './examine-add-or-update'
 export default {
   data() {
     return {
@@ -99,10 +99,10 @@ export default {
     }
   },
   components: {
-    AddOrUpdate
+    firstUpdate
   },
   activated() {
-    this.getDataList()
+    this.getFirstList()
   },
   computed: {
     filteredDataList() {
@@ -115,7 +115,7 @@ export default {
       return new Date(time).toLocaleString();
     },
     // 获取数据列表
-    getDataList() {
+    getFirstList() {
       this.dataListLoading = true
       this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/list'),
@@ -140,12 +140,12 @@ export default {
     sizeChangeHandle(val) {
       this.pageSize = val
       this.pageIndex = 1
-      this.getDataList()
+      this.getFirstList()
     },
     // 当前页
     currentChangeHandle(val) {
       this.pageIndex = val
-      this.getDataList()
+      this.getFirstList()
     },
     // 多选
     selectionChangeHandle(val) {
@@ -188,7 +188,7 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
-                this.getDataList()
+                this.getFirstList()
               }
             })
           } else {

@@ -46,6 +46,7 @@
       </div>
       <div id="task-chart" style="width: 100%; height: 400px;"></div> <!-- 用于echarts图表 -->
       <div slot="footer">
+        <el-button v-if="isAuth('generator:issuemasktable:admin')" @click="openTaskList">任务列表</el-button>
         <el-button @click="taskDetailVisible = false">关闭</el-button>
       </div>
     </el-dialog>
@@ -72,7 +73,7 @@
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
-      :row-class-name="getRowClassName"
+      :row-class-name="rowClassName"
       style="width: 100%;">
     <el-table-column
         type="selection"
@@ -80,17 +81,22 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
-        prop="serialNumber"
-        header-align="center"
-        align="center"
-        label="序号">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="serialNumber"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="序号">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="issueNumber"
         header-align="center"
         align="center"
         label="问题编号">
+        <template slot-scope="scope">
+           <span :style="{ color: scope.row.overDue === 'true' ? 'red' : 'black' }">
+              {{ scope.row.issueNumber }}
+            </span>
+        </template>
       </el-table-column>
       <el-table-column
         prop="inspectionDepartment"
@@ -127,6 +133,12 @@
         header-align="center"
         align="center"
         label="问题描述">
+      </el-table-column>
+      <el-table-column
+        prop="peliminaryAnalysis"
+        header-align="center"
+        align="center"
+        label="初步分析">
       </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="issuePhoto"-->
@@ -220,12 +232,12 @@
         align="center"
         label="整改责任人">
       </el-table-column>
-      <el-table-column
-        prop="requiredSecondRectificationTime"
-        header-align="center"
-        align="center"
-        label="要求二次整改时间">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="requiredSecondRectificationTime"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="要求二次整改时间">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="remark"
         header-align="center"
@@ -237,6 +249,9 @@
         header-align="center"
         align="center"
         label="创建人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.creator) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="creationTime"
@@ -244,30 +259,31 @@
         align="center"
         label="创建时间">
       </el-table-column>
-      <el-table-column
-        prop="lastModifier"
-        header-align="center"
-        align="center"
-        label="最后修改人">
-      </el-table-column>
-      <el-table-column
-        prop="lastModificationTime"
-        header-align="center"
-        align="center"
-        label="最后修改时间">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="lastModifier"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="最后修改时间">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="lastModificationTime"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="最后修改时间">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="associatedRectificationRecords"
         header-align="center"
         align="center"
-        label="关联问题整改记录">
+        label="关联问题">
       </el-table-column>
-      <el-table-column
-        prop="associatedIssueAddition"
-        header-align="center"
-        align="center"
-        label="关联问题添加">
-      </el-table-column>
+
+<!--      <el-table-column-->
+<!--        prop="associatedIssueAddition"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="关联问题添加">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="creationDuration"
         header-align="center"
@@ -314,12 +330,12 @@
         <template slot-scope="scope">
           <div>
             <span v-for="(state, index) in getStates(scope.row.verificationConclusion)" :key="index">
-                <el-tag v-if="state === '未完成'" type="danger" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '暂停'" type="info" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-if="state === '持续'" type="danger" disable-transitions>{{ state }}</el-tag>
+<!--                <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>-->
+                <el-tag v-else-if="state === '暂缓'" type="info" disable-transitions>{{ state }}</el-tag>
                 <el-tag v-else-if="state === '结项'" type="warning" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '未完成，暂停'" type="danger" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '暂停，未完成'" type="info" disable-transitions>{{ state }}</el-tag>
+<!--                <el-tag v-else-if="state === '持续，暂停'" type="danger" disable-transitions>{{ state }}</el-tag>-->
+<!--                <el-tag v-else-if="state === '暂停，未完成'" type="info" disable-transitions>{{ state }}</el-tag>-->
                 <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
             </span>
           </div>
@@ -331,6 +347,9 @@
         header-align="center"
         align="center"
         label="验证人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.verifier) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="formula"
@@ -346,12 +365,33 @@
         label="操作">
         <template slot-scope="scope">
 <!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.issueId)">修改</el-button>-->
-          <el-button type="text" size="small" @click="showTaskDetails(scope.row.issueNumber)">问题详情</el-button>
+          <el-button type="text" size="small" @click="showTaskDetails(scope.row.issueNumber, scope.row.issueId)">完成情况</el-button>
           <el-button type="text" size="small" @click="reuseTask(scope.row.issueId)">问题重写</el-button>
           <el-button type="text" size="small" @click="closeRelatedTasks(scope.row.issueId)">问题关闭</el-button>
+          <el-button type="text" size="small" @click="showAssociatedIssues(scope.row.associatedRectificationRecords)">关联问题</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 弹出框，用于显示关联问题列表 -->
+    <el-dialog
+      :visible.sync="dialogVisible3"
+      title="关联问题"
+      width="30%"
+    >
+      <el-row>
+        <el-col :span="24" v-for="(issue, index) in currentIssues" :key="index">
+        <span
+          @click="viewIssueDetails(issue)"
+          style="display: block; color: #409EFF; cursor: pointer; margin-bottom: 8px;"
+        >
+          {{ issue }}
+        </span>
+        </el-col>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+      <el-button @click="dialogVisible3 = false">关闭</el-button>
+    </span>
+    </el-dialog>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -377,10 +417,15 @@
     data () {
       return {
         //查询参数
+        options:[],
         queryParams:{
           issueCategoryId: '',
           vehicleTypeId: '',
           responsibleDepartment: '',
+        },
+        tempParams:{
+          issueId: '',
+          issueNumber: '',
         },
         issueCategoryOptions: [],
         vehicleTypeOptions: [],
@@ -394,6 +439,7 @@
           { value: '企管科', label: '企管科' }
           // 其他科室选项
         ],
+        currentIssues: [],
         tableData: [],
         dataForm: {
           key: ''
@@ -420,6 +466,7 @@
         fullCause: '',    // 用于存储完整描述
         fullstatus: '',
         dialogVisible2: false,
+        dialogVisible3: false,
         fullRetStates:'',
       }
 
@@ -428,13 +475,60 @@
       AddOrUpdateD,
       AddOrUpdate
     },
+    async created(){
+      // 获取分组后的员工数据
+      this.$http({
+        url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+        method: 'get',
+      }).then(({data}) => {
+        this.options = data;
+        console.log(this.options);
+      });
+    },
     activated () {
       this.fetchIssueCategories()
       this.fetchVehicleTypes()
       this.getDataList()
-      this.fetchData()
+      // this.fetchData()
     },
     methods: {
+      getUsernameByUserId(auditorId) {
+        for (const category of this.options) {
+          for (const auditor of category.options) {
+            if (auditor.value === auditorId) {
+              return auditor.label;
+            }
+          }
+        }
+        return "-";
+      },
+      // rowStyle({ row }) {
+      //   console.log("染色")
+      //   return row.overDue === 'true' ? { color: 'red' } : {};
+      // },
+      // formatIssueNumber(row) {
+      //   if (row.overDue === 'true') {
+      //     // 当 overDue 为 true 时，返回带有红色样式的 HTML
+      //     return `<span style="color: red;">${row.issueNumber}</span>`;
+      //   }
+      //   return `<span>${row.issueNumber}</span>`;
+      // },
+      rowClassName({ row }) {
+        return row.overDue === 'true' ? 'overdue-text' : '';
+      },
+
+      openTaskList() {
+        // console.log('打开任务列表', this.tempParams.issueId)
+        // console.log('打开任务列表', this.tempParams.issueNumber)
+        this.taskDetailVisible = false;
+        this.$router.push({
+          name: 'issue-issuemask',
+          params: {
+            issueId: this.tempParams.issueId,
+            issueNumber: this.tempParams.issueNumber
+          }
+        })
+      },
       getImageUrl(fileflag) {
         const token = this.$cookie.get('token'); // 获取当前的 token
         if (!token) {
@@ -452,9 +546,7 @@
         console.log('获取的地址 ' ,fileflag)
         // 拼接带有 token 的请求地址
         const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
-
           window.open(url);
-
       },
 
       getStates(verificationConclusion) {
@@ -462,8 +554,10 @@
         // 按照逗号分隔，并去除多余的空格
         return verificationConclusion.split(',').map(state => state.trim());
       },
-      showTaskDetails(issueNumber) {
+      showTaskDetails(issueNumber,issueId) {
         this.fetchTaskDetails(issueNumber);
+        this.tempParams.issueId = issueId;
+        this.tempParams.issueNumber = issueNumber;
         this.taskDetailVisible = true; // 显示弹窗
       },
       fetchTaskDetails(issueNumber) {
@@ -524,41 +618,22 @@
         myChart.setOption(option);
       }
       ,
-      // previewImage (imageUrl) {
-      //   const token = localStorage.getItem('token');
-      //   console.log("cur imageUrl====>" + imageUrl);
-      //   window.open(imageUrl + '?token' + '03fa820c47519bd3e2f845b9f720fa96');
-      //   console.log("图片地址：" ,imageUrl)
-      // },
-      // previewImage(imageUrl) {
-      //   // 获取当前的 token，假设它存储在 localStorage 中
-      //   const token = this.$cookie.get('token');
-      //   if (token) {
-      //   } else {
-      //     console.error('Token not found!');
-      //   }
-      //   // 将 token 作为参数添加到 URL
-      //   const imageUrlWithToken = `${imageUrl}?token=${token}`;
-      //   // 打开包含 token 的图片地址
-      //   window.open(imageUrlWithToken);
-      //
-      // },
-      // previewImagetest2(flag) {
-      //   // 获取当前的 token，假设它存储在 localStorage 中
-      //   const token = this.$cookie.get('token');
-      //   if (token) {
-      //   } else {
-      //     console.error('Token not found!');
-      //   }
-      //   // 将 token 作为参数添加到 URL
-      //   const imageUrlWithToken = `${imageUrl}?token=${token}`;
-      //   // 打开包含 token 的图片地址
-      //   window.open(imageUrlWithToken);
-      //
-      // },
-      getRowClassName({ row, rowIndex }) {
-        return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
+      showAssociatedIssues(associatedRectificationRecords) {
+        // 将数据库中的字符串分割成数组
+        this.currentIssues = associatedRectificationRecords.split(',');
+        this.dialogVisible3 = true; // 打开对话框
       },
+      viewIssueDetails(associatedRectificationRecords) {
+        // 将数据库中的字符串分割成数组
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.viewIssueDetails(associatedRectificationRecords)
+        })
+        this.dialogVisible3 = false; // 打开对话框
+      },
+      // getRowClassName({ row, rowIndex }) {
+      //   return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
+      // },
       // 关闭相关任务
       closeRelatedTasks(id) {
         // 提示用户确认
@@ -595,28 +670,28 @@
         });
       },
 
-      fetchData () {
-        // Assuming you have an API endpoint to fetch the data
-        fetch('/api/data')
-          .then(response => response.json())
-          .then(data => {
-            const promises = data.map(item => {
-              if (item.issuePhoto) {
-                return fetch(`/api/images/${item.issuePhoto}`)
-                  .then(response => response.blob())
-                  .then(blob => this.blobToBase64(blob))
-                  .then(base64Data => {
-                    item.issuePhoto = base64Data
-                  })
-              }
-              return Promise.resolve()
-            })
-
-            Promise.all(promises).then(() => {
-              this.tableData = data
-            })
-          })
-      },
+      // fetchData () {
+      //   // Assuming you have an API endpoint to fetch the data
+      //   fetch('/api/data')
+      //     .then(response => response.json())
+      //     .then(data => {
+      //       const promises = data.map(item => {
+      //         if (item.issuePhoto) {
+      //           return fetch(`/api/images/${item.issuePhoto}`)
+      //             .then(response => response.blob())
+      //             .then(blob => this.blobToBase64(blob))
+      //             .then(base64Data => {
+      //               item.issuePhoto = base64Data
+      //             })
+      //         }
+      //         return Promise.resolve()
+      //       })
+      //
+      //       Promise.all(promises).then(() => {
+      //         this.tableData = data
+      //       })
+      //     })
+      // },
       blobToBase64 (blob) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader()
@@ -625,8 +700,35 @@
           reader.readAsDataURL(blob)
         })
       },
+      // getDataList () {
+      //   this.dataListLoading = true
+      //   this.$http({
+      //     url: this.$http.adornUrl('/generator/issuetable/list'),
+      //     method: 'get',
+      //     params: this.$http.adornParams({
+      //       'page': this.pageIndex,
+      //       'limit': this.pageSize,
+      //       'key': this.dataForm.key
+      //     })
+      //   }).then(({data}) => {
+      //     if (data && data.code === 0) {
+      //       this.dataList = data.page.list.map(item => {
+      //         // 确保图片路径有效
+      //         if (!item.issuePhoto || !this.isValidImageUrl(item.issuePhoto)) {
+      //           // item.issuePhoto = '默认图片路径' // 设置默认图片路径
+      //         }
+      //         return item
+      //       })
+      //       this.totalPage = data.page.totalCount
+      //     } else {
+      //       this.dataList = []
+      //       this.totalPage = 0
+      //     }
+      //     this.dataListLoading = false
+      //   })
+      // },
       getDataList () {
-        this.dataListLoading = true
+        this.dataListLoading = true;
         this.$http({
           url: this.$http.adornUrl('/generator/issuetable/list'),
           method: 'get',
@@ -635,23 +737,50 @@
             'limit': this.pageSize,
             'key': this.dataForm.key
           })
-        }).then(({data}) => {
+        }).then(({ data }) => {
           if (data && data.code === 0) {
             this.dataList = data.page.list.map(item => {
-              // 确保图片路径有效
               if (!item.issuePhoto || !this.isValidImageUrl(item.issuePhoto)) {
-                // item.issuePhoto = '默认图片路径' // 设置默认图片路径
+                // item.issuePhoto = '默认图片路径';
               }
-              return item
-            })
-            this.totalPage = data.page.totalCount
+              return item;
+            });
+
+            // 排序操作前，输出每个元素的 overDue 和 creationTime
+            // console.log("排序前的 dataList: ", this.dataList);
+            this.dataList.forEach(item => {
+              // console.log(`item.overDue: ${item.overDue}, type: ${typeof item.overDue}`);
+              // console.log(`item.creationTime: ${item.creationTime}, type: ${typeof item.creationTime}`);
+            });
+
+            // 排序操作
+            this.dataList.sort((a, b) => {
+              // 转换 overDue 为布尔值，'true' 转为 true，其他转为 false
+              const isOverDueA = a.overDue === 'true';
+              const isOverDueB = b.overDue === 'true';
+
+              // 优先按照 overDue 排序，overDue 为 true 的排在前面
+              if (isOverDueA !== isOverDueB) {
+                return isOverDueA ? -1 : 1;
+              }
+
+              // 如果 overDue 相同，则按创建时间排序
+              return new Date(b.creationTime) - new Date(a.creationTime);
+            });
+
+            // 排序后再输出一次以确认排序结果
+            // console.log("排序后的 dataList: ", this.dataList);
+
+            this.totalPage = data.page.totalCount;
           } else {
-            this.dataList = []
-            this.totalPage = 0
+            this.dataList = [];
+            this.totalPage = 0;
           }
-          this.dataListLoading = false
-        })
+          this.dataListLoading = false;
+        });
       },
+
+
       getQueryList () {
         this.dataListLoading = true
         this.$http({
@@ -873,6 +1002,11 @@
   margin-top: 10px;
   font-size: 14px; /* 分页器字体大小 */
 }
+.overdue-text {
+  color: red;  /* 红色字体 */
+}
+
+
 </style>
 
 

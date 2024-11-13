@@ -27,6 +27,6 @@
         <result property="samplingFrequency" column="sampling_frequency"/>
         <result property="controlList" column="control_list"/>
     </resultMap>
-
+    <select id="selectFinishedSubjectList" resultType="io.renren.modules.indicator.entity.IndicatorKeyIndicatorsEntity"> SELECT * FROM indicator_dictionary WHERE storage_flag = 1 </select>
 
 </mapper>

@@ -32,8 +32,11 @@ public class QcToolsConplanController {
     private QcToolsConplanDao qcToolsConplanDao;
 
     /**
-     * 根据T S P获取列表
-     * 对应step的 type+subject+process
+     * 根据给定的T、S和P获取相应的列表
+     * @param conplanType    图的类型
+     * @param conplanSubject 对应step的subject字段
+     * @param conplanProcess 对应具体的process
+     * @return 返回包含符合匹配的结果列表，封装在响应对象中
      */
     @RequestMapping("/TspList")
 //    @RequiresPermissions("qcTools:template:list")
@@ -42,43 +45,20 @@ public class QcToolsConplanController {
         System.out.println("TSP resultList====>" + resultList);
         return R.ok().put("resultList", resultList);
     }
-//
-//
-    /**
-     * 列表
-     * no use
-     */
-//    @RequestMapping("/listAll")
-////    @RequiresPermissions("qcTools:template:list")
-//    public R list(@RequestParam Map<String, Object> params){
-//        PageUtils page = qcToolsConplanService.queryPage(params);
-//        return R.ok().put("page", page);
-//    }
-//
-//
-    /**
-     * 指定信息查看
-     */
-//    @RequestMapping("/info/{templateId}")
-////    @RequiresPermissions("qcTools:template:info")
-//    public R info(@PathVariable("templateId") Integer templateId){
-////		QcToolsTemplateEntity qcToolsTemplate = qcToolsTemplateService.getById(templateId);
-//
-//        return R.ok().put("qcToolsTemplate", "ok");
-//    }
-//
+
 
     /**
-     * 保存
+     * 保存用户自定义的QC图的数据
+     * @param qcToolsConplanEntity 前端传递过来的数据实体
+     * @return 保存成功标识
      */
     @RequestMapping("/save")
 //    @RequiresPermissions("qcTools:conplan:save")
     public R save(@RequestBody QcToolsConplanEntity qcToolsConplanEntity) {
-
-        System.out.println("=========qc=======tools========conplan========entity");
-        System.out.println(qcToolsConplanEntity);
+//
+//        System.out.println("=========qc=======tools========conplan========entity");
+//        System.out.println(qcToolsConplanEntity);
         //判断一下当前记录是否存在
-
         String conplanType = qcToolsConplanEntity.getConplanType();
         Integer conplanSubject = qcToolsConplanEntity.getConplanSubject();
         Integer conplanProcess = qcToolsConplanEntity.getConplanProcess();
@@ -97,9 +77,9 @@ public class QcToolsConplanController {
 
         return R.ok();
     }
-//
+
     /**
-     * 修改更新
+     * 修改更新 update
      * 按照指定 step的subject+process+type
      * 进行更新对应的数据记录行
      */
@@ -109,7 +89,7 @@ public class QcToolsConplanController {
 //
 //        return R.ok();
 //    }
-//
+
 //    /**
 //     * TODO 删除
 //     */
@@ -117,7 +97,6 @@ public class QcToolsConplanController {
 //    @RequiresPermissions("qcTools:template:delete")
 //    public R delete(@RequestBody Integer[] templateIds){
 //		qcToolsTemplateService.removeByIds(Arrays.asList(templateIds));
-//
 //        return R.ok();
 //    }
 

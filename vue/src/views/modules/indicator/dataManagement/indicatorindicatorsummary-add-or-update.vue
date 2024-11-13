@@ -11,9 +11,9 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="指标目标值" prop="indicatorValue">
-      <el-input v-model="dataForm.indicatorValue" placeholder="指标值"></el-input>
-    </el-form-item>
+<!--    <el-form-item label="指标目标值" prop="indicatorValue">-->
+<!--      <el-input v-model="dataForm.indicatorValue" placeholder="指标值"></el-input>-->
+<!--    </el-form-item>-->
       <el-form-item label="指标值" prop="indicatorValue">
         <el-input v-model="dataForm.indicatorActualValue" placeholder="指标值"></el-input>
       </el-form-item>

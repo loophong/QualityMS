@@ -9,14 +9,14 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="年月" prop="yearMonth">
+      <el-form-item label="年月">
         <el-date-picker
-          v-model="queryParams.yearMonth"
-          type="month"
-          placeholder="选择月份"
-          format="yyyy-MM"
-          value-format="yyyy-MM"
-        ></el-date-picker>
+          v-model="selectedDate"
+          type="monthrange"
+          start-placeholder="开始月份"
+          end-placeholder="结束月份"
+          @change="handleDateChange">
+        </el-date-picker>
       </el-form-item>
       <el-form-item label="管理部门" prop="managementDepartment">
         <el-input v-model="queryParams.managementDepartment" placeholder="请输入管理部门"></el-input>
@@ -195,6 +195,7 @@
   export default {
     data () {
       return {
+        selectedDate: [],  // 选择日期范围
         indicatorDictionaryList: {},
 
         //excel上传
@@ -223,6 +224,8 @@
           indicatorParentNode: '',
           indicatorCreatTime: '',
           yearMonth: '',
+          startTime: '',
+          endTime: '',
           indicatorState: '',
           indicatorChildNode: ''
         },
@@ -271,6 +274,7 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
+        console.log('this.queryParams',this.queryParams);
         this.$http({
           url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
           method: 'get',
@@ -306,6 +310,16 @@
           managementContentCurrentAnalysis: null,
         }
         this.getDataList()
+      },
+      handleDateChange(value) {
+        if (value && value[1]) {
+          let endDate = new Date(value[1]);
+          endDate.setMonth(endDate.getMonth() + 1);
+          endDate.setDate(0);
+          this.selectedDate[1] = endDate;
+          this.queryParams.startTime = this.selectedDate[0];
+          this.queryParams.endTime = this.selectedDate[1];
+        }
       },
       //获取全部指标列表
       getIndicatorDictionaryList() {
@@ -396,7 +410,7 @@
           }).then(({data}) => {
             if (data && data.code === 0 && data.page.totalCount === 0) {
               console.log("data123====>",data)
-              this.dataList = data.page.list
+              this.dataList = data.page.list;
               const aimUrl = http.adornUrl('/indicator/indicatorindicatorsummary/upload');
               uploadFile(formData, aimUrl)
                 .then(response => {

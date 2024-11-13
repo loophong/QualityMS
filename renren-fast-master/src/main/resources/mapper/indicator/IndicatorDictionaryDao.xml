@@ -24,6 +24,10 @@
         <result property="indicatorChildNode" column="indicator_child_node"/>
         <result property="indicatorValueUpperBound" column="indicator_value_upper_bound"/>
         <result property="indicatorValueLowerBound" column="indicator_value_lower_bound"/>
+        <result property="storageFlag" column="storage_flag"/>
+        <result property="weight" column="weight"/>
+        <result property="indicatorPlannedValue" column="indicator_planned_value"/>
+        <result property="indicatorBoundFlag" column="indicator_bound_flag"/>
     </resultMap>
 
 

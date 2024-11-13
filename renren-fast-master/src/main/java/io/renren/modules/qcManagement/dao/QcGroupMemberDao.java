@@ -77,4 +77,16 @@ public interface QcGroupMemberDao extends BaseMapper<QcGroupMemberEntity> {
             "WHERE YEAR(participation_date) = YEAR(CURRENT_DATE) AND role_in_topic = '组长' AND registration_num IS NOT NULL"
     })
     Integer registrationCount();
+
+    //根据ID查询成员
+    @Select({
+            "SELECT * ",
+            "FROM qc_group_members ",
+            "WHERE qcgm_id =  #{id}"
+    })
+    QcGroupMemberEntity selectMemberById(Integer id);
+
+    //检查成员是否重复
+
+    Boolean checkRepeat(Integer parentId,String name);
 }

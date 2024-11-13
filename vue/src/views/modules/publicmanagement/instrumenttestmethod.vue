@@ -222,8 +222,8 @@
         prop="delteflag"
         header-align="center"
         align="center"
-        label="是否失效">
-
+        label="是否失效"> -->
+        <!-- <el-table-column prop="flag" label="是否失效" header-align="center" align="center">
          <template slot-scope="scope">
               <span v-if="scope.row.delteflag === '0'">
                 <el-tag type="info" disable-transitions>未失效</el-tag></span>
@@ -231,10 +231,10 @@
                 <el-tag disable-transitions>已失效</el-tag></span>
               <span v-else-if="scope.row.delteflag === '2'">
                 <el-tag disable-transitions>驳回审批</el-tag></span>
-        
-              <span v-else>-</span> <!-- 处理未知状态 -->
-            <!-- </template>
-      </el-table-column> --> -->
+              <span v-else>-</span> 
+          </template>
+      </el-table-column> --> 
+      
       <el-table-column
         fixed="right"
         header-align="center"

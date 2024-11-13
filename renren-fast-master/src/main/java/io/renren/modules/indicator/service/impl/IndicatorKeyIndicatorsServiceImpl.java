@@ -1,5 +1,9 @@
 package io.renren.modules.indicator.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.renren.modules.generator.dao.IssueTableDao;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -12,10 +16,11 @@ import io.renren.modules.indicator.dao.IndicatorKeyIndicatorsDao;
 import io.renren.modules.indicator.entity.IndicatorKeyIndicatorsEntity;
 import io.renren.modules.indicator.service.IndicatorKeyIndicatorsService;
 
-
+@Slf4j
 @Service("indicatorKeyIndicatorsService")
 public class IndicatorKeyIndicatorsServiceImpl extends ServiceImpl<IndicatorKeyIndicatorsDao, IndicatorKeyIndicatorsEntity> implements IndicatorKeyIndicatorsService {
-
+    @Autowired
+    IndicatorKeyIndicatorsDao indicatorKeyIndicatorsDao;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<IndicatorKeyIndicatorsEntity> page = this.page(
@@ -25,6 +30,20 @@ public class IndicatorKeyIndicatorsServiceImpl extends ServiceImpl<IndicatorKeyI
 
         return new PageUtils(page);
     }
+
+    @Override
+    public PageUtils queryPageFinishedList(Map<String, Object> params) {
+        log.info("param"+params.get("page")+"------"+ params.get("limit"));
+
+        long p = Long.parseLong((String) params.get("page"));
+        long l = Long.parseLong((String) params.get("limit"));
+        Page<IndicatorKeyIndicatorsEntity> page = new Page<IndicatorKeyIndicatorsEntity>(p,l);
+
+        Page<IndicatorKeyIndicatorsEntity> result = indicatorKeyIndicatorsDao.selectFinishedSubjectList(page);
+        log.info("page"+page);
+        return new PageUtils(page);
+    }
+
 
 
 }

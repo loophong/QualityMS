@@ -21,11 +21,12 @@
         <el-button type="danger" @click="toIssue()">问题添加</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="filteredDataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-      style="width: 100%;">
-      <el-table-column type="selection" header-align="center" align="center" width="50">
-      </el-table-column>
-      <el-table-column prop="qcsrId" header-align="center" align="center" label="课题ID" fixed>
+    <el-table :data="filteredDataList" :row-class-name="tableRowClassName" border v-loading="dataListLoading"
+      @selection-change="selectionChangeHandle" style="width: 100%;"
+      :default-sort="{ prop: 'qcsrId', order: 'descending' }">
+      <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
+      </el-table-column> -->
+      <el-table-column prop="qcsrId" header-align="center" align="center" label="课题ID" fixed sortable width="100">
       </el-table-column>
       <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" width="160" fixed>
       </el-table-column>
@@ -52,7 +53,7 @@
       <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
         <template slot-scope="scope">
           <span>{{ toStatus(scope.row.topicActivityStatus,
-      scope.row.topicType) }}</span>
+            scope.row.topicType) }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -75,9 +76,9 @@
           <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
             @click="newPlanHandle(scope.row.qcsrId)">关联计划</el-button>
           <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
-            @click="addOrUpdateHandle(scope.row.qcsrId)">提交计划</el-button>
+            @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
           <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
-            @click="examineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
+            @click="examineStatus(scope.row.qcsrId)">审核状态</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -89,6 +90,16 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
   </div>
 </template>
+
+<style scoped>
+.el-table .warning-row {
+  background: oldlace;
+}
+
+.el-table .success-row {
+  background: #f0f9eb;
+}
+</style>
 
 <script>
 import AddOrUpdate from './qcPlan-add-or-update'
@@ -123,6 +134,14 @@ export default {
     }
   },
   methods: {
+    tableRowClassName({ row, rowIndex }) {
+      if (rowIndex === 1) {
+        return 'warning-row';
+      } else if (rowIndex === 3) {
+        return 'success-row';
+      }
+      return '';
+    },
     //创建计划跳转
     newPlanHandle(id) {
       let qcsrId = id;
@@ -301,13 +320,40 @@ export default {
       this.dataListSelections = val
     },
     // 新增 / 修改
-    addOrUpdateHandle(id) {
+    addOrUpdateHandle(id, status, type) {
+      if (type == '创新型') {
+        if (status != '8') {
+          this.$message({
+            message: '请先完成课题计划',
+            type: 'warning',
+            duration: 1500
+          })
+        } else {
+          this.addOrUpdateVisible = true
+          this.$nextTick(() => {
+            this.$refs.addOrUpdate.init(id)
+          })
+        }
+      } else {
+        if (status != '10') {
+          this.$message({
+            message: '请先完成课题计划',
+            type: 'warning',
+            duration: 1500
+          })
+        } else {
+          this.addOrUpdateVisible = true
+          this.$nextTick(() => {
+            this.$refs.addOrUpdate.init(id)
+          })
+        }
+      }
       console.log(this.dataListSelections)
       // console.log(id)
-      this.addOrUpdateVisible = true
-      this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(id)
-      })
+      // this.addOrUpdateVisible = true
+      // this.$nextTick(() => {
+      //   this.$refs.addOrUpdate.init(id)
+      // })
     },
     // 删除
     deleteHandle(id) {

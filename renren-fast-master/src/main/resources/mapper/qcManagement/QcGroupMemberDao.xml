@@ -10,7 +10,6 @@
         <result property="gender" column="gender"/>
         <result property="telNumber" column="tel_number"/>
         <result property="number" column="number"/>
-        <result property="education" column="education"/>
         <result property="department" column="department"/>
         <result property="position" column="position"/>
         <result property="team" column="team"/>
@@ -31,6 +30,13 @@
         WHERE (parent_id = #{id} OR qcgm_id = #{id}) AND delete_flag != 1
     </select>
 
+    <!-- 检查同一组是否有相同名字的成员 -->
+    <select id="checkRepeat" resultType="java.lang.Boolean">
+        SELECT COUNT(*) > 0 AS exists
+        FROM qc_group_member
+        WHERE parent_id = #{parentId}
+          AND name = #{name}
+    </select>
 
 
 </mapper>

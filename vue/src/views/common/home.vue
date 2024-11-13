@@ -55,7 +55,7 @@
           <div class="panel-footer"></div>
         </div>
         <div class="panel issue">
-          <h2>当月问题统计  完成率：{{ completionRate }}</h2>
+          <h2>问题统计  完成率：{{ completionRate }}</h2>
           <div id="issueChart" ref="issueChart"></div>
           <div class="panel-footer"></div>
         </div>
@@ -127,7 +127,7 @@ export default {
 
       //----------------问题模块-----------------
       issueStats: {}, // 存储当月问题统计数据
-      issueCategories: ["暂停", "未完成", "已完成", "结项"], // 问题分类
+      issueCategories: ["暂缓", "持续", "结项"], // 问题分类
       totalIssue: '',
       completionRateData: { completed: 0, notCompleted: 0 },// 新增的完成率数据
       completionRate: 0, // 完成率
@@ -464,7 +464,7 @@ export default {
     },
 
     //----------------问题模块-----------------
-    // 查询当月问题数量
+    // 查询问题数量
     getIssueStats() {
       this.$http({
         url: this.$http.adornUrl('/generator/issuetable/currentMonth'),
@@ -474,15 +474,15 @@ export default {
         if (data && data.code === 0) {
           this.issueStats = data.stats; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
           // this.totalIssue = data.stats['暂停'] + data.stats['未完成'] + data.stats['已完成'] + data.stats['结项']
-          // console.log('数据转换中......', this.issueStats)
+          console.log('数据转换中......', this.issueStats)
           this.renderIssueChart(); // 渲染图表
         } else {
-          this.issueStats = { 暂停: 0, 未完成: 0, 已完成: 0, 结项: 0 }; // 默认值
+          this.issueStats = { 暂缓: 0, 持续: 0, 结项: 0 }; // 默认值
           // this.issueStats = {创建: 0, 持续: 0, 未完成: 0, 已完成: 0, 结项: 0};
         }
       });
     },
-    // 查询当月问题完成情况
+    // 查询问题完成情况
     getCompletionRate() {
       this.$http({
         url: this.$http.adornUrl('/generator/issuetable/completionRate'),
@@ -571,9 +571,8 @@ export default {
             type: 'bar',
             data: [
               // this.issueStats['创建'] || 0,
-              { value: this.issueStats['暂停'] || 0, itemStyle: { normal: { color: '#2d84ff' } } },
-              { value: this.issueStats['未完成'] || 0, itemStyle: { normal: { color: '#ff8a22' } } },
-              { value: this.issueStats['已完成'] || 0, itemStyle: { normal: { color: '#67c23a' } } },
+              { value: this.issueStats['暂缓'] || 0, itemStyle: { normal: { color: '#2d84ff' } } },
+              { value: this.issueStats['持续'] || 0, itemStyle: { normal: { color: '#ff8a22' } } },
               { value: this.issueStats['结项'] || 0, itemStyle: { normal: { color: '#f7ff10' } } }
             ], // 根据获取的数据填充
             itemStyle: {

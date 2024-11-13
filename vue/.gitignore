@@ -15,3 +15,5 @@ selenium-debug.log
 *.ntvs*
 *.njsproj
 *.sln
+/src/views/modules/issueexamine/issueExamine.vue
+/src/views/modules/issueexamine/issuemasktable-

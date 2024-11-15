@@ -64,7 +64,7 @@
       :close-on-click-modal="false"
       :visible.sync="visible2"
       :width="'400px'"> <!-- 设置对话框宽度 -->
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="40px">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
         <el-form-item label="处理方案" prop="handlingScenarios">
 <!--          <el-input v-model="dataForm.handlingscenarios" placeholder="处理方案"></el-input>-->
           <el-input v-model="dataForm.handlingscenarios" placeholder="处理方案"></el-input>

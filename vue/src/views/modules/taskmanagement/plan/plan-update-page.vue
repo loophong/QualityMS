@@ -76,7 +76,7 @@
                       v-model="dataForm.planContent" maxlength="1000">
             </el-input>
           </el-form-item>
-          <el-form-item label="上传附件" prop="planFile" required>
+          <el-form-item label="上传附件" prop="planFile">
             <el-upload ref="file" :file-list="planFileList" :action="uploadUrl"
                        :on-remove="handleRemove" :before-remove="beforeRemove" :on-change="uploadFile" :auto-upload="false">
               <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
@@ -312,9 +312,9 @@ export default {
         planAuditor: [
           {required: true, message: '审核人不能为空', trigger: ['change', 'blur']}
         ],
-        planAssociatedIndicatorsId: [
-          {required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur']}
-        ],
+        // planAssociatedIndicatorsId: [
+        //   {required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur']}
+        // ],
 
         taskId: [
           {required: true, message: '任务编号不能为空', trigger: 'blur'},

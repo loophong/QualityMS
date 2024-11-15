@@ -24,7 +24,7 @@ public class TaskScheduledTasks {
 
 
     //    @Scheduled(cron = "0 0 4 * * *")
-//    @Scheduled(cron = "0,30 * * * * *")
+    @Scheduled(cron = "0,30 * * * * *")
     public void taskScheduledTasks() {
         log.info("定时任务执行了");
         checkPlanIsCanStart();
@@ -175,7 +175,14 @@ public class TaskScheduledTasks {
                         return;
                     }
                 }
+                Date zeroTime = DateUtils.getZeroTime();
+                plan.setPlanActualCompletionDate(zeroTime);
+                plan.setPlanActualDays((zeroTime.getTime() - plan.getPlanStartDate().getTime()) / 1000 / 60 / 60 / 24);
                 plan.setPlanCurrentState(TaskStatus.COMPLETED);
+                plan.setPlanIsCompleted(1);
+                if (plan.getPlanScheduleDays() >= plan.getPlanActualDays()){
+                    plan.setPlanEarlyCompletionDays(plan.getPlanScheduleDays() - plan.getPlanActualDays());
+                }
                 planService.updateById(plan);
             }
 
@@ -202,7 +209,7 @@ public class TaskScheduledTasks {
             log.info("allChildNum:" + allChildNum);
             log.info("allChildFinishedNum:" + allChildFinishedNum);
 
-            plan.setPlanSchedule(String.valueOf((int)(allChildFinishedNum * 100.0 / allChildNum)));
+            plan.setPlanSchedule(String.valueOf((int) (allChildFinishedNum * 100.0 / allChildNum)));
             planService.updateById(plan);
         });
     }
@@ -228,7 +235,7 @@ public class TaskScheduledTasks {
             if (allChildNum == 0 || allChildFinishedNum == 0) {
                 task.setTaskSchedule(String.valueOf(0));
             } else {
-                task.setTaskSchedule(String.valueOf((int)(allChildFinishedNum * 100.0 / allChildNum)));
+                task.setTaskSchedule(String.valueOf((int) (allChildFinishedNum * 100.0 / allChildNum)));
             }
             taskService.updateById(task);
 

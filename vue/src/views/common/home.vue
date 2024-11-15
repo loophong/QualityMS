@@ -55,7 +55,7 @@
           <div class="panel-footer"></div>
         </div>
         <div class="panel issue">
-          <h2>问题统计  完成率：{{ completionRate }}</h2>
+          <h2 @click="openNewPage">问题统计  完成率：{{ completionRate }}</h2>
           <div id="issueChart" ref="issueChart"></div>
           <div class="panel-footer"></div>
         </div>
@@ -172,12 +172,12 @@ export default {
       this.currentTime = `${y}-${m}-${d} ${h}:${mi}:${s}`; // 格式化时间
       // console.log('当前时间1：' ,this.currentTime);
     },
-    beforeDestroy() {
-      if (this.t) {
-        clearInterval(this.t); // 清除定时器
-      }
-      console.log('组件即将销毁');
-    },
+    // beforeDestroy() {
+    //   if (this.t) {
+    //     clearInterval(this.t); // 清除定时器
+    //   }
+    //   console.log('组件即将销毁');
+    // },
     //----------------指标模块-----------------
     getIndicatorCounts() {
       this.$http({
@@ -464,6 +464,13 @@ export default {
     },
 
     //----------------问题模块-----------------
+    openNewPage() {
+      this.$router.push({
+        name: 'issue-issueView',
+        params: {
+        }
+      })
+    },
     // 查询问题数量
     getIssueStats() {
       this.$http({

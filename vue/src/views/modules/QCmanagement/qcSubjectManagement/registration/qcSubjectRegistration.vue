@@ -20,7 +20,7 @@
           </el-form-item>
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%;" stripe>
+          style="width: 100%;" stripe highlight-current-row>
           <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
@@ -90,12 +90,12 @@
     </el-tab-pane>
     <el-tab-pane label="我创办的课题" name="2">
       <div class="mod-config">
-        <el-form :inline="true" :model="myQueryParam" @keyup.enter.native="getLeadList()">
+        <el-form :inline="true" :model="myQueryParamLead" @keyup.enter.native="getLeadList()">
           <el-form-item>
-            <el-input v-model="myQueryParam.topicName" placeholder="课题名称" clearable></el-input>
+            <el-input v-model="myQueryParamLead.topicName" placeholder="课题名称" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
+            <el-input v-model="myQueryParamLead.keywords" placeholder="课题关键字" clearable></el-input>
           </el-form-item>
           <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
@@ -110,7 +110,7 @@
           </el-form-item>
         </el-form>
         <el-table :data="subjectLeadList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%" stripe>
+          style="width: 100%" stripe highlight-current-row>
           <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
@@ -166,22 +166,22 @@
             </template>
           </el-table-column>
         </el-table>
-        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-          :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPageSubject"
+        <el-pagination @size-change="sizeChangeHandleLead" @current-change="currentChangeHandleLead"
+          :current-page="pageIndexLead" :page-sizes="[10, 20, 50, 100]" :page-size="pageSizeLead" :total="totalPageLead"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination> -->
+        </el-pagination>
         <!-- 弹窗, 新增 / 修改 -->
         <!-- <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshLeadList="getLeadList()"></add-or-update> -->
       </div>
     </el-tab-pane>
     <el-tab-pane label="我参与的课题" name="3">
       <div class="mod-config">
-        <el-form :inline="true" :model="myQueryParam" @keyup.enter.native="getJoinList()">
+        <el-form :inline="true" :model="myQueryParamJoin" @keyup.enter.native="getJoinList()">
           <el-form-item>
-            <el-input v-model="myQueryParam.topicName" placeholder="课题名称" clearable></el-input>
+            <el-input v-model="myQueryParamJoin.topicName" placeholder="课题名称" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
+            <el-input v-model="myQueryParamJoin.keywords" placeholder="课题关键字" clearable></el-input>
           </el-form-item>
           <el-form-item>
             <el-button @click="getJoinList()">查询</el-button>
@@ -194,7 +194,7 @@
           </el-form-item>
         </el-form>
         <el-table :data="subjectJoinList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%" stripe>
+          style="width: 100%" stripe highlight-current-row>
           <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
@@ -249,10 +249,10 @@
             </template>
           </el-table-column>
         </el-table>
-        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-          :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPageSubject"
+        <el-pagination @size-change="sizeChangeHandleJoin" @current-change="currentChangeHandleJoin"
+          :current-page="pageIndexJoin" :page-sizes="[10, 20, 50, 100]" :page-size="pageSizeJoin" :total="totalPageJoin"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination> -->
+        </el-pagination>
 
       </div>
     </el-tab-pane>
@@ -273,9 +273,19 @@ export default {
         key: ''
       },
       dataList: [],
+
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
+
+      pageIndexLead: 1,
+      pageSizeLead: 10,
+      totalPageLead: 0,
+
+      pageIndexJoin: 1,
+      pageSizeJoin: 10,
+      totalPageJoin: 0,
+
       dataListLoading: false,
       dataListSelections: [],
       subjectDataList: [],
@@ -285,6 +295,14 @@ export default {
       addOrUpdateVisible: false,
       groupMemberList: [],
       myQueryParam: {
+        topicName: '',
+        keywords: '',
+      },
+      myQueryParamLead: {
+        topicName: '',
+        keywords: '',
+      },
+      myQueryParamJoin: {
         topicName: '',
         keywords: '',
       },
@@ -324,18 +342,15 @@ export default {
         url: this.$http.adornUrl("/qcSubject/registration/myList"),
         method: "get",
         params: this.$http.adornParams({
-          'page': 1,
-          'limit': 1000,
-          'topicName': this.myQueryParam.topicName,
-          'keywords': this.myQueryParam.keywords
-          // 'key': 1,
-          // 'reuseStepId': 5
+          'page': this.pageIndexJoin,
+          'limit': this.pageSizeJoin,
+          'key': this.myQueryParamJoin,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.subjectJoinList = data.page.list;
           // this.dataList = resultList
-          // this.totalPageSubject = data.page.totalCount;
+          this.totalPageJoin = data.page.totalCount;
         } else {
           this.subjectJoinList = [];
           this.totalPageSubject = 0;
@@ -351,18 +366,15 @@ export default {
         url: this.$http.adornUrl("/qcSubject/registration/leadList"),
         method: "get",
         params: this.$http.adornParams({
-          'page': 1,
-          'limit': 1000,
-          'topicName': this.myQueryParam.topicName,
-          'keywords': this.myQueryParam.keywords
-          // 'key': 1,
-          // 'reuseStepId': 5
+          'page': this.pageIndexLead,
+          'limit': this.pageSizeLead,
+          'key': this.myQueryParamLead,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.subjectLeadList = data.page.list;
           // this.dataList = resultList
-          // this.totalPageSubject = data.page.totalCount;
+          this.totalPageLead = data.page.totalCount;
         } else {
           this.subjectLeadList = [];
           this.totalPageSubject = 0;
@@ -377,15 +389,11 @@ export default {
       this.dataListLoading = true
       await this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/list'),
-        // url: this.$http.adornUrl('/qcPlan/step/reuse'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
           'limit': this.pageSize,
-          'topicName': this.myQueryParam.topicName,
-          'keywords': this.myQueryParam.keywords
-          // 'key': 1,
-          // 'reuseStepId': 5
+          'key': this.myQueryParam,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -406,10 +414,28 @@ export default {
       this.pageIndex = 1
       this.getDataList()
     },
+    sizeChangeHandleLead(val) {
+      this.pageSizeLead = val
+      this.pageIndexLead = 1
+      this.getLeadList()
+    },
+    sizeChangeHandleJoin(val) {
+      this.pageSizeJoin = val
+      this.pageIndexJoin = 1
+      this.getJoinList()
+    },
     // 当前页
     currentChangeHandle(val) {
       this.pageIndex = val
       this.getDataList()
+    },
+    currentChangeHandleJoin(val) {
+      this.pageIndexJoin = val
+      this.getJoinList()
+    },
+    currentChangeHandleLead(val) {
+      this.pageIndexLead = val
+      this.getLeadList()
     },
     // 多选
     selectionChangeHandle(val) {
@@ -480,7 +506,7 @@ export default {
                 map[item.qcgmId] = {
                   id: item.qcgmId,
                   date: item.participationDate,
-                  name: item.name,
+                  name: item.memberName,
                   number: item.number,
                   groupName: item.groupName,
                   roleInTopic: '组长',
@@ -494,7 +520,7 @@ export default {
                 map[item.parentId].children.push({
                   id: item.qcgmId,
                   date: item.participationDate,
-                  name: item.name,
+                  name: item.memberName,
                   number: item.number,
                   roleInTopic: item.roleInTopic,
                   parentId: item.parentId,

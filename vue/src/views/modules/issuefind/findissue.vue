@@ -10,16 +10,16 @@
     <el-dialog title="验证整改情况" :visible.sync="dialogVisible2" width="400px">
       <p>{{ fullRetStates }}</p>
     </el-dialog>
-    <el-tabs type="border-card">
+    <el-tabs type="border-card" action="tabClickHandle">
 
       <!-- 问题添加 Tab Pane -->
       <el-tab-pane label="问题添加">
         <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-<!--          <el-form-item>-->
-<!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-<!--          </el-form-item>-->
+          <!--          <el-form-item>-->
+          <!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+          <!--          </el-form-item>-->
           <el-form-item>
-<!--            <el-button @click="getDataList()">查询</el-button>-->
+            <!--            <el-button @click="getDataList()">查询</el-button>-->
             <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
                        @click="addOrUpdateHandle()">新增</el-button>
             <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
@@ -37,8 +37,8 @@
           </el-form-item>
         </el-form>
 
-        <el-table v-if="showForm" :data="dataList" border v-loading="dataListLoading"
-                  @selection-change="selectionChangeHandle" style="width: 100%;">
+        <el-table  :data="dataList" border v-loading="dataListLoading"
+                   @selection-change="selectionChangeHandle" style="width: 100%;">
           <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column>
           <el-table-column prop="issueNumber" header-align="center" align="center" label="问题编号">
@@ -57,11 +57,11 @@
           </el-table-column>
           <el-table-column prop="peliminaryAnalysis" header-align="center" align="center" label="初步分析">
           </el-table-column>
-<!--          <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
-<!--            <template slot-scope="scope">-->
-<!--              <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
+          <!--          <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
+          <!--            <template slot-scope="scope">-->
+          <!--              <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
           <el-table-column
             prop="issuePhoto"
             header-align="center"
@@ -98,19 +98,19 @@
       <!-- 整改记录 Tab Pane -->
       <el-tab-pane label="整改记录">
         <div class="mod-config">
-          <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-<!--            <el-form-item>-->
-<!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-<!--            </el-form-item>-->
+          <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+            <!--            <el-form-item>-->
+            <!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+            <!--            </el-form-item>-->
             <el-form-item>
-<!--              <el-button @click="getDataList()">查询</el-button>-->
+              <!--              <el-button @click="getDataList()">查询</el-button>-->
               <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
               <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
                          :disabled="dataListSelections.length <= 0">批量删除</el-button>
             </el-form-item>
           </el-form>
-          <el-table v-if="showForm" :data="dataList" border v-loading="dataListLoading"
-                    @selection-change="selectionChangeHandle" style="width: 100%;">
+          <el-table  :data="dataList" border v-loading="dataListLoading"
+                     @selection-change="selectionChangeHandle" style="width: 100%;">
             <el-table-column type="selection" header-align="center" align="center" width="50">
             </el-table-column>
             <el-table-column prop="issueNumber" header-align="center" align="center" label="问题编号">
@@ -129,11 +129,11 @@
             </el-table-column>
             <el-table-column prop="peliminaryAnalysis" header-align="center" align="center" label="初步分析">
             </el-table-column>
-<!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
-<!--              <template slot-scope="scope">-->
-<!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
-<!--              </template>-->
-<!--            </el-table-column>-->
+            <!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
+            <!--              <template slot-scope="scope">-->
+            <!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+            <!--              </template>-->
+            <!--            </el-table-column>-->
             <el-table-column
               prop="issuePhoto"
               header-align="center"
@@ -194,12 +194,12 @@
             </el-table-column>
             <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
             </el-table-column>
-<!--            <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">-->
-<!--              <template slot-scope="scope">-->
-<!--                <el-button type="text" size="small"-->
-<!--                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
-<!--              </template>-->
-<!--            </el-table-column>-->
+            <!--            <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">-->
+            <!--              <template slot-scope="scope">-->
+            <!--                <el-button type="text" size="small"-->
+            <!--                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
+            <!--              </template>-->
+            <!--            </el-table-column>-->
             <el-table-column
               prop="rectificationPhotoDeliverable"
               header-align="center"
@@ -243,17 +243,17 @@
       <el-tab-pane label="问题验证">
         <div class="mod-config">
           <el-form v-if="showForm1" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-<!--            <el-form-item>-->
-<!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-<!--            </el-form-item>-->
+            <!--            <el-form-item>-->
+            <!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+            <!--            </el-form-item>-->
             <el-form-item>
-<!--              <el-button @click="getDataList()">查询</el-button>-->
+              <!--              <el-button @click="getDataList()">查询</el-button>-->
               <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
               <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
                          :disabled="dataListSelections.length <= 0">批量删除</el-button>
             </el-form-item>
           </el-form>
-          <el-table v-if="showForm" :data="dataList" border v-loading="dataListLoading"
+          <el-table :data="dataList" border v-loading="dataListLoading"
                     @selection-change="selectionChangeHandle" style="width: 100%;">
             <el-table-column type="selection" header-align="center" align="center" width="50">
             </el-table-column>
@@ -285,11 +285,11 @@
             </el-table-column>
             <el-table-column prop="peliminaryAnalysis" header-align="center" align="center" label="初步分析">
             </el-table-column>
-<!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
-<!--              <template slot-scope="scope">-->
-<!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
-<!--              </template>-->
-<!--            </el-table-column>-->
+            <!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
+            <!--              <template slot-scope="scope">-->
+            <!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+            <!--              </template>-->
+            <!--            </el-table-column>-->
             <el-table-column
               prop="issuePhoto"
               header-align="center"

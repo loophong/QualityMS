@@ -373,9 +373,6 @@ export default {
 
     },
 
-    existName() {
-
-    },
     ifUpdate() {
       if (this.dataForm.qcsrId) {
         this.flag = 1;
@@ -425,7 +422,7 @@ export default {
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                if (data.exist) {
+                if (!this.dataForm.qcsrId && data.exist) {
                   this.$message.error('课题名称已存在!')
                   return
                 } else {

@@ -6,7 +6,7 @@
 	<!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="io.renren.modules.qcManagement.entity.QcGroupMemberEntity" id="qcGroupMemberMap">
         <result property="qcgmId" column="qcgm_id"/>
-        <result property="name" column="name"/>
+        <result property="memberName" column="member_name"/>
         <result property="gender" column="gender"/>
         <result property="telNumber" column="tel_number"/>
         <result property="number" column="number"/>
@@ -26,16 +26,15 @@
     <!-- 查询与"我"相关的成员 -->
     <select id="aboutMeList" parameterType="int" resultType="io.renren.modules.qcManagement.entity.QcGroupMemberEntity">
         SELECT *
-        FROM qc_group_member
+        FROM qc_group_members
         WHERE (parent_id = #{id} OR qcgm_id = #{id}) AND delete_flag != 1
     </select>
 
     <!-- 检查同一组是否有相同名字的成员 -->
-    <select id="checkRepeat" resultType="java.lang.Boolean">
-        SELECT COUNT(*) > 0 AS exists
-        FROM qc_group_member
-        WHERE parent_id = #{parentId}
-          AND name = #{name}
+    <select id="checkRepeat" parameterType="map" resultType="java.lang.Boolean">
+        SELECT EXISTS (
+            SELECT * FROM qc_group_members WHERE parent_id = #{parentId} AND member_name = #{memberName}
+        )
     </select>
 
 

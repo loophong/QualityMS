@@ -16,10 +16,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static jdk.nashorn.internal.objects.Global.undefined;
@@ -88,14 +85,34 @@ public class QcGroupMemberController {
     /**
      * 移交组长
      */
-//    @RequestMapping("/change")
+    @RequestMapping("/change")
 //    @RequiresPermissions("qcMembers:leader:change")
-//    public R leaderChange(@RequestParam Map<String, Object> params){
-//        QcGroupMemberEntity member= qcGroupMemberDao.selectMemberById((Integer) params.get("id"));
-//        QcGroupMemberEntity parent= qcGroupMemberDao.selectMemberById((Integer) params.get("ParentId"));
-//
-//        return R.ok();
-//    }
+    public R leaderChange(@RequestParam Map<String, Object> params){
+        log.info("子id:"+(String) params.get("id"));
+        log.info("父id:"+(String) params.get("parentId"));
+        QcGroupMemberEntity member= qcGroupMemberDao.selectMemberById(Integer.parseInt((String) params.get("id")));
+        QcGroupMemberEntity parent= qcGroupMemberDao.selectMemberById(Integer.parseInt((String) params.get("parentId")));
+
+        String tmpName = member.getMemberName();
+        String tmpNum = member.getNumber();
+        String tmpDepartment = member.getDepartment();
+        Date tmpTime = member.getParticipationDate();
+        //交换
+
+        member.setMemberName(parent.getMemberName());
+        parent.setMemberName(tmpName);
+        member.setNumber(parent.getNumber());
+        parent.setNumber(tmpNum);
+        member.setDepartment(parent.getDepartment());
+        parent.setDepartment(tmpDepartment);
+        member.setParticipationDate(parent.getParticipationDate());
+        parent.setParticipationDate(tmpTime);
+
+        qcGroupMemberService.updateById(member);
+        qcGroupMemberService.updateById(parent);
+
+        return R.ok();
+    }
 
     /**
      * 列表
@@ -164,7 +181,7 @@ public class QcGroupMemberController {
         } else {
             // 通过用户id获取用户姓名
             String username = sysUserService.getById(qcGroupMember.getUserId()).getUsername();
-            qcGroupMember.setName(username);
+            qcGroupMember.setMemberName(username);
             qcGroupMemberService.save(qcGroupMember);
             // 修改当前用户权限
             // 获取用户所属的角色列表
@@ -192,15 +209,21 @@ public class QcGroupMemberController {
     @RequiresPermissions("qcMembers:qcGroupMember:save")
     public R save(@RequestBody QcGroupMemberEntity qcGroupMember){
         Integer parentId = qcGroupMember.getParentId();
-        String name=qcGroupMember.getName();
+        String name = qcGroupMember.getMemberName();
+        int count = qcGroupMemberService.count(new LambdaUpdateWrapper<QcGroupMemberEntity>()
+                .eq(QcGroupMemberEntity::getGroupName, qcGroupMember.getGroupName()));
+        log.info("小组名称：" + qcGroupMember.getGroupName() + "，查询结果条数：" + count);
+        if (count > 0) {
+            return R.error("该小组已存在，请勿重复添加");
+        }
         if(parentId != null){
            Boolean result = qcGroupMemberDao.checkRepeat(parentId,name);
            if(result){
                return R.error("请检查是否有重复成员");
            }
         }
-
         qcGroupMemberService.save(qcGroupMember);
+
         return R.ok().put("id", qcGroupMember.getQcgmId());
     }
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <span>
-      <el-select
+      <!-- <el-select
         v-model="value"
         @change="handleSelectChange"
         placeholder="请选择模版"
@@ -13,49 +13,49 @@
           :value="item.value"
         >
         </el-option>
-      </el-select>
-      <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
+      </el-select> -->
+      <el-button type="danger" @click="handleDelete">删除当前QC图</el-button>
     </span>
 
     <div id="main" ref="main"></div>
-    <div class="editOne">
-      <span>
-        <label for="xAxisDataBy">横坐标:</label>
-        <el-input
-          v-model="xAxisDataBy"
-          placeholder="请输入内容"
-          style="width: 35%"
-        ></el-input>
-        <label for="seriesDataBy">折线数:</label>
-        <el-input
-          v-model="seriesDataBy"
-          placeholder="请输入内容"
-          style="width: 35%"
-        ></el-input>
-      </span>
-      <br />
-      <br />
-    </div>
-    <div class="editTwo">
-      <span>
-        <label for="textBy">图标题:</label>
-        <el-input
-          v-model="textBy"
-          placeholder="请输入内容"
-          style="width: 30%"
-        ></el-input>
-        <el-button type="primary" @click="initChart(tmpResultList)"
-          >更新图表</el-button
-        >
-        <el-button type="success" @click="dialogFormVisible = true"
-          >保存当前数据</el-button
-        >
+    <span>
+      <label for="xAxisDataBy">横坐标:</label>
+      <el-input
+        v-model="xAxisDataBy"
+        placeholder="请输入内容"
+        style="width: 30%"
+      ></el-input>
+      <label for="seriesDataBy">折线数:</label>
+      <el-input
+        v-model="seriesDataBy"
+        placeholder="请输入内容"
+        style="width: 30%"
+      ></el-input>
+    </span>
+    <br />
+    <br />
+    <span>
+      <label for="textBy">图标题:</label>
+      <el-input
+        v-model="textBy"
+        placeholder="请输入内容"
+        style="width: 15%"
+      ></el-input>
+      <el-button type="primary" @click="initChart(tmpResultList)"
+        >更新图表</el-button
+      >
+      <!-- 保存为模板 change to 暂存当前数据  -->
+      <!-- <el-button type="success" @click="dialogFormVisible = true"
+        >更新当前数据</el-button
+      > -->
+      <el-button type="success" @click="handleUp">更新当前数据</el-button>
+    </span>
 
-        <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
-      </span>
-    </div>
-
-    <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
+    <el-dialog
+      title="自定义图名"
+      :visible.sync="dialogFormVisible"
+      append-to-body
+    >
       <el-input
         v-model="inputName"
         placeholder="请输入图名"
@@ -72,20 +72,21 @@
 <script>
 import * as echarts from "echarts";
 import moment from "moment";
+import qcPlanNew from "../qcSubjectManagement/plan/qcPlanNew.vue";
 
 export default {
+  components: {
+    qcPlanNew,
+  },
   name: "lineAndBar",
   //在qcPlanNew.vue 中应用this, 传递过来的参数
   props: {
-    conplanSubject: {
-      type: Number,
-      required: true,
-    },
-    conplanProcess: {
-      type: Number,
-      required: true,
+    item: {
+      type: Object,
+      required: true, // 确保 item 是必须传递的
     },
   },
+
   data() {
     return {
       loading: false,
@@ -98,12 +99,11 @@ export default {
       pickerOptions: [],
       option: {},
       myChart: {},
-      seriesDataBy: "UCL,avg,LCL,线",
+      seriesDataBy: "折线,柱状(柱)",
       xAxisDataBy: "A,B,C,D,E,F",
-      textBy: "控制图",
+      textBy: "折柱混合图",
       options: [],
       value: "",
-      name: "",
       resultList: [],
       tmpResultList: {
         templateId: 0,
@@ -116,83 +116,123 @@ export default {
   mounted() {
     this.getTemplateData();
     this.myChart = echarts.init(this.$refs.main);
-    this.initChart(this.tmpResultList);
   },
   methods: {
-    //处理下拉框选择变化
-    handleSelectChange() {
-      console.log(this.value);
-      let tmpList = {};
-      this.resultList.forEach((item) => {
-        if (item.templateId == this.value) {
-          tmpList = item;
-          this.name = item.templateName;
-        }
-      });
-      this.initChart(tmpList);
-    },
     async getTemplateData() {
       await this.$http({
-        url: this.$http.adornUrl("/qcTools/template/templateList"),
-        // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        url: this.$http.adornUrl("/qcTools/conplan/GetById"),
         method: "get",
         params: this.$http.adornParams({
-          templateType: "控制图",
-          // conplanSubject: this.conplanSubject,
-          // conplanProcess: this.conplanProcess,
+          conplanId: this.item.conplanId,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.resultList = data.resultList.map((row) => ({
-            templateId: row.templateId,
-            templateName: row.templateName,
-            templateType: row.templateType,
-            templateText: row.templateText,
-            templateSeries: JSON.parse(row.templateSeries),
-            templateAxis: JSON.parse(row.templateAxis),
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+            conplanSubject: row.conplanSubject,
+            conplanProcess: row.conplanProcess,
           }));
           this.options = data.resultList.map((item) => ({
-            value: item.templateId,
-            label: item.templateName,
+            value: item.conplanId,
+            label: item.conplanName,
           }));
-          console.log(this.resultList);
         } else {
           this.options = [];
         }
       });
 
+      // console.log("1119"+this.resultList[0]);
       //查询到有用户暂存的数据,就使用该数据渲染echarts
-      // if (this.resultList.length != 0) {
-      //   let tmpList = {};
-      //   this.resultList.forEach((item) => {
-      //     tmpList = item;
-      //     this.name = item.templateName;
-      //   });
-      //   console.log(tmpList);
-      //   this.initChart(tmpList);
-      // } else {
-      //   //否则使用默认数据渲染echarts
-      //   this.initChart(this.tmpResultList);
-      // }
+      if (this.resultList.length != 0) {
+        let tmpList = {};
+        this.resultList.forEach((item) => {
+          tmpList = item;
+          this.name = item.templateName;
+        });
+        console.log(tmpList);
+        this.initChart(tmpList);
+      }else{//否则使用默认数据渲染echarts
+        this.initChart(this.tmpResultList);
+      }
+
+
     },
+
     handleUp() {
       console.log(this.updatedSeries);
       console.log(this.test);
       this.dialogFormVisible = false;
       this.addTemplate();
     },
-    //删除当前模版
-    handleDelete() {
-      let ids = [this.value];
+
+    //更新数据 是由save --> update
+    addTemplate() {
+      console.log(this.updatedSeries);
+      console.log(this.xAxisDataBy);
+
+      const tmp = this.xAxisDataBy.split(",");
+      let tmpListString = JSON.stringify(this.updatedSeries, null, 2);
+      let tmpListString2 = JSON.stringify(this.updatedAxis);
+      console.log(tmpListString);
+      console.log(tmpListString2);
+      //过滤掉多余的数据
+      const filteredData = this.updatedSeries.map((series) => ({
+        name: series.name,
+        data: series.data,
+      }));
+      console.log(filteredData);
+
+    
+
+      this.$http({
+        url: this.$http.adornUrl(`/qcTools/conplan/update`),
+        method: "post",
+        data: this.$http.adornData({
+          conplanId: this.resultList[0].templateId,
+          conplanName: this.resultList[0].templateName,
+          conplanType: this.resultList[0].templateType,
+          conplanText: this.resultList[0].templateText,
+          conplanSeries: JSON.stringify(filteredData),
+          conplanAxis: JSON.stringify(tmp),
+          conplanSubject: this.resultList[0].conplanSubject,
+          conplanProcess: this.resultList[0].conplanProcess,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            // message: '操作成功',
+            message: "更新成功",
+            type: "success",
+            duration: 1500,
+            onClose: () => {
+              this.visible = false;
+            },
+          });
+        } else {
+          this.$message.error(data.msg);
+        }
+      });
+    },
+
+
+
+     //删除当前图
+     handleDelete() {
+      let ids = this.item.conplanId;
       console.log(ids);
       if (ids) {
-        this.$confirm(`确定对 [${this.name}] 进行删除?`, "提示", {
+        this.$confirm(`确定对 [${this.item.conplanName}] 进行删除?`, "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning",
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl("/qcTools/template/delete"),
+            url: this.$http.adornUrl("/qcTools/conplan/delete"),
             method: "post",
             data: this.$http.adornData(ids, false),
           }).then(({ data }) => {
@@ -202,8 +242,8 @@ export default {
                 type: "success",
                 duration: 1500,
                 onClose: () => {
-                  this.name = "";
                   this.value = "";
+                  this.name = "";
                   this.initChart(this.tmpResultList);
                   this.getTemplateData();
                 },
@@ -221,52 +261,9 @@ export default {
         });
       }
     },
-    addTemplate() {
-      console.log(this.updatedSeries);
-      console.log(this.xAxisDataBy);
-      const tmp = this.xAxisDataBy.split(",");
-      let tmpListString = JSON.stringify(this.updatedSeries, null, 2);
-      let tmpListString2 = JSON.stringify(this.updatedAxis);
-      console.log(tmpListString);
-      console.log(tmpListString2);
-      //过滤掉多余的数据
-      const filteredData = this.updatedSeries.map((series) => ({
-        name: series.name,
-        data: series.data,
-      }));
-      console.log(filteredData);
-      this.$http({
-        url: this.$http.adornUrl(`/qcTools/conplan/save`),
-        method: "post",
-        data: this.$http.adornData({
-          conplanId: this.value || undefined,
-          conplanName: this.inputName || "未命名",
-          conplanType: "控制图",
-          conplanText: this.textBy || "未命名",
-          conplanSeries: JSON.stringify(filteredData),
-          conplanAxis: JSON.stringify(tmp),
-          conplanSubject: this.conplanSubject,
-          conplanProcess: this.conplanProcess,
-        }),
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.$message({
-            message: "操作成功",
-            type: "success",
-            duration: 1500,
-            onClose: () => {
-              this.visible = false;
-              this.$emit("refreshDataList");
-            },
-          });
-        } else {
-          this.$message.error(data.msg);
-        }
-      });
-    },
+
 
     initChart(resultList) {
-      console.log(resultList);
       // console.log(resultList.width)
       var app = {};
       const posList = [
@@ -363,55 +360,44 @@ export default {
       let xAxisData = [];
       let legendData = [];
       let title = {
-        text: "控制图",
+        text: "折柱图",
       };
       if (resultList.templateId == 0) {
-        if (this.tmpSeriesList.length > 0) {
-          seriesData = this.tmpSeriesList;
-        } else {
-          seriesData = [
-            {
-              name: "UCL",
-              type: "line",
-              color: "",
-              label: labelOption,
-              emphasis: {
-                focus: "series",
+        try {
+          console.log(this.tmpSeriesList);
+          if (this.tmpSeriesList.length > 0) {
+            console.log(this.tmpSeriesList);
+            console.log("-------");
+            seriesData = this.tmpSeriesList;
+
+            console.log(seriesData);
+          } else {
+            seriesData = [
+              {
+                name: "折线",
+                type: "line",
+                color: "",
+                label: labelOption,
+                emphasis: {
+                  focus: "series",
+                },
+                data: [5, 5, 5, 5, 5, 5],
               },
-              data: [5, 5, 5, 5, 5, 5],
-            },
-            {
-              name: "avg",
-              type: "line",
-              color: "",
-              label: labelOption,
-              emphasis: {
-                focus: "series",
+              {
+                name: "柱状(柱)",
+                type: "bar",
+                label: labelOption,
+                emphasis: {
+                  focus: "series",
+                },
+                data: [10, 10, 10, 10, 10, 10],
               },
-              data: [10, 10, 10, 10, 10, 10],
-            },
-            {
-              name: "LCL",
-              type: "line",
-              color: "",
-              label: labelOption,
-              emphasis: {
-                focus: "series",
-              },
-              data: [20, 20, 20, 20, 20, 20],
-            },
-            {
-              name: "线",
-              type: "line",
-              label: labelOption,
-              // yAxisIndex: 1,
-              emphasis: {
-                focus: "series",
-              },
-              data: [17, 3, 12, 15, 22, 14],
-            },
-          ];
+            ];
+          }
+        } catch (e) {
+          console.log(e);
         }
+
         title.text = this.textBy;
         if (this.seriesDataBy) {
           const tmp2 = this.seriesDataBy.split(",");
@@ -424,14 +410,18 @@ export default {
                 console.log("存在");
               } else {
                 console.log("不存在");
+                console.log(tmp2[i].includes("(柱)"));
                 seriesData.push({
                   name: tmp2[i],
-                  type: "line",
+                  type:
+                    tmp2[i].includes("(柱)") || tmp2[i].includes("（柱）")
+                      ? "bar"
+                      : "line",
                   label: labelOption,
                   emphasis: {
                     focus: "series",
                   },
-                  data: [0, 0, 0, 0, 0, 0],
+                  data: [0],
                 });
               }
             }
@@ -456,7 +446,10 @@ export default {
         try {
           seriesData = resultList.templateSeries.map((item) => ({
             name: item.name,
-            type: "line",
+            type:
+              item.name.includes("(柱)") || item.name.includes("（柱）")
+                ? "bar"
+                : "line",
             label: labelOption,
             emphasis: {
               focus: "series",
@@ -516,7 +509,7 @@ export default {
                 let series = opt.series; // 折线图数据
                 console.log(opt);
                 let tdHeads =
-                  '<td style="padding: 2px 10px;background-color: #eeeeee;font-weight: 700;color: #333333"><input type="text" value="时间" style="border: none;text-align: center;color: #444444;width: 100px;"></td>'; // 表头
+                  '<td style="padding: 2px 10px;background-color: #eeeeee;font-weight: 700;color: #333333"><input type="text" value="" style="border: none;text-align: center;color: #444444;width: 100px;"></td>'; // 表头
                 let tdBodys = ""; // 数据
 
                 series.forEach(function (item) {
@@ -616,6 +609,7 @@ export default {
         console.log("dataViewChanged:", params);
         this.updatedSeries = params.newOption.series;
         this.tmpSeriesList = params.newOption.series;
+        console.log(params.newOption.series);
         this.test = params.newOption.series;
         console.log(this.updatedSeries);
         console.log(this.test);
@@ -635,19 +629,5 @@ export default {
 .block {
   margin-top: 50px;
   text-align: center;
-}
-
-.editOne {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  // margin-top: 20px;
-}
-
-.editTwo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
 }
 </style>

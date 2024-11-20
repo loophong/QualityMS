@@ -40,7 +40,7 @@
         </el-select>
       </el-form-item>
     <el-form-item label="关键要素" prop="keyElements">
-      <el-select v-model="dataForm.keyElements" placeholder="请选择">
+      <el-select v-model="keyElementsList" multiple placeholder="请选择">
         <el-option label="测" value="测"></el-option>
         <el-option label="法" value="法"></el-option>
         <el-option label="环" value="环"></el-option>
@@ -94,6 +94,7 @@
   export default {
     data () {
       return {
+        keyElementsList: [], // 关键要素列表
         indicatorDictionaryList: {},
         visible: false,
         dataForm: {
@@ -117,7 +118,8 @@
           evaluationMeasurementTechnique: '',
           sampleSize: '',
           samplingFrequency: '',
-          controlList: ''
+          controlList: '',
+          storageFlag: ''
         },
         dataRule: {
           indicatorName: [
@@ -245,6 +247,7 @@
                 this.dataForm.sampleSize = data.indicatorKeyIndicators.sampleSize
                 this.dataForm.samplingFrequency = data.indicatorKeyIndicators.samplingFrequency
                 this.dataForm.controlList = data.indicatorKeyIndicators.controlList
+                this.dataForm.storageFlag = data.indicatorKeyIndicators.storageFlag
               }
             })
           }
@@ -253,7 +256,10 @@
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
+          console.log("dataFormSubmit=====>",this.dataForm)
           if (valid) {
+            // 将数组转换成字符串
+            const keyElementsString =this.keyElementsList.join(',');
             this.$http({
               url: this.$http.adornUrl(`/indicator/indicatorkeyindicators/${!this.dataForm.keyIndicatorId ? 'save' : 'update'}`),
               method: 'post',
@@ -267,7 +273,7 @@
                 'managementContent': this.dataForm.managementContent,
                 'isManagementOutOfControl': this.dataForm.isManagementOutOfControl,
                 'isNeedsControl': this.dataForm.isNeedsControl,
-                'keyElements': this.dataForm.keyElements,
+                'keyElements': keyElementsString,
                 'potentialFailureMode': this.dataForm.potentialFailureMode,
                 'potentialFailureConsequences': this.dataForm.potentialFailureConsequences,
                 'involvedProduct': this.dataForm.involvedProduct,

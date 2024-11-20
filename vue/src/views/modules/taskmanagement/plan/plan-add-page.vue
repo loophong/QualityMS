@@ -375,6 +375,9 @@ export default {
     // 初始化计划编号
     await this.getPlanId()
 
+    // 获取指标页面新建计划是传递的指标id
+    this.getIndicatorIdFromQuery();
+
   },
 
 
@@ -807,7 +810,17 @@ export default {
 
     },
 
+    //获取指标页面新建计划时传递的id
+    getIndicatorIdFromQuery() {
+      const indicatorId = this.$route.query.indicatorId;
+      if (indicatorId) {
+        this.taskAssociatedIndicatorsId = indicatorId;
+      }
+    },
+
   },
+
+
 
 
   computed: {

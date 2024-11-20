@@ -29,4 +29,6 @@ public class QcAllCountEntity implements Serializable {
 	 */
 	private Integer qcMemberCount;
 
+
+
 }

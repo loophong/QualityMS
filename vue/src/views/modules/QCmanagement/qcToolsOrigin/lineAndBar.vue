@@ -21,19 +21,17 @@
       <label for="textBy">图标题:</label>
       <el-input v-model="textBy" placeholder="请输入内容" style="width:15%"></el-input>
       <el-button type="primary" @click="initChart(tmpResultList)">更新图表</el-button>
-      <!-- 保存为模板 change to 暂存当前数据  -->
-      <!-- <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button> -->
-      <el-button type="success" @click="dialogFormVisible = true">暂存当前数据</el-button>
+      <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
     </span>
 
     
-    <!-- <el-dialog title="模版名" :visible.sync="dialogFormVisible" append-to-body>
+    <el-dialog title="模版名" :visible.sync="dialogFormVisible" append-to-body>
       <el-input v-model="inputName" placeholder="请输入模版名" style="width:50%"></el-input>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleUp">确 定</el-button>
       </div>
-    </el-dialog> -->
+    </el-dialog>
     
   </div>
 

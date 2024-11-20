@@ -47,6 +47,30 @@ public class QcToolsConplanController {
         return R.ok().put("resultList", resultList);
     }
 
+    /**
+     * 根据S获取相应的列表
+     * @param conplanSubject
+     * @return
+     */
+    @RequestMapping("/SList")
+    public R templateListS(@RequestParam Integer conplanSubject) {
+        List<QcToolsConplanEntity> resultList = qcToolsConplanDao.getDataByS(conplanSubject);
+        System.out.println("save === save ====");
+        return R.ok().put("resultList", resultList);
+    }
+
+    /**
+     * 根据Id获取对应的数据
+     * @param conplanId
+     * @return
+     */
+    @RequestMapping("/GetById")
+    public R templateList(@RequestParam Integer conplanId) {
+        System.out.println( "ID conplanId====>" + conplanId);
+        List<QcToolsConplanEntity> resultList =  qcToolsConplanDao.getDataById(conplanId);
+        System.out.println("ID resultList====>" + resultList);
+        return R.ok().put("resultList", resultList);
+    }
 
     /**
      * 保存用户自定义的QC图的数据
@@ -56,26 +80,7 @@ public class QcToolsConplanController {
     @RequestMapping("/save")
 //    @RequiresPermissions("qcTools:conplan:save")
     public R save(@RequestBody QcToolsConplanEntity qcToolsConplanEntity) {
-//
-//        System.out.println("=========qc=======tools========conplan========entity");
-//        System.out.println(qcToolsConplanEntity);
-        //判断一下当前记录是否存在
-        String conplanType = qcToolsConplanEntity.getConplanType();
-        Integer conplanSubject = qcToolsConplanEntity.getConplanSubject();
-        Integer conplanProcess = qcToolsConplanEntity.getConplanProcess();
-        List<QcToolsConplanEntity> dataByTSP = qcToolsConplanDao.getDataByTSP(conplanType, conplanSubject, conplanProcess);
-
-        //存在则进行update
-        if (dataByTSP.size() != 0) {
-            Integer conplanId = dataByTSP.get(0).getConplanId();
-            qcToolsConplanEntity.setConplanId(conplanId);
-            qcToolsConplanService.updateById(qcToolsConplanEntity);
-        } else {
-            //否则进行save
-            qcToolsConplanService.save(qcToolsConplanEntity);
-        }
-
-
+        qcToolsConplanService.save(qcToolsConplanEntity);
         return R.ok();
     }
 
@@ -84,20 +89,33 @@ public class QcToolsConplanController {
      * 按照指定 step的subject+process+type
      * 进行更新对应的数据记录行
      */
-//    @RequestMapping("/update")
+    @RequestMapping("/update")
 //    @RequiresPermissions("qcTools:template:update")
-//    public R update(@RequestBody QcToolsConplanEntity qcToolsConplanEntity){
-//
-//        return R.ok();
-//    }
+    public R update(@RequestBody QcToolsConplanEntity qcToolsConplanEntity){
+//        System.out.println("updateById qcToolsConplanEntity =="+qcToolsConplanEntity);
+//        Integer conplanId = qcToolsConplanEntity.getConplanId();
+//        System.out.println("updateById conplanId====>" + conplanId);
+        boolean updateByIdResult = qcToolsConplanService.updateById(qcToolsConplanEntity);
+//        System.out.println("updateByIdResult====>" + updateByIdResult);
+        return R.ok();
+    }
 
-//    /**
-//     * TODO 删除
-//     */
-//    @RequestMapping("/delete")
+    /**
+     * 单个删除QC示例
+     * @param conplanId 前端传递过来的要删除的数据的ID
+     */
+    @RequestMapping("/delete")
 //    @RequiresPermissions("qcTools:template:delete")
+    public R delete(@RequestBody Integer conplanId){
+        qcToolsConplanService.removeById(conplanId);
+        return R.ok();
+    }
+
+
+//    @RequestMapping("/delete")
+////    @RequiresPermissions("qcTools:template:delete")
 //    public R delete(@RequestBody Integer[] templateIds){
-//		qcToolsTemplateService.removeByIds(Arrays.asList(templateIds));
+//        qcToolsConplanService.removeByIds(Arrays.asList(templateIds));
 //        return R.ok();
 //    }
 

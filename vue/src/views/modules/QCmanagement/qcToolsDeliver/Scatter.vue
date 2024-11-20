@@ -1,11 +1,11 @@
 <template>
   <div>
     <span>
-            <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+            <!-- <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
                 <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
-            </el-select>
-            <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
+            </el-select> -->
+            <el-button type="danger" @click="handleDelete">删除当前QC图</el-button>
         </span>
     <div class="content">
       <div class="chart-container">
@@ -60,13 +60,13 @@
         <el-button type="danger" @click="clearCurrent">清空当前数据</el-button>
         <br />
         <br />
-        <el-button type="success" @click="dialogFormVisible = true">保存当前数据</el-button>
-        <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
+        <!-- <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button> -->
+        <el-button type="success" @click="handleUp">更新当前数据</el-button>
       </div>
-      <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
+      <el-dialog title="模版名" :visible.sync="dialogFormVisible">
         <el-input
           v-model="inputName"
-          placeholder="请输入图名"
+          placeholder="请输入模版名"
           style="width: 50%"
         ></el-input>
         <div slot="footer" class="dialog-footer">
@@ -83,13 +83,9 @@ import * as echarts from "echarts";
 export default {
   //在qcPlanNew.vue 中应用this, 传递过来的参数
   props: {
-    conplanSubject: {
-      type: Number,
-      required: true,
-    },
-    conplanProcess: {
-      type: Number,
-      required: true,
+    item: {
+      type: Object,
+      required: true, // 确保 item 是必须传递的
     },
   },
   data() {
@@ -128,7 +124,7 @@ export default {
   },
   mounted() {
     this.getTemplateData();
-    this.init();
+    // this.init();
   },
   methods: {
     //处理下拉框选择变化
@@ -145,23 +141,23 @@ export default {
     },
     async getTemplateData() {
       await this.$http({
-        url: this.$http.adornUrl("/qcTools/template/templateList"),
-        // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        // url: this.$http.adornUrl("/qcTools/template/templateList"),
+        url: this.$http.adornUrl("/qcTools/conplan/GetById"),
         method: "get",
         params: this.$http.adornParams({
-          templateType: "散点图",
-          // conplanSubject: this.conplanSubject,
-          // conplanProcess: this.conplanProcess,
+          conplanId: this.item.conplanId,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.resultList = data.resultList.map((row) => ({
-            templateId: row.templateId,
-            templateName: row.templateName,
-            templateType: row.templateType,
-            templateText: row.templateText,
-            templateSeries: JSON.parse(row.templateSeries),
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
             // templateAxis: JSON.parse(row.conplanAxis),
+            conplanSubject: row.conplanSubject,
+            conplanProcess: row.conplanProcess,
           }));
           this.options = data.resultList.map((item) => ({
             value: item.templateId,
@@ -174,13 +170,13 @@ export default {
       });
       // 渲染数据的更新
       // 将获取的数据传递给 this.dataPoints
-      // if (this.resultList.length != 0) {
-      //   this.resultList.forEach((item) => {
-      //     this.dataPoints = item.templateSeries;
-      //   });
-      // }
-      // // 初始化 渲染数据
-      // this.init();
+      if (this.resultList.length != 0) {
+        this.resultList.forEach((item) => {
+          this.dataPoints = item.templateSeries;
+        });
+      }
+      // 初始化 渲染数据
+      this.init();
     },
     handleUp() {
       console.log(this.updatedSeries);
@@ -190,16 +186,16 @@ export default {
     },
     //删除当前模版
     handleDelete() {
-      let ids = [this.value];
+      let ids = this.item.conplanId;
       console.log(ids);
       if (ids) {
-        this.$confirm(`确定对 [${this.name}] 进行删除?`, "提示", {
+        this.$confirm(`确定对 [${this.item.conplanName}] 进行删除?`, "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning",
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl("/qcTools/template/delete"),
+            url: this.$http.adornUrl("/qcTools/conplan/delete"),
             method: "post",
             data: this.$http.adornData(ids, false),
           }).then(({ data }) => {
@@ -230,17 +226,26 @@ export default {
     addTemplate() {
       this.$http({
         // url: this.$http.adornUrl(`/qcTools/template/save`),
-        url: this.$http.adornUrl(`/qcTools/conplan/save`),
+        url: this.$http.adornUrl(`/qcTools/conplan/update`),
         method: "post",
         data: this.$http.adornData({
-          conplanId: undefined,
-          conplanName: this.inputName || "未命名",
-          conplanType: "散点图",
-          conplanText: this.textBy || "未命名",
+          // conplanId: undefined,
+          // conplanName: this.inputName || "未命名",
+          // conplanType: "散点图",
+          // conplanText: this.textBy || "未命名",
+          // conplanSeries: JSON.stringify(this.dataPoints),
+          // //   'templateAxis': ,
+          // conplanSubject: this.conplanSubject,
+          // conplanProcess: this.conplanProcess,
+
+          conplanId: this.resultList[0].templateId,
+          conplanName: this.resultList[0].templateName,
+          conplanType: this.resultList[0].templateType,
+          conplanText: this.resultList[0].templateText,
           conplanSeries: JSON.stringify(this.dataPoints),
-          //   'templateAxis': ,
-          conplanSubject: this.conplanSubject,
-          conplanProcess: this.conplanProcess,
+          // conplanAxis: JSON.stringify(tmp),
+          conplanSubject: this.resultList[0].conplanSubject,
+          conplanProcess: this.resultList[0].conplanProcess,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {

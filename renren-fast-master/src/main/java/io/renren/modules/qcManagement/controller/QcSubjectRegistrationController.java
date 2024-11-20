@@ -53,7 +53,6 @@ public class QcSubjectRegistrationController {
         Integer countWithoutExamined = qcExamineStatusDao.countWithoutExamined();
         //已完成课题数
         Integer countExamined = qcExamineStatusDao.countExamined();
-
         Map<String, Object> result = new HashMap<>();
         result.put("countRegistration", countRegistration);
         result.put("countSubmitted", countSubmitted);
@@ -69,6 +68,16 @@ public class QcSubjectRegistrationController {
     @RequiresPermissions("qcSubject:registration:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = qcSubjectRegistrationService.queryPage(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 大屏展示全部列表
+     */
+    @RequestMapping("/all")
+//    @RequiresPermissions("qcSubject:registration:list")
+    public R listAll(@RequestParam Map<String, Object> params){
+        PageUtils page = qcSubjectRegistrationService.queryPageAll(params);
         return R.ok().put("page", page);
     }
 

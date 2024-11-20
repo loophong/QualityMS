@@ -24,5 +24,6 @@ public interface QcSubjectRegistrationService extends IService<QcSubjectRegistra
     PageUtils queryPageLead(Map<String, Object> params);
     PageUtils queryPageFinishedList(Map<String, Object> params) ;
 
+    PageUtils queryPageAll(Map<String, Object> params);
 }
 

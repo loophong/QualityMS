@@ -8,8 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.common.utils.ShiroUtils;
-import io.renren.modules.indicator.entity.IndicatorDataDictionaryEntity;
-import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
+import io.renren.modules.qcManagement.entity.QcExamineStatusEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.renren.modules.qcManagement.dao.QcGroupMemberDao;
@@ -129,7 +128,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
         }
 
         IPage<QcSubjectRegistrationEntity> page = this.page(
-                new Query<QcSubjectRegistrationEntity>().getPage(params),
+                new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
                 queryWrapper
         );
         return new PageUtils(page);
@@ -173,8 +172,18 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo);
 
         IPage<QcSubjectRegistrationEntity> page = this.page(
-                new Query<QcSubjectRegistrationEntity>().getPage(params),
+                new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
                 queryWrapper
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryPageAll(Map<String, Object> params) {
+
+        IPage<QcSubjectRegistrationEntity> page = this.page(
+                new Query<QcSubjectRegistrationEntity>().getPage(params),
+                new QueryWrapper<QcSubjectRegistrationEntity>()
         );
         return new PageUtils(page);
     }
@@ -214,7 +223,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
 
         IPage<QcSubjectRegistrationEntity> page = this.page(
-                new Query<QcSubjectRegistrationEntity>().getPage(params),
+                new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
                 queryWrapper
         );
         return new PageUtils(page);

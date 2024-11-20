@@ -13,12 +13,8 @@
     <div class="plan1" v-if="value === '问题解决型'">
       <br />
       <el-steps :active="active1" align-center>
-        <el-step
-          v-for="item in filteredDataList1"
-          :key="item.dictId"
-          :title="`${item.phase}阶段`"
-          :description="item.step"
-        ></el-step>
+        <el-step v-for="item in filteredDataList1" :key="item.dictId" :title="`${item.phase}阶段`"
+          :description="item.step"></el-step>
       </el-steps>
       <!-- <br> -->
       <span>
@@ -40,86 +36,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="选择课题描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -128,16 +76,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -145,41 +87,28 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
               <!-- <el-button>取消</el-button> -->
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -189,86 +118,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="现状调查描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
@@ -276,16 +157,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -293,41 +168,28 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
               <!-- <el-button>取消</el-button> -->
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -336,90 +198,39 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item
-              type="textarea"
-              label="设定目标描述"
-              prop="stageDescribe"
-            >
-              <el-input
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+            <el-form-item type="textarea" autosize label="设定目标描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -428,16 +239,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -445,41 +250,28 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
               <!-- <el-button>取消</el-button> -->
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -488,86 +280,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="原因分析描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加添加QC工具实例实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -576,16 +320,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -593,41 +331,33 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
-
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
               <!-- <el-button>取消</el-button> -->
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -636,86 +366,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="要因确定描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -724,16 +406,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -741,40 +417,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -783,86 +446,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="制定对策描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -871,16 +486,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -888,40 +497,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -930,86 +526,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="对策实施描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -1018,16 +566,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -1035,40 +577,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -1077,100 +606,44 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="活动前现状" prop="stageBefore">
-              <el-input
-                type="textarea"
-                v-model="form.stageBefore"
-                placeholder="活动前现状"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageBefore" placeholder="活动前现状"></el-input>
             </el-form-item>
             <el-form-item label="活动后现状" prop="stageAfter">
-              <el-input
-                type="textarea"
-                v-model="form.stageAfter"
-                placeholder="活动后现状"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageAfter" placeholder="活动后现状"></el-input>
             </el-form-item>
             <el-form-item label="效果检查描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="效果检查描述"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="效果检查描述"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -1179,16 +652,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -1196,40 +663,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -1238,86 +692,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="巩固措施描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -1326,16 +732,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -1343,40 +743,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -1385,89 +772,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item
-              type="textarea"
-              label="总结和下一步打算描述"
-              prop="stageDescribe"
-            >
-              <el-input
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+            <el-form-item type="textarea" autosize label="总结和下一步打算描述" prop="stageDescribe">
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -1476,16 +812,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active1
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active1
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -1493,40 +823,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled1" @click="lastStep1"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled1" @click="nextStep1"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
+              <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -1536,12 +853,8 @@
     <div class="plan2" v-if="value === '问题解决型(指令型)'">
       <br />
       <el-steps :active="active2" align-center>
-        <el-step
-          v-for="item in filteredDataList2"
-          :key="item.dictId"
-          :title="`${item.phase}阶段`"
-          :description="item.step"
-        ></el-step>
+        <el-step v-for="item in filteredDataList2" :key="item.dictId" :title="`${item.phase}阶段`"
+          :description="item.step"></el-step>
       </el-steps>
       <span>
         <el-button @click="handleClickToStep(1)">选择课题</el-button>
@@ -1562,86 +875,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="阶段名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="选择课题描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -1650,16 +915,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -1667,40 +926,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.stageExtra"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -1709,80 +955,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.participants"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="设定目标描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -1791,16 +995,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -1808,40 +1006,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -1850,80 +1035,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.participants"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="可靠性分析描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -1932,16 +1075,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -1949,40 +1086,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -1991,80 +1115,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.participants"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="原因分析描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -2073,16 +1155,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -2090,40 +1166,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -2132,80 +1195,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.participants"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="要因确定描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -2214,16 +1235,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -2231,40 +1246,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -2273,80 +1275,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.participants"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="制定对策描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -2355,16 +1315,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -2372,40 +1326,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -2414,80 +1355,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.participants"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="对策实施描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
@@ -2495,16 +1394,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -2512,40 +1405,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -2554,92 +1434,44 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.participants"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="活动前现状" prop="stageBefore">
-              <el-input
-                type="textarea"
-                v-model="form.stageBefore"
-                placeholder="活动前现状"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageBefore" placeholder="活动前现状"></el-input>
             </el-form-item>
             <el-form-item label="活动后现状" prop="stageAfter">
-              <el-input
-                v-model="form.stageAfter"
-                placeholder="活动后现状"
-              ></el-input>
+              <el-input v-model="form.stageAfter" placeholder="活动后现状"></el-input>
             </el-form-item>
             <el-form-item label="效果检查描述" prop="stageDescribe">
-              <el-input
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -2648,16 +1480,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -2665,40 +1491,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -2707,80 +1520,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.participants"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="巩固措施描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -2789,16 +1560,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -2806,40 +1571,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -2848,80 +1600,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="课题名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.participationDate"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择日期"
-              >
+              <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
+                placeholder="请选择日期">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.participants"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="总结和下一步打算描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder="总结和下一步打算描述"
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="总结和下一步打算描述"></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -2930,16 +1640,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active2
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active2
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -2947,40 +1651,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.desc"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled2" @click="lastStep2"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled2" @click="nextStep2"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
+              <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -2990,12 +1681,8 @@
     <div class="plan3" v-if="value === '创新型'">
       <br />
       <el-steps :active="active3" align-center>
-        <el-step
-          v-for="item in filteredDataList3"
-          :key="item.dictId"
-          :title="`${item.phase}阶段`"
-          :description="item.step"
-        ></el-step>
+        <el-step v-for="item in filteredDataList3" :key="item.dictId" :title="`${item.phase}阶段`"
+          :description="item.step"></el-step>
       </el-steps>
       <span>
         <el-button @click="handleClickToStep(1)">选择课题</el-button>
@@ -3014,86 +1701,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="阶段名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="选择课题描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -3102,16 +1741,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active3
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active3
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -3119,40 +1752,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.stageExtra"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active3)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled3" @click="lastStep3"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled3" @click="nextStep3"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
+              <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -3161,86 +1781,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="阶段名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="设定目标描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -3249,16 +1821,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active3
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active3
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -3266,41 +1832,28 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.stageExtra"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled3" @click="lastStep3"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled3" @click="nextStep3"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
+              <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -3310,86 +1863,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="阶段名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="提出方案确定最佳方案描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -3398,16 +1903,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active3
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active3
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -3415,40 +1914,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.stageExtra"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active3)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled3" @click="lastStep3"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled3" @click="nextStep3"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
+              <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -3458,86 +1944,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="阶段名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="制定对策描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -3546,16 +1984,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active3
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active3
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -3563,41 +1995,28 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.stageExtra"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled3" @click="lastStep3"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled3" @click="nextStep3"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
+              <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -3606,86 +2025,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="阶段名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="对策实施描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -3694,16 +2065,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active3
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active3
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -3711,41 +2076,28 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.stageExtra"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled3" @click="lastStep3"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled3" @click="nextStep3"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
+              <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -3754,100 +2106,44 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="阶段名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="活动前现状" prop="stageBefore">
-              <el-input
-                type="textarea"
-                v-model="form.stageBefore"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageBefore" placeholder=""></el-input>
             </el-form-item>
             <el-form-item label="活动后现状" prop="stageAfter">
-              <el-input
-                type="textarea"
-                v-model="form.stageAfter"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageAfter" placeholder=""></el-input>
             </el-form-item>
             <el-form-item label="效果检查描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -3856,16 +2152,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active3
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active3
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -3873,41 +2163,28 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.stageExtra"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled3" @click="lastStep3"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled3" @click="nextStep3"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
+              <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -3916,86 +2193,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="阶段名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="标准化描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -4004,16 +2233,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active3
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active3
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -4021,41 +2244,28 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.stageExtra"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled3" @click="lastStep3"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled3" @click="nextStep3"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
+              <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -4064,86 +2274,38 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input
-                v-model="form.stageName"
-                placeholder="阶段名称"
-              ></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.planDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段实际活动时间">
-              <el-date-picker
-                clearable
-                v-model="form.actualDate"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                placeholder="请选择日期"
-                value-format="yyyy-MM-dd"
-              >
+              <el-date-picker clearable v-model="form.actualDate" type="daterange" range-separator="-"
+                start-placeholder="开始日期" end-placeholder="结束日期" placeholder="请选择日期" value-format="yyyy-MM-dd">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select
-                v-model="form.stagePeople"
-                multiple
-                placeholder="请选择主要参与人员"
-              >
-                <el-option
-                  v-for="participant in participantOptions"
-                  :key="participant.value"
-                  :label="participant.label"
-                  :value="participant.value"
-                >
+              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+                <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
+                  :value="participant.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="总结与下一步打算描述" prop="stageDescribe">
-              <el-input
-                type="textarea"
-                v-model="form.stageDescribe"
-                placeholder=""
-              ></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
             <el-form-item>
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar"
-                >折柱混合图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleControl"
-                >控制图</el-button
-              >
-              <el-button
-                size="small"
-                type="primary"
-                @click="fishBonetoggleLineAndBar"
-                >鱼骨图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleSystem"
-                >系统图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleScatter"
-                >散点图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleRelation"
-                >关联图</el-button
-              >
-              <el-button size="small" type="primary" @click="toggleHistogram"
-                >直方图</el-button
-              >
+              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+              <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+              <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+              <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+              <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+              <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
             <!-- 动态生成的按钮组 -->
@@ -4152,16 +2314,10 @@
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button
-                    v-if="
-                      item.conplanSubject === conplanSubject &&
-                      item.conplanProcess === active3
-                    "
-                    :key="type + '-' + index"
-                    size="small"
-                    type="primary"
-                    @click="toggleLineAndBarShow(item)"
-                  >
+                  <el-button v-if="
+                    item.conplanSubject === conplanSubject &&
+                    item.conplanProcess === active3
+                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -4169,40 +2325,27 @@
             </el-form-item>
 
             <el-form-item label="上传附件">
-              <el-upload
-                ref="file"
-                class="upload-btn-group"
-                :file-list="fileList"
-                :action="uploadUrl"
-                :on-change="handleFileChange"
-                :auto-upload="false"
-              >
-                <el-button size="middle" type="primary" icon="el-icon-upload"
-                  >点击上传</el-button
-                >
+              <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                :on-change="handleFileChange" :auto-upload="false">
+                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
-              <el-button
-                class="upload-preview-btn"
-                type="primary"
-                size="middle"
-                @click="uploadAllListVisible = true"
-                >附件预览</el-button
-              >
+              <el-button class="upload-preview-btn" type="primary" size="middle"
+                @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
 
+            <el-form-item label="顾问意见">
+              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+            </el-form-item>
+            <el-form-item label="评审意见">
+              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+            </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="form.stageExtra"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active3)"
-                >确定</el-button
-              >
-              <el-button :disabled="lastDisabled3" @click="lastStep3"
-                >上一步</el-button
-              >
-              <el-button :disabled="nextDisabled3" @click="nextStep3"
-                >下一步</el-button
-              >
+              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
+              <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -4210,234 +2353,111 @@
     </div>
 
     <!-- 引用的组件s -->
-    <el-dialog
-      title="折柱混合图"
-      :close-on-click-modal="false"
-      :visible.sync="dialogVisible"
-      width="80%"
-      v-if="dialogVisible"
-      @close="handleDialogClose"
-    >
+    <el-dialog title="折柱混合图" :close-on-click-modal="false" :visible.sync="dialogVisible" width="80%"
+      v-if="dialogVisible" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
         <!-- <line-and-bar ref="qcChart"></line-and-bar> -->
-        <line-and-bar
-          ref="qcChart"
-          :conplanSubject="conplanSubject"
-          :conplanProcess="conplanProcess"
-        ></line-and-bar>
+        <line-and-bar ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></line-and-bar>
       </div>
     </el-dialog>
 
-    <el-dialog
-      title="鱼骨图"
-      :close-on-click-modal="false"
-      :visible.sync="fishBonedialogVisible"
-      width="80%"
-      v-if="fishBonedialogVisible"
-      @close="handleDialogClose"
-    >
+    <el-dialog title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible" width="80%"
+      v-if="fishBonedialogVisible" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <fish-bone
-          ref="fishBone"
-          :conplanSubject="conplanSubject"
-          :conplanProcess="conplanProcess"
-        ></fish-bone>
+        <fish-bone ref="fishBone" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></fish-bone>
       </div>
     </el-dialog>
 
-    <el-dialog
-      title="控制图"
-      :visible.sync="dialogVisibleControl"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleControl"
-      @close="handleDialogClose"
-    >
+    <el-dialog title="控制图" :visible.sync="dialogVisibleControl" :close-on-click-modal="false" width="80%"
+      v-if="dialogVisibleControl" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <control
-          ref="qcChart"
-          :conplanSubject="conplanSubject"
-          :conplanProcess="conplanProcess"
-        ></control>
+        <control ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></control>
       </div>
     </el-dialog>
 
-    <el-dialog
-      title="系统图"
-      :visible.sync="dialogVisibleSystem"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleSystem"
-      @close="handleDialogClose"
-    >
+    <el-dialog title="系统图" :visible.sync="dialogVisibleSystem" :close-on-click-modal="false" width="80%"
+      v-if="dialogVisibleSystem" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <system
-          ref="qcChart"
-          :conplanSubject="conplanSubject"
-          :conplanProcess="conplanProcess"
-        ></system>
+        <system ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></system>
       </div>
     </el-dialog>
 
-    <el-dialog
-      title="散点图"
-      :visible.sync="dialogVisibleScatter"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleScatter"
-      @close="handleDialogClose"
-    >
+    <el-dialog title="散点图" :visible.sync="dialogVisibleScatter" :close-on-click-modal="false" width="80%"
+      v-if="dialogVisibleScatter" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <Scatter
-          ref="qcChart"
-          :conplanSubject="conplanSubject"
-          :conplanProcess="conplanProcess"
-        ></Scatter>
+        <Scatter ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></Scatter>
       </div>
     </el-dialog>
 
-    <el-dialog
-      title="关联图"
-      :visible.sync="dialogVisibleRelation"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleRelation"
-      @close="handleDialogClose"
-    >
+    <el-dialog title="关联图" :visible.sync="dialogVisibleRelation" :close-on-click-modal="false" width="80%"
+      v-if="dialogVisibleRelation" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <RelationGraph
-          ref="qcChart"
-          :conplanSubject="conplanSubject"
-          :conplanProcess="conplanProcess"
-        ></RelationGraph>
+        <RelationGraph ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></RelationGraph>
       </div>
     </el-dialog>
 
-    <el-dialog
-      title="直方图"
-      :visible.sync="dialogVisibleHistogram"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleHistogram"
-      @close="handleDialogClose"
-    >
+    <el-dialog title="直方图" :visible.sync="dialogVisibleHistogram" :close-on-click-modal="false" width="80%"
+      v-if="dialogVisibleHistogram" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <histogram
-          ref="qcChart"
-          :conplanSubject="conplanSubject"
-          :conplanProcess="conplanProcess"
-        ></histogram>
+        <histogram ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></histogram>
       </div>
     </el-dialog>
 
     <!-- 引用的组件s deliver-->
     <!-- 1、折柱图 -->
-    <el-dialog
-      :title="this.selectedItem.conplanName"
-      :close-on-click-modal="false"
-      :visible.sync="dialogVisibleDeliver"
-      width="80%"
-      v-if="dialogVisibleDeliver"
-      @close="handleDialogClose"
-    >
+    <el-dialog :title="this.selectedItem.conplanName" :close-on-click-modal="false" :visible.sync="dialogVisibleDeliver"
+      width="80%" v-if="dialogVisibleDeliver" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <line-and-bar-deliver
-          ref="qcChart"
-          :item="selectedItem"
-        ></line-and-bar-deliver>
+        <line-and-bar-deliver ref="qcChart" :item="selectedItem"></line-and-bar-deliver>
       </div>
     </el-dialog>
 
     <!-- 2、控制图 -->
-    <el-dialog
-      :title="this.selectedItem.conplanName"
-      :visible.sync="dialogVisibleControlDeliver"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleControlDeliver"
-      @close="handleDialogClose"
-    >
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleControlDeliver"
+      :close-on-click-modal="false" width="80%" v-if="dialogVisibleControlDeliver" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
         <control-deliver ref="qcChart" :item="selectedItem"></control-deliver>
       </div>
     </el-dialog>
 
     <!-- 3、鱼骨图 -->
-    <el-dialog
-      :title="this.selectedItem.conplanName"
-      :close-on-click-modal="false"
-      :visible.sync="fishBonedialogVisibleDeliver"
-      width="80%"
-      v-if="fishBonedialogVisibleDeliver"
-      @close="handleDialogClose"
-    >
+    <el-dialog :title="this.selectedItem.conplanName" :close-on-click-modal="false"
+      :visible.sync="fishBonedialogVisibleDeliver" width="80%" v-if="fishBonedialogVisibleDeliver"
+      @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <fish-bone-deliver
-          ref="fishBone"
-          :item="selectedItem"
-        ></fish-bone-deliver>
+        <fish-bone-deliver ref="fishBone" :item="selectedItem"></fish-bone-deliver>
       </div>
     </el-dialog>
 
     <!-- 4、系统图 -->
-    <el-dialog
-      :title="this.selectedItem.conplanName"
-      :visible.sync="dialogVisibleSystemDeliver"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleSystemDeliver"
-      @close="handleDialogClose"
-    >
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleSystemDeliver"
+      :close-on-click-modal="false" width="80%" v-if="dialogVisibleSystemDeliver" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
         <system-deliver ref="qcChart" :item="selectedItem"></system-deliver>
       </div>
     </el-dialog>
 
     <!-- 5、散点图 -->
-    <el-dialog
-      :title="this.selectedItem.conplanName"
-      :visible.sync="dialogVisibleScatterDeliver"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleScatterDeliver"
-      @close="handleDialogClose"
-    >
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleScatterDeliver"
+      :close-on-click-modal="false" width="80%" v-if="dialogVisibleScatterDeliver" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
         <Scatter-deliver ref="qcChart" :item="selectedItem"></Scatter-deliver>
       </div>
     </el-dialog>
 
     <!-- 6、关联图 -->
-    <el-dialog
-      :title="this.selectedItem.conplanName"
-      :visible.sync="dialogVisibleRelationDeliver"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleRelationDeliver"
-      @close="handleDialogClose"
-    >
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleRelationDeliver"
+      :close-on-click-modal="false" width="80%" v-if="dialogVisibleRelationDeliver" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <RelationGraph-deliver
-          ref="qcChart"
-          :item="selectedItem"
-        ></RelationGraph-deliver>
+        <RelationGraph-deliver ref="qcChart" :item="selectedItem"></RelationGraph-deliver>
       </div>
     </el-dialog>
 
     <!-- 7、直方图 -->
-    <el-dialog
-      :title="this.selectedItem.conplanName"
-      :visible.sync="dialogVisibleHistogramDeliver"
-      :close-on-click-modal="false"
-      width="80%"
-      v-if="dialogVisibleHistogramDeliver"
-      @close="handleDialogClose"
-    >
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleHistogramDeliver"
+      :close-on-click-modal="false" width="80%" v-if="dialogVisibleHistogramDeliver" @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
-        <histogram-deliver
-          ref="qcChart"
-          :item="selectedItem"
-        ></histogram-deliver>
+        <histogram-deliver ref="qcChart" :item="selectedItem"></histogram-deliver>
       </div>
     </el-dialog>
 
@@ -4452,9 +2472,7 @@
         <el-table-column prop="name" label="文件名"> </el-table-column>
         <el-table-column prop="url" label="预览">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.url" @click="previewDoc(scope.row.url)"
-              >点击预览</el-button
-            >
+            <el-button v-if="scope.row.url" @click="previewDoc(scope.row.url)">点击预览</el-button>
             <span v-else>--</span>
           </template>
         </el-table-column>
@@ -4526,6 +2544,8 @@ export default {
         stageBefore: "",
         stageAfter: "",
         stageConsolidate: "",
+        stageConsultant: "",
+        stageReview: "",
         key: "",
       },
       dialogVisible: false, //折线柱状混合图
@@ -4568,6 +2588,8 @@ export default {
         stageConsolidate: "",
         stepFile: "",
         stepAttachment: "",
+        stageConsultant: "",
+        stageReview: "",
       },
 
       participantOptions: [
@@ -4611,7 +2633,7 @@ export default {
     };
   },
 
-  mounted() {},
+  mounted() { },
   activated() {
     this.initRouterParam();
     this.getDictWorkFlowList();
@@ -4745,12 +2767,12 @@ export default {
       const res = this.$route.query.data
         ? JSON.parse(this.$route.query.data)
         : {
-            qcsrId: "",
-            topicName: "",
-            teamNumberIds: "",
-            topicLeader: "",
-            topicType: "",
-          };
+          qcsrId: "",
+          topicName: "",
+          teamNumberIds: "",
+          topicLeader: "",
+          topicType: "",
+        };
       this.routerParam = res;
 
       //==================2024.11.11新增调整================================
@@ -4832,7 +2854,17 @@ export default {
             this.uploadAllList = tmp;
             this.form.stepAttachment = item.stageAttachment;
           }
+          if (item.stageConsultant) {
+            this.form.stageConsultant = item.stageConsultant;
+          }
+          if (item.stageExtra) {
+            this.form.stageExtra = item.stageExtra;
+          }
+          if (item.stageReview) {
+            this.form.stageReview = item.stageReview;
+          }
           break;
+
         }
       }
     },
@@ -4910,7 +2942,7 @@ export default {
         .then((_) => {
           done();
         })
-        .catch((_) => {});
+        .catch((_) => { });
     },
     //上一步
     lastStep1() {
@@ -4973,7 +3005,7 @@ export default {
         id: "fishBone",
         jsonData: this.testFishData,
         canvasSize: [document.body.scrollWidth, document.body.scrollHeight],
-        clickNodeFunction: (node, event) => {},
+        clickNodeFunction: (node, event) => { },
       }).init();
     },
     // 上传文件
@@ -5053,6 +3085,8 @@ export default {
         stageAfter: "",
         stageExtra: "",
         stageConsolidate: "",
+        stageConsultant: "",
+        stageReview: "",
       };
     },
     init(id) {
@@ -5082,6 +3116,9 @@ export default {
               this.dataForm.stageBefore = data.qcStep.stageBefore;
               this.dataForm.stageAfter = data.qcStep.stageAfter;
               this.dataForm.stageConsolidate = data.qcStep.stageConsolidate;
+              this.dataForm.stageConsultant = data.qcStep.stageConsultant;
+              this.dataForm.stageReview = data.qcStep.stageReview;
+
             }
           });
         }
@@ -5107,21 +3144,17 @@ export default {
           stageName: this.form.stageName ? this.form.stageName : "",
           stagePlanStart: this.form.planDate[0],
           stagePlanEnd: this.form.planDate[1],
-          stageActualStart: this.form.actualDate[0]
-            ? this.form.actualDate[0]
-            : "",
-          stageActualEnd: this.form.actualDate[1]
-            ? this.form.actualDate[1]
-            : "",
-          stagePeople: this.form.stagePeople ? tmpStagePeople : "",
+          stageActualStart: this.form.actualDate[0] ? this.form.actualDate[0] : "",
+          stageActualEnd: this.form.actualDate[1] ? this.form.actualDate[1] : "",
+          stagePeople: this.form.stagePeople ? tmpStagePeople : undefined,
           stageDescribe: this.form.stageDescribe || "",
           stageExtra: this.form.stageExtra || "",
           stageBefore: this.form.stageBefore || "",
           stageAfter: this.form.stageAfter || "",
+          stageConsultant: this.form.stageConsultant || "",
           stageConsolidate: this.form.stageConsolidate || "",
-          stageAttachment: this.tmpAllList.length
-            ? tmpListString
-            : this.form.stepAttachment,
+          stageReview: this.form.stageReview || "",
+          stageAttachment: this.tmpAllList.length ? tmpListString : this.form.stepAttachment,
         }),
       })
         .then(({ data }) => {

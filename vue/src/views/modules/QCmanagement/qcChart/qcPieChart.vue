@@ -73,7 +73,7 @@ export default {
       this.chartLoading = true
       //各阶段个数
       await this.$http({
-        url: this.$http.adornUrl('/qcSubject/registration/list'),
+        url: this.$http.adornUrl('/qcSubject/registration/all'),
         method: 'get',
       }).then(({ data }) => {
         if (data && data.code === 0) {

@@ -161,7 +161,8 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.subjectJoinList = data.page.list;
-          this.allOptions = data.page.list.map(item => ({
+          let tmp = data.page.list.filter(item => item.topicReviewStatus == 3)
+          this.allOptions = tmp.map(item => ({
             value: item.qcsrId,
             label: item.topicName
           }))
@@ -184,7 +185,8 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.subjectJoinList = data.page.list;
-          this.options2 = data.page.list.map(item => ({
+          let tmp = data.page.list.filter(item => item.topicReviewStatus == 3)
+          this.options2 = tmp.map(item => ({
             value: item.qcsrId,
             label: item.topicName
           }))
@@ -207,7 +209,8 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.subjectLeadList = data.page.list;
-          this.options = data.page.list.map(item => ({
+          let tmp = data.page.list.filter(item => item.topicReviewStatus == 3)
+          this.options = tmp.map(item => ({
             value: item.qcsrId,
             label: item.topicName
           }))

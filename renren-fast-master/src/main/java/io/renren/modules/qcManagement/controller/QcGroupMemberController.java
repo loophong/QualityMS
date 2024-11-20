@@ -210,12 +210,7 @@ public class QcGroupMemberController {
     public R save(@RequestBody QcGroupMemberEntity qcGroupMember){
         Integer parentId = qcGroupMember.getParentId();
         String name = qcGroupMember.getMemberName();
-        int count = qcGroupMemberService.count(new LambdaUpdateWrapper<QcGroupMemberEntity>()
-                .eq(QcGroupMemberEntity::getGroupName, qcGroupMember.getGroupName()));
-        log.info("小组名称：" + qcGroupMember.getGroupName() + "，查询结果条数：" + count);
-        if (count > 0) {
-            return R.error("该小组已存在，请勿重复添加");
-        }
+
         if(parentId != null){
            Boolean result = qcGroupMemberDao.checkRepeat(parentId,name);
            if(result){

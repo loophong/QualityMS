@@ -21,5 +21,6 @@ public interface QcSubjectRegistrationService extends IService<QcSubjectRegistra
     List<QcGroupMemberEntity> getMembersOfGroup(String groupName);
     PageUtils queryPage(Map<String, Object> params);
     PageUtils queryPageFinishedList(Map<String, Object> params) ;
+
 }
 

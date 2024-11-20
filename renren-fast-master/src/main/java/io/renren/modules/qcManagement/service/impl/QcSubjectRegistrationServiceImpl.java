@@ -27,21 +27,68 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     @Override
     public List<QcGroupMemberEntity> getMembersOfGroup(String groupName) {
 //        System.out.println("根据组名获得的成员" + baseMapper.getMembersOfGroup(groupName));
-         return baseMapper.getMembersOfGroup(groupName);
+        return baseMapper.getMembersOfGroup(groupName);
     }
 
     @Override
     public PageUtils queryPageFinishedList(Map<String, Object> params) {
-        log.info("param"+params.get("page")+"------"+ params.get("limit"));
+        log.info("param" + params.get("page") + "------" + params.get("limit"));
 
         long p = Long.parseLong((String) params.get("page"));
         long l = Long.parseLong((String) params.get("limit"));
-        Page<QcSubjectRegistrationEntity> page = new Page<QcSubjectRegistrationEntity>(p,l);
+        Page<QcSubjectRegistrationEntity> page = new Page<>(p, l);
 
-        Page<QcSubjectRegistrationEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(page);
-        log.info("result"+result);
-        return new PageUtils(page);
+        // 提取模糊查询参数
+        String topicName = (String) params.get("topicName");
+        String keywords = (String) params.get("keywords");
+        String startDate = (String) params.get("startDate");
+        String endDate = (String) params.get("endDate");
+
+        try {
+            // 执行分页查询
+            List<QcSubjectRegistrationEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,startDate,endDate);
+            page.setRecords(result);
+            page.setTotal(result.size());
+
+            log.info("result" + page);
+            return new PageUtils(page);
+        } catch (Exception e) {
+            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+            page.setTotal(0);
+            return new PageUtils(page);
+        }
     }
+//    @Override
+//    public PageUtils queryPageFinishedList(Map<String, Object> params) {
+//    log.info("param" + params.get("page") + "------" + params.get("limit"));
+//
+//    long p = Long.parseLong((String) params.get("page"));
+//    long l = Long.parseLong((String) params.get("limit"));
+//    Page<QcSubjectRegistrationEntity> page = new Page<>(p, l);
+//
+//    // 提取模糊查询参数
+//    String topicName = (String) params.get("topicName");
+//    String keywords = (String) params.get("keywords");
+//
+//    // 构建查询条件
+//    QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
+//    if (topicName != null && !topicName.isEmpty()) {
+//        queryWrapper.like("topic_name", topicName);
+//    }
+//    if (keywords != null && !keywords.isEmpty()) {
+//        queryWrapper.like("keywords", keywords);
+//    }
+//
+//    try {
+//        // 执行查询
+//        Page<QcSubjectRegistrationEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(page);
+//        log.info("result" + result);
+//        return new PageUtils(result);
+//    } catch (Exception e) {
+//        log.error("查询出错: " + e.getMessage(), e);
+//        return new PageUtils(page);
+//    }
+//}
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {

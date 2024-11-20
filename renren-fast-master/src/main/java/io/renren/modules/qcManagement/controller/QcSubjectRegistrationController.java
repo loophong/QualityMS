@@ -84,7 +84,6 @@ public class QcSubjectRegistrationController {
 //        for(int i=0;i<10;i++){
 //            qcSubjectRegistrationDao.getActivity("1","创新型");
 //        }
-
         return R.ok().put("page", page);
     }
 

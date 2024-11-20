@@ -3,7 +3,7 @@
     <el-form :inline="true" :model="queryParams" @keyup.enter.native="getDataList()">
 
       <el-form-item label="指标名称" prop="indicatorName">
-        <el-select v-model="queryParams.indicatorName" placeholder="请选择指标名称">
+        <el-select v-model="queryParams.indicatorName" placeholder="请选择指标名称" filterable>
           <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
             {{ field.indicatorName }}
           </el-option>
@@ -495,62 +495,51 @@
       },
 
       // 导出
-      exportAll(){
+      exportAll() {
         this.$http({
           url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list01'),
           method: 'get',
           params: this.$http.adornParams({
             'key': this.queryParams
           })
-        }).then(({data}) => {
+        }).then(({ data }) => {
           if (data) {
-            this.dataList01 = data
-          } else {
-            this.dataList01 = []
-          }
-        })
-        const loadingInstance = Loading.service({
-          lock: true,
-          text: "正在导出，请稍后...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)",
-        });
+            this.dataList01 = data;
+            console.log("this.dataList01=====>", this.dataList01);
 
-        const promises = this.dataList01.map((tableRow, index) => {
-            return {
+            const loadingInstance = Loading.service({
+              lock: true,
+              text: "正在导出，请稍后...",
+              spinner: "el-icon-loading",
+              background: "rgba(0, 0, 0, 0.7)",
+            });
+
+            const transformedData = this.dataList01.map((tableRow, index) => ({
               序号: index + 1,
               指标名称: tableRow.indicatorName,
               年月: tableRow.yearMonth,
-              指标值: tableRow.indicatorValue,
+              指标目标值: tableRow.indicatorValue,
+              指标值: tableRow.indicatorActualValue,
               管理部门: tableRow.managementDepartment,
               考核部门: tableRow.assessmentDepartment,
               指标填报时间: tableRow.indicatorCreatTime,
-            };
-        });
-        Promise.all(promises)
-          .then((data) => {
-            const ws = XLSX.utils.json_to_sheet(data);
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(transformedData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "项目列表");
 
             const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-            saveAs(
-              new Blob([wbout], { type: "application/octet-stream" }),
-              "指标月度数据总台账.xlsx"
-            );
+            saveAs(new Blob([wbout], { type: "application/octet-stream" }), "指标月度数据总台账.xlsx");
 
-            // // 提交数据到Vuex Store
-            // this.updateExportedData(data);
-
-
-          })
-          .finally(() => {
             loadingInstance.close();
-          })
-          .catch((error) => {
-            console.error("导出失败:", error);
-            loadingInstance.close();
-          });
+          } else {
+            this.dataList01 = [];
+            console.log("没有数据");
+          }
+        }).catch((error) => {
+          console.error("请求失败:", error);
+        });
       },
     }
   }

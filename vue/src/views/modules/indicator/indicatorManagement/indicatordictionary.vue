@@ -22,7 +22,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="上级指标" prop="indicatorParentNode">
-        <el-select v-model="queryParams.indicatorParentNode" filterable placeholder="请选择上级指标">
+        <el-select v-model="queryParams.indicatorParentNode" filterable clearable placeholder="请选择上级指标">
           <el-option v-for="field in indicatorDictionaryList1" :key="field.indicatorId" :value="field.indicatorName">
             {{ field.indicatorName }}
           </el-option>
@@ -122,6 +122,18 @@
         align="center"
         label="上级指标">
       </el-table-column>
+      <el-table-column
+        prop="planId"
+        header-align="center"
+        align="center"
+        label="关联计划">
+      </el-table-column>
+      <el-table-column
+        prop="taskId"
+        header-align="center"
+        align="center"
+        label="关联任务">
+      </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="indicatorValueLowerBound"-->
 <!--        header-align="center"-->
@@ -150,7 +162,8 @@
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.indicatorId)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.indicatorId)">删除</el-button>
           <el-button type="text" size="small" @click="keyControlHandle(scope.row.indicatorId)">重点管控</el-button>
-          <el-button type="text" size="small" @click="storageHandle(scope.row.indicatorId)">入库</el-button>
+          <el-button type="text" size="small" @click="queryKeyControlHandle(scope.row.indicatorName)">查看重点管控措施</el-button>
+          <el-button type="text" size="small" @click="addPlanHandle(scope.row.indicatorId)">新建计划</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -165,6 +178,7 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-plan v-if="addPlanVisible" ref="addPlan" @refreshDataList="getDataList"></add-plan>
     <key-control v-if="keyControlVisible" ref="keyControl" @refreshDataList="getDataList"></key-control>
   </div>
 </template>
@@ -172,6 +186,7 @@
 <script>
   import AddOrUpdate from './indicatordictionary-add-or-update'
   import KeyControl from './keyindicator-add'
+  import AddPlan from "../../taskmanagement/plan/plan-add-page";
   export default {
     data () {
       return {
@@ -213,13 +228,15 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
+        addPlanVisible: false, //新建计划
         // 关键指标
         keyControlVisible: false
       }
     },
     components: {
       AddOrUpdate,
-      KeyControl
+      AddPlan,
+      KeyControl,
     },
     mounted () {
       this.getDataList()
@@ -352,6 +369,15 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
+      // 新建计划
+      addPlanHandle (id) {
+        this.$router.push({
+          name: 'plan-add-page',
+          query: {
+            indicatorId: id
+          }
+        });
+      },
       //重点指标管控
       keyControlHandle (id) {
         this.keyControlVisible = true
@@ -359,65 +385,14 @@
           this.$refs.keyControl.init(id)
         })
       },
-      //入知识库
-      storageHandle (id) {
-        console.log("id=====>",id)
-        this.$confirm(`是否入库该指标？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          if (id !== undefined) {
-            this.$http({
-              url: this.$http.adornUrl(`/indicator/indicatordictionary/info/${this.dataForm.indicatorId}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.dataForm.indicatorName = data.indicatorDictionary.indicatorName
-                this.dataForm.assessmentDepartment = data.indicatorDictionary.assessmentDepartment
-                this.dataForm.managementDepartment = data.indicatorDictionary.managementDepartment
-                this.dataForm.indicatorDefinition = data.indicatorDictionary.indicatorDefinition
-                this.dataForm.indicatorClassification = data.indicatorDictionary.indicatorClassification
-                this.dataForm.managementContentCurrentAnalysis = data.indicatorDictionary.managementContentCurrentAnalysis
-                this.dataForm.dataId = data.indicatorDictionary.dataId
-                this.dataForm.sourceDepartment = data.indicatorDictionary.sourceDepartment
-                this.dataForm.collectionMethod = data.indicatorDictionary.collectionMethod
-                this.dataForm.collectionFrequency = data.indicatorDictionary.collectionFrequency
-                this.dataForm.planId = data.indicatorDictionary.planId
-                this.dataForm.taskId = data.indicatorDictionary.taskId
-                this.dataForm.indicatorParentNode = data.indicatorDictionary.indicatorParentNode
-                this.dataForm.indicatorCreatTime = data.indicatorDictionary.indicatorCreatTime
-                this.dataForm.indicatorState = data.indicatorDictionary.indicatorState
-                this.dataForm.indicatorChildNode = data.indicatorDictionary.indicatorChildNode
-                this.dataForm.indicatorValueLowerBound = data.indicatorDictionary.indicatorValueLowerBound
-                this.dataForm.indicatorValueUpperBound = data.indicatorDictionary.indicatorValueUpperBound
-                this.dataForm.storageFlag = data.indicatorDictionary.storageFlag
-              }
-            })
+      //查询重点管控措施
+      queryKeyControlHandle (id) {
+        this.$router.push({
+          name: 'indicator-key-indicators',
+          query: {
+            indicatorName: id
           }
-          this.$http({
-            url: this.$http.adornUrl('/indicator/indicatordictionary/update'),
-            method: 'post',
-            data: this.$http.adornData({
-              'indicatorId': id,
-              'storageFlag': 1
-            })
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '入库成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        })
+        });
       },
       // 删除
       deleteHandle (id) {

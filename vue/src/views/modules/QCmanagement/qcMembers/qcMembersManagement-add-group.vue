@@ -75,7 +75,7 @@
             <el-col :span="12">
               <el-form-item label="姓名" prop="name">
                 <!-- <el-input v-model="member.name" placeholder="请输入姓名"></el-input> -->
-                <el-select v-model="member.name" placeholder="请选择角色">
+                <el-select v-model="member.name" filterable placeholder="请选择角色">
                   <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
                     <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
                     </el-option>
@@ -88,12 +88,6 @@
               <el-form-item label="组内角色" prop="roleInTopic">
                 <el-select v-model="member.roleInTopic" placeholder="请选择组内角色">
                   <el-option label="成员" value="成员"></el-option>
-                  <el-option label="顾问" value="顾问"></el-option>
-                  <el-option label="评审员" value="评审员"></el-option>
-                  <el-option label="相关方评审员" value="相关方评审员"></el-option>
-                  <el-option label="成果初评管理员" value="成果初评管理员"></el-option>
-                  <el-option label="财务科评审员" value="财务科评审员"></el-option>
-                  <el-option label="成果复评管理员" value="成果复评管理员"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="参加时间" prop="participationDate">

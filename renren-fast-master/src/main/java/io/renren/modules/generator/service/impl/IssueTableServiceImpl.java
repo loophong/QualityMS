@@ -853,10 +853,18 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
     }
 
     @Override
-    public boolean checkReplicateIssue(Integer issueId, String issueCategoryIds) {
-        // 构建查询条件
+    public boolean checkReplicateIssue(Integer issueId, String issueCategoryIds, String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
+                // 构建查询条件
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("issue_category_id", issueCategoryIds);
+
+            queryWrapper.eq("issue_category_id", issueCategoryIds)
+                    .eq("Systematic_classification",systematicClassification )
+                    .eq("fault_type", faultType)
+                    .eq("First_Faulty_parts", firstFaultyParts)
+                    .eq("Second_Faulty_parts", secondFaultyParts)
+                    .eq("fault_model",faultModel );
+
+
 
         // 查询符合条件的记录
         List<IssueTableEntity> issues = this.list(queryWrapper);
@@ -872,6 +880,8 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
 
         return isDuplicate; // 返回是否存在重复记录
     }
+
+
 
 
 

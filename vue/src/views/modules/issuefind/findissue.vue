@@ -26,8 +26,24 @@
                        :disabled="dataListSelections.length <= 0">批量删除</el-button>
             <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
                        @click="openRegistration()">课题登记</el-button>
-            <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
-                       @click="openTools()">QC工具</el-button>
+<!--            <el-button v-if="isAuth('generator:issuetable:save')" type="primary"-->
+<!--                       @click="openTools()">QC工具</el-button>-->
+            <!-- QC工具下拉菜单 -->
+            <el-dropdown v-if="isAuth('generator:issuetable:save')">
+              <el-button type="primary" class="el-dropdown-link">
+                QC工具
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item
+                  v-for="tool in tools"
+                  :key="tool.routeName"
+                  @click.native="navigateTo(tool.routeName)"
+                >
+                  {{ tool.label }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </el-form-item>
           <el-form-item>
             <el-upload class="upload-demo" :before-upload="beforeUpload" :show-file-list="false"
@@ -48,6 +64,16 @@
           <el-table-column prop="inspectionDate" header-align="center" align="center" label="检查日期">
           </el-table-column>
           <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
+          </el-table-column>
+          <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
+          </el-table-column>
+          <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
+          </el-table-column>
+          <el-table-column prop="secondFaultyParts" header-align="center" align="center" label="故障件二级">
+          </el-table-column>
+          <el-table-column prop="faultType" header-align="center" align="center" label="故障类别">
+          </el-table-column>
+          <el-table-column prop="faultModel" header-align="center" align="center" label="故障模式">
           </el-table-column>
           <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
           </el-table-column>
@@ -120,6 +146,16 @@
             <el-table-column prop="inspectionDate" header-align="center" align="center" label="检查日期">
             </el-table-column>
             <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
+            </el-table-column>
+            <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
+            </el-table-column>
+            <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
+            </el-table-column>
+            <el-table-column prop="secondFaultyParts" header-align="center" align="center" label="故障件二级">
+            </el-table-column>
+            <el-table-column prop="faultType" header-align="center" align="center" label="故障类别">
+            </el-table-column>
+            <el-table-column prop="faultModel" header-align="center" align="center" label="故障模式">
             </el-table-column>
             <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
             </el-table-column>
@@ -194,26 +230,26 @@
             </el-table-column>
             <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
             </el-table-column>
-            <!--            <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">-->
-            <!--              <template slot-scope="scope">-->
-            <!--                <el-button type="text" size="small"-->
-            <!--                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
-            <!--              </template>-->
-            <!--            </el-table-column>-->
-            <el-table-column
-              prop="rectificationPhotoDeliverable"
-              header-align="center"
-              align="center"
-              label="整改照片交付物">
-              <template slot-scope="scope">
-                <img
-                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"
-                  alt="整改照片交付物"
-                  style="width: 100px; height: auto; cursor: pointer;"
-                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"
-                />
-              </template>
-            </el-table-column>
+                        <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">
+                          <template slot-scope="scope">
+                            <el-button type="text" size="small"
+                                       @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+                          </template>
+                        </el-table-column>
+<!--            <el-table-column-->
+<!--              prop="rectificationPhotoDeliverable"-->
+<!--              header-align="center"-->
+<!--              align="center"-->
+<!--              label="整改照片交付物">-->
+<!--              <template slot-scope="scope">-->
+<!--                <img-->
+<!--                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"-->
+<!--                  alt="整改照片交付物"-->
+<!--                  style="width: 100px; height: auto; cursor: pointer;"-->
+<!--                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"-->
+<!--                />-->
+<!--              </template>-->
+<!--            </el-table-column>-->
             <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
             </el-table-column>
             <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
@@ -276,6 +312,16 @@
             <el-table-column prop="inspectionDate" header-align="center" align="center" label="检查日期">
             </el-table-column>
             <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
+            </el-table-column>
+            <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
+            </el-table-column>
+            <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
+            </el-table-column>
+            <el-table-column prop="secondFaultyParts" header-align="center" align="center" label="故障件二级">
+            </el-table-column>
+            <el-table-column prop="faultType" header-align="center" align="center" label="故障类别">
+            </el-table-column>
+            <el-table-column prop="faultModel" header-align="center" align="center" label="故障模式">
             </el-table-column>
             <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
             </el-table-column>
@@ -356,20 +402,26 @@
             </el-table-column>
             <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
             </el-table-column>
-            <el-table-column
-              prop="rectificationPhotoDeliverable"
-              header-align="center"
-              align="center"
-              label="整改照片交付物">
+            <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">
               <template slot-scope="scope">
-                <img
-                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"
-                  alt="整改照片交付物"
-                  style="width: 100px; height: auto; cursor: pointer;"
-                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable,scope.row.issueId)"
-                />
+                <el-button type="text" size="small"
+                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
               </template>
             </el-table-column>
+<!--            <el-table-column-->
+<!--              prop="rectificationPhotoDeliverable"-->
+<!--              header-align="center"-->
+<!--              align="center"-->
+<!--              label="整改照片交付物">-->
+<!--              <template slot-scope="scope">-->
+<!--                <img-->
+<!--                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"-->
+<!--                  alt="整改照片交付物"-->
+<!--                  style="width: 100px; height: auto; cursor: pointer;"-->
+<!--                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable,scope.row.issueId)"-->
+<!--                />-->
+<!--              </template>-->
+<!--            </el-table-column>-->
             <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
             </el-table-column>
             <el-table-column prop="associatedIssueAddition" header-align="center" align="center" label="关联问题">
@@ -451,6 +503,15 @@ import AddOrUpdateV from '../RectVerification/issuetable-add-or-update.vue'
 export default {
   data() {
     return {
+      tools: [
+        { label: '系统图', routeName: 'qcTools' },
+        { label: '散点图', routeName: 'Scatter' },
+        { label: '直方图', routeName: 'histogram' },
+        { label: '控制图', routeName: 'control' },
+        { label: '折柱图', routeName: 'lineAndBar' },
+        { label: '鱼骨图', routeName: 'fishBone' },
+        { label: '关联图', routeName: 'RelationGraph' }
+      ],
       showForm: true, // 控制表单显示的变量
       showForm1: true, // 控制表单显示的变量
       dataForm: {
@@ -653,6 +714,28 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.dataList = data.page.list
+
+          // 排序操作前，输出每个元素的 overDue 和 creationTime
+          // console.log("排序前的 dataList: ", this.dataList);
+          this.dataList.forEach(item => {
+            // console.log(`item.overDue: ${item.overDue}, type: ${typeof item.overDue}`);
+            // console.log(`item.creationTime: ${item.creationTime}, type: ${typeof item.creationTime}`);
+          });
+
+          // 排序操作
+          this.dataList.sort((a, b) => {
+            // 转换 overDue 为布尔值，'true' 转为 true，其他转为 false
+            const isOverDueA = a.overDue === 'true';
+            const isOverDueB = b.overDue === 'true';
+
+            // 优先按照 overDue 排序，overDue 为 true 的排在前面
+            if (isOverDueA !== isOverDueB) {
+              return isOverDueA ? -1 : 1;
+            }
+
+            // 如果 overDue 相同，则按创建时间排序
+            return new Date(b.creationTime) - new Date(a.creationTime);
+          });
           this.totalPage = data.page.totalCount
         } else {
           this.dataList = []
@@ -766,21 +849,26 @@ export default {
         }
       })
     },
+    // openRegistration() {
+    //   this.$router.push({
+    //     name: 'qcSubjectRegistration',
+    //     params: {
+    //
+    //     }
+    //   })
+    // },
+    // 跳转到工具页面
+    navigateTo(routeName) {
+      this.$router.push({
+        name: routeName,
+        params: {} // 如果需要传递参数，可以在这里添加
+      });
+    },
     openRegistration() {
       this.$router.push({
-        name: 'qcSubjectRegistration',
-        params: {
-
-        }
-      })
-    },
-    openTools() {
-      this.$router.push({
         name: 'qcTools',
-        params: {
-
-        }
-      })
+        params: {}
+      });
     },
     // 删除
     deleteHandle(id) {

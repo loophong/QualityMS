@@ -69,6 +69,80 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="系统分类" prop="systematicClassification">
+          <el-select
+            v-model="selectedSystematic"
+            @change="filterFirstFaultyParts"
+            filterable
+            placeholder="请选择系统分类">
+            <el-option
+              v-for="option in filteredSystematicOptions"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="故障件一级" prop="firstFaultyParts">
+          <el-select
+            v-model="selectedFirstFaultyParts"
+            @change="filterSecondFaultyParts"
+            filterable
+            placeholder="请选择故障件一级">
+            <el-option
+              v-for="option in filteredFirstFaultyPartsOptions"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="故障件二级" prop="secondFaultyParts">
+          <el-select
+            v-model="selectedSecondFaultyParts"
+            @change="filterFaultType"
+            filterable
+            placeholder="请选择故障件二级">
+            <el-option
+              v-for="option in filteredSecondFaultyPartsOptions"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="故障类别" prop="faultType">
+          <el-select
+            v-model="selectedFaultType"
+            @change="filterFaultModel"
+            filterable
+            placeholder="请选择故障类别">
+            <el-option
+              v-for="option in filteredFaultTypeOptions"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="故障模式" prop="faultModel">
+          <el-select
+            v-model="selectedFaultModel"
+            filterable
+            placeholder="请选择故障模式">
+            <el-option
+              v-for="option in filteredFaultModelOptions"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
           <div v-for="(vehicle, index) in dataForm.vehicles" :key="vehicle.key">
             <el-form-item :label="'车型 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleTypeId'" :rules="{ required: true, message: '请选择车型', trigger: 'change' }" label-width="140px">
@@ -99,8 +173,18 @@
           <el-input v-model="dataForm.issueDescription" placeholder="问题描述"></el-input>
         </el-form-item>
         <el-form-item label="初步分析" prop="peliminaryAnalysis">
-          <el-input v-model="dataForm.peliminaryAnalysis" placeholder="初步分析"></el-input>
+          <el-select v-model="dataForm.peliminaryAnalysis" filterable placeholder="请选择初步分析">
+            <el-option
+              v-for="department in issuepeliminaryAnalysis"
+              :key="department.value"
+              :label="department.label"
+              :value="department.value">
+            </el-option>
+          </el-select>
         </el-form-item>
+<!--        <el-form-item label="初步分析" prop="peliminaryAnalysis">-->
+<!--          <el-input v-model="dataForm.peliminaryAnalysis" placeholder="初步分析"></el-input>-->
+<!--        </el-form-item>-->
         <!--    <el-form-item label="问题照片" prop="issuePhoto">-->
         <!--      <img v-if="dataForm.issuePhoto" :src="dataForm.issuePhoto" alt="问题照片" style="max-width: 100%;">-->
         <!--    </el-form-item>-->
@@ -196,7 +280,7 @@
           :on-change="handleFileChange1"
           :auto-upload="false"
         >
-          <el-button type="primary">上传图片</el-button>
+          <el-button type="primary">上传文件</el-button>
         </el-upload>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -497,8 +581,23 @@
 export default {
   data () {
     return {
+      // 全部选项数据
+      allOptions: [],
+      // 各级筛选后的选项
+      filteredSystematicOptions: [],
+      filteredFirstFaultyPartsOptions: [],
+      filteredSecondFaultyPartsOptions: [],
+      filteredFaultTypeOptions: [],
+      filteredFaultModelOptions: [],
+      // 选中值
+      selectedSystematic: null,
+      selectedFirstFaultyParts: null,
+      selectedSecondFaultyParts: null,
+      selectedFaultType: null,
+      selectedFaultModel: null,
       issueGrades: [],  // 存储所有唯一的问题等级
       issueCategoryOptions: [],  // 原始数据
+      issuepeliminaryAnalysis: [],  // 存储所有唯一的初步分析
       filteredIssueCategoryOptions: [],  // 过滤后的问题类别选项
       selectedGrade: null,  // 用户选择的问题等级
       addImageDialogVisible: false,
@@ -592,6 +691,8 @@ export default {
     this.fetchVehicleTypes()
     this.fetchIssueOptions() // 获取所有问题编号选项
     this.fetchDepartments()
+    this.fetchAnalysis()
+    this.fetchFaultOptions()
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
@@ -609,6 +710,28 @@ export default {
 
   },
   methods: {
+    // 通用数组去重方法
+    removeDuplicates(array, key) {
+      const seen = new Set();
+      return array.filter(item => {
+        const val = key ? item[key] : item; // 如果有 key，按 key 去重，否则直接按值去重
+        if (seen.has(val)) {
+          return false;
+        }
+        seen.add(val);
+        return true;
+      });
+    },
+
+    // 批量去重所有数组
+    deduplicateAll() {
+      this.filteredIssueCategoryOptions = this.removeDuplicates(this.filteredIssueCategoryOptions, 'value');
+      this.filteredSystematicOptions = this.removeDuplicates(this.filteredSystematicOptions, 'value');
+      this.filteredFirstFaultyPartsOptions = this.removeDuplicates(this.filteredFirstFaultyPartsOptions, 'value');
+      this.filteredSecondFaultyPartsOptions = this.removeDuplicates(this.filteredSecondFaultyPartsOptions, 'value');
+      this.filteredFaultTypeOptions = this.removeDuplicates(this.filteredFaultTypeOptions, 'value');
+      this.filteredFaultModelOptions = this.removeDuplicates(this.filteredFaultModelOptions, 'value');
+    },
     uploadFile(file) {
       const formData = new FormData();
       formData.append('file', file); // 将文件添加到 FormData
@@ -723,7 +846,7 @@ export default {
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const day = String(now.getDate()).padStart(2, '0');
       const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-      return `ZL-IS-${year}${month}${day}${random}`;
+      return `ZL-IS-${year}${month}-${day}${random}`;
     },
     // 处理图片预览
     handlePictureCardPreview(file) {
@@ -797,6 +920,125 @@ export default {
     //     console.error('There was an error fetching the issue categories!', error)
     //   })
     // },
+    fetchAnalysis () {
+      this.$http({
+        url: this.$http.adornUrl('/generator/peliminaryanalysistable/fetchAnalysis'),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          // console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
+          this.issuepeliminaryAnalysis = data.peliminaryAnalysisTableEntities.map(peliminaryAnalysisTableEntities => ({
+            value: peliminaryAnalysisTableEntities.peliminaryAnalysis,
+            label: peliminaryAnalysisTableEntities.peliminaryAnalysis
+          }))
+        } else {
+
+          console.error('Failed to fetch issue categories:', data.msg)
+        }
+      }).catch(error => {
+        console.error('There was an error fetching the issue categories!', error)
+      })
+      // console.log('Successfully fetched departmentOptions:', this.departmentOptions)
+
+    },
+    fetchFaultOptions() {
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuefaulttable/options'),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          // 全量数据
+          this.allOptions = data.options.map(option => ({
+            systematicClassification: option.systematicClassification,
+            firstFaultyParts: option.firstFaultyParts,
+            secondFaultyParts: option.secondFaultyParts,
+            faultType: option.faultType,
+            faultModel: option.faultModel
+          }));
+
+          // 初始化系统分类选项
+          this.filteredSystematicOptions = [...new Set(this.allOptions.map(item => ({
+            value: item.systematicClassification,
+            label: item.systematicClassification
+          })))];
+          // 去重
+          this.deduplicateAll();
+        } else {
+          console.error('Failed to fetch fault options:', data.msg);
+        }
+      }).catch(error => {
+        console.error('There was an error fetching the fault options!', error);
+      });
+    },
+    // 筛选一级故障件
+    filterFirstFaultyParts() {
+      const filtered = this.allOptions.filter(
+        item => item.systematicClassification === this.selectedSystematic
+      );
+      this.filteredFirstFaultyPartsOptions = [...new Set(filtered.map(item => ({
+        value: item.firstFaultyParts,
+        label: item.firstFaultyParts
+      })))];
+
+      this.selectedFirstFaultyParts = null;
+      this.filterSecondFaultyParts();
+      this.deduplicateAll();
+    },
+
+    // 筛选二级故障件
+    filterSecondFaultyParts() {
+      const filtered = this.allOptions.filter(
+        item =>
+          item.systematicClassification === this.selectedSystematic &&
+          item.firstFaultyParts === this.selectedFirstFaultyParts
+      );
+      this.filteredSecondFaultyPartsOptions = [...new Set(filtered.map(item => ({
+        value: item.secondFaultyParts,
+        label: item.secondFaultyParts
+      })))];
+
+      this.selectedSecondFaultyParts = null;
+      this.filterFaultType();
+      this.deduplicateAll();
+    },
+
+    // 筛选故障类别
+    filterFaultType() {
+      const filtered = this.allOptions.filter(
+        item =>
+          item.systematicClassification === this.selectedSystematic &&
+          item.firstFaultyParts === this.selectedFirstFaultyParts &&
+          item.secondFaultyParts === this.selectedSecondFaultyParts
+      );
+      this.filteredFaultTypeOptions = [...new Set(filtered.map(item => ({
+        value: item.faultType,
+        label: item.faultType
+      })))];
+
+      this.selectedFaultType = null;
+      this.filterFaultModel();
+      this.deduplicateAll();
+    },
+
+    // 筛选故障模式
+    filterFaultModel() {
+      const filtered = this.allOptions.filter(
+        item =>
+          item.systematicClassification === this.selectedSystematic &&
+          item.firstFaultyParts === this.selectedFirstFaultyParts &&
+          item.secondFaultyParts === this.selectedSecondFaultyParts &&
+          item.faultType === this.selectedFaultType
+      );
+      this.filteredFaultModelOptions = [...new Set(filtered.map(item => ({
+        value: item.faultModel,
+        label: item.faultModel
+      })))];
+      this.deduplicateAll();
+      this.selectedFaultModel = null;
+    },
+
     fetchIssueCategories() {
       this.$http({
         url: this.$http.adornUrl('/generator/issuetypetable/issuestype'),
@@ -804,7 +1046,7 @@ export default {
         params: this.$http.adornParams()
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          console.log('Successfully fetched issue categories:', data.category);
+          // console.log('Successfully fetched issue categories:', data.category);
 
           // 原始数据
           this.issueCategoryOptions = data.category.map(category => ({
@@ -815,6 +1057,8 @@ export default {
 
           // 获取唯一的等级选项
           this.issueGrades = [...new Set(data.category.map(category => category.issueGrade))];
+          // 去重
+          this.deduplicateAll();
         } else {
           console.error('Failed to fetch issue categories:', data.msg);
         }
@@ -1089,6 +1333,11 @@ export default {
                     'vehicleTypeId': this.dataForm.vehicleTypeIds.join(','),
                     'vehicleNumberId': this.dataForm.vehicleNumbers.join(','),
                     'issueDescription': this.dataForm.issueDescription,
+                    'systematicClassification': this.selectedSystematic,
+                    'firstFaultyParts': this.selectedFirstFaultyParts,
+                   'secondFaultyParts': this.selectedSecondFaultyParts,
+                    'faultType': this.selectedFaultType,
+                    'faultModel': this.selectedFaultModel,
                     'issuePhoto': this.dataForm.issuePhoto,
                     'rectificationRequirement': this.dataForm.rectificationRequirement,
                     'peliminaryAnalysis': this.dataForm.peliminaryAnalysis,

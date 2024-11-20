@@ -4,12 +4,12 @@
     <el-tabs type="border-card">
       <el-tab-pane label="待处理审批">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-          <el-form-item>
-            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button @click="getDataList()">查询</el-button>
-          </el-form-item>
+<!--          <el-form-item>-->
+<!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--          </el-form-item>-->
+<!--          <el-form-item>-->
+<!--            <el-button @click="getDataList()">查询</el-button>-->
+<!--          </el-form-item>-->
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" style="width: 100%;">
           <el-table-column prop="approvalId" header-align="center" align="center" label="审批编号">
@@ -84,12 +84,12 @@
       <el-tab-pane label="已处理审批">
 
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getHistoryApprovalList()">
-          <el-form-item>
-            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button @click="getHistoryApprovalList()">查询</el-button>
-          </el-form-item>
+<!--          <el-form-item>-->
+<!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--          </el-form-item>-->
+<!--          <el-form-item>-->
+<!--            <el-button @click="getHistoryApprovalList()">查询</el-button>-->
+<!--          </el-form-item>-->
         </el-form>
         <el-table :data="historyDataList" border v-loading="historyDataListLoading" style="width: 100%;">
           <el-table-column prop="approvalId" header-align="center" align="center" label="审批编号">
@@ -224,7 +224,7 @@
             <el-tag type="success" disable-transitions>已通过</el-tag></span>
           <span v-else-if="scope.row.approvalStatus === 'REJECTED'">
             <el-tag type="danger" disable-transitions>已拒绝</el-tag></span>
-          <span v-else>-</span> 
+          <span v-else>-</span>
           处理未知状态
         </template>
       </el-table-column> -->
@@ -313,7 +313,7 @@ export default {
       console.log(this.options);
       // if (data && data.code === 0) {
       //   console.log(data);
-      // } 
+      // }
     })
 
     // console.log(data);

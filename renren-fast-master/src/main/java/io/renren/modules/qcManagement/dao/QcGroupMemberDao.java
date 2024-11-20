@@ -48,7 +48,7 @@ public interface QcGroupMemberDao extends BaseMapper<QcGroupMemberEntity> {
 //    })
 //    Integer countMembersUnique();
         @Select({
-            "SELECT COUNT(DISTINCT name) ",
+            "SELECT COUNT(DISTINCT member_name) ",
             "FROM qc_group_members ",
             "WHERE delete_flag = 0"
          })
@@ -85,4 +85,8 @@ public interface QcGroupMemberDao extends BaseMapper<QcGroupMemberEntity> {
             "WHERE qcgm_id =  #{id}"
     })
     QcGroupMemberEntity selectMemberById(Integer id);
+
+    //检查成员是否重复
+
+    Boolean checkRepeat(@Param("parentId")Integer parentId,@Param("memberName")String memberName);
 }

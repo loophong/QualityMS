@@ -69,8 +69,6 @@ public class QcSubjectRegistrationController {
     @RequiresPermissions("qcSubject:registration:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = qcSubjectRegistrationService.queryPage(params);
-//        System.out.println("params++++++++++++++++++++++++++++++++++++: " + params);
-//        List<QcSubjectRegistrationEntity> result=qcSubjectRegistrationDao.fuzzyQueryList();
         return R.ok().put("page", page);
     }
 
@@ -93,16 +91,8 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/leadList")
     @RequiresPermissions("qcSubject:registration:list")
     public R myListLeader(@RequestParam Map<String, Object> params){
-
-        PageUtils page = qcSubjectRegistrationService.queryPage(params);
-        String userName= ShiroUtils.getUserEntity().getUsername();
-        List<QcSubjectRegistrationEntity> resultList = (List<QcSubjectRegistrationEntity>) page.getList();
-        // 过滤结果列表,查询只与当前角色相关的
-        List<QcSubjectRegistrationEntity> filteredResultList = resultList.stream()
-                .filter(entity -> entity.getTopicLeader().contains(userName))
-                .collect(Collectors.toList());
-        page.setList(filteredResultList);
-        page.setTotalCount(filteredResultList.size());
+        log.info("我开展："+(String) params.get("key"));
+        PageUtils page = qcSubjectRegistrationService.queryPageLead(params);
         return R.ok().put("page", page);
     }
 
@@ -113,18 +103,8 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/myList")
     @RequiresPermissions("qcSubject:registration:list")
     public R myList(@RequestParam Map<String, Object> params){
-        log.info("查询查询："+params);
-        PageUtils page = qcSubjectRegistrationService.queryPage(params);
-        String userName= ShiroUtils.getUserEntity().getUsername();
-//        String userName= "95";
-        List<QcSubjectRegistrationEntity> resultList = (List<QcSubjectRegistrationEntity>) page.getList();
-        // 过滤结果列表,查询只与当前角色相关的
-        List<QcSubjectRegistrationEntity> filteredResultList = resultList.stream()
-                .filter(entity -> entity.getTeamNumberIds().contains(userName)|| entity.getTopicConsultant().contains(userName))
-                .collect(Collectors.toList());
-//        log.info("过滤后的结果集合: " + filteredResultList);
-        page.setList(filteredResultList);
-        page.setTotalCount(filteredResultList.size());
+        log.info("我参与："+(String) params.get("key"));
+        PageUtils page = qcSubjectRegistrationService.queryPageAbout(params);
         return R.ok().put("page", page);
     }
     /**

@@ -21,10 +21,16 @@
         <el-input v-model="dataForm.topicConsultant" placeholder="课题顾问"></el-input>
       </el-form-item> -->
       <el-form-item label="课题顾问" prop="topicConsultant">
-        <el-select v-model="dataForm.topicConsultant" placeholder="请选择课题顾问">
-          <el-option v-for="item in consultantOptions" :key="item.value" :label="item.label" :value="item.value">
-          </el-option>
+        <el-select v-model="dataForm.topicConsultant" filterable placeholder="请选择课题顾问">
+          <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
+            <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
+            </el-option>
+          </el-option-group>
         </el-select>
+        <!-- <el-select v-model="dataForm.topicConsultant" filterable placeholder="请选择课题顾问">
+          <el-option v-for="item in membersOptions" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select> -->
       </el-form-item>
       <!-- <el-form-item label="小组成员" prop="teamNumberIds">
         <el-input v-model="dataForm.teamNumberIds" placeholder="小组成员"></el-input>
@@ -96,6 +102,7 @@ export default {
       groupMemberList: [],
       flag: 1,
       visible: false,
+      membersOptions: [],
       dataForm: {
         qcsrId: 0,
         topicName: '',
@@ -181,7 +188,7 @@ export default {
         // console.log(this.dataForm.topicConsultant)
         // console.log(this.dataForm.teamNumberIds)
         console.log(this.groupMemberList)
-        console.log(this.dataForm)
+        // console.log(this.dataForm)
         const matchedItem = Object.values(this.groupMemberList).find(item => {
           return item.groupName === this.dataForm.groupName;
         });
@@ -241,10 +248,11 @@ export default {
             }
             // data.userName
             console.log(this.groupMemberList)
-            if (this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList)) {
+            if ((this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList) && !this.isAuth('qcManagement:group:admin'))) {
               // 遍历对象
+              console.log('11')
               this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
-                if (this.groupMemberList[key].name == data.userName) {
+                if (this.groupMemberList[key].name == data.userName && this.groupMemberList[key].examineStatus === '通过') {
                   return {
                     value: this.groupMemberList[key].groupName,
                     label: this.groupMemberList[key].groupName
@@ -270,7 +278,30 @@ export default {
                 label: item.groupName
               }));
             } else {
-              console.error('this.groupMemberList is neither an array nor an object');
+              if (this.isAuth('qcManagement:group:admin')) {
+                // 遍历对象
+                this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
+                  if (this.groupMemberList[key].examineStatus === '通过') {
+                    return {
+                      value: this.groupMemberList[key].groupName,
+                      label: this.groupMemberList[key].groupName
+                    };
+                  }
+                });
+                const filteredGroupMemberList = Object.entries(this.groupMemberList).reduce((acc, [key, value]) => {
+                  acc[key] = value;
+                  return acc;
+                }, {});
+
+                // 更新 groupNameOptions
+                this.groupNameOptions = Object.keys(filteredGroupMemberList).map(key => ({
+                  value: filteredGroupMemberList[key].groupName,
+                  label: filteredGroupMemberList[key].groupName
+                }));
+              } else {
+                console.error('this.groupMemberList is neither an array nor an object');
+              }
+
             }
           })
         } else {
@@ -280,7 +311,7 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             if (data && data.code === 0) {
-              if (this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList)) {
+              if ((this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList) && !this.isAuth('qcManagement:group:admin'))) {
                 // 遍历对象
                 this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
                   if (this.groupMemberList[key].name == data.userName) {
@@ -309,7 +340,29 @@ export default {
                   label: item.groupName
                 }));
               } else {
-                console.error('this.groupMemberList is neither an array nor an object');
+                if (this.isAuth('qcManagement:group:admin')) {
+                  // 遍历对象
+                  this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
+                    if (this.groupMemberList[key].examineStatus == '通过') {
+                      return {
+                        value: this.groupMemberList[key].groupName,
+                        label: this.groupMemberList[key].groupName
+                      };
+                    }
+                  });
+                  const filteredGroupMemberList = Object.entries(this.groupMemberList).reduce((acc, [key, value]) => {
+                    acc[key] = value;
+                    return acc;
+                  }, {});
+
+                  // 更新 groupNameOptions
+                  this.groupNameOptions = Object.keys(filteredGroupMemberList).map(key => ({
+                    value: filteredGroupMemberList[key].groupName,
+                    label: filteredGroupMemberList[key].groupName
+                  }));
+                } else {
+                  console.error('this.groupMemberList is neither an array nor an object');
+                }
               }
             }
           })
@@ -320,9 +373,6 @@ export default {
 
     },
 
-    existName() {
-
-    },
     ifUpdate() {
       if (this.dataForm.qcsrId) {
         this.flag = 1;
@@ -372,7 +422,7 @@ export default {
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                if (data.exist) {
+                if (!this.dataForm.qcsrId && data.exist) {
                   this.$message.error('课题名称已存在!')
                   return
                 } else {
@@ -408,6 +458,8 @@ export default {
                         onClose: () => {
                           this.visible = false
                           this.$emit('refreshDataList')
+                          this.$emit('refreshLeadList')
+                          this.$emit('refreshJoinList')
                         }
                       })
                     } else {

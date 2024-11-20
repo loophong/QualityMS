@@ -1,9 +1,12 @@
 package io.renren.modules.taskmanagement.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.renren.common.utils.DateUtils;
+import io.renren.modules.taskmanagement.dto.TaskQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -97,6 +100,25 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
     }
 
     @Override
+    public PageUtils queryPageGetUnfinishedTasks(TaskQueryParamDTO taskQueryParamDTO, Long userId) {
+//        String executorIdLike = "\"" + userId + "\"";
+        TaskEntity task = new TaskEntity();
+        BeanUtils.copyProperties(taskQueryParamDTO.getTask(), task);
+        task.setTaskIsCompleted(0L);
+        Page<TaskEntity> page = new Page<>(taskQueryParamDTO.getPage(), taskQueryParamDTO.getLimit());
+        Page<TaskEntity> result = taskDao.queryPageByParams(page,task,userId);
+        return new PageUtils(result);
+
+//        PlanEntity plan = new PlanEntity();
+//        BeanUtils.copyProperties(planQueryParamDTO.getPlan(), plan);
+//        plan.setPlanCurrentState(TaskStatus.COMPLETED);
+//        Page<PlanEntity> page = new Page<>(planQueryParamDTO.getPage(), planQueryParamDTO.getLimit());
+//        Page<PlanEntity> result = planDao.queryPageByParams(page,plan);
+//        return new PageUtils(result);
+
+    }
+
+    @Override
     public PageUtils queryPageGetCompletedTasksList(Map<String, Object> params, Long userId) {
         // 模糊查询执行人ID,"userid"拼接双引号
         String executorIdLike = "\"" + userId + "\"";
@@ -114,6 +136,18 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
     }
 
     @Override
+    public PageUtils queryPageGetCompletedTasksList(TaskQueryParamDTO taskQueryParamDTO, Long userId) {
+//        String executorIdLike = "\"" + userId + "\"";
+        TaskEntity task = new TaskEntity();
+        BeanUtils.copyProperties(taskQueryParamDTO.getTask(), task);
+        task.setTaskIsCompleted(1L);
+        Page<TaskEntity> page = new Page<>(taskQueryParamDTO.getPage(), taskQueryParamDTO.getLimit());
+        Page<TaskEntity> result = taskDao.queryPageByParams(page,task,userId);
+        return new PageUtils(result);
+//        return null;
+    }
+
+    @Override
     public PageUtils queryPageSelectTasksByPlanId(Map<String, Object> params, String planId) {
         IPage<TaskEntity> page = this.page(
                 new Query<TaskEntity>().getPage(params),
@@ -124,7 +158,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
 
     @Override
     public List<Map<String, Integer>> home() {
-        int year = DateUtils.getZeroTime().getYear()+1900;
+        int year = DateUtils.getZeroTime().getYear() + 1900;
         log.info("year" + year);
 
         // 查询当年的任务数量,计划开始时间年份模糊匹配 year

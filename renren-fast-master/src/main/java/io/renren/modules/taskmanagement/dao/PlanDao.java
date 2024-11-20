@@ -1,5 +1,6 @@
 package io.renren.modules.taskmanagement.dao;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.renren.modules.taskmanagement.entity.PlanEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto;
@@ -25,4 +26,6 @@ public interface PlanDao extends BaseMapper<PlanEntity> {
     List<PlanEntity> getPlansByUserId(@Param("userId") String userId);
 
     List<PlanStatisticsLabelDto> getPlanLabel();
+
+    Page<PlanEntity> queryPageByParams(Page<PlanEntity> page, PlanEntity plan);
 }

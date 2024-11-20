@@ -121,7 +121,43 @@ const mainRoutes = {
       path: '/qcTools',
       component: _import('modules/QCmanagement/qcTools/system'),
       name: 'qcTools',
-      meta: { title: 'QC工具', isDynamic: true, isTab: false }
+      meta: { title: 'QC工具-系统图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/Scatter',
+      component: _import('modules/QCmanagement/qcTools/Scatter'),
+      name: 'Scatter',
+      meta: { title: 'QC工具-散点图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/histogram',
+      component: _import('modules/QCmanagement/qcTools/histogram'),
+      name: 'histogram',
+      meta: { title: 'QC工具-直方图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/control',
+      component: _import('modules/QCmanagement/qcTools/control'),
+      name: 'control',
+      meta: { title: 'QC工具-控制图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/fishBone',
+      component: _import('modules/QCmanagement/qcTools/fishBone'),
+      name: 'fishBone',
+      meta: { title: 'QC工具-鱼骨图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/lineAndBar',
+      component: _import('modules/QCmanagement/qcTools/lineAndBar'),
+      name: 'lineAndBar',
+      meta: { title: 'QC工具-折线图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/RelationGraph',
+      component: _import('modules/QCmanagement/qcTools/RelationGraph'),
+      name: 'RelationGraph',
+      meta: { title: 'QC工具-关联图', isDynamic: true, isTab: false }
     },
 
     //问题
@@ -138,7 +174,7 @@ const mainRoutes = {
       meta: { title: '任务详情', isDynamic: true, isTab: false }
     },
     {
-      path: '/issue-issuemask',
+      path: '/issue-issueflow',
       component: _import('modules/issuemask/issuemaskflow'),
       name: 'issue-issueflow',
       meta: { title: '任务流程', isDynamic: true, isTab: false }

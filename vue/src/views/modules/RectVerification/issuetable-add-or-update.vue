@@ -279,6 +279,11 @@
           inspectionDate: '',
           issueCategoryId: '',
           vehicleTypeId: '',
+          systematicClassification: '',
+          firstFaultyParts: '',
+          secondFaultyParts: '',
+          faultType: '',
+          faultModel: '',
           vehicleNumberId: '',
           issueDescription: '',
           vehicleTypeOptions: [],
@@ -572,6 +577,11 @@
                 this.dataForm.vehicleTypeIds = data.issueTable.vehicleTypeId ? data.issueTable.vehicleTypeId.split(',') : [] // 将逗号分隔的字符串转换为数组
                 this.dataForm.vehicleNumberId = data.issueTable.vehicleNumberId
                 this.dataForm.issueDescription = data.issueTable.issueDescription
+                this.dataForm.systematicClassification = data.issueTable.systematicClassification
+                this.dataForm.faultType = data.issueTable.faultType
+                this.dataForm.faultModel = data.issueTable.faultModel
+                this.dataForm.firstFaultyParts = data.issueTable.firstFaultyParts
+                this.dataForm.secondFaultyParts = data.issueTable.secondFaultyParts
                 this.dataForm.issuePhoto = data.issueTable.issuePhoto
                 this.dataForm.rectificationRequirement = data.issueTable.rectificationRequirement
                 this.dataForm.requiredCompletionTime = data.issueTable.requiredCompletionTime

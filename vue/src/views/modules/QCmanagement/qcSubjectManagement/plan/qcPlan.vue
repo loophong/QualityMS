@@ -80,7 +80,7 @@
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
-                @click="examineStatus(scope.row.qcsrId)">审核状态</el-button>
+                @click="examineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -170,7 +170,7 @@
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
-                @click="examineStatus(scope.row.qcsrId)">审核状态</el-button>
+                @click="examineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -258,7 +258,7 @@
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
-                @click="examineStatus(scope.row.qcsrId)">审核状态</el-button>
+                @click="examineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
             </template>
           </el-table-column>
         </el-table>

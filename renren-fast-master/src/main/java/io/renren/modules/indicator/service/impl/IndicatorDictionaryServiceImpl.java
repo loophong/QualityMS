@@ -6,6 +6,7 @@ import io.renren.modules.indicator.entity.IndicatorResponseByDepartmentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,9 @@ public class IndicatorDictionaryServiceImpl extends ServiceImpl<IndicatorDiction
                                 queryWrapper.lambda().like(IndicatorDictionaryEntity::getIndicatorClassification, value);
                                 break;
                             case "indicatorParentNode":
-                                queryWrapper.lambda().like(IndicatorDictionaryEntity::getIndicatorParentNode, value);
+                                // 获取该节点及其所有子节点
+                                List<String> allChildrenNodes = getAllChildrenNodes(value);
+                                queryWrapper.lambda().in(IndicatorDictionaryEntity::getIndicatorParentNode, allChildrenNodes);
                                 break;
                         }
                     }
@@ -69,6 +72,8 @@ public class IndicatorDictionaryServiceImpl extends ServiceImpl<IndicatorDiction
                 e.printStackTrace();
             }
         }
+
+        queryWrapper.orderByDesc("`indicator_creat_time`");
 
         IPage<IndicatorDictionaryEntity> page = this.page(
                 new Query<IndicatorDictionaryEntity>().getPage(params),
@@ -127,6 +132,22 @@ public class IndicatorDictionaryServiceImpl extends ServiceImpl<IndicatorDiction
                 .collect(Collectors.toList());
 
         return sortedList;
+    }
+
+    // 递归方法，获取某个节点及其所有子节点
+    private List<String> getAllChildrenNodes(String parentNodeName) {
+        List<String> allChildrenNodes = new ArrayList<>();
+        allChildrenNodes.add(parentNodeName); // 包括根节点本身
+
+        List<IndicatorDictionaryEntity> children = this.list(new QueryWrapper<IndicatorDictionaryEntity>()
+                .lambda()
+                .eq(IndicatorDictionaryEntity::getIndicatorParentNode, parentNodeName));
+
+        for (IndicatorDictionaryEntity child : children) {
+            allChildrenNodes.addAll(getAllChildrenNodes(child.getIndicatorName()));
+        }
+
+        return allChildrenNodes;
     }
 
 }

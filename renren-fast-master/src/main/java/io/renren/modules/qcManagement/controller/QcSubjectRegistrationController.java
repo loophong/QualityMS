@@ -53,7 +53,6 @@ public class QcSubjectRegistrationController {
         Integer countWithoutExamined = qcExamineStatusDao.countWithoutExamined();
         //已完成课题数
         Integer countExamined = qcExamineStatusDao.countExamined();
-
         Map<String, Object> result = new HashMap<>();
         result.put("countRegistration", countRegistration);
         result.put("countSubmitted", countSubmitted);
@@ -73,6 +72,16 @@ public class QcSubjectRegistrationController {
     }
 
     /**
+     * 大屏展示全部列表
+     */
+    @RequestMapping("/all")
+//    @RequiresPermissions("qcSubject:registration:list")
+    public R listAll(@RequestParam Map<String, Object> params){
+        PageUtils page = qcSubjectRegistrationService.queryPageAll(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
      * 统计各个活动状态课题数
      */
     @RequestMapping("/activityList")
@@ -82,7 +91,6 @@ public class QcSubjectRegistrationController {
 //        for(int i=0;i<10;i++){
 //            qcSubjectRegistrationDao.getActivity("1","创新型");
 //        }
-
         return R.ok().put("page", page);
     }
 

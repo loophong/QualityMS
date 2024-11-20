@@ -7,6 +7,30 @@
       <el-form-item>
         <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
       </el-form-item>
+       <!-- <el-form-item>
+        <el-input v-model="myQueryParam.startDate" placeholder="开始日期" clearable></el-input>
+      </el-form-item>
+            <el-form-item>
+        <el-input v-model="myQueryParam.endDate" placeholder="结束日期" clearable></el-input>
+      </el-form-item> -->
+      <el-form-item label="开始日期" prop="startDate">
+        <el-date-picker
+          v-model="myQueryParam.startDate"
+          type="date"
+          placeholder="选择日期"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
+      </el-form-item>
+        <el-form-item label="结束日期" prop="endDate">
+        <el-date-picker
+          v-model="myQueryParam.endDate"
+          type="date"
+          placeholder="选择日期"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
+      </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <!-- <el-button v-if="isAuth('qcSubject:plan:submit')" type="primary"
@@ -31,8 +55,8 @@
       </el-table-column>
       <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
       </el-table-column>
-      <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
-      </el-table-column> -->
+      <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+      </el-table-column>
       <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
       </el-table-column>
       <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
@@ -64,11 +88,26 @@
           <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
           <span v-else>--</span> <!-- 处理未知状态 -->
         </template>
-      </el-table-column>
-
       <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
       </el-table-column>
       <el-table-column prop="note" header-align="center" align="center" label="备注">
+      </el-table-column>
+      </el-table-column>
+      <el-table-column prop="qcTwoContent" header-align="center" align="center" label="成果认定审核意见" width="180">
+      </el-table-column>
+      <el-table-column prop="qcThreeContent" header-align="center" align="center" label="相关方审核意见" width="180">
+      </el-table-column>
+      <el-table-column prop="qcFourContent" header-align="center" align="center" label="成果初评审核意见" width="180">
+      </el-table-column>
+       <el-table-column prop="qcFirstScore" header-align="center" align="center" label="成果初评分数" width="120">
+      </el-table-column>
+       <el-table-column prop="qcSecondScore" header-align="center" align="center" label="成果复评分数" width="120">
+      </el-table-column>
+        <el-table-column prop="qcFiveContent" header-align="center" align="center" label="成果复评审核意见" width="180">
+      </el-table-column>
+         <el-table-column prop="qcSixContent" header-align="center" align="center" label="财务部审核意见" width="180">
+      </el-table-column>
+       <el-table-column prop="qcSevenContent" header-align="center" align="center" label="终评审核意见" width="180">
       </el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
@@ -108,6 +147,8 @@ export default {
       myQueryParam: {
         topicName: '',
         keywords: '',
+        startDate: '',
+        endDate: '',
       }
     }
   },
@@ -269,7 +310,9 @@ export default {
           'page': this.pageIndex,
           'limit': this.pageSize,
           'topicName': this.myQueryParam.topicName,
-          'keywords': this.myQueryParam.keywords
+          'keywords': this.myQueryParam.keywords,
+          'startDate': this.myQueryParam.startDate,
+          'endDate': this.myQueryParam.endDate,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -293,6 +336,7 @@ export default {
       this.pageIndex = val
       this.getDataList()
     },
+
     // 多选
     selectionChangeHandle(val) {
       this.dataListSelections = val

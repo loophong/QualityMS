@@ -63,6 +63,12 @@ const mainRoutes = {
     //   }
     // })
     {
+      path: '/my-tasks',
+      component: _import('modules/taskmanagement/task/my-tasks'),
+      name: 'task-list',
+      meta: { title: '我的任务', isDynamic: true, isTab: true },
+    },
+    {
       path: '/task-update-page',
       component: _import('modules/taskmanagement/task/task-update-page'),
       name: 'task-update-page',
@@ -192,6 +198,12 @@ const mainRoutes = {
       component: _import('modules/indicator/display/charts/indicatorchart'),
       name: 'indicatorchart',
       meta: { title: '指标详情', isTab: true }
+    },
+    {
+      path: '/indicator-keyControlIndicators-indicatorkeyindicators',
+      component: _import('modules/indicator/keyControlIndicators/indicatorkeyindicators'),
+      name: 'indicator-key-indicators',
+      meta: { title: '重点管控指标', isTab: true }
     },
     // {
     //   path: '/indicator-display-charts-indicatorchart/:indicatorName',

@@ -1,14 +1,14 @@
 <template>
   <div>
-    <!-- <div>
+    <div>
       <span>
         <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
-        <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
+        <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
       </span>
-    </div> -->
+    </div>
     <br />
     <div id="chart" ref="chart">
       <el-button @click="addNode">增加节点</el-button>
@@ -18,13 +18,13 @@
       <el-button @click="removeLink">删除链接</el-button>
       <el-button @click="modifyLink">修改链接</el-button>
       <el-button type="warning" @click="downloadAsImage">保存图片</el-button>
-      <!-- <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button> -->
-      <el-button type="success" @click="handleUp">更新当前数据</el-button>
+      <el-button type="success" @click="dialogFormVisible = true">保存当前数据</el-button>
+      <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
 
-      <el-dialog title="模版名" :visible.sync="dialogFormVisible">
+      <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
         <el-input
           v-model="inputName"
-          placeholder="请输入模版名"
+          placeholder="请输入图名"
           style="width: 50%"
         ></el-input>
         <div slot="footer" class="dialog-footer">
@@ -79,8 +79,8 @@ export default {
   },
   mounted() {
     this.getTemplateData();
-    // this.initSvg();
-    // this.renderGraph();
+    this.initSvg();
+    this.renderGraph();
   },
   methods: {
     handleUp() {
@@ -124,8 +124,8 @@ export default {
     //获取模版数据
     async getTemplateData() {
       await this.$http({
-        // url: this.$http.adornUrl("/qcTools/template/templateList"),
-        url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        url: this.$http.adornUrl("/qcTools/template/templateList"),
+        // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
         method: "get",
         params: this.$http.adornParams({
           conplanType: "关联图",
@@ -155,15 +155,15 @@ export default {
         }
       });
       //渲染数据
-      if (this.resultList.length != 0) {
-        this.resultList.forEach((item) => {
-          this.nodes = item.templateSeries;
-          this.links = item.templateAxis;
-        });
-      }
+      // if (this.resultList.length != 0) {
+      //   this.resultList.forEach((item) => {
+      //     this.nodes = item.templateSeries;
+      //     this.links = item.templateAxis;
+      //   });
+      // }
  
-      this.initSvg();
-      this.renderGraph();
+      // this.initSvg();
+      // this.renderGraph();
     },
     //处理下拉框选项变化
     handleSelectChange() {

@@ -18,7 +18,19 @@ import java.util.List;
 @Mapper
 public interface QcToolsConplanDao extends BaseMapper<QcToolsConplanEntity> {
 
+    // 根据TSP查询
     @Select("select * from qc_tools_conplan where conplan_type = #{conplanType} and conplan_subject = #{conplanSubject} and conplan_process = #{conplanProcess}")
     List<QcToolsConplanEntity> getDataByTSP(String conplanType, Integer conplanSubject, Integer conplanProcess);
 
+    // 根据SP查询
+    @Select("select * from qc_tools_conplan where conplan_subject = #{conplanSubject} and conplan_process = #{conplanProcess}")
+    List<QcToolsConplanEntity> getDataBySP(Integer conplanSubject, Integer conplanProcess);
+
+    // 根据S查询
+    @Select("select * from qc_tools_conplan where conplan_subject = #{conplanSubject} ")
+    List<QcToolsConplanEntity> getDataByS(Integer conplanSubject);
+
+    //根据Id查询
+    @Select("select * from qc_tools_conplan where conplan_id = #{conplanId}")
+    List<QcToolsConplanEntity> getDataById(Integer conplanId);
 }

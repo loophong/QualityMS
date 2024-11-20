@@ -74,7 +74,7 @@
             </el-input>
           </el-form-item>
 
-          <el-form-item label="上传附件" prop="planFile" required>
+          <el-form-item label="上传附件" prop="planFile">
             <el-upload ref="file" :file-list="planFileList" :action="uploadUrl"
                        :on-remove="handleRemove" :before-remove="beforeRemove" :on-change="uploadFile"
                        :auto-upload="false">
@@ -375,6 +375,9 @@ export default {
     // 初始化计划编号
     await this.getPlanId()
 
+    // 获取指标页面新建计划是传递的指标id
+    this.getIndicatorIdFromQuery();
+
   },
 
 
@@ -389,7 +392,8 @@ export default {
       formData.append('file', file.raw); // 将文件添加到 FormData
 
       this.$http({
-        url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        // url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        url: this.$http.adornUrl('/generator/issuetable/upload'), // 替换为实际上传接口
         method: 'post',
         data: formData,
         headers: {
@@ -773,7 +777,8 @@ export default {
       let pre;
       let nowDate = moment(new Date()).format('YYYYMMDD');
 
-      if (this.dataForm.planAssociatedIndicatorsId !== null) {
+      if (this.dataForm.planAssociatedIndicatorsId !== '') {
+        console.log("关联指标id" + this.dataForm.planAssociatedIndicatorsId)
         pre = "ZL" + '-' + "ZB" + '-';
       } else {
         pre = "ZL" + '-' + "RW" + '-';
@@ -805,7 +810,17 @@ export default {
 
     },
 
+    //获取指标页面新建计划时传递的id
+    getIndicatorIdFromQuery() {
+      const indicatorId = this.$route.query.indicatorId;
+      if (indicatorId) {
+        this.taskAssociatedIndicatorsId = indicatorId;
+      }
+    },
+
   },
+
+
 
 
   computed: {

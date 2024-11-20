@@ -25,10 +25,10 @@ public class QcGroupMemberServiceImpl extends ServiceImpl<QcGroupMemberDao, QcGr
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<QcGroupMemberEntity> page = this.page(
-                new Query<QcGroupMemberEntity>().getPage(params),
+                new Query<QcGroupMemberEntity>().getPage(params, "participation_date", false),
                 new QueryWrapper<QcGroupMemberEntity>()
         );
-//        log.info("记录长这样："+page.getRecords().toString());
+
         return new PageUtils(page);
     }
 

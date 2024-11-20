@@ -1,20 +1,33 @@
 <template>
   <div>
-    <!-- <div>
-      <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
-        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+    <div>
+      <el-select
+        v-model="value"
+        @change="handleSelectChange"
+        placeholder="请选择模版"
+      >
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        >
         </el-option>
       </el-select>
-      <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
-    </div> -->
+      <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
+    </div>
     <div class="button-container">
       <el-form>
         <el-form-item>
           <br />
           <el-button type="primary" @click="addEdge">新增分支节点</el-button>
-          <el-button type="success" @click="downloadAsImage">下载图片</el-button>
-          <!-- <el-button type="success" @click="dialogVisibleSave = true">保存为模版</el-button> -->
-          <el-button type="success" @click="handleUp">更新当前数据</el-button>
+          <el-button type="success" @click="downloadAsImage"
+            >下载图片</el-button
+          >
+          <el-button type="success" @click="dialogVisibleSave = true"
+            >保存当前数据</el-button
+          >
+          <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
         </el-form-item>
       </el-form>
     </div>
@@ -62,10 +75,14 @@
           <el-button type="primary" @click="addNode">确定</el-button>
         </div>
       </el-dialog>
-      <el-dialog title="模版名" :visible.sync="dialogVisibleSave">
+      <el-dialog
+        title="自定义图名"
+        :visible.sync="dialogVisibleSave"
+        append-to-body
+      >
         <el-input
           v-model="inputName"
-          placeholder="请输入模版名"
+          placeholder="请输入图名"
           style="width: 50%"
         ></el-input>
         <div slot="footer" class="dialog-footer">
@@ -131,8 +148,8 @@ export default {
   },
   mounted() {
     this.getTemplateData();
-    // this.initFishBone();
-    // this.getNodeNames(this.testFishData);
+    this.initFishBone();
+    this.getNodeNames(this.testFishData);
   },
   methods: {
     initFishBone() {
@@ -256,22 +273,23 @@ export default {
     },
     async getTemplateData() {
       await this.$http({
-        url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        url: this.$http.adornUrl("/qcTools/template/templateList"),
         method: "get",
         params: this.$http.adornParams({
-          conplanType: "鱼骨图",
-          conplanSubject: this.conplanSubject,
-          conplanProcess: this.conplanProcess,
+          templateType: "鱼骨图",
+          // conplanSubject: this.conplanSubject,
+          // conplanProcess: this.conplanProcess,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.resultList = data.resultList.map((row) => ({
-            templateId: row.conplanId,
-            templateName: row.conplanName,
-            templateType: row.conplanType,
-            templateText: row.conplanText,
-            templateSeries: JSON.parse(row.conplanSeries),
-            templateAxis: JSON.parse(row.conplanAxis),
+            templateId: row.templateId,
+            templateName: row.templateName,
+            templateType: row.templateType,
+            templateText: row.templateText,
+            templateSeries: JSON.parse(row.templateSeries),
+            templateAxis: JSON.parse(row.templateAxis),
           }));
           this.options = data.resultList.map((item) => ({
             value: item.templateId,
@@ -284,15 +302,15 @@ export default {
       });
 
       //查询到有用户暂存的数据,就使用该数据渲染echarts
-      if (this.resultList.length != 0) {
-        this.resultList.forEach((item) => {
-          this.testFishData = item.templateSeries;
-          this.name = item.templateName;
-        });
-      }
-      console.log("this.testFishData=====xht=====>", this.testFishData);
-      this.initFishBone();
-      this.getNodeNames(this.testFishData);
+      // if (this.resultList.length != 0) {
+      //   this.resultList.forEach((item) => {
+      //     this.testFishData = item.templateSeries;
+      //     this.name = item.templateName;
+      //   });
+      // }
+      // console.log("this.testFishData=====xht=====>", this.testFishData);
+      // this.initFishBone();
+      // this.getNodeNames(this.testFishData);
     },
     handleUp() {
       console.log(this.updatedSeries);

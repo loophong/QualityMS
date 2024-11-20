@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <span>
+    <span>
       <el-select
         v-model="value"
         @change="handleSelectChange"
@@ -14,8 +14,8 @@
         >
         </el-option>
       </el-select>
-      <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
-    </span> -->
+      <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
+    </span>
 
     <div id="main" ref="main"></div>
     <div class="editOne">
@@ -47,18 +47,18 @@
         <el-button type="primary" @click="initChart(tmpResultList)"
           >更新图表</el-button
         >
-        <!-- <el-button type="success" @click="dialogFormVisible = true"
-          >保存为模版</el-button
-        > -->
+        <el-button type="success" @click="dialogFormVisible = true"
+          >保存当前数据</el-button
+        >
 
-        <el-button type="success" @click="handleUp">更新当前数据</el-button>
+        <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
       </span>
     </div>
 
-    <el-dialog title="模版名" :visible.sync="dialogFormVisible">
+    <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
       <el-input
         v-model="inputName"
-        placeholder="请输入模版名"
+        placeholder="请输入图名"
         style="width: 50%"
       ></el-input>
       <div slot="footer" class="dialog-footer">
@@ -116,7 +116,7 @@ export default {
   mounted() {
     this.getTemplateData();
     this.myChart = echarts.init(this.$refs.main);
-    // this.initChart(this.tmpResultList);
+    this.initChart(this.tmpResultList);
   },
   methods: {
     //处理下拉框选择变化
@@ -133,23 +133,23 @@ export default {
     },
     async getTemplateData() {
       await this.$http({
-        // url: this.$http.adornUrl("/qcTools/template/templateList"),
-        url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        url: this.$http.adornUrl("/qcTools/template/templateList"),
+        // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
         method: "get",
         params: this.$http.adornParams({
           templateType: "控制图",
-          conplanSubject: this.conplanSubject,
-          conplanProcess: this.conplanProcess,
+          // conplanSubject: this.conplanSubject,
+          // conplanProcess: this.conplanProcess,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.resultList = data.resultList.map((row) => ({
-            templateId: row.conplanId,
-            templateName: row.conplanName,
-            templateType: row.conplanType,
-            templateText: row.conplanText,
-            templateSeries: JSON.parse(row.conplanSeries),
-            templateAxis: JSON.parse(row.conplanAxis),
+            templateId: row.templateId,
+            templateName: row.templateName,
+            templateType: row.templateType,
+            templateText: row.templateText,
+            templateSeries: JSON.parse(row.templateSeries),
+            templateAxis: JSON.parse(row.templateAxis),
           }));
           this.options = data.resultList.map((item) => ({
             value: item.templateId,
@@ -162,19 +162,18 @@ export default {
       });
 
       //查询到有用户暂存的数据,就使用该数据渲染echarts
-      if (this.resultList.length != 0) {
-        let tmpList = {};
-        this.resultList.forEach((item) => {
-          tmpList = item;
-          this.name = item.templateName;
-        });
-        console.log(tmpList);
-        this.initChart(tmpList);
-      } else {
-        //否则使用默认数据渲染echarts
-        this.initChart(this.tmpResultList);
-      }
-
+      // if (this.resultList.length != 0) {
+      //   let tmpList = {};
+      //   this.resultList.forEach((item) => {
+      //     tmpList = item;
+      //     this.name = item.templateName;
+      //   });
+      //   console.log(tmpList);
+      //   this.initChart(tmpList);
+      // } else {
+      //   //否则使用默认数据渲染echarts
+      //   this.initChart(this.tmpResultList);
+      // }
     },
     handleUp() {
       console.log(this.updatedSeries);

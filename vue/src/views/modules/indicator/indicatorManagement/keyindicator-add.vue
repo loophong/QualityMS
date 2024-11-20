@@ -39,15 +39,25 @@
           <el-option label="否" value="否"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="关键要素" prop="keyElements">
+        <el-select v-model="keyElementsList" multiple placeholder="请选择">
+          <el-option label="测" value="测"></el-option>
+          <el-option label="法" value="法"></el-option>
+          <el-option label="环" value="环"></el-option>
+          <el-option label="机" value="机"></el-option>
+          <el-option label="料" value="料"></el-option>
+          <el-option label="人" value="人"></el-option>
+        </el-select>
+      </el-form-item>
       <!--    <el-form-item label="关键要素" prop="keyElements">-->
       <!--      <el-input v-model="dataForm.keyElements" placeholder="关键要素"></el-input>-->
       <!--    </el-form-item>-->
-      <!--    <el-form-item label="潜在失效模式" prop="potentialFailureMode">-->
-      <!--      <el-input v-model="dataForm.potentialFailureMode" placeholder="潜在失效模式"></el-input>-->
-      <!--    </el-form-item>-->
-      <!--    <el-form-item label="潜在失效后果" prop="potentialFailureConsequences">-->
-      <!--      <el-input v-model="dataForm.potentialFailureConsequences" placeholder="潜在失效后果"></el-input>-->
-      <!--    </el-form-item>-->
+          <el-form-item label="潜在失效模式" prop="potentialFailureMode">
+            <el-input v-model="dataForm.potentialFailureMode" placeholder="潜在失效模式"></el-input>
+          </el-form-item>
+          <el-form-item label="潜在失效后果" prop="potentialFailureConsequences">
+            <el-input v-model="dataForm.potentialFailureConsequences" placeholder="潜在失效后果"></el-input>
+          </el-form-item>
       <el-form-item label="涉及产品" prop="involvedProduct">
         <el-input v-model="dataForm.involvedProduct" placeholder="涉及产品"></el-input>
       </el-form-item>
@@ -87,6 +97,7 @@
 export default {
   data () {
     return {
+      keyElementsList: [], // 关键要素列表
       indicatorDictionaryList: {},
       visible: false,
       dataForm: {
@@ -234,6 +245,8 @@ export default {
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          // 将数组转换成字符串
+          const keyElementsString =this.keyElementsList.join(',');
           this.$http({
             url: this.$http.adornUrl(`/indicator/indicatorkeyindicators/save`),
             method: 'post',
@@ -247,7 +260,7 @@ export default {
               'managementContent': this.dataForm.managementContent,
               'isManagementOutOfControl': this.dataForm.isManagementOutOfControl,
               'isNeedsControl': this.dataForm.isNeedsControl,
-              'keyElements': this.dataForm.keyElements,
+              'keyElements': keyElementsString,
               'potentialFailureMode': this.dataForm.potentialFailureMode,
               'potentialFailureConsequences': this.dataForm.potentialFailureConsequences,
               'involvedProduct': this.dataForm.involvedProduct,

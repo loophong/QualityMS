@@ -1,12 +1,12 @@
 <template>
   <div>
-    <!-- <span>
+    <span>
       <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
-      <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
-    </span> -->
+      <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
+    </span>
     <div class="container">
       <div ref="chart" style="width: 900px; height: 500px"></div>
       <div class="input-group">
@@ -25,15 +25,15 @@
         <el-button @click="removeData">删除数据</el-button>
         <el-button @click="modifyData">修改数据</el-button>
         <el-button @click="restoreData">恢复数据</el-button>
-        <!-- <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
-          -->
-        <el-button type="success" @click="handleUp">更新当前数据</el-button>
+        <el-button type="success" @click="dialogFormVisible = true">保存当前数据</el-button>
+         
+        <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
       </div>
     </div>
-    <el-dialog title="模版名" :visible.sync="dialogFormVisible">
+    <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
       <el-input
         v-model="inputName"
-        placeholder="请输入模版名"
+        placeholder="请输入图名"
         style="width: 50%"
       ></el-input>
       <div slot="footer" class="dialog-footer">
@@ -83,9 +83,9 @@ export default {
   },
   mounted() {
     this.getTemplateData();
-    // this.drawChart();
-    // this.updateStatistics(); // 计算初始统计数据
-    // this.updateChart(); // 更新图表以显示初始数据
+    this.drawChart();
+    this.updateStatistics(); // 计算初始统计数据
+    this.updateChart(); // 更新图表以显示初始数据
   },
   methods: {
     //处理下拉框选择变化
@@ -102,23 +102,23 @@ export default {
     },
     async getTemplateData() {
       await this.$http({
-        // url: this.$http.adornUrl("/qcTools/template/templateList"),
-        url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        url: this.$http.adornUrl("/qcTools/template/templateList"),
+        // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
         method: "get",
         params: this.$http.adornParams({
-          conplanType: "直方图",
-          conplanSubject: this.conplanSubject,
-          conplanProcess: this.conplanProcess,
+          templateType: "直方图",
+          // conplanSubject: this.conplanSubject,
+          // conplanProcess: this.conplanProcess,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.resultList = data.resultList.map((row) => ({
-            templateId: row.conplanId,
-            templateName: row.conplanName,
-            templateType: row.conplanType,
-            templateText: row.conplanText,
-            templateSeries: JSON.parse(row.conplanSeries),
-            templateAxis: JSON.parse(row.conplanAxis),
+            templateId: row.templateId,
+            templateName: row.templateName,
+            templateType: row.templateType,
+            templateText: row.templateText,
+            templateSeries: JSON.parse(row.templateSeries),
+            templateAxis: JSON.parse(row.templateAxis),
           }));
           this.options = data.resultList.map((item) => ({
             value: item.templateId,
@@ -129,20 +129,20 @@ export default {
           this.options = [];
         }
       });
-      //TODO 渲染数据
+      //渲染数据
       /**
        *     conplanSeries: JSON.stringify(this.data),
           conplanAxis: JSON.stringify(this.categories),
        */
-      if (this.resultList.length != 0) {
-        this.resultList.forEach((item) => {
-          this.data = item.templateSeries;
-          this.categories = item.templateAxis;
-        });
-      }
-      this.drawChart();
-      this.updateStatistics(); // 计算初始统计数据
-      this.updateChart(); // 更新图表以显示初始数据
+      // if (this.resultList.length != 0) {
+      //   this.resultList.forEach((item) => {
+      //     this.data = item.templateSeries;
+      //     this.categories = item.templateAxis;
+      //   });
+      // }
+      // this.drawChart();
+      // this.updateStatistics(); // 计算初始统计数据
+      // this.updateChart(); // 更新图表以显示初始数据
     },
     handleUp() {
       console.log(this.updatedSeries);

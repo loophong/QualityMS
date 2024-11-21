@@ -165,7 +165,7 @@
           <el-button type="text" size="small" @click="queryKeyControlHandle(scope.row.indicatorName)">查看重点管控措施</el-button>
           <el-button type="text" size="small" @click="addPlanHandle(scope.row.indicatorId)">新建计划</el-button>
           <el-button type="text" size="small" @click="queryPlanHandle(scope.row.indicatorId)">关联计划</el-button>
-          <el-button type="text" size="small" @click="queryTaskHandle(scope.row.indicatorName)">关联任务</el-button>
+          <el-button type="text" size="small" @click="queryTaskHandle(scope.row.indicatorId)">关联任务</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -389,7 +389,10 @@
       // 查看任务
       queryTaskHandle (id) {
         this.$router.push({
-          name: 'task-list'
+          name: 'task-list',
+          query: {
+            indicatorId: id
+          }
         });
       },
       //重点指标管控

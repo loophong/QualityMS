@@ -11,7 +11,7 @@
       </el-form-item>
     </el-form>
     <el-table
-      :data="dataList"
+      :data="filteredDataList"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -270,6 +270,7 @@
         dataForm: {
           key: ''
         },
+         props: ['id', 'toolNumber'], // 接收路由参数
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -282,6 +283,19 @@
     components: {
       AddOrUpdate
     },
+    computed: {
+  // 计算属性来过滤数据
+  filteredDataList() {
+    // 获取路由参数中的toolNumber
+    const toolNumber = this.$route.params.toolNumber;
+    // 如果toolNumber存在，则过滤数据列表
+    if (toolNumber) {
+      return this.dataList.filter(item => item.creatPeople === toolNumber);
+    }
+    // 如果toolNumber不存在，则返回原始数据列表
+    return this.dataList;
+  }
+},
     activated () {
       this.getDataList()
     },

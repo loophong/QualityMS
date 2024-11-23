@@ -93,6 +93,11 @@
             </if>
         </where>
     </select>
+    <select id="ifGroupLead" resultType="java.lang.Boolean">
+        SELECT EXISTS (
+            SELECT * FROM qc_group_members WHERE member_name = #{userName} AND role_in_topic = '组长'
+        )
+    </select>
 
     <!--    <select id="getMembersOfGroup" resultType="QcGroupMemberEntity">-->
 <!--        SELECT *-->

@@ -133,6 +133,50 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
         );
         return new PageUtils(page);
     }
+
+    @Override
+    public PageUtils queryPageFilter(Map<String, Object> params) {
+        QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
+
+        String key = (String) params.get("key");
+        if (key != null && !key.isEmpty()) {
+            try {
+                // 将 key 字符串解析为 Map
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> keyMap = objectMapper.readValue(key, Map.class);
+
+                // 遍历 Map 并添加查询条件
+                for (Map.Entry<String, String> entry : keyMap.entrySet()) {
+                    String field = entry.getKey();
+                    String value = entry.getValue();
+
+                    if (value != null && !value.isEmpty()) {
+                        switch (field) {
+                            case "topicName":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicName, value);
+                                break;
+                            case "keywords":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
+                                break;
+                            case "join":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTeamNumberIds, value);
+                                break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        queryWrapper.lambda()
+                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
+
+        IPage<QcSubjectRegistrationEntity> page = this.page(
+                new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
     @Override
     public PageUtils queryPageAbout(Map<String, Object> params) {
 
@@ -165,6 +209,53 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 e.printStackTrace();
             }
         }
+        String valueTwo = ShiroUtils.getUserEntity().getUsername();
+        queryWrapper.lambda()
+                .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
+                .or()
+                .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo);
+
+        IPage<QcSubjectRegistrationEntity> page = this.page(
+                new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryPageAboutFilter(Map<String, Object> params) {
+
+        QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
+
+        String key = (String) params.get("key");
+        if (key != null && !key.isEmpty()) {
+            try {
+                // 将 key 字符串解析为 Map
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> keyMap = objectMapper.readValue(key, Map.class);
+
+                // 遍历 Map 并添加查询条件
+                for (Map.Entry<String, String> entry : keyMap.entrySet()) {
+                    String field = entry.getKey();
+                    String value = entry.getValue();
+
+                    if (value != null && !value.isEmpty()) {
+                        switch (field) {
+                            case "topicName":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicName, value);
+                                break;
+                            case "keywords":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
+                                break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        queryWrapper.lambda()
+                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
         String valueTwo = ShiroUtils.getUserEntity().getUsername();
         queryWrapper.lambda()
                 .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
@@ -228,5 +319,49 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
         );
         return new PageUtils(page);
     }
+
+    @Override
+    public PageUtils queryPageLeadFilter(Map<String, Object> params) {
+        QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
+        String valueOne = ShiroUtils.getUserEntity().getUsername();
+
+        String key = (String) params.get("key");
+        if (key != null && !key.isEmpty()) {
+            try {
+                // 将 key 字符串解析为 Map
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> keyMap = objectMapper.readValue(key, Map.class);
+
+                // 遍历 Map 并添加查询条件
+                for (Map.Entry<String, String> entry : keyMap.entrySet()) {
+                    String field = entry.getKey();
+                    String value = entry.getValue();
+                    if (value != null && !value.isEmpty()) {
+                        switch (field) {
+                            case "topicName":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicName, value);
+                                break;
+                            case "keywords":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
+                                break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        queryWrapper.lambda()
+                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
+        queryWrapper.lambda()
+                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
+
+        IPage<QcSubjectRegistrationEntity> page = this.page(
+                new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
+
 
 }

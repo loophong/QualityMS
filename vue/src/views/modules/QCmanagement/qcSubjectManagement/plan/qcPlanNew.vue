@@ -2,9 +2,9 @@
   <div class="container">
     <div v-if="this.routerParam">
       <ul>
-        <li v-for="item in this.routerParam" :key="item.qcsrId">
-          {{ item.topicName }}
-          {{ item.topicType }}
+        <li>
+          {{ this.routerParam.topicName }}
+          {{ this.routerParam.topicType }}
         </li>
         <!-- <el-button type="danger" @click="toIssue()" style="justify-content: flex-end;">问题添加</el-button> -->
       </ul>
@@ -2745,7 +2745,7 @@ export default {
         params: this.$http.adornParams({
           page: 1,
           limit: 100,
-          key: this.routerParam[0].qcsrId,
+          key: this.routerParam.qcsrId,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -2764,32 +2764,31 @@ export default {
     },
 
     initRouterParam() {
-      const res = this.$route.query.data
-        ? JSON.parse(this.$route.query.data)
-        : {
-          qcsrId: "",
-          topicName: "",
-          teamNumberIds: "",
-          topicLeader: "",
-          topicType: "",
-        };
+      const res = this.$route.query.data ? JSON.parse(this.$route.query.data) : {
+        qcsrId: "",
+        topicName: "",
+        teamNumberIds: "",
+        topicLeader: "",
+        topicType: "",
+      };
+      console.log(this.$route.query.data)
       this.routerParam = res;
 
       //==================2024.11.11新增调整================================
-      // console.log("this.routerParam===xht==>"+ this.routerParam[0].qcsrId);
+      // console.log("this.routerParam===xht==>"+ this.routerParam.qcsrId);
       //在init的时候 将qcsrId赋值传递
-      this.conplanSubject = this.routerParam[0].qcsrId;
+      this.conplanSubject = this.routerParam.qcsrId;
       // console.log("this.routerParam===xht==>"+this.routerParam);
       // console.log("this.this.active1 ===xht==>"+this.active1);
       this.conplanProcess = this.active1;
       //==================2024.11.11新增调整================================
 
-      const tmp = this.routerParam[0].teamNumberIds.split(",");
+      const tmp = this.routerParam.teamNumberIds.split(",");
       this.participantOptions = tmp.map((id) => ({
         value: id.trim(),
         label: id.trim(),
       }));
-      this.value = this.routerParam[0].topicType;
+      this.value = this.routerParam.topicType;
     },
     chart(id) {
       this.addOrUpdateVisible = true;
@@ -2799,13 +2798,13 @@ export default {
     },
     handleClickToStep(id) {
       console.log(this.routerParam);
-      if (this.routerParam[0].topicType == "问题解决型") {
+      if (this.routerParam.topicType == "问题解决型") {
         this.active1 = id;
         this.findMatchingItem(this.active1);
-      } else if (this.routerParam[0].topicType == "问题解决型(指令型)") {
+      } else if (this.routerParam.topicType == "问题解决型(指令型)") {
         this.active2 = id;
         this.findMatchingItem(this.active2);
-      } else if (this.routerParam[0].topicType == "创新型") {
+      } else if (this.routerParam.topicType == "创新型") {
         this.active3 = id;
         this.findMatchingItem(this.active3);
       }
@@ -3138,8 +3137,8 @@ export default {
         method: "post",
         data: this.$http.adornData({
           stepId: this.form.stepId || undefined,
-          stepSubjectId: this.routerParam[0].qcsrId,
-          stepType: this.routerParam[0].topicType,
+          stepSubjectId: this.routerParam.qcsrId,
+          stepType: this.routerParam.topicType,
           stepProcess: id,
           stageName: this.form.stageName ? this.form.stageName : "",
           stagePlanStart: this.form.planDate[0],
@@ -3167,12 +3166,12 @@ export default {
                 this.visible = false;
               },
             });
-            if (this.routerParam[0].qcsrId) {
+            if (this.routerParam.qcsrId) {
               this.$http({
                 url: this.$http.adornUrl(`/qcSubject/registration/update`),
                 method: "post",
                 data: this.$http.adornData({
-                  qcsrId: this.routerParam[0].qcsrId,
+                  qcsrId: this.routerParam.qcsrId,
                   topicReviewStatus: 3,
                   topicActivityStatus: id,
                 }),

@@ -562,13 +562,15 @@ export default {
       // 当前任务查询
       currentTaskQuery: {
         taskId: '',
-        taskName: ''
+        taskName: '',
+        taskAssociatedIndicatorsId: ''
       },
 
       // 历史任务查询
       historyTaskQuery: {
         taskId: '',
-        taskName: ''
+        taskName: '',
+        taskAssociatedIndicatorsId: ''
       }
 
 
@@ -578,6 +580,8 @@ export default {
     AddOrUpdate
   },
   activated() {
+    //指标管理页面传递的指标id
+    this.queryFromIndicator();
     // this.getDataList();
     this.getUnfinishedTasksList();
     this.getCompletedTasksList();
@@ -1001,7 +1005,7 @@ export default {
         }
       })
 
-    }
+    },
     // updatePlanPage(planId) {
     //   // 使用Vue Router进行页面跳转
     //   this.$router.push({
@@ -1009,6 +1013,14 @@ export default {
     //     query: { planId } // 如果需要，可以通过query传递参数
     //   });
     // },
+
+    //指标管理页面传递的指标id
+    queryFromIndicator() {
+      const indicatorId = this.$route.query.indicatorId;
+      if (indicatorId) {
+        this.currentTaskQuery.taskAssociatedIndicatorsId = indicatorId;
+      }
+    }
 
   }
 

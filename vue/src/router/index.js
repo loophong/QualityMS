@@ -50,6 +50,12 @@ const mainRoutes = {
       meta: { title: '工作计划', isDynamic: true, isTab: true }
     },
     // {
+    //   path: 'publicmanagement/instrumenttestmethod',
+    //   component: _import('modules/publicmanagement/instrumenttestmethod.vue'),
+    //   name: 'publicmanagement/instrumenttestmethod',
+    //   meta: { title: '检验方法', isDynamic: true, isTab: true }
+    // },
+    // {
     //   path: '/plan-update-page',
     //   component: _import('modules/taskmanagement/plan/plan-detail-page'),
     //   name: 'plan-update-page',
@@ -160,6 +166,20 @@ const mainRoutes = {
       meta: { title: 'QC工具-关联图', isDynamic: true, isTab: false }
     },
 
+    {
+      path: '/issue-issuetable',
+      component: _import('modules/issueRectification/Rectificationissue'),
+      name: 'issue-issueRectification',
+      meta: { title: '任务详情', isDynamic: true, isTab: true }
+    },
+
+  //仪器仪表
+  {
+    path: '/instrument-testmethod',
+    component: _import('modules/publicmanagement/instrumenttestmethod'),
+    name: 'instrument-testmethod',
+    meta: { title: '关联检验方法', isDynamic: true, isTab: true }
+  },
     //问题
     {
       path: '/issue-issuetable',

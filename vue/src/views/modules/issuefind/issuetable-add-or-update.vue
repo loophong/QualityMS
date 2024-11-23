@@ -1312,7 +1312,12 @@ export default {
                 method: 'post',
                 data: this.$http.adornData({
                   issueId: this.dataForm.issueId,
-                  issueCategoryId: this.dataForm.issueCategoryId
+                  issueCategoryId: this.dataForm.issueCategoryId,
+                  systematicClassification: this.selectedSystematic,
+                  firstFaultyParts: this.selectedFirstFaultyParts,
+                  secondFaultyParts: this.selectedSecondFaultyParts,
+                  faultType: this.selectedFaultType,
+                  faultModel: this.selectedFaultModel
                 })
               });
             })

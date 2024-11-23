@@ -47,7 +47,7 @@ public class IssueFaultTableServiceImpl extends ServiceImpl<IssueFaultTableDao, 
             Sheet sheet = workbook.getSheetAt(2); // 读取第三个sheet
             List<IssueFaultTableEntity> issueList = new ArrayList<>();
 
-            // 用于存储上一次的字段值
+            // 上一次的字段值，用于继承
             String systematicClassification = null;
             String firstFaultyParts = null;
             String secondFaultyParts = null;
@@ -68,62 +68,44 @@ public class IssueFaultTableServiceImpl extends ServiceImpl<IssueFaultTableDao, 
                     continue;
                 }
 
-                // 创建实体对象
-                IssueFaultTableEntity issue = new IssueFaultTableEntity();
-
-                // 获取每一列的值
+                // 获取当前行每一列的值
                 String currentSystematicClassification = getCellValueAsString(row.getCell(0));
                 String currentFirstFaultyParts = getCellValueAsString(row.getCell(1));
                 String currentSecondFaultyParts = getCellValueAsString(row.getCell(2));
                 String currentFaultType = getCellValueAsString(row.getCell(3));
                 String currentFaultModel = getCellValueAsString(row.getCell(4));
 
-                // 判断是否有新值，若前四个字段有新值，则强制后面的字段为空值
+                // 判断是否有新值（第一个字段）
                 boolean hasNewValue = false;
 
                 if (currentSystematicClassification != null && !currentSystematicClassification.isEmpty()) {
                     systematicClassification = currentSystematicClassification;
                     hasNewValue = true;
                 }
-                if (currentFirstFaultyParts != null && !currentFirstFaultyParts.isEmpty()) {
-                    firstFaultyParts = currentFirstFaultyParts;
-                    hasNewValue = true;
-                }
-                if (currentSecondFaultyParts != null && !currentSecondFaultyParts.isEmpty()) {
-                    secondFaultyParts = currentSecondFaultyParts;
-                    hasNewValue = true;
-                }
-                if (currentFaultType != null && !currentFaultType.isEmpty()) {
-                    faultType = currentFaultType;
-                    hasNewValue = true;
-                }
 
-                // 如果有新值，则后续字段为空时强制置为空
+                // 如果发现新值，继承前面字段，清空后面字段
                 if (hasNewValue) {
+                    firstFaultyParts = (currentFirstFaultyParts != null && !currentFirstFaultyParts.isEmpty()) ? currentFirstFaultyParts : null;
                     secondFaultyParts = (currentSecondFaultyParts != null && !currentSecondFaultyParts.isEmpty()) ? currentSecondFaultyParts : null;
                     faultType = (currentFaultType != null && !currentFaultType.isEmpty()) ? currentFaultType : null;
                     faultModel = (currentFaultModel != null && !currentFaultModel.isEmpty()) ? currentFaultModel : null;
                 } else {
-                    // 逐字段检查是否更新
-                    if (currentSecondFaultyParts != null && !currentSecondFaultyParts.isEmpty()) {
-                        secondFaultyParts = currentSecondFaultyParts;
-                    }
-                    if (currentFaultType != null && !currentFaultType.isEmpty()) {
-                        faultType = currentFaultType;
-                    }
-                    if (currentFaultModel != null && !currentFaultModel.isEmpty()) {
-                        faultModel = currentFaultModel;
-                    }
+                    // 逐个字段检查是否有值，无值则继承上一行
+                    firstFaultyParts = (currentFirstFaultyParts != null && !currentFirstFaultyParts.isEmpty()) ? currentFirstFaultyParts : firstFaultyParts;
+                    secondFaultyParts = (currentSecondFaultyParts != null && !currentSecondFaultyParts.isEmpty()) ? currentSecondFaultyParts : secondFaultyParts;
+                    faultType = (currentFaultType != null && !currentFaultType.isEmpty()) ? currentFaultType : faultType;
+                    faultModel = (currentFaultModel != null && !currentFaultModel.isEmpty()) ? currentFaultModel : faultModel;
                 }
 
-                // 设置实体属性
+                // 创建实体对象并设置字段
+                IssueFaultTableEntity issue = new IssueFaultTableEntity();
                 issue.setSystematicClassification(systematicClassification);
                 issue.setFirstFaultyParts(firstFaultyParts);
                 issue.setSecondFaultyParts(secondFaultyParts);
                 issue.setFaultType(faultType);
                 issue.setFaultModel(faultModel);
 
-                // 添加到列表中
+                // 添加到列表
                 issueList.add(issue);
             }
 
@@ -138,6 +120,9 @@ public class IssueFaultTableServiceImpl extends ServiceImpl<IssueFaultTableDao, 
             return R.error("上传失败，发生异常：" + e.getMessage());
         }
     }
+
+
+
 
     // 工具方法：获取单元格值为字符串
     private String getCellValueAsString(Cell cell) {

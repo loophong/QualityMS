@@ -686,7 +686,10 @@ export default {
       this.queryParamsFinished.planId = ''
       this.queryParamsFinished.planName = ''
       this.getFinishedPlanList()
-    }
+    },
+
+
+
 
   }
 }

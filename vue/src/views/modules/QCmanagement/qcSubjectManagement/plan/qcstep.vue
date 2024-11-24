@@ -69,7 +69,7 @@ import JSZip from 'pizzip'
 import Docxtemplater from 'docxtemplater'
 import AddOrUpdate from './qcstep-add-or-update'
 import 'jspdf-autotable';
-
+import { saveAs } from 'file-saver'
 
 export default {
   data() {
@@ -116,6 +116,7 @@ export default {
   mounted() {
 
   },
+
   methods: {
     handleSelectChange() {
       this.name = this.options.find(item => item.value === this.which).label
@@ -227,6 +228,9 @@ export default {
       this.getDataList()
     },
 
+
+
+
     // 新增 / 修改
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
@@ -234,11 +238,47 @@ export default {
         this.$refs.addOrUpdate.init(id)
       })
     },
-    wordExport(form, table) {
+    async wordExport(form, table) {
+      var ImageModule = require('docxtemplater-image-module-free');
+      var expressions = require('angular-expressions')
+      var assign = require('lodash/assign')
+      var last = require("lodash/last")
+      expressions.filters.lower = function (input) {
+        // This condition should be used to make sure that if your input is
+        // undefined, your output will be undefined as well and will not
+        // throw an error
+        if (!input) return input
+        // toLowerCase() 方法用于把字符串转换为小写。
+        return input.toLowerCase()
+      }
+      function angularParser(tag) {
+        tag = tag
+          .replace(/^\.$/, 'this')
+          .replace(/(’|‘)/g, "'")
+          .replace(/(“|”)/g, '"')
+        const expr = expressions.compile(tag)
+        return {
+          get: function (scope, context) {
+            let obj = {}
+            const index = last(context.scopePathItem)
+            const scopeList = context.scopeList
+            const num = context.num
+            for (let i = 0, len = num + 1; i < len; i++) {
+              obj = assign(obj, scopeList[i])
+            }
+            //word模板中使用 $index+1 创建递增序号
+            obj = assign(obj, { $index: index })
+            return expr(scope, obj)
+          }
+        }
+      }
       this.form2.topicType = this.dataList[0].stepType
       this.form2.topicName = this.name
       form = this.form2
       table = this.dataList
+      table.forEach(e => {
+        e.stageImages = []
+      })
       table.forEach(item => {
         // item.stagePeople = JSON.parse(item.stagePeople)
         if (item.stepProcess == 1) {
@@ -298,17 +338,116 @@ export default {
           item.titleName = '总结和下一步打算'
         }
       })
-      console.log(table)
+      function angularParser(tag) {
+        tag = tag
+          .replace(/^\.$/, 'this')
+          .replace(/(’|‘)/g, "'")
+          .replace(/(“|”)/g, '"')
+        const expr = expressions.compile(tag)
+        return {
+          get: function (scope, context) {
+            let obj = {}
+            const index = last(context.scopePathItem)
+            const scopeList = context.scopeList
+            const num = context.num
+            for (let i = 0, len = num + 1; i < len; i++) {
+              obj = assign(obj, scopeList[i])
+            }
+            //word模板中使用 $index+1 创建递增序号
+            obj = assign(obj, { $index: index })
+            return expr(scope, obj)
+          }
+        }
+      }
+      await this.$http({
+        url: this.$http.adornUrl(`/qcTools/conplan/SList`),
+        method: "get",
+        params: this.$http.adornParams({
+          'conplanSubject': this.which,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          table.forEach(t => {
+            data.resultList.forEach(r => {
+              if (t.stepProcess == r.conplanProcess) {
+                r.conplanUrl = JSON.parse(r.conplanUrl)
+                let tmp = {
+                  url: '',
+                  caption: ''
+                }
+                if (r.conplanUrl != '' && r.conplanUrl != null) {
+                  tmp.url = r.conplanUrl
+                }
+
+                tmp.caption = r.conplanName
+                t.stageImages.push(tmp)
+              }
+            })
+          })
+        } else {
+        }
+      });
+      function base64DataURLToArrayBuffer(dataURL) {
+        const base64Regex = /^data:image\/(png|jpg|svg|svg\+xml);base64,/;
+        if (!base64Regex.test(dataURL)) {
+          return false;
+        }
+        const stringBase64 = dataURL.replace(base64Regex, "");
+        let binaryString;
+        if (typeof window !== "undefined") {
+          binaryString = window.atob(stringBase64);
+        } else {
+          binaryString = new Buffer(stringBase64, "base64").toString("binary");
+        }
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          const ascii = binaryString.charCodeAt(i);
+          bytes[i] = ascii;
+        }
+        return bytes.buffer;
+      }
       // const _this = this
       JSZipUtils.getBinaryContent('/static/test.docx', function (error, content) {
         // 抛出异常
         if (error) {
           throw error
         }
+        expressions.filters.size = function (input, width, height) {
+          return {
+            data: input,
+            size: [width, height],
+          };
+        };
+        console.log(table)
+        // console.log(table[0].stageImages[1].url)
+        // console.log(table[0].stageImages)
+        let opts = {}
+
+        opts = {
+          //图像是否居中
+          centered: true
+        };
+
+        opts.getImage = (tag) => {
+          return base64DataURLToArrayBuffer(tag);
+        };
+        opts.getSize = function (img, tagValue, tagName) {
+          //自定义指定图像大小
+          if (tagName == 'signature') {
+            return [80, 40];
+          } else {
+            return [200, 200];
+          }
+        }
+
         // 创建一个JSZip实例，内容为模板的内容
         let zip = new JSZip(content)
         // 创建并加载docxtemplater实例对象
-        let doc = new Docxtemplater().loadZip(zip)
+        let doc = new Docxtemplater()
+        doc.attachModule(new ImageModule(opts));
+        doc.loadZip(zip)
+        doc.setOptions({ parser: angularParser });
         // 设置模板变量的值
         doc.setData({
           ...form,
@@ -318,17 +457,24 @@ export default {
           // 用模板变量的值替换所有模板变量
           doc.render()
         } catch (error) {
-          this.$message.error('导出word失败')
+          const e = {
+            message: error.message,
+            name: error.name,
+            stack: error.stack,
+            properties: error.properties
+
+          }
+          console.log('err', { error: e })
+          // 当使用json记录时，此处抛出错误信息
           throw error
+
         }
 
-        // 生成一个代表docxtemplater对象的zip文件（不是一个真实的文件，而是在内存中的表示）
         let out = doc.getZip().generate({
           type: 'blob',
           mimeType:
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         })
-        // 将目标文件对象保存为目标类型的文件，并命名
         saveAs(out, form.tableTitle + '.docx')
       })
     },
@@ -362,7 +508,10 @@ export default {
           }
         })
       })
-    }
-  }
+    },
+
+
+
+  },
 }
 </script>

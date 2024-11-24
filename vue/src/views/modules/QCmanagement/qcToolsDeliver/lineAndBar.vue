@@ -165,7 +165,15 @@ export default {
       }));
       console.log(filteredData);
 
-
+      let img = new Image()
+      img.src = this.myChart.getDataURL(
+        {
+          type: 'png',
+          // pixelRatio: 1,
+          // backgroundColor: '#fff',
+          excludeComponents: ['toolbox']
+        }
+      )
 
       this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/update`),
@@ -179,6 +187,7 @@ export default {
           conplanAxis: JSON.stringify(tmp),
           conplanSubject: this.resultList[0].conplanSubject,
           conplanProcess: this.resultList[0].conplanProcess,
+          conplanUrl: JSON.stringify(img.src),
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {

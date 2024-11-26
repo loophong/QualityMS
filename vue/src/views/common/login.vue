@@ -157,7 +157,7 @@ export default {
   .brand-info {
     margin: 220px 100px 0 90px;
     color: #fff;
-    margin-top: -50px;
+    margin-top: 70px;
     /* 调整这个值来上下移动 */
   }
 
@@ -166,6 +166,7 @@ export default {
     font-size: 31px;
     font-weight: 400;
     text-transform: uppercase;
+    color: #e8f0fe
   }
 
   .brand-info__intro {

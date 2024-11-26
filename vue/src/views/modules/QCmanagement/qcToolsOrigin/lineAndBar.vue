@@ -24,7 +24,7 @@
       <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
     </span>
 
-    
+
     <el-dialog title="模版名" :visible.sync="dialogFormVisible" append-to-body>
       <el-input v-model="inputName" placeholder="请输入模版名" style="width:50%"></el-input>
       <div slot="footer" class="dialog-footer">
@@ -32,7 +32,7 @@
         <el-button type="primary" @click="handleUp">确 定</el-button>
       </div>
     </el-dialog>
-    
+
   </div>
 
 </template>
@@ -531,7 +531,8 @@ export default {
           //   }
           // }
         ],
-        series: seriesData
+        series: seriesData,
+        animation: false,
       };
       this.option && this.myChart.setOption(this.option);
       // console.log(this.option)

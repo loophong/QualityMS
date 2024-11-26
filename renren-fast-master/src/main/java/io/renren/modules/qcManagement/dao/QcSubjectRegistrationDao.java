@@ -59,6 +59,9 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
 
     boolean ifExistSubjectName(String name);
 
+    //查询当前用户是否是组长
+    boolean ifGroupLead(String userName);
+
 
     //计算课题活动状态
 //    @Select({

@@ -33,7 +33,6 @@
           <el-form-item v-if="!isAdmin" label="组内角色" prop="roleInTopic">
             <el-select v-model="dataForm.roleInTopic" placeholder="请选择组内角色">
               <el-option label="成员" value="成员"></el-option>
-              <el-option label="组长" value="组长"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item prop="participationDate" label="创建QC小组时间">

@@ -9,8 +9,8 @@
     </div>
     <div ref="treeChart" style="width: 100%; height: 500px;"></div>
     <el-dialog title="科室审核" :visible.sync="showDialog1">
-      <el-form :model="form1">
-        <el-form-item label="审核结果" :label-width="formLabelWidth">
+      <el-form :model="form1" :rules="rule">
+        <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
           <el-select v-model="form1.result" placeholder=""
             :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B'">
             <el-option label="通过" value="1"></el-option>
@@ -18,17 +18,19 @@
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
-          <el-input type="textarea" v-model="form1.comment" autocomplete="off"></el-input>
+          <el-input type="textarea" v-model="form1.comment" autocomplete="off"
+            :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B'"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog1 = false">取 消</el-button>
-        <el-button type="primary" @click="dataFormSubmitEx(form1.id)">确 定</el-button>
+        <el-button type="primary" @click="dataFormSubmitEx(form1.id)"
+          :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B'">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog title="成果认定" :visible.sync="showDialog2">
-      <el-form :model="form2">
-        <el-form-item label="审核结果" :label-width="formLabelWidth">
+      <el-form :rules="rule" :model="form2">
+        <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
           <el-select v-model="form2.result" placeholder=""
             :disabled="!isAuth('qcExamine:Achievement:recognition') || dataList[0].status != 'B'">
             <el-option label="通过" value="1"></el-option>
@@ -42,12 +44,13 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog2 = false">取 消</el-button>
-        <el-button type="primary" @click="dataFormSubmitEx(form2.id)">确 定</el-button>
+        <el-button type="primary" @click="dataFormSubmitEx(form2.id)"
+          :disabled="!isAuth('qcExamine:Achievement:recognition') || dataList[0].status != 'B'">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog title="相关方审核" :visible.sync="showDialog3">
-      <el-form :model="form3">
-        <el-form-item label="审核结果" :label-width="formLabelWidth">
+      <el-form :rules="rule" :model="form3">
+        <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
           <el-select v-model="form3.result" placeholder="" :disabled="dataList[1].status != 'B' || !ifSelected">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
@@ -60,11 +63,12 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog3 = false">取 消</el-button>
-        <el-button type="primary" @click="dataFormSubmitEx(form3.id)">确 定</el-button>
+        <el-button type="primary" @click="dataFormSubmitEx(form3.id)"
+          :disabled="dataList[1].status != 'B' || !ifSelected">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog title="成果初评" :visible.sync="showDialog4" width="60%">
-      <el-form :model="form4">
+      <el-form :rules="rule" :model="form4">
         <table width="100%">
           <thead>
             <tr>
@@ -165,7 +169,7 @@
             <el-option label="D" value="D"></el-option>
           </el-select>
         </el-form-item> -->
-        <el-form-item label="审核结果" :label-width="formLabelWidth">
+        <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
           <el-select v-model="form4.result" placeholder=""
             :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">
             <el-option label="通过" value="1"></el-option>
@@ -179,7 +183,8 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog4 = false">取 消</el-button>
-        <el-button type="primary" @click="dataFormSubmitEx(form4.id)">确 定</el-button>
+        <el-button type="primary" @click="dataFormSubmitEx(form4.id)"
+          :disabled="!isAuth('qcExamine:first:comment') || dataList[2].status != 'B'">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog title="成果复评" :visible.sync="showDialog5" width="60%">
@@ -266,7 +271,7 @@
         </tbody>
       </table>
       <br>
-      <el-form :model="form5">
+      <el-form :rules="rule" :model="form5">
         <!-- <el-form-item label="复评等级" :label-width="formLabelWidth">
           <el-select v-model="form5.level" placeholder=""
             :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
@@ -276,7 +281,7 @@
             <el-option label="D" value="D"></el-option>
           </el-select>
         </el-form-item> -->
-        <el-form-item label="审核结果" :label-width="formLabelWidth">
+        <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
           <el-select v-model="form5.result" placeholder=""
             :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">
             <el-option label="通过" value="1"></el-option>
@@ -290,13 +295,14 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog5 = false">取 消</el-button>
-        <el-button type="primary" @click="dataFormSubmitEx(form5.id)">确 定</el-button>
+        <el-button type="primary" @click="dataFormSubmitEx(form5.id)"
+          :disabled="!isAuth('qcExamine:second:comment') || dataList[3].status != 'B'">确 定</el-button>
       </div>
 
     </el-dialog>
     <el-dialog title="财务部审核" :visible.sync="showDialog6">
-      <el-form :model="form6">
-        <el-form-item label="审核结果" :label-width="formLabelWidth">
+      <el-form :rules="rule" :model="form6">
+        <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
           <el-select v-model="form6.result" placeholder=""
             :disabled="!isAuth('qcExamine:finance:department') || dataList[4].status != 'B'">
             <el-option label="通过" value="1"></el-option>
@@ -310,14 +316,15 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog6 = false">取 消</el-button>
-        <el-button type="primary" @click="dataFormSubmitEx(form6.id)">确 定</el-button>
+        <el-button type="primary" @click="dataFormSubmitEx(form6.id)"
+          :disabled="!isAuth('qcExamine:finance:department') || dataList[4].status != 'B'">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog title="终评提交" :visible.sync="showDialog7">
       <final-score-table />
       <br>
-      <el-form :model="form7">
-        <el-form-item label="审核结果" :label-width="formLabelWidth">
+      <el-form :rules="rule" :model="form7">
+        <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
           <el-select v-model="form7.result" placeholder=""
             :disabled="!isAuth('qcExamine:final:submit') || dataList[5].status != 'B'">
             <el-option label="通过" value="1"></el-option>
@@ -331,7 +338,8 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog7 = false">取 消</el-button>
-        <el-button type="primary" @click="dataFormSubmitEx(form7.id)">确 定</el-button>
+        <el-button type="primary" @click="dataFormSubmitEx(form7.id)"
+          :disabled="!isAuth('qcExamine:final:submit') || dataList[5].status != 'B'">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -473,6 +481,12 @@ export default {
         qcTwoContent: '',
         qcOneContent: '',
       },
+      rule: {
+        result: [
+          { required: true, message: '审核结果不能为空', trigger: 'blur' }
+        ],
+      },
+
       commentTable: [],
       commentTableFirst: [],
       commentTableSecond: [],
@@ -495,6 +509,7 @@ export default {
     initRouterParam() {
       try {
         this.routerParam = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', topicType: '', resultType: '', examineId: '' };
+        console.log(this.routerParam)
         this.ifSelected = this.ifSelectedPart()
       } catch (e) {
         console.log('处理跳转参数失败')
@@ -1085,6 +1100,7 @@ export default {
                 data: this.$http.adornData({
                   'qcsrId': this.routerParam[0].qcsrId,
                   'topicActivityResult': this.finalDataCount,
+                  'topicReviewStatus': 3,
                 })
               })
             } else {

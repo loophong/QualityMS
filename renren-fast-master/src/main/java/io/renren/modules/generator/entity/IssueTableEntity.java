@@ -49,6 +49,26 @@ public class IssueTableEntity implements Serializable {
 	 */
 	private String issueCategoryId;
 	/**
+	 * 系统分类
+	 */
+	private String systematicClassification;
+	/**
+	 * 故障件一级
+	 */
+	private String firstFaultyParts;
+	/**
+	 * 故障件二级
+	 */
+	private String secondFaultyParts;
+	/**
+	 * 故障类别
+	 */
+	private String faultType;
+	/**
+	 * 故障模式
+	 */
+	private String faultModel;
+	/**
 	 * 车型ID
 	 */
 	private String vehicleTypeId;

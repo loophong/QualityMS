@@ -11,17 +11,19 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getDataList()">查询</el-button>
-
             <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
-              :disabled="dataListSelections.length != 1">课题重用</el-button>
+            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
+              @click="reuseVisible = true">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <!-- <el-button type="primary" @click="exportAll('list')">课题导出</el-button> -->
           </el-form-item>
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%;" stripe highlight-current-row>
+          style="width: 100%;" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
           <el-table-column type="selection" header-align="center" align="center" width="50">
+          </el-table-column>
+          <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed>
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
           </el-table-column>
@@ -91,6 +93,7 @@
     <el-tab-pane label="我创办的课题" name="2">
       <div class="mod-config">
         <el-form :inline="true" :model="myQueryParamLead" @keyup.enter.native="getLeadList()">
+
           <el-form-item>
             <el-input v-model="myQueryParamLead.topicName" placeholder="课题名称" clearable></el-input>
           </el-form-item>
@@ -99,19 +102,22 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+            <el-button v-if="((isAuth('qcSubject:registration:save')) || groupLead)" type="primary"
               @click="addOrUpdateHandle()">新增</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
-              :disabled="dataListSelections.length != 1">课题重用</el-button>
+            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
+              @click="reuseVisible = true">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <!-- <el-button type="primary" @click="exportAll('leadList')">课题导出</el-button> -->
             <!-- <el-badge :value="superScriptNumber" class="item">
               <el-button type="warning" @click="dialogMessageVisible = true">消息详情</el-button>
             </el-badge> -->
           </el-form-item>
         </el-form>
         <el-table :data="subjectLeadList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%" stripe highlight-current-row>
-          <el-table-column type="selection" header-align="center" align="center" width="50">
+          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
+          <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
+          </el-table-column> -->
+          <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed>
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
           </el-table-column>
@@ -148,7 +154,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-                }}</span>
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -185,17 +191,17 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getJoinList()">查询</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
-              @click="addOrUpdateHandle()">新增</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
-              :disabled="dataListSelections.length != 1">课题重用</el-button>
+            <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+              @click="addOrUpdateHandle()">新增</el-button> -->
+            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
+              @click="reuseVisible = true">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
-
+            <!-- <el-button type="primary" @click="exportAll('myList')">课题导出</el-button> -->
           </el-form-item>
         </el-form>
         <el-table :data="subjectJoinList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%" stripe highlight-current-row>
-          <el-table-column type="selection" header-align="center" align="center" width="50">
+          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }">
+          <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed>
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
           </el-table-column>
@@ -232,7 +238,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-                }}</span>
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -256,6 +262,66 @@
 
       </div>
     </el-tab-pane>
+    <el-dialog title="课题重用" :visible.sync="reuseVisible">
+      <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
+        :disabled="dataListSelections.length != 1">重用</el-button>
+      <br>
+      <br>
+      <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id"
+        @selection-change="selectionChangeHandle" highlight-current-row>
+        <el-table-column type="selection" header-align="center" align="center" width="50">
+        </el-table-column>
+        <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+        </el-table-column>
+        <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
+        </el-table-column>
+        <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column> -->
+        <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+        </el-table-column>
+        <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+        </el-table-column>
+        <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+        </el-table-column>
+        <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+        </el-table-column>
+        <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+        </el-table-column>
+        <!-- <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <template slot-scope="scope">
+            <span>{{
+              toStatus(scope.row.topicActivityStatus, scope.row.topicType)
+            }}</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+        </el-table-column>
+        <el-table-column prop="note" header-align="center" align="center" label="备注">
+        </el-table-column>
+        <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628">未通过</span>
+            <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray">未开始</span>
+            <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb">审核中</span>
+            <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146">已通过</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column> -->
+        <!-- <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
+              @click="messagePlanHandle(scope.row.qcsrId)">关联计划</el-button>
+            <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
+              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              ">审核状态</el-button>
+          </template>
+        </el-table-column> -->
+      </el-table>
+      <el-pagination @size-change="sizeChangeHandleReuse" @current-change="currentChangeHandleReuse"
+        :current-page="pageIndexReuse" :page-sizes="[10, 20, 50, 100]" :page-size="pageSizeReuse"
+        :total="totalPageReuse" layout="total, sizes, prev, pager, next, jumper">
+      </el-pagination>
+    </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList()"
       @refreshJoinList="getJoinList()" @refreshLeadList="getLeadList()"></add-or-update>
@@ -264,6 +330,10 @@
 
 <script>
 import AddOrUpdate from './qcSubjectRegistration-add-or-update'
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { Loading } from "element-ui";
+import { group } from 'd3';
 export default {
   name: 'qcSubjectRegistration',
   data() {
@@ -272,8 +342,14 @@ export default {
       dataForm: {
         key: ''
       },
+      groupLead: false,
+      currentUserName: '',
       dataList: [],
+      reuseVisible: false,
+      messageList: [],
 
+      messageListLoading: false,
+      exportList: [],
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
@@ -285,6 +361,11 @@ export default {
       pageIndexJoin: 1,
       pageSizeJoin: 10,
       totalPageJoin: 0,
+
+      pageIndexReuse: 1,
+      pageSizeReuse: 10,
+      totalPageReuse: 0,
+
 
       dataListLoading: false,
       dataListSelections: [],
@@ -316,6 +397,7 @@ export default {
     this.getDataList()
     this.getJoinList();
     this.getLeadList();
+    this.getUserName();
     this.getGroupMemberData().then(groupList => {
       this.groupMemberList = Object.values(groupList).filter(item => item.examineStatus === "通过").reduce((acc, item) => {
         acc[item.id] = item;
@@ -329,9 +411,35 @@ export default {
     }).then(({ data }) => {
       this.membersOptions = data;
     });
+    this.ifGroupLead();
   },
   methods: {
+    async ifGroupLead() {
+      this.$http({
+        url: this.$http.adornUrl('/qcSubject/registration/ifGroupLead'),
+        method: 'get',
+        params: this.$http.adornParams({
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.groupLead = data.ifLead
+        }
+      });
+    },
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
 
+      });
+    },
     parseTime(time) {
       return new Date(time).toLocaleString();
     },
@@ -385,20 +493,22 @@ export default {
     },
 
     // 获取数据列表
-    async getDataList() {
+    async getDataList(reuse) {
       this.dataListLoading = true
       await this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/list'),
         method: 'get',
         params: this.$http.adornParams({
-          'page': this.pageIndex,
-          'limit': this.pageSize,
+          'page': reuse ? this.pageIndexReuse : this.pageIndex,
+          'limit': reuse ? this.pageSizeReuse : this.pageSize,
           'key': this.myQueryParam,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.dataList = data.page.list
           this.totalPage = data.page.totalCount
+          this.messageList = data.page.list
+          this.totalPageReuse = data.page.totalCount
         } else {
           this.dataList = []
           this.totalPage = 0
@@ -424,6 +534,11 @@ export default {
       this.pageIndexJoin = 1
       this.getJoinList()
     },
+    sizeChangeHandleReuse(val) {
+      this.pageSizeReuse = val
+      this.pageIndexReuse = 1
+      this.getDataList()
+    },
     // 当前页
     currentChangeHandle(val) {
       this.pageIndex = val
@@ -436,6 +551,10 @@ export default {
     currentChangeHandleLead(val) {
       this.pageIndexLead = val
       this.getLeadList()
+    },
+    currentChangeHandleReuse(val) {
+      this.pageIndexReuse = val
+      this.getDataList(1)
     },
     // 多选
     selectionChangeHandle(val) {
@@ -574,6 +693,8 @@ export default {
               duration: 1500,
               onClose: () => {
                 this.getDataList()
+                this.getJoinList()
+                this.getLeadList()
               }
             })
           } else {
@@ -719,9 +840,9 @@ export default {
             'qcsrId': this.dataForm.qcsrId || undefined,
             'topicName': `${newDataForm.topicName}(重用)`,
             'topicNumber': newDataForm.topicNumber,
-            'topicLeader': newDataForm.topicLeader,
+            'topicLeader': this.currentUserName,
             'topicConsultant': newDataForm.topicConsultant,
-            'teamNumberIds': newDataForm.teamNumberIds,
+            'teamNumberIds': undefined,
             'topicReviewStatus': '1',
             'topicDescription': newDataForm.topicDescription,
             'topicType': newDataForm.topicType,
@@ -741,6 +862,9 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
+                this.reuseVisible = false
+                this.getJoinList()
+                this.getLeadList()
                 this.getDataList()
               }
             })
@@ -763,6 +887,74 @@ export default {
           })
         })
       }
+    },
+    // 导出
+    async exportAll(url) {
+      console.log(url)
+      await this.$http({
+        url: this.$http.adornUrl(`/qcSubject/registration/${url}`),
+        method: 'get',
+        params: this.$http.adornParams({
+          'page': 1,
+          'limit': 10000,
+        })
+      }).then(({ data }) => {
+        if (data) {
+          this.exportList = data.page.list
+        } else {
+          this.exportList = []
+        }
+      })
+      const loadingInstance = Loading.service({
+        lock: true,
+        text: "正在导出，请稍后...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      console.log(this.exportList)
+      const promises = this.exportList.map((tableRow, index) => {
+        return {
+          序号: index + 1,
+          课题ID: tableRow.qcsrId,
+          课题编号: tableRow.topicNumber,
+          课题组长: tableRow.topicLeader,
+          课题顾问: tableRow.topicConsultant,
+          课题成员: tableRow.teamNumberIds,
+          课题描述: tableRow.topicDescription,
+          课题类型: tableRow.topicType,
+          活动特性: tableRow.activityCharacteristics,
+          活动计划开始日期: tableRow.activityPlan,
+          活动计划结束日期: tableRow.activityPlanEnd,
+          课题关键字: tableRow.keywords,
+          课题活动评分结果: tableRow.topicActivityResult,
+          提交类型: tableRow.resultType,
+          备注: tableRow.note,
+        };
+      });
+      Promise.all(promises)
+        .then((data) => {
+          const ws = XLSX.utils.json_to_sheet(data);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+          const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+          saveAs(
+            new Blob([wbout], { type: "application/octet-stream" }),
+            "课题登记表.xlsx"
+          );
+
+          // // 提交数据到Vuex Store
+          // this.updateExportedData(data);
+
+
+        })
+        .finally(() => {
+          loadingInstance.close();
+        })
+        .catch((error) => {
+          console.error("导出失败:", error);
+          loadingInstance.close();
+        });
     },
   }
 }

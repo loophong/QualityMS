@@ -325,7 +325,9 @@ export default {
       const element = document.querySelector('.org-tree-container'); // 获取需要截图的元素
       html2canvas(element).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
+        console.log(imgData)
         const blob = this.dataURLtoBlob(imgData);
+        console.log(blob)
         saveAs(blob, 'tree-screenshot.png');
       });
     },

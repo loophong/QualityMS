@@ -20,30 +20,16 @@
     <div id="main" ref="main"></div>
     <span>
       <label for="xAxisDataBy">横坐标:</label>
-      <el-input
-        v-model="xAxisDataBy"
-        placeholder="请输入内容"
-        style="width: 30%"
-      ></el-input>
+      <el-input v-model="xAxisDataBy" placeholder="请输入内容" style="width: 30%"></el-input>
       <label for="seriesDataBy">折线数:</label>
-      <el-input
-        v-model="seriesDataBy"
-        placeholder="请输入内容"
-        style="width: 30%"
-      ></el-input>
+      <el-input v-model="seriesDataBy" placeholder="请输入内容" style="width: 30%"></el-input>
     </span>
     <br />
     <br />
     <span>
       <label for="textBy">图标题:</label>
-      <el-input
-        v-model="textBy"
-        placeholder="请输入内容"
-        style="width: 15%"
-      ></el-input>
-      <el-button type="primary" @click="initChart(tmpResultList)"
-        >更新图表</el-button
-      >
+      <el-input v-model="textBy" placeholder="请输入内容" style="width: 15%"></el-input>
+      <el-button type="primary" @click="initChart(tmpResultList)">更新图表</el-button>
       <!-- 保存为模板 change to 暂存当前数据  -->
       <!-- <el-button type="success" @click="dialogFormVisible = true"
         >更新当前数据</el-button
@@ -51,16 +37,8 @@
       <el-button type="success" @click="handleUp">更新当前数据</el-button>
     </span>
 
-    <el-dialog
-      title="自定义图名"
-      :visible.sync="dialogFormVisible"
-      append-to-body
-    >
-      <el-input
-        v-model="inputName"
-        placeholder="请输入图名"
-        style="width: 50%"
-      ></el-input>
+    <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
+      <el-input v-model="inputName" placeholder="请输入图名" style="width: 50%"></el-input>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleUp">确 定</el-button>
@@ -156,7 +134,7 @@ export default {
         });
         console.log(tmpList);
         this.initChart(tmpList);
-      }else{//否则使用默认数据渲染echarts
+      } else {//否则使用默认数据渲染echarts
         this.initChart(this.tmpResultList);
       }
 
@@ -187,7 +165,15 @@ export default {
       }));
       console.log(filteredData);
 
-    
+      let img = new Image()
+      img.src = this.myChart.getDataURL(
+        {
+          type: 'png',
+          // pixelRatio: 1,
+          // backgroundColor: '#fff',
+          excludeComponents: ['toolbox']
+        }
+      )
 
       this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/update`),
@@ -201,6 +187,7 @@ export default {
           conplanAxis: JSON.stringify(tmp),
           conplanSubject: this.resultList[0].conplanSubject,
           conplanProcess: this.resultList[0].conplanProcess,
+          conplanUrl: JSON.stringify(img.src),
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -221,8 +208,8 @@ export default {
 
 
 
-     //删除当前图
-     handleDelete() {
+    //删除当前图
+    handleDelete() {
       let ids = this.item.conplanId;
       console.log(ids);
       if (ids) {
@@ -602,6 +589,7 @@ export default {
           // }
         ],
         series: seriesData,
+        animation: false,
       };
       this.option && this.myChart.setOption(this.option);
       // console.log(this.option)

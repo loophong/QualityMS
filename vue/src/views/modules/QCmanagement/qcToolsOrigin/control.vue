@@ -77,6 +77,16 @@ export default {
     this.getTemplateData()
     this.myChart = echarts.init(this.$refs.main);
     this.initChart(this.tmpResultList)
+    let img = new Image()
+    img.src = this.myChart.getDataURL(
+      {
+        type: 'png',
+        // pixelRatio: 1,
+        // backgroundColor: '#fff',
+        excludeComponents: ['toolbox']
+      }
+    )
+    console.log(img.src)
   },
   methods: {
     //处理下拉框选择变化
@@ -542,9 +552,11 @@ export default {
           //   }
           // }
         ],
-        series: seriesData
+        series: seriesData,
+        animation: false,
       };
       this.option && this.myChart.setOption(this.option);
+
       // console.log(this.option)
       this.myChart.on('dataViewChanged', (params) => {
         console.log('dataViewChanged:', params);
@@ -554,6 +566,7 @@ export default {
         console.log(this.updatedSeries)
         console.log(this.test)
       });
+
     },
   },
 }

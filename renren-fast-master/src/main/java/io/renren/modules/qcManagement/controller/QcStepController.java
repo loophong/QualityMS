@@ -78,6 +78,7 @@ public class QcStepController {
                 // 遍历列表并修改每个元素的 stepSubjectId
                 for (QcStepEntity entity : reuseList) {
                     entity.setStepSubjectId(reuseStepId);
+                    entity.setStagePeople(null);
                     entity.setStepId(null);
                 }
 

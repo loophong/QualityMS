@@ -150,7 +150,7 @@
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
-          <el-table-column prop="name" header-align="center" align="center" label="姓名" width="160">
+          <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="160">
           </el-table-column>
           <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column>
@@ -259,6 +259,21 @@ export default {
     if ((this.isAuth('qcManagement:group:admin')) || (this.isAuth('qcManagement:group:examine'))) {
       await this.getDataList().then(groupList => {
         this.groupList = groupList;
+      });
+      console.log(this.tableData)
+      this.tableData.sort(function (a, b) {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        // 比较两个日期对象，降序排列
+        return dateB - dateA;
+      })
+      this.tableData.forEach(e => {
+        e.children.sort(function (a, b) {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          // 比较两个日期对象，降序排列
+          return dateB - dateA;
+        });
       });
       console.log(this.tableData)
       this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
@@ -391,6 +406,20 @@ export default {
           console.log(map)
           this.dataList = Object.values(map);
           // this.dataList = resultList
+          this.dataList.sort(function (a, b) {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            // 比较两个日期对象，降序排列
+            return dateB - dateA;
+          })
+          this.dataList.forEach(e => {
+            e.children.sort(function (a, b) {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              // 比较两个日期对象，降序排列
+              return dateB - dateA;
+            });
+          });
           console.log(this.dataList)
           this.totalPageGroup = resultList.length
         } else {

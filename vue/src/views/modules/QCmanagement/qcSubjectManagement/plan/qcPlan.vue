@@ -23,7 +23,7 @@
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
           </el-form-item>
         </el-form>
-        <el-table :data="filteredDataList" :row-class-name="tableRowClassName" border v-loading="dataListLoading"
+        <el-table :data="dataList" :row-class-name="tableRowClassName" border v-loading="dataListLoading"
           @selection-change="selectionChangeHandle" style="width: 100%;"
           :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
           <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
@@ -76,11 +76,11 @@
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
-                @click="newPlanHandle(scope.row.qcsrId)">关联计划</el-button>
+                @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
-                @click="examineStatus(scope.row.qcsrId)">审核状态</el-button>
+                @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -113,7 +113,7 @@
             </el-badge> -->
           </el-form-item>
         </el-form>
-        <el-table :data="filteredLeadList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
+        <el-table :data="subjectLeadList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
           style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
           <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column> -->
@@ -166,11 +166,11 @@
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
-                @click="newPlanHandle(scope.row.qcsrId)">关联计划</el-button>
+                @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
-                @click="examineStatus(scope.row.qcsrId)">审核状态</el-button>
+                @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -201,7 +201,7 @@
 
           </el-form-item>
         </el-form>
-        <el-table :data="filteredJoinList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
+        <el-table :data="subjectJoinList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
           style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
           <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column> -->
@@ -254,11 +254,11 @@
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
-                @click="newPlanHandle(scope.row.qcsrId)">关联计划</el-button>
+                @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
-                @click="examineStatus(scope.row.qcsrId)">审核状态</el-button>
+                @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -334,15 +334,15 @@ export default {
     this.getLeadList();
   },
   computed: {
-    filteredDataList() {
-      return this.dataList.filter(item => item.topicReviewStatus === 3 || item.topicReviewStatus === '3');
-    },
-    filteredJoinList() {
-      return this.subjectJoinList.filter(item => item.topicReviewStatus === 3 || item.topicReviewStatus === '3');
-    },
-    filteredLeadList() {
-      return this.subjectLeadList.filter(item => item.topicReviewStatus === 3 || item.topicReviewStatus === '3');
-    }
+    // filteredDataList() {
+    //   return this.dataList.filter(item => item.topicReviewStatus === 3 || item.topicReviewStatus === '3');
+    // },
+    // filteredJoinList() {
+    //   return this.subjectJoinList.filter(item => item.topicReviewStatus === 3 || item.topicReviewStatus === '3');
+    // },
+    // filteredLeadList() {
+    //   return this.subjectLeadList.filter(item => item.topicReviewStatus === 3 || item.topicReviewStatus === '3');
+    // }
   },
   methods: {
     tableRowClassName({ row, rowIndex }) {
@@ -354,30 +354,35 @@ export default {
       return '';
     },
     //创建计划跳转
-    newPlanHandle(id) {
+    newPlanHandle(id, row) {
       let qcsrId = id;
       // console.log("qcsrId======xht=======>"+qcsrId);
       let filteredArray = [];
       // 遍历原始数组
-      for (let i = 0; i < this.dataList.length; i++) {
-        if (this.dataList[i].qcsrId === id) {
-          // 如果满足条件，将对象添加到新数组中
-          filteredArray.push(this.dataList[i]);
-        }
-      }
+      console.log(row)
+      let tmpList = [];
+      // for (let i = 0; i < tmpList.length; i++) {
+      //   if (this.dataList[i].qcsrId === id) {
+      //     // 如果满足条件，将对象添加到新数组中
+      //     filteredArray.push(this.dataList[i]);
+      //     // console.log('1')
+      //   }
+      // }
+      // console.log(filteredArray)
       this.$router.push(
         {
           name: 'qcPlanNew',
           query: {
-            data: JSON.stringify(filteredArray),
+            data: JSON.stringify(row),
             qcsrId: qcsrId,
           }
         });
     },
     //计划审批跳转
-    examineStatus(id, resultType) {
-      console.log(resultType)
-      console.log(id)
+    examineStatus(row, resultType) {
+      // console.log(resultType)
+      // console.log(id)
+      console.log(row)
       if (resultType === null || resultType === '') {
         this.$message({
           message: '课题计划尚未提交',
@@ -386,17 +391,15 @@ export default {
         })
       } else {
         let filteredArray = [];
-        // 遍历原始数组
-        for (let i = 0; i < this.dataList.length; i++) {
-          if (this.dataList[i].qcsrId === id) {
-            // 如果满足条件，将对象添加到新数组中
-            filteredArray.push(this.dataList[i]);
-            console.log(filteredArray)
-          }
-        }
-        // console.log('+-+-+-+-++-+-+--+')
-        // console.log(this.dataList)
-        // console.log('+-+-+-+-++-+-+--+')
+
+        // for (let i = 0; i < this.dataList.length; i++) {
+        //   if (this.dataList[i].qcsrId === id) {
+        //     // 如果满足条件，将对象添加到新数组中
+        filteredArray.push(row);
+        //     console.log(filteredArray)
+        //   }
+        // }
+
         this.$router.push(
           {
             name: 'qcExamineStatus',
@@ -410,7 +413,7 @@ export default {
     async getJoinList() {
       this.dataListLoading = true;
       await this.$http({
-        url: this.$http.adornUrl("/qcSubject/registration/myList"),
+        url: this.$http.adornUrl("/qcSubject/registration/myListFilter"),
         method: "get",
         params: this.$http.adornParams({
           'page': this.pageIndexJoin,
@@ -437,11 +440,11 @@ export default {
     async getLeadList() {
       this.dataListLoading = true;
       await this.$http({
-        url: this.$http.adornUrl("/qcSubject/registration/leadList"),
+        url: this.$http.adornUrl("/qcSubject/registration/leadListFilter"),
         method: "get",
         params: this.$http.adornParams({
-          'page': 1,
-          'limit': 1000,
+          'page': this.pageIndexLead,
+          'limit': this.pageSizeLead,
           // 'topicName': this.myQueryParam.topicName,
           // 'keywords': this.myQueryParam.keywords
           'key': this.myQueryParamLead,
@@ -551,7 +554,7 @@ export default {
     getDataList() {
       this.dataListLoading = true
       this.$http({
-        url: this.$http.adornUrl('/qcSubject/registration/list'),
+        url: this.$http.adornUrl('/qcSubject/registration/listFilter'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,

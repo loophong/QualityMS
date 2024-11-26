@@ -12,11 +12,7 @@
       <div class="input-group">
         <span>
           <input v-model="newCategory" placeholder="请输入横坐标数据" />
-          <input
-            v-model="newValue"
-            type="text"
-            placeholder="请输入纵坐标数据"
-          />
+          <input v-model="newValue" type="text" placeholder="请输入纵坐标数据" />
         </span>
       </div>
       <br />
@@ -31,11 +27,7 @@
       </div>
     </div>
     <el-dialog title="模版名" :visible.sync="dialogFormVisible">
-      <el-input
-        v-model="inputName"
-        placeholder="请输入模版名"
-        style="width: 50%"
-      ></el-input>
+      <el-input v-model="inputName" placeholder="请输入模版名" style="width: 50%"></el-input>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleUp">确 定</el-button>
@@ -267,6 +259,7 @@ export default {
             },
           },
         ],
+        animation: false,
         graphic: {
           elements: [
             {
@@ -407,9 +400,9 @@ export default {
       const variance =
         this.totalFrequency > 1
           ? this.data.reduce((sum, freq, index) => {
-              const value = Number(this.categories[index]);
-              return sum + freq * Math.pow(value - this.weightedMean, 2);
-            }, 0) / this.totalFrequency
+            const value = Number(this.categories[index]);
+            return sum + freq * Math.pow(value - this.weightedMean, 2);
+          }, 0) / this.totalFrequency
           : 0;
 
       this.standardDeviation = Math.sqrt(variance).toFixed(2); // 计算标准差

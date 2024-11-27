@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.instrument.dao.InstrumentationDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.instrument.entity.InstrumentationEntity" id="instrumentationMap">
+        <result property="id" column="id"/>
+        <result property="warehouseNumber" column="Warehouse_number"/>
+        <result property="toolNumber" column="Tool_number"/>
+        <result property="toolName" column="Tool_name"/>
+        <result property="specificationModel" column="Specification_model"/>
+        <result property="rangeValue" column="Range_value"/>
+        <result property="divisionValue" column="Division_value"/>
+        <result property="accuracy" column="Accuracy"/>
+        <result property="purpose" column="Purpose"/>
+        <result property="supplier" column="Supplier"/>
+        <result property="factoryNumber" column="Factory_number"/>
+        <result property="companyNumber" column="Company_number"/>
+        <result property="level" column="Level"/>
+        <result property="verificationCycle" column="Verification_cycle"/>
+        <result property="verificationStatus" column="Verification_status"/>
+        <result property="usageStatus" column="Usage_status"/>
+        <result property="allocationLocation" column="Allocation_location"/>
+        <result property="responsibleDepartment" column="Responsible_department"/>
+        <result property="userName" column="User_name"/>
+        <result property="calibrationDate" column="Calibration_date"/>
+        <result property="calibrationValidity" column="Calibration_validity"/>
+        <result property="calibrationUnit" column="Calibration_unit"/>
+        <result property="certificateNumber" column="Certificate_number"/>
+        <result property="remarks" column="Remarks"/>
+        <result property="quantity" column="Quantity"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="createPeople" column="create_people"/>
+        <result property="leader" column="leader"/>
+    </resultMap>
+
+
+</mapper>

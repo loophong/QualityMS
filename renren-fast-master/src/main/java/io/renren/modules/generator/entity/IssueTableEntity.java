@@ -49,6 +49,26 @@ public class IssueTableEntity implements Serializable {
 	 */
 	private String issueCategoryId;
 	/**
+	 * 系统分类
+	 */
+	private String systematicClassification;
+	/**
+	 * 故障件一级
+	 */
+	private String firstFaultyParts;
+	/**
+	 * 故障件二级
+	 */
+	private String secondFaultyParts;
+	/**
+	 * 故障类别
+	 */
+	private String faultType;
+	/**
+	 * 故障模式
+	 */
+	private String faultModel;
+	/**
 	 * 车型ID
 	 */
 	private String vehicleTypeId;
@@ -60,6 +80,10 @@ public class IssueTableEntity implements Serializable {
 	 * 问题描述
 	 */
 	private String issueDescription;
+	/**
+	 * 初步分析
+	 */
+	private String peliminaryAnalysis;
 	/**
 	 * 问题照片
 	 */
@@ -136,6 +160,14 @@ public class IssueTableEntity implements Serializable {
 	 * 整改验证情况
 	 */
 	private String rectificationVerificationStatus;
+	/**
+	 * 是否超过截止时间
+	 */
+	private String overDue;
+	/**
+	 * 验证截止时间
+	 */
+	private Date verificationDeadline;
 	/**
 	 * 验证结论
 	 */

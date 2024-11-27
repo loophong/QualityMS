@@ -27,7 +27,7 @@ public class IndicatorKeyIndicatorsEntity implements Serializable {
 	/**
 	 * 指标ID
 	 */
-	private String indicatorId;
+	private Integer indicatorId;
 	/**
 	 * 指标名称
 	 */
@@ -104,5 +104,10 @@ public class IndicatorKeyIndicatorsEntity implements Serializable {
 	 * 控制清单
 	 */
 	private String controlList;
+
+	/**
+	 * 入库标识符
+	 */
+	private Integer storageFlag;
 
 }

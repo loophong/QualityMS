@@ -13,18 +13,19 @@ import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.notice.entity.CreateNoticeParams;
 import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.taskmanagement.dto.TaskQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.ApprovalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.taskmanagement.service.TaskService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
-
 
 
 /**
@@ -54,7 +55,7 @@ public class TaskController {
     @GetMapping("/taskLineDisplay")
     public List<TaskLineChartDTO> taskLineDisplay(String planId) {
         List<TaskLineChartDTO> taskLineChartDTOS = taskService.taskLineDisplay(planId);
-        log.info("taskLineChartDTOS"+taskLineChartDTOS);
+        log.info("taskLineChartDTOS" + taskLineChartDTOS);
         return taskLineChartDTOS;
     }
 
@@ -70,9 +71,8 @@ public class TaskController {
     }
 
 
-
     /**
-     * @description: 检查当前taskId,任务编号是否被使用
+     * @description: 检查当前taskId, 任务编号是否被使用
      * @author: hong
      * @date: 2024/8/26 15:37
      * @version: 1.0
@@ -80,7 +80,7 @@ public class TaskController {
     @GetMapping("/checkTaskId")
     public ResponseEntity<Boolean> checkPlanNumber(@RequestParam String taskId) {
         boolean isUsed = taskService.isTaskIdUsed(taskId);
-        log.info("当前taskId"+taskId+",是否使用"+isUsed);
+        log.info("当前taskId" + taskId + ",是否使用" + isUsed);
         return ResponseEntity.ok(isUsed);
     }
 
@@ -92,8 +92,8 @@ public class TaskController {
      * @version: 1.0
      */
     @RequestMapping("/getTaskDetailInfo")
-    public R getTaskDetailInfo(@RequestParam String taskId){
-        log.info("taskId"+taskId);
+    public R getTaskDetailInfo(@RequestParam String taskId) {
+        log.info("taskId" + taskId);
         TaskDetailDTO taskDetailDTO = taskService.getTaskDetailInfo(taskId);
 
         return R.ok().put("taskDetail", taskDetailDTO);
@@ -107,14 +107,12 @@ public class TaskController {
      */
     @PostMapping("/decomposition")
 //    @RequiresPermissions("taskmanagement:task:list")
-    public R decompositionTask(@RequestBody TaskDetailDTO taskDetailDTO){
+    public R decompositionTask(@RequestBody TaskDetailDTO taskDetailDTO) {
         log.info("当前分解的任务详情为：" + taskDetailDTO);
         int i = taskService.saveDecompositionTasks(taskDetailDTO.getTasks());
         return R.ok();
 
     }
-
-
 
 
     /**
@@ -125,13 +123,11 @@ public class TaskController {
      */
     @RequestMapping("/getAllTasksByPlanId")
 //    @RequiresPermissions("taskmanagement:task:list")
-    public R getAllTasksByPlanId(@RequestParam Map<String, Object>  params){
+    public R getAllTasksByPlanId(@RequestParam Map<String, Object> params) {
         PageUtils page = taskService.queryPageSelectTasksByPlanId(params, params.get("planId").toString());
 
         return R.ok().put("page", page);
     }
-
-
 
 
     /**
@@ -142,9 +138,10 @@ public class TaskController {
      * @date: 2024/8/24 18:50
      */
 
+    @Transactional
     @RequestMapping("/submitApprover")
     //    @RequiresPermissions("taskmanagement:task:list")
-    public R executeTask(String taskId,String taskApprovalor){
+    public R executeTask(String taskId, String taskApprovalor) {
 
         log.info("当前任务id为：" + taskId);
         TaskEntity task = taskService.getByTaskId(taskId);
@@ -152,22 +149,28 @@ public class TaskController {
         // 审批之前先检查其子任务是否全部完成
         // 查询当前任务的子任务
         List<TaskEntity> childrenTasks = taskService.list(new QueryWrapper<TaskEntity>().eq("task_parent_node", taskId));
-        if (childrenTasks.size() > 0){
+        if (childrenTasks.size() > 0) {
             for (TaskEntity childrenTask : childrenTasks) {
-                if (childrenTask.getTaskCurrentState() != TaskStatus.COMPLETED){
+                if (childrenTask.getTaskCurrentState() != TaskStatus.COMPLETED) {
                     return R.error("当前任务子任务未全部完成，不能进行审批");
                 }
             }
         }
 
-        if (task.getTaskCurrentState() == TaskStatus.IN_PROGRESS){
+        if (task.getTaskCurrentState() == TaskStatus.IN_PROGRESS) {
             ApprovalEntity approvalEntity = new ApprovalEntity();
             approvalEntity.setTaskId(taskId);
             approvalEntity.setTaskName(task.getTaskName());
             approvalEntity.setTaskContent(task.getTaskContent());
             approvalEntity.setTaskAssociatedPlanId(task.getTaskAssociatedPlanId());
+            log.info("当前任务的task信息为：" + task);
+
             approvalEntity.setTaskPrincipal(task.getTaskPrincipal());
-            approvalEntity.setTaskAssociatedIndicatorsId(task.getTaskAssociatedIndicatorsId());
+
+            log.info("当前任务的AssociatedIndicatorsId为：" + task.getTaskAssociatedIndicatorsId());
+            if (task.getTaskAssociatedIndicatorsId() != null && !task.getTaskAssociatedIndicatorsId().equals("")) {
+                approvalEntity.setTaskAssociatedIndicatorsId(task.getTaskAssociatedIndicatorsId());
+            }
             //获取当前时间
 
             approvalEntity.setTaskStartDate(task.getTaskStartDate());
@@ -189,22 +192,22 @@ public class TaskController {
 //        taskService.updateById(taskEntity);
 
         // 发送消息
-        messageService.sendMessages(new CreateNoticeParams( Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()} , "您有一个任务需要审批，请及时审批！", "任务审批通知"));
+        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()}, "您有一个任务需要审批，请及时审批！", "任务审批通知"));
 
         return R.ok();
 
     }
-    
-    /** 
+
+    /**
      * @description: 测试获取当前登录的用户信息用户信息
-     * @param: null 
-     * @return:  
+     * @param: null
+     * @return:
      * @author: hong
      * @date: 2024/8/21 18:08
      */
     @RequestMapping("/testUserInfo")
 //    @RequiresPermissions("taskmanagement:task:list")
-    public R userInfo(@RequestParam Map<String, Object> params){
+    public R userInfo(@RequestParam Map<String, Object> params) {
         SysUserEntity userEntity = ShiroUtils.getUserEntity();
 
         log.info("当前登录的用户信息为：" + userEntity);
@@ -226,7 +229,7 @@ public class TaskController {
      */
     @RequestMapping("/getTasksByUserId")
 //    @RequiresPermissions("taskmanagement:task:list")
-    public R selectTasksByUserId(@RequestParam Map<String, Object> params){
+    public R selectTasksByUserId(@RequestParam Map<String, Object> params) {
         SysUserEntity userEntity = ShiroUtils.getUserEntity();
 
         log.info("当前登录的用户信息为：" + userEntity);
@@ -252,26 +255,41 @@ public class TaskController {
      * @author: hong
      * @date: 2024/8/23 15:53
      */
-    @RequestMapping("/getUnfinishedTasksList")
+    @PostMapping("/getUnfinishedTasksList")
 //    @RequiresPermissions("taskmanagement:task:list")
-    public R getUnfinishedTasksList(@RequestParam Map<String, Object> params){
-        PageUtils page = taskService.queryPageGetUnfinishedTasks(params,ShiroUtils.getUserId());
+    public R getUnfinishedTasksList(@RequestBody TaskQueryParamDTO taskQueryParamDTO) {
+        log.info("当前用户未完成的任务参数为：" + taskQueryParamDTO);
+        PageUtils page = taskService.queryPageGetUnfinishedTasks(taskQueryParamDTO, ShiroUtils.getUserId());
         log.info("当前用户未完成的任务为：" + page.getList().toString());
         return R.ok().put("page", page);
     }
+//    @RequestMapping("/getUnfinishedTasksList")
+//    @RequiresPermissions("taskmanagement:task:list")
+//    public R getUnfinishedTasksList(@RequestParam Map<String, Object> params){
+//        PageUtils page = taskService.queryPageGetUnfinishedTasks(params,ShiroUtils.getUserId());
+//        log.info("当前用户未完成的任务为：" + page.getList().toString());
+//        return R.ok().put("page", page);
+//    }
 
     /**
      * @description: 获取当前用户，已完成任务
      * @author: hong
      * @date: 2024/8/23 15:53
      */
-    @RequestMapping("/getCompletedTasksList")
+    @PostMapping("/getCompletedTasksList")
 //    @RequiresPermissions("taskmanagement:task:list")
-    public R getCompletedTasksList(@RequestParam Map<String, Object> params){
-        PageUtils page = taskService.queryPageGetCompletedTasksList(params,ShiroUtils.getUserId());
-        log.info("当前用户已完成的任务为：" + page);
+    public R getCompletedTasksList(@RequestBody TaskQueryParamDTO taskQueryParamDTO) {
+        log.info("当前用户完成的任务参数为：" + taskQueryParamDTO);
+        PageUtils page = taskService.queryPageGetCompletedTasksList(taskQueryParamDTO, ShiroUtils.getUserId());
         return R.ok().put("page", page);
     }
+//    @RequestMapping("/getCompletedTasksList")
+////    @RequiresPermissions("taskmanagement:task:list")
+//    public R getCompletedTasksList(@RequestParam Map<String, Object> params){
+//        PageUtils page = taskService.queryPageGetCompletedTasksList(params,ShiroUtils.getUserId());
+//        log.info("当前用户已完成的任务为：" + page);
+//        return R.ok().put("page", page);
+//    }
 
     /**
      * @description: 修改任务状态，进行中--》审核中
@@ -307,28 +325,28 @@ public class TaskController {
 //        log.info("当前日期：" + date);
 //        Date date = new Date();
 //        Date oldDate = new Date();
-        // 实际完成日期
+    // 实际完成日期
 //        taskEntity.setTaskActualCompletionDate(date);
 
-        // 实际天数
+    // 实际天数
 //        long diffMillis = date.getTime() - taskEntity.getTaskStartDate().getTime();
 //        long diffDays = diffMillis / (24 * 60 * 60 * 1000);
 //        log.info("实际天数"+diffDays);
 //        taskEntity.setTaskActualDays(diffDays);
-        
+
 //        taskService.updateById(taskEntity);
-        
+
 //        return R.ok();
 
 //    }
-    
-    /** 
+
+    /**
      * @description:
-     * @param: null 
-     * @return:  
+     * @param: null
+     * @return:
      * @author: hong
      * @date: 2024/8/21 19:51
-     */ 
+     */
 
 
     /**
@@ -336,7 +354,7 @@ public class TaskController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("taskmanagement:task:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = taskService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -348,8 +366,8 @@ public class TaskController {
      */
     @RequestMapping("/info/{tmTid}")
     @RequiresPermissions("taskmanagement:task:info")
-    public R info(@PathVariable("tmTid") Long tmTid){
-		TaskEntity taskManagementTask = taskService.getById(tmTid);
+    public R info(@PathVariable("tmTid") Long tmTid) {
+        TaskEntity taskManagementTask = taskService.getById(tmTid);
 
         return R.ok().put("taskManagementTask", taskManagementTask);
     }
@@ -359,7 +377,7 @@ public class TaskController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("taskmanagement:task:save")
-    public R save(@RequestBody TaskEntity taskManagementTask){
+    public R save(@RequestBody TaskEntity taskManagementTask) {
         taskService.save(taskManagementTask);
 
         return R.ok();
@@ -370,7 +388,7 @@ public class TaskController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("taskmanagement:task:update")
-    public R update(@RequestBody TaskEntity taskManagementTask){
+    public R update(@RequestBody TaskEntity taskManagementTask) {
         taskService.updateById(taskManagementTask);
 
         return R.ok();
@@ -381,7 +399,7 @@ public class TaskController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("taskmanagement:task:delete")
-    public R delete(@RequestBody Long[] tmTids){
+    public R delete(@RequestBody Long[] tmTids) {
         taskService.removeByIds(Arrays.asList(tmTids));
 
         return R.ok();
@@ -394,7 +412,7 @@ public class TaskController {
      */
     @RequestMapping("/deleteByTaskId")
 //    @RequiresPermissions("taskmanagement:task:delete")
-    public R deleteByTaskId(@RequestParam Long tmTid){
+    public R deleteByTaskId(@RequestParam Long tmTid) {
         taskService.removeById(tmTid);
         return R.ok();
     }

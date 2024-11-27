@@ -141,7 +141,7 @@ export default {
               this.dataForm.modifier = data.qcSubjectRegistration.modifier
               this.dataForm.startDate = data.qcSubjectRegistration.startDate
               this.dataForm.endDate = data.qcSubjectRegistration.endDate
-              this.dataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus
+              // this.dataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus
               this.dataForm.topicDescription = data.qcSubjectRegistration.topicDescription
               this.dataForm.topicType = data.qcSubjectRegistration.topicType
               this.dataForm.activityCharacteristics = data.qcSubjectRegistration.activityCharacteristics

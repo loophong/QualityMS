@@ -28,8 +28,57 @@
         <result property="resultType" column="result_type"/>
         <result property="examineId" column="examine_id"/>
         <result property="groupName" column="group_name"/>
-    </resultMap>
 
+    </resultMap>
+<!--    <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity">-->
+<!--        SELECT *-->
+<!--        FROM qc_subject_registration-->
+<!--        <where>-->
+<!--            <if test="topicName != null and topicName != ''">-->
+<!--                AND topic_name LIKE CONCAT('%', #{topicName}, '%')-->
+<!--            </if>-->
+<!--            <if test="keywords != null and keywords != ''">-->
+<!--                AND keywords LIKE CONCAT('%', #{keywords}, '%')-->
+<!--            </if>-->
+<!--            <if test="startDate != null and startDate != ''">-->
+<!--                AND start_date = STR_TO_DATE(#{startDate}, '%Y-%m-%d')-->
+<!--            </if>-->
+<!--            <if test="endDate != null and endDate != ''">-->
+<!--                AND end_date = STR_TO_DATE(#{endDate}, '%Y-%m-%d')-->
+<!--            </if>-->
+<!--            AND qcsr_id IN (-->
+<!--            SELECT qc_examine_subject-->
+<!--            FROM qc_examine_status-->
+<!--            WHERE qc_status_seven = 1-->
+<!--            )-->
+<!--        </where>-->
+<!--    </select>-->
+   <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity">
+    SELECT *
+    FROM qc_subject_registration s
+    LEFT JOIN qc_examine_status e ON s.qcsr_id = e.qc_examine_subject
+    <where>
+        <if test="topicName != null and topicName != ''">
+            AND s.topic_name LIKE CONCAT('%', #{topicName}, '%')
+        </if>
+        <if test="keywords != null and keywords != ''">
+            AND s.keywords LIKE CONCAT('%', #{keywords}, '%')
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND s.start_date = STR_TO_DATE(#{startDate}, '%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND s.end_date = STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+        </if>
+            AND e.qc_status_seven = 1
+    </where>
+</select>
+
+    <select id="ifExistSubjectName" resultType="boolean">
+        SELECT EXISTS (
+            SELECT * FROM qc_subject_registration WHERE topic_name = #{name}
+        )
+    </select>
     <!--    根据输入动态模糊查询-->
     <select id="fuzzyQueryList"
             resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity">
@@ -43,7 +92,11 @@
                 AND keywords like concat('%',#{keywords},'%')
             </if>
         </where>
-
+    </select>
+    <select id="ifGroupLead" resultType="java.lang.Boolean">
+        SELECT EXISTS (
+            SELECT * FROM qc_group_members WHERE member_name = #{userName} AND role_in_topic = '组长'
+        )
     </select>
 
     <!--    <select id="getMembersOfGroup" resultType="QcGroupMemberEntity">-->

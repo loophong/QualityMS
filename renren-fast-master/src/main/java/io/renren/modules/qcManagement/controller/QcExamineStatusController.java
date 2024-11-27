@@ -39,6 +39,7 @@ public class QcExamineStatusController {
     @Autowired
     private MessageNotificationService messageService;
 
+
     /**
      * 列表
      */
@@ -46,11 +47,8 @@ public class QcExamineStatusController {
     @RequiresPermissions("qcManagement:examineStatus:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = qcExamineStatusService.queryPage(params);
-
         return R.ok().put("page", page);
     }
-
-
 
 
     /**

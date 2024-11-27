@@ -9,15 +9,14 @@ import io.renren.modules.qcManagement.entity.QcExamineStatusEntity;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.service.QcSubjectRegistrationService;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -54,7 +53,6 @@ public class QcSubjectRegistrationController {
         Integer countWithoutExamined = qcExamineStatusDao.countWithoutExamined();
         //已完成课题数
         Integer countExamined = qcExamineStatusDao.countExamined();
-
         Map<String, Object> result = new HashMap<>();
         result.put("countRegistration", countRegistration);
         result.put("countSubmitted", countSubmitted);
@@ -70,8 +68,26 @@ public class QcSubjectRegistrationController {
     @RequiresPermissions("qcSubject:registration:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = qcSubjectRegistrationService.queryPage(params);
-//        System.out.println("params++++++++++++++++++++++++++++++++++++: " + params);
-//        List<QcSubjectRegistrationEntity> result=qcSubjectRegistrationDao.fuzzyQueryList();
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 通过审核列表
+     */
+    @RequestMapping("/listFilter")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R listFilter(@RequestParam Map<String, Object> params){
+        PageUtils page = qcSubjectRegistrationService.queryPageFilter(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 大屏展示全部列表
+     */
+    @RequestMapping("/all")
+//    @RequiresPermissions("qcSubject:registration:list")
+    public R listAll(@RequestParam Map<String, Object> params){
+        PageUtils page = qcSubjectRegistrationService.queryPageAll(params);
         return R.ok().put("page", page);
     }
 
@@ -85,49 +101,91 @@ public class QcSubjectRegistrationController {
 //        for(int i=0;i<10;i++){
 //            qcSubjectRegistrationDao.getActivity("1","创新型");
 //        }
+        return R.ok().put("page", page);
+    }
 
+    /**
+     * 我开展的列表
+     */
+    @RequestMapping("/leadList")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R myListLeader(@RequestParam Map<String, Object> params){
+        log.info("我开展："+(String) params.get("key"));
+        PageUtils page = qcSubjectRegistrationService.queryPageLead(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 我开展的列表,通过审核
+     */
+    @RequestMapping("/leadListFilter")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R myListLeaderFilter(@RequestParam Map<String, Object> params){
+        log.info("我开展："+(String) params.get("key"));
+        PageUtils page = qcSubjectRegistrationService.queryPageLeadFilter(params);
         return R.ok().put("page", page);
     }
 
 
-
-
     /**
-     * 我的列表
+     * 我参与的列表
      */
     @RequestMapping("/myList")
     @RequiresPermissions("qcSubject:registration:list")
     public R myList(@RequestParam Map<String, Object> params){
-        PageUtils page = qcSubjectRegistrationService.queryPage(params);
-        String userName= ShiroUtils.getUserEntity().getUsername();
-//        String userName= "95";
-        List<QcSubjectRegistrationEntity> resultList = (List<QcSubjectRegistrationEntity>) page.getList();
-        // 过滤结果列表,查询只与当前角色相关的
-        List<QcSubjectRegistrationEntity> filteredResultList = resultList.stream()
-                .filter(entity -> entity.getTeamNumberIds().contains(userName)|| entity.getTopicConsultant().contains(userName))
-                .collect(Collectors.toList());
-//        log.info("过滤后的结果集合: " + filteredResultList);
-        page.setList(filteredResultList);
-        page.setTotalCount(filteredResultList.size());
+        log.info("我参与："+(String) params.get("key"));
+        PageUtils page = qcSubjectRegistrationService.queryPageAbout(params);
         return R.ok().put("page", page);
     }
-//    /**
-//     * 根据组名获得成员
-//     */
-//    @RequestMapping("/getMembers")
-//    @RequiresPermissions("qcSubject:registration:list")
-//    public R getMembers(@RequestParam String groupName){
-//        List<QcGroupMemberEntity> qcGroupMemberEntityList = qcSubjectRegistrationService.getMembersOfGroup(groupName);
-//        return R.ok().put("成员",qcGroupMemberEntityList);
-//    }
 
+    /**
+     * 我参与的列表,通过审核
+     */
+    @RequestMapping("/myListFilter")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R myListFilter(@RequestParam Map<String, Object> params){
+        log.info("我参与："+(String) params.get("key"));
+        PageUtils page = qcSubjectRegistrationService.queryPageAboutFilter(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 获取当前登录用户名
+     */
+    @RequestMapping("/user")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R getUerName(){
+        String userName= ShiroUtils.getUserEntity().getUsername();
+        return R.ok().put("userName",userName);
+    }
+
+    /**
+     * 检查当前用户是否是课题组长
+     */
+    @RequestMapping("/ifGroupLead")
+//    @RequiresPermissions("qcSubject:registration:list")
+    public R ifGroupLead(){
+        String userName= ShiroUtils.getUserEntity().getUsername();
+        boolean ifLead = qcSubjectRegistrationDao.ifGroupLead(userName);
+        return R.ok().put("ifLead",ifLead);
+    }
+
+    /**
+     * 课题名称重复性检查
+     */
+    @RequestMapping("/exist")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R existName(@RequestParam String topicName){
+        boolean exist=qcSubjectRegistrationDao.ifExistSubjectName(topicName);
+        return R.ok().put("exist",exist);
+    }
     /**
      * 信息
      */
     @RequestMapping("/info/{qcsrId}")
     @RequiresPermissions("qcSubject:registration:update")
     public R info(@PathVariable("qcsrId") Long qcsrId){
-		QcSubjectRegistrationEntity qcSubjectRegistration = qcSubjectRegistrationService.getById(qcsrId);
+        QcSubjectRegistrationEntity qcSubjectRegistration = qcSubjectRegistrationService.getById(qcsrId);
         String userName= ShiroUtils.getUserEntity().getUsername();
         return R.ok().put("qcSubjectRegistration", qcSubjectRegistration).put("userName",userName);
     }
@@ -138,7 +196,15 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/save")
     @RequiresPermissions("qcSubject:registration:save")
     public R save(@RequestBody QcSubjectRegistrationEntity qcSubjectRegistration){
-		qcSubjectRegistrationService.save(qcSubjectRegistration);
+        Integer tmpId = qcSubjectRegistrationDao.maxOfId();
+        // 获取当前年份
+        Date currentDate = new Date();
+        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+        String currentYear = yearFormat.format(currentDate);
+        String topicNumber = "PJHLQCKT-"+currentYear +"-"+(tmpId+1);
+        log.info("课题编号:"+topicNumber);
+        qcSubjectRegistration.setTopicNumber(topicNumber);
+        qcSubjectRegistrationService.save(qcSubjectRegistration);
         return R.ok().put("id", qcSubjectRegistration.getQcsrId());
     }
 
@@ -148,7 +214,7 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/update")
     @RequiresPermissions("qcSubject:registration:update")
     public R update(@RequestBody QcSubjectRegistrationEntity qcSubjectRegistration){
-		qcSubjectRegistrationService.updateById(qcSubjectRegistration);
+        qcSubjectRegistrationService.updateById(qcSubjectRegistration);
 
         return R.ok();
     }
@@ -159,7 +225,7 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/delete")
     @RequiresPermissions("qcSubject:registration:delete")
     public R delete(@RequestBody Long[] qcsrIds){
-		qcSubjectRegistrationService.removeByIds(Arrays.asList(qcsrIds));
+        qcSubjectRegistrationService.removeByIds(Arrays.asList(qcsrIds));
 
         return R.ok();
     }
@@ -173,6 +239,17 @@ public class QcSubjectRegistrationController {
             QcSubjectRegistrationEntity qcSubjectRegistration = qcSubjectRegistrationService.getById(qcsrId);
             return R.ok().put("resultType", qcSubjectRegistration.getResultType());
         }
+
+    /**
+     * QC知识库
+     */
+
+    @RequestMapping("/finishedList")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R finishedList(@RequestParam Map<String, Object> params){
+        PageUtils page =  qcSubjectRegistrationService.queryPageFinishedList(params);
+        return R.ok().put("page", page);
+    }
     }
 
 

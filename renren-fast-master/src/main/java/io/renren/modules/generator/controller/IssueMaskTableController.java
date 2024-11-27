@@ -30,6 +30,29 @@ public class IssueMaskTableController {
     private IssueMaskTableService issueMaskTableService;
 
     /**
+     * 列表，本人接受任务
+     */
+    @RequestMapping("/accepttasklist")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R accepttasklist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueMaskTableService.acceptqueryPage(params);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 列表，本人派发任务
+     */
+    @RequestMapping("/distributetasklist")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R distributetasklist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueMaskTableService.distributequeryPage(params);
+
+        return R.ok().put("page", page);
+    }
+
+
+    /**
      * 列表，接收人可见
      */
     @RequestMapping("/recipientslist")
@@ -106,7 +129,7 @@ public class IssueMaskTableController {
     @RequestMapping("/info/{issuemaskId}")
     @RequiresPermissions("generator:issuemasktable:info")
     public R info(@PathVariable("issuemaskId") Integer issuemaskId){
-		IssueMaskTableEntity issueMaskTable = issueMaskTableService.getById(issuemaskId);
+        IssueMaskTableEntity issueMaskTable = issueMaskTableService.getById(issuemaskId);
 
         return R.ok().put("issueMaskTable", issueMaskTable);
     }
@@ -117,9 +140,10 @@ public class IssueMaskTableController {
     @RequestMapping("/save")
     @RequiresPermissions("generator:issuemasktable:save")
     public R save(@RequestBody IssueMaskTableEntity issueMaskTable){
-        System.out.println("+++++++++++++++++++后端获取信息开始：+++++++");
+//        System.out.println("+++++++++++++++++++后端获取信息开始：+++++++");
+//        System.out.println(issueMaskTable);
         issueMaskTableService.save(issueMaskTable);
-        System.out.println("+++++++++++++++++后端获取信息："+ issueMaskTable+"+++++++");
+//        System.out.println("+++++++++++++++++后端获取信息："+ issueMaskTable+"+++++++");
         return R.ok();
     }
 
@@ -130,7 +154,7 @@ public class IssueMaskTableController {
     @RequiresPermissions("generator:issuemasktable:update")
     public R update(@RequestBody IssueMaskTableEntity issueMaskTable){
         System.out.println("开始修改整改数据"+issueMaskTable);
-		issueMaskTableService.updateById(issueMaskTable);
+        issueMaskTableService.updateById(issueMaskTable);
 
         return R.ok();
     }
@@ -141,7 +165,7 @@ public class IssueMaskTableController {
     @RequestMapping("/delete")
     @RequiresPermissions("generator:issuemasktable:delete")
     public R delete(@RequestBody Integer[] issuemaskIds){
-		issueMaskTableService.removeByIds(Arrays.asList(issuemaskIds));
+        issueMaskTableService.removeByIds(Arrays.asList(issuemaskIds));
 
         return R.ok();
     }
@@ -171,7 +195,7 @@ public class IssueMaskTableController {
      * 审核
      */
     @RequestMapping("/audit")
-    @RequiresPermissions("generator:issuemasktable:delete")
+    @RequiresPermissions("generator:issuemasktable:update")
     public R audit(@RequestParam("issuemaskIds") String issuemaskIds,@RequestParam("reviewerOpinion") String reviewerOpinion, @RequestParam("result") String result) {
         // 将以逗号分隔的字符串转换为 Integer 数组
         String[] idStrings = issuemaskIds.split(",");

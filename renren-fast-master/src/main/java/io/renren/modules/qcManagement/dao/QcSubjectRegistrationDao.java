@@ -3,6 +3,7 @@ package io.renren.modules.qcManagement.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
+import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -19,7 +20,7 @@ import java.util.List;
 @Mapper
 public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrationEntity> {
 
-   List<QcSubjectRegistrationEntity> selectFinishedSubjectList(@Param("topicName") String topicName, @Param("keywords") String keywords, @Param("startDate") String startDate, String endDate);
+   List<QcknowledgebaseEntity> selectFinishedSubjectList(@Param("topicName") String topicName, @Param("keywords") String keywords, @Param("startDate") String startDate, String endDate);
 
     //根据小组名称查询小组成员
     @Select({

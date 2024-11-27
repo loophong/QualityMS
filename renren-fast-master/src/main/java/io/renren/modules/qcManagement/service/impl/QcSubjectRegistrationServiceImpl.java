@@ -9,6 +9,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.qcManagement.entity.QcExamineStatusEntity;
+import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.renren.modules.qcManagement.dao.QcGroupMemberDao;
@@ -18,6 +19,7 @@ import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.service.QcSubjectRegistrationService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +41,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
 
         long p = Long.parseLong((String) params.get("page"));
         long l = Long.parseLong((String) params.get("limit"));
-        Page<QcSubjectRegistrationEntity> page = new Page<>(p, l);
+        Page<QcknowledgebaseEntity> page = new Page<>(p, l);
 
         // 提取模糊查询参数
         String topicName = (String) params.get("topicName");
@@ -49,7 +51,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
 
         try {
             // 执行分页查询
-            List<QcSubjectRegistrationEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,startDate,endDate);
+            List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,startDate,endDate);
             page.setRecords(result);
             page.setTotal(result.size());
 
@@ -61,6 +63,29 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
             return new PageUtils(page);
         }
     }
+    public List<QcknowledgebaseEntity> queryFinishedList1(Map<String, Object> params) {
+    log.info("param" + params.get("page") + "------" + params.get("limit"));
+
+    // 提取模糊查询参数
+    String topicName = (String) params.get("topicName");
+    String keywords = (String) params.get("keywords");
+    String startDate = (String) params.get("startDate");
+    String endDate = (String) params.get("endDate");
+
+    try {
+        // 执行查询
+        List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords, startDate, endDate);
+        log.info("result" + result);
+        return result;
+    } catch (Exception e) {
+        log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+        return Collections.emptyList(); // 返回空列表
+    }
+}
+
+
+
+    ;
 //    @Override
 //    public PageUtils queryPageFinishedList(Map<String, Object> params) {
 //    log.info("param" + params.get("page") + "------" + params.get("limit"));

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="!dataForm.qcsrId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="!dataForm.qcsrId ? '新增' : '修改'" :close-on-click-modal="true" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
       label-width="150px">
       <el-form-item label="课题名称" prop="topicName">

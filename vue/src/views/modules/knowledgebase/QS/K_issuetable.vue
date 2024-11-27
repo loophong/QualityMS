@@ -337,7 +337,7 @@
         align="center"
         label="公式">
       </el-table-column>
-     
+
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"

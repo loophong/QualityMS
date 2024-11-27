@@ -8,6 +8,7 @@ import io.renren.modules.qcManagement.dao.QcSubjectRegistrationDao;
 import io.renren.modules.qcManagement.entity.QcExamineStatusEntity;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
+import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import io.renren.modules.qcManagement.service.QcSubjectRegistrationService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -205,6 +206,12 @@ public class QcSubjectRegistrationController {
         PageUtils page =  qcSubjectRegistrationService.queryPageFinishedList(params);
         return R.ok().put("page", page);
     }
+    @RequestMapping("/finishedList01")
+    @RequiresPermissions("qcSubject:registration:list")
+    public List<QcknowledgebaseEntity>list1(@RequestParam Map<String, Object> params){
+        List<QcknowledgebaseEntity> list = qcSubjectRegistrationService.queryFinishedList1(params);
+         return list;
     }
+}
 
 

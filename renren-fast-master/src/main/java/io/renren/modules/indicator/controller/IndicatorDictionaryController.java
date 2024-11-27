@@ -86,6 +86,7 @@ public class IndicatorDictionaryController {
     @RequestMapping("/save")
     @RequiresPermissions("indicator:indicatordictionary:save")
     public R save(@RequestBody IndicatorDictionaryEntity indicatorDictionary){
+        System.out.println("indicatorDictionary===>"+indicatorDictionary);
 		indicatorDictionaryService.save(indicatorDictionary);
 
         return R.ok();

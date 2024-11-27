@@ -76,9 +76,9 @@
                       v-model="dataForm.planContent" maxlength="1000">
             </el-input>
           </el-form-item>
-          <el-form-item label="上传附件" prop="planFile" required>
+          <el-form-item label="上传附件" prop="planFile">
             <el-upload ref="file" :file-list="planFileList" :action="uploadUrl"
-                       :on-change="uploadFile" :auto-upload="false">
+                       :on-remove="handleRemove" :before-remove="beforeRemove" :on-change="uploadFile" :auto-upload="false">
               <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
             </el-upload>
           </el-form-item>
@@ -312,9 +312,9 @@ export default {
         planAuditor: [
           {required: true, message: '审核人不能为空', trigger: ['change', 'blur']}
         ],
-        planAssociatedIndicatorsId: [
-          {required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur']}
-        ],
+        // planAssociatedIndicatorsId: [
+        //   {required: true, message: '关联指标编号不能为空', trigger: ['change', 'blur']}
+        // ],
 
         taskId: [
           {required: true, message: '任务编号不能为空', trigger: 'blur'},
@@ -446,8 +446,39 @@ export default {
   methods: {
 
     // 上传文件
+    // uploadFile(file) {
+    //   console.log("文件" + file.raw);
+    //
+    //   const formData = new FormData();
+    //   formData.append('file', file.raw); // 将文件添加到 FormData
+    //
+    //   this.$http({
+    //     url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+    //     method: 'post',
+    //     data: formData,
+    //     headers: {
+    //       'Content-Type': 'multipart/form-data' // 指定为文件上传
+    //     }
+    //   }).then(({data}) => {
+    //     if (data && data.code === 0) {
+    //       // 保存后端返回的url到变量中
+    //       this.dataForm.planFile = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+    //       console.log('获得的文件地址 ：', data.uploadurl)
+    //       this.$message.success('文件上传成功');
+    //       // 处理成功后的逻辑，例如更新状态
+    //     } else {
+    //       this.$message.error(data.msg);
+    //     }
+    //   }).catch(error => {
+    //     this.$message.error('上传失败');
+    //     console.error(error);
+    //   });
+    // },
+
+    // 上传文件
     uploadFile(file) {
-      console.log("文件" + file.raw);
+
+      console.log("文件" + file.name);
 
       const formData = new FormData();
       formData.append('file', file.raw); // 将文件添加到 FormData
@@ -463,6 +494,11 @@ export default {
         if (data && data.code === 0) {
           // 保存后端返回的url到变量中
           this.dataForm.planFile = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+          this.planFileList.push({
+            'planId': this.dataForm.planId,
+            'name': file.name,
+            'url': data.uploadurl
+          });
           console.log('获得的文件地址 ：', data.uploadurl)
           this.$message.success('文件上传成功');
           // 处理成功后的逻辑，例如更新状态
@@ -473,6 +509,16 @@ export default {
         this.$message.error('上传失败');
         console.error(error);
       });
+    },
+
+    // 移除文件之前提示
+    beforeRemove(file, planFileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+
+    // 移除文件
+    handleRemove(file, planFileList) {
+      console.log("移除的文件为: " + JSON.stringify(file));
     },
 
     init(routerPlanId) {
@@ -512,6 +558,7 @@ export default {
               this.dataForm.planAssociatedIndicatorsId = data.plan.planAssociatedIndicatorsId
               this.dataForm.planFile = data.plan.planFile
               this.tasks = data.tasks
+              this.planFileList = data.files
             }
           })
         }
@@ -628,7 +675,8 @@ export default {
               method: 'post',
               data: this.$http.adornData({
                 'plan': plan,
-                'tasks': tasksData
+                'tasks': tasksData,
+                'files': this.planFileList
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -754,12 +802,12 @@ export default {
     // 移除任务
     removeTask(index) {
       // 弹窗询问用户是否确认删除
-      this.$confirm('此操作将永久删除该任务, 是否继续?', '提示', {
+      this.$confirm('此操作将该任务, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.deleteTaskByTaskId(this.tasks[index].tmTid);
+        // this.deleteTaskByTaskId(this.tasks[index].tmTid);
 
         this.tasks.splice(index, 1);
         this.$message({
@@ -834,17 +882,17 @@ export default {
     //   }
     // },
 
-    deleteTaskByTaskId(tmTid) {
-      console.log("删除任务" + tmTid);
-      this.$http({
-        url: this.$http.adornUrl(`/taskmanagement/task/deleteByTaskId`),
-        method: 'get',
-        params: {
-          tmTid: tmTid
-        }
-      })
-
-    },
+    // deleteTaskByTaskId(tmTid) {
+    //   console.log("删除任务" + tmTid);
+    //   this.$http({
+    //     url: this.$http.adornUrl(`/taskmanagement/task/deleteByTaskId`),
+    //     method: 'get',
+    //     params: {
+    //       tmTid: tmTid
+    //     }
+    //   })
+    //
+    // },
 
 
   },

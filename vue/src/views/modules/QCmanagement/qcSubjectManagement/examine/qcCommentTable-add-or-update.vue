@@ -12,7 +12,7 @@
         <el-input v-model="dataForm.tableTag" placeholder="标题内容"></el-input>
       </el-form-item>
       <el-form-item label="评审内容" prop="tableComment">
-        <el-input type="textarea" :rows="6" v-model="dataForm.tableComment" placeholder="评审内容"></el-input>
+        <el-input type="textarea" autosize v-model="dataForm.tableComment" placeholder="评审内容"></el-input>
       </el-form-item>
       <!-- <el-form-item label="备注" prop="tableExtra">
         <el-input v-model="dataForm.tableExtra" placeholder="备注"></el-input>

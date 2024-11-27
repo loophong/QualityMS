@@ -21,9 +21,9 @@
         <result property="stageAfter" column="stage_after"/>
         <result property="stageConsolidate" column="stage_consolidate"/>
         <result property="stageAttachment" column="stage_attachment"/>
+        <result property="stageConsultant" column="stage_consultant"/>
+        <result property="stageReview" column="stage_review"/>
     </resultMap>
-
-
 
 
 </mapper>

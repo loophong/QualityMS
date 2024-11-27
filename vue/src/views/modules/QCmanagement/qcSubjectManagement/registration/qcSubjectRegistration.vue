@@ -1,107 +1,389 @@
 <template>
-  <div class="mod-config">
-    <el-form :inline="true" :model="myQueryParam" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="myQueryParam.topicName" placeholder="课题名称" clearable></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+  <el-tabs v-model="activeName" type="border-card">
+    <el-tab-pane label="所有课题" name="1" v-if="isAuth('qcManagement:group:admin')">
+      <div class="mod-config">
+        <el-form :inline="true" :model="myQueryParam" @keyup.enter.native="getDataList()">
+          <el-form-item>
+            <el-input v-model="myQueryParam.topicName" placeholder="课题名称" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="getDataList()">查询</el-button>
+            <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+              @click="addOrUpdateHandle()">新增</el-button>
+            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
+              @click="reuseVisible = true">课题重用</el-button>
+            <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <!-- <el-button type="primary" @click="exportAll('list')">课题导出</el-button> -->
+          </el-form-item>
+        </el-form>
+        <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
+          style="width: 100%;" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
+          <el-table-column type="selection" header-align="center" align="center" width="50">
+          </el-table-column>
+          <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed>
+          </el-table-column>
+          <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
+          </el-table-column>
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+            <template slot-scope="scope">
+              <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
+              <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
+              <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
+              <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
+              <span v-else>-</span> <!-- 处理未知状态 -->
+            </template>
+          </el-table-column>
+          <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
+          </el-table-column>
+          <el-table-column prop="groupName" header-align="center" align="center" label="小组名称">
+          </el-table-column>
+          <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column>
+          <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+          </el-table-column>
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          </el-table-column>
+          <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要">
+          </el-table-column>
+          <el-table-column prop="topicType" header-align="center" align="center" label="课题类型">
+          </el-table-column>
+          <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+          </el-table-column>
+          <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期">
+          </el-table-column>
+          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期">
+          </el-table-column>
+          <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+          </el-table-column>
+          <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
+          </el-table-column>
+          <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
+            <template slot-scope="scope">
+              <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
+              <span v-else>--</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="note" header-align="center" align="center" label="备注">
+          </el-table-column>
 
-        <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
-          @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
-          :disabled="dataListSelections.length != 1">课题重用</el-button>
-        <el-button type="danger" @click="toIssue()">问题添加</el-button>
-      </el-form-item>
-    </el-form>
-    <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-      style="width: 100%;" stripe>
-      <el-table-column type="selection" header-align="center" align="center" width="50">
-      </el-table-column>
-      <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
-      </el-table-column>
-      <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
-      </el-table-column>
-      <el-table-column prop="groupName" header-align="center" align="center" label="小组名称">
-      </el-table-column>
-      <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
-      </el-table-column> -->
-      <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
-      </el-table-column>
-      <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
-      </el-table-column>
-      <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要">
-      </el-table-column>
-      <el-table-column prop="topicType" header-align="center" align="center" label="课题类型">
-      </el-table-column>
-      <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
-      </el-table-column>
-      <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期">
-      </el-table-column>
-      <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期">
-      </el-table-column>
-      <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
-      </el-table-column>
-      <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
-      </el-table-column>
-      <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
-        <template slot-scope="scope">
-          <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
-          <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
-          <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
-          <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
-          <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
-          <span v-else>--</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="note" header-align="center" align="center" label="备注">
-      </el-table-column>
-      <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
-        <template slot-scope="scope">
-          <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
-          <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
-          <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
-          <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
-          <span v-else>-</span> <!-- 处理未知状态 -->
-        </template>
-      </el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
-          <el-button type="text" size="small" @click="checkHandle(scope.row.qcsrId)">审核</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-      :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper">
-    </el-pagination>
+          <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
+              <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
+              <el-button type="text" size="small" v-if="scope.row.topicReviewStatus != 3"
+                @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+          :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+          layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination>
+        <!-- 弹窗, 新增 / 修改 -->
+        <!-- <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update> -->
+      </div>
+    </el-tab-pane>
+    <el-tab-pane label="我创办的课题" name="2">
+      <div class="mod-config">
+        <el-form :inline="true" :model="myQueryParamLead" @keyup.enter.native="getLeadList()">
+
+          <el-form-item>
+            <el-input v-model="myQueryParamLead.topicName" placeholder="课题名称" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input v-model="myQueryParamLead.keywords" placeholder="课题关键字" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="getLeadList()">查询</el-button>
+            <el-button v-if="((isAuth('qcSubject:registration:save')) || groupLead)" type="primary"
+              @click="addOrUpdateHandle()">新增</el-button>
+            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
+              @click="reuseVisible = true">课题重用</el-button>
+            <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <!-- <el-button type="primary" @click="exportAll('leadList')">课题导出</el-button> -->
+            <!-- <el-badge :value="superScriptNumber" class="item">
+              <el-button type="warning" @click="dialogMessageVisible = true">消息详情</el-button>
+            </el-badge> -->
+          </el-form-item>
+        </el-form>
+        <el-table :data="subjectLeadList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
+          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
+          <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
+          </el-table-column> -->
+          <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed>
+          </el-table-column>
+          <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+          </el-table-column>
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+            <template slot-scope="scope">
+              <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
+              <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
+              <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
+              <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
+          </el-table-column>
+          <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column>
+          <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+          </el-table-column>
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          </el-table-column>
+          <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要" width="150">
+          </el-table-column>
+          <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+          </el-table-column>
+          <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+          </el-table-column>
+          <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+          </el-table-column>
+          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+          </el-table-column>
+          <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+          </el-table-column>
+          <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+            <template slot-scope="scope">
+              <span>{{
+                toStatus(scope.row.topicActivityStatus, scope.row.topicType)
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
+          </el-table-column>
+          <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+          </el-table-column>
+          <el-table-column prop="note" header-align="center" align="center" label="备注">
+          </el-table-column>
+
+          <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
+              <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
+              <el-button type="text" size="small" @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination @size-change="sizeChangeHandleLead" @current-change="currentChangeHandleLead"
+          :current-page="pageIndexLead" :page-sizes="[10, 20, 50, 100]" :page-size="pageSizeLead" :total="totalPageLead"
+          layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination>
+        <!-- 弹窗, 新增 / 修改 -->
+        <!-- <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshLeadList="getLeadList()"></add-or-update> -->
+      </div>
+    </el-tab-pane>
+    <el-tab-pane label="我参与的课题" name="3">
+      <div class="mod-config">
+        <el-form :inline="true" :model="myQueryParamJoin" @keyup.enter.native="getJoinList()">
+          <el-form-item>
+            <el-input v-model="myQueryParamJoin.topicName" placeholder="课题名称" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input v-model="myQueryParamJoin.keywords" placeholder="课题关键字" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="getJoinList()">查询</el-button>
+            <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+              @click="addOrUpdateHandle()">新增</el-button> -->
+            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
+              @click="reuseVisible = true">课题重用</el-button>
+            <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <!-- <el-button type="primary" @click="exportAll('myList')">课题导出</el-button> -->
+          </el-form-item>
+        </el-form>
+        <el-table :data="subjectJoinList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
+          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }">
+          <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed>
+          </el-table-column>
+          <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+          </el-table-column>
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+            <template slot-scope="scope">
+              <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
+              <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
+              <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
+              <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
+          </el-table-column>
+          <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column>
+          <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+          </el-table-column>
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          </el-table-column>
+          <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要" width="150">
+          </el-table-column>
+          <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+          </el-table-column>
+          <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+          </el-table-column>
+          <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+          </el-table-column>
+          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+          </el-table-column>
+          <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+          </el-table-column>
+          <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+            <template slot-scope="scope">
+              <span>{{
+                toStatus(scope.row.topicActivityStatus, scope.row.topicType)
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
+          </el-table-column>
+          <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+          </el-table-column>
+          <el-table-column prop="note" header-align="center" align="center" label="备注">
+          </el-table-column>
+          <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
+              <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
+              <el-button type="text" size="small" @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination @size-change="sizeChangeHandleJoin" @current-change="currentChangeHandleJoin"
+          :current-page="pageIndexJoin" :page-sizes="[10, 20, 50, 100]" :page-size="pageSizeJoin" :total="totalPageJoin"
+          layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination>
+
+      </div>
+    </el-tab-pane>
+    <el-dialog title="课题重用" :visible.sync="reuseVisible">
+      <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
+        :disabled="dataListSelections.length != 1">重用</el-button>
+      <br>
+      <br>
+      <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id"
+        @selection-change="selectionChangeHandle" highlight-current-row>
+        <el-table-column type="selection" header-align="center" align="center" width="50">
+        </el-table-column>
+        <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+        </el-table-column>
+        <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
+        </el-table-column>
+        <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column> -->
+        <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+        </el-table-column>
+        <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+        </el-table-column>
+        <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+        </el-table-column>
+        <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+        </el-table-column>
+        <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+        </el-table-column>
+        <!-- <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <template slot-scope="scope">
+            <span>{{
+              toStatus(scope.row.topicActivityStatus, scope.row.topicType)
+            }}</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+        </el-table-column>
+        <el-table-column prop="note" header-align="center" align="center" label="备注">
+        </el-table-column>
+        <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628">未通过</span>
+            <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray">未开始</span>
+            <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb">审核中</span>
+            <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146">已通过</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column> -->
+        <!-- <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
+              @click="messagePlanHandle(scope.row.qcsrId)">关联计划</el-button>
+            <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
+              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              ">审核状态</el-button>
+          </template>
+        </el-table-column> -->
+      </el-table>
+      <el-pagination @size-change="sizeChangeHandleReuse" @current-change="currentChangeHandleReuse"
+        :current-page="pageIndexReuse" :page-sizes="[10, 20, 50, 100]" :page-size="pageSizeReuse"
+        :total="totalPageReuse" layout="total, sizes, prev, pager, next, jumper">
+      </el-pagination>
+    </el-dialog>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-  </div>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList()"
+      @refreshJoinList="getJoinList()" @refreshLeadList="getLeadList()"></add-or-update>
+  </el-tabs>
 </template>
 
 <script>
 import AddOrUpdate from './qcSubjectRegistration-add-or-update'
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { Loading } from "element-ui";
+import { group } from 'd3';
 export default {
+  name: 'qcSubjectRegistration',
   data() {
     return {
+      activeName: '2',
       dataForm: {
         key: ''
       },
+      groupLead: false,
+      currentUserName: '',
       dataList: [],
+      reuseVisible: false,
+      messageList: [],
+
+      messageListLoading: false,
+      exportList: [],
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
+
+      pageIndexLead: 1,
+      pageSizeLead: 10,
+      totalPageLead: 0,
+
+      pageIndexJoin: 1,
+      pageSizeJoin: 10,
+      totalPageJoin: 0,
+
+      pageIndexReuse: 1,
+      pageSizeReuse: 10,
+      totalPageReuse: 0,
+
+
       dataListLoading: false,
       dataListSelections: [],
+      subjectDataList: [],
+      subjectLeadList: [],
+      subjectJoinList: [],
+      membersOptions: [],
       addOrUpdateVisible: false,
       groupMemberList: [],
       myQueryParam: {
+        topicName: '',
+        keywords: '',
+      },
+      myQueryParamLead: {
+        topicName: '',
+        keywords: '',
+      },
+      myQueryParamJoin: {
         topicName: '',
         keywords: '',
       },
@@ -111,36 +393,122 @@ export default {
   components: {
     AddOrUpdate
   },
-  activated() {
+  async activated() {
     this.getDataList()
+    this.getJoinList();
+    this.getLeadList();
+    this.getUserName();
     this.getGroupMemberData().then(groupList => {
-      this.groupMemberList = groupList;
+      this.groupMemberList = Object.values(groupList).filter(item => item.examineStatus === "通过").reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {});
     });
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.membersOptions = data;
+    });
+    this.ifGroupLead();
   },
   methods: {
+    async ifGroupLead() {
+      this.$http({
+        url: this.$http.adornUrl('/qcSubject/registration/ifGroupLead'),
+        method: 'get',
+        params: this.$http.adornParams({
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.groupLead = data.ifLead
+        }
+      });
+    },
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
 
+      });
+    },
     parseTime(time) {
       return new Date(time).toLocaleString();
     },
+    // 获取我参与课题数据列表
+    async getJoinList() {
+      this.dataListLoading = true;
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/myList"),
+        method: "get",
+        params: this.$http.adornParams({
+          'page': this.pageIndexJoin,
+          'limit': this.pageSizeJoin,
+          'key': this.myQueryParamJoin,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.subjectJoinList = data.page.list;
+          // this.dataList = resultList
+          this.totalPageJoin = data.page.totalCount;
+        } else {
+          this.subjectJoinList = [];
+          this.totalPageSubject = 0;
+        }
+
+        this.dataListLoading = false;
+      });
+    },
+    // 获取我创办课题数据列表
+    async getLeadList() {
+      this.dataListLoading = true;
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/leadList"),
+        method: "get",
+        params: this.$http.adornParams({
+          'page': this.pageIndexLead,
+          'limit': this.pageSizeLead,
+          'key': this.myQueryParamLead,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.subjectLeadList = data.page.list;
+          // this.dataList = resultList
+          this.totalPageLead = data.page.totalCount;
+        } else {
+          this.subjectLeadList = [];
+          this.totalPageSubject = 0;
+        }
+
+        this.dataListLoading = false;
+      });
+    },
+
     // 获取数据列表
-    async getDataList() {
+    async getDataList(reuse) {
       this.dataListLoading = true
       await this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/list'),
-        // url: this.$http.adornUrl('/qcPlan/step/reuse'),
         method: 'get',
         params: this.$http.adornParams({
-          'page': this.pageIndex,
-          'limit': this.pageSize,
-          'topicName': this.myQueryParam.topicName,
-          'keywords': this.myQueryParam.keywords
-          // 'key': 1,
-          // 'reuseStepId': 5
+          'page': reuse ? this.pageIndexReuse : this.pageIndex,
+          'limit': reuse ? this.pageSizeReuse : this.pageSize,
+          'key': this.myQueryParam,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.dataList = data.page.list
           this.totalPage = data.page.totalCount
+          this.messageList = data.page.list
+          this.totalPageReuse = data.page.totalCount
         } else {
           this.dataList = []
           this.totalPage = 0
@@ -156,10 +524,37 @@ export default {
       this.pageIndex = 1
       this.getDataList()
     },
+    sizeChangeHandleLead(val) {
+      this.pageSizeLead = val
+      this.pageIndexLead = 1
+      this.getLeadList()
+    },
+    sizeChangeHandleJoin(val) {
+      this.pageSizeJoin = val
+      this.pageIndexJoin = 1
+      this.getJoinList()
+    },
+    sizeChangeHandleReuse(val) {
+      this.pageSizeReuse = val
+      this.pageIndexReuse = 1
+      this.getDataList()
+    },
     // 当前页
     currentChangeHandle(val) {
       this.pageIndex = val
       this.getDataList()
+    },
+    currentChangeHandleJoin(val) {
+      this.pageIndexJoin = val
+      this.getJoinList()
+    },
+    currentChangeHandleLead(val) {
+      this.pageIndexLead = val
+      this.getLeadList()
+    },
+    currentChangeHandleReuse(val) {
+      this.pageIndexReuse = val
+      this.getDataList(1)
     },
     // 多选
     selectionChangeHandle(val) {
@@ -169,7 +564,9 @@ export default {
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
+        this.$refs.addOrUpdate.membersOptions = this.membersOptions;
         this.$refs.addOrUpdate.groupMemberList = this.groupMemberList
+        this.$refs.addOrUpdate.updateOptions()
         this.$refs.addOrUpdate.init(id)
       })
     },
@@ -191,8 +588,8 @@ export default {
             type: 'success',
             duration: 1500,
             onClose: () => {
+              this.getDataList();
               this.visible = false
-              this.$emit('refreshDataList')
             }
           })
         } else {
@@ -215,7 +612,10 @@ export default {
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
-            this.groupMemberList = data.page.list;
+            this.groupMemberList = data.page.list
+            this.groupMemberList.filter(item => {
+              item.examineStatus == '通过'
+            });
             // this.totalPage = data.page.totalCount;
             groupList = this.groupMemberList;
             // 分组
@@ -225,10 +625,11 @@ export default {
                 map[item.qcgmId] = {
                   id: item.qcgmId,
                   date: item.participationDate,
-                  name: item.name,
+                  name: item.memberName,
                   number: item.number,
                   groupName: item.groupName,
                   roleInTopic: '组长',
+                  examineStatus: item.examineStatus,
                   children: []
                 };
               }
@@ -238,7 +639,7 @@ export default {
                 map[item.parentId].children.push({
                   id: item.qcgmId,
                   date: item.participationDate,
-                  name: item.name,
+                  name: item.memberName,
                   number: item.number,
                   roleInTopic: item.roleInTopic,
                   parentId: item.parentId,
@@ -292,6 +693,8 @@ export default {
               duration: 1500,
               onClose: () => {
                 this.getDataList()
+                this.getJoinList()
+                this.getLeadList()
               }
             })
           } else {
@@ -299,6 +702,79 @@ export default {
           }
         })
       })
+    },
+    toStatus(num, type) {
+      if (type == '创新型') {
+        if (num == '1') {
+          return '设定目标'
+        } else if (num == '2') {
+          return '提出方案确定最佳方案'
+        } else if (num == '3') {
+          return '制定对策'
+        } else if (num == '4') {
+          return '对策实施'
+        } else if (num == '5') {
+          return '检查效果'
+        } else if (num == '6') {
+          return '标准化'
+        } else if (num == '7') {
+          return '总结和下一步打算'
+        } else if (num == '8') {
+          return '完成'
+        } else {
+          return '选择课题'
+        }
+      } else if (type === '问题解决型') {
+        if (num === '1') {
+          return '现状调查'
+        } else if (num === '2') {
+          return '设定目标'
+        } else if (num === '3') {
+          return '原因分析'
+        } else if (num === '4') {
+          return '要因确定'
+        } else if (num === '5') {
+          return '制定对策'
+        } else if (num === '6') {
+          return '对策实施'
+        } else if (num === '7') {
+          return '检查效果'
+        } else if (num === '8') {
+          return '巩固措施'
+        } else if (num === '9') {
+          return '总结和下一步打算'
+        } else if (num === '10') {
+          return '完成'
+        } else {
+          return '选择课题'
+        }
+      } else if (type === '问题解决型(指令型)') {
+        if (num === '1') {
+          return '设定目标'
+        } else if (num === '2') {
+          return '可靠性分析'
+        } else if (num === '3') {
+          return '原因分析'
+        } else if (num === '4') {
+          return '要因确定'
+        } else if (num === '5') {
+          return '制定对策'
+        } else if (num === '6') {
+          return '对策实施'
+        } else if (num === '7') {
+          return '检查效果'
+        } else if (num === '8') {
+          return '巩固措施'
+        } else if (num === '9') {
+          return '总结和下一步打算'
+        } else if (num === '10') {
+          return '完成'
+        } else {
+          return '选择课题'
+        }
+      } else {
+        return '-'
+      }
     },
     // 课题重用
     async reuseHandle() {
@@ -364,9 +840,9 @@ export default {
             'qcsrId': this.dataForm.qcsrId || undefined,
             'topicName': `${newDataForm.topicName}(重用)`,
             'topicNumber': newDataForm.topicNumber,
-            'topicLeader': newDataForm.topicLeader,
+            'topicLeader': this.currentUserName,
             'topicConsultant': newDataForm.topicConsultant,
-            'teamNumberIds': newDataForm.teamNumberIds,
+            'teamNumberIds': undefined,
             'topicReviewStatus': '1',
             'topicDescription': newDataForm.topicDescription,
             'topicType': newDataForm.topicType,
@@ -386,6 +862,9 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
+                this.reuseVisible = false
+                this.getJoinList()
+                this.getLeadList()
                 this.getDataList()
               }
             })
@@ -409,6 +888,83 @@ export default {
         })
       }
     },
+    // 导出
+    async exportAll(url) {
+      console.log(url)
+      await this.$http({
+        url: this.$http.adornUrl(`/qcSubject/registration/${url}`),
+        method: 'get',
+        params: this.$http.adornParams({
+          'page': 1,
+          'limit': 10000,
+        })
+      }).then(({ data }) => {
+        if (data) {
+          this.exportList = data.page.list
+        } else {
+          this.exportList = []
+        }
+      })
+      const loadingInstance = Loading.service({
+        lock: true,
+        text: "正在导出，请稍后...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      console.log(this.exportList)
+      const promises = this.exportList.map((tableRow, index) => {
+        return {
+          序号: index + 1,
+          课题ID: tableRow.qcsrId,
+          课题编号: tableRow.topicNumber,
+          课题组长: tableRow.topicLeader,
+          课题顾问: tableRow.topicConsultant,
+          课题成员: tableRow.teamNumberIds,
+          课题描述: tableRow.topicDescription,
+          课题类型: tableRow.topicType,
+          活动特性: tableRow.activityCharacteristics,
+          活动计划开始日期: tableRow.activityPlan,
+          活动计划结束日期: tableRow.activityPlanEnd,
+          课题关键字: tableRow.keywords,
+          课题活动评分结果: tableRow.topicActivityResult,
+          提交类型: tableRow.resultType,
+          备注: tableRow.note,
+        };
+      });
+      Promise.all(promises)
+        .then((data) => {
+          const ws = XLSX.utils.json_to_sheet(data);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+          const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+          saveAs(
+            new Blob([wbout], { type: "application/octet-stream" }),
+            "课题登记表.xlsx"
+          );
+
+          // // 提交数据到Vuex Store
+          // this.updateExportedData(data);
+
+
+        })
+        .finally(() => {
+          loadingInstance.close();
+        })
+        .catch((error) => {
+          console.error("导出失败:", error);
+          loadingInstance.close();
+        });
+    },
   }
 }
 </script>
+<style scoped>
+.el-table .warning-row {
+  background: oldlace;
+}
+
+.el-table .success-row {
+  background: #f0f9eb;
+}
+</style>

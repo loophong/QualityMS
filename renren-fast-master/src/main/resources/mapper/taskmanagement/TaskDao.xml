@@ -41,7 +41,28 @@
         FROM task_management_task
         where task_associated_plan_id = #{planId}
     </select>
-<!--    private String taskId;-->
+
+    <select id="queryPageByParams" resultType="io.renren.modules.taskmanagement.entity.TaskEntity">
+        SELECT * FROM task_management_task
+        <where>
+            <if test="task.taskId != null and task.taskId != ''">
+                AND task_id like concat('%',#{task.taskId},'%')
+            </if>
+            <if test="task.taskName != null and task.taskName != ''">
+                AND task_name like concat('%',#{task.taskName},'%')
+            </if>
+            <if test="task.taskIsCompleted != null ">
+                AND task_is_completed = #{task.taskIsCompleted}
+            </if>
+            <if test="task.taskAssociatedIndicatorsId != null and task.taskAssociatedIndicatorsId != ''">
+                AND task_associated_indicators_id = #{task.taskAssociatedIndicatorsId}
+            </if>
+            <if test="userId != null">
+                AND ( task_executor like concat('%','"',#{userId},'"','%') or task_principal = #{userId} )
+            </if>
+        </where>
+    </select>
+    <!--    private String taskId;-->
 
 <!--    private Integer taskStartTime;-->
 

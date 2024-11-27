@@ -1,16 +1,44 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+    <el-form :inline="true" :model="queryParams" @keyup.enter.native="getDataList()">
+      <el-form-item label="指标名称" prop="indicatorName">
+        <el-select v-model="queryParams.indicatorName" filterable clearable placeholder="请选择指标名称">
+          <el-option v-for="field in keyIndicatorList" :key="field.indicatorId" :value="field.indicatorName">
+            {{ field.indicatorName }}
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="管理部门" prop="managementDepartment">
+        <el-input v-model="queryParams.managementDepartment" placeholder="请输入管理部门"></el-input>
+      </el-form-item>
+      <el-form-item label="考核部门" prop="assessmentDepartment">
+        <el-input v-model="queryParams.assessmentDepartment" placeholder="请输入考核部门"></el-input>
+      </el-form-item>
+      <el-form-item label="指标分级" prop="indicatorClassification">
+        <el-select v-model="queryParams.indicatorClassification" clearable placeholder="请选择指标分级">
+          <el-option label="A" value="A"></el-option>
+          <el-option label="B" value="B"></el-option>
+          <el-option label="C" value="C"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('indicator:indicatorkeyindicators:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('indicator:indicatorkeyindicators:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('indicator:indicatorkeyindicators:save')" type="danger" @click="issueHandle()">问题添加</el-button>
+        <el-button @click="resetQuery()">重置</el-button>
       </el-form-item>
     </el-form>
+
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button v-if="isAuth('indicator:indicatorkeyindicators:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button v-if="isAuth('indicator:indicatorkeyindicators:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button  type="danger" @click="issueHandle()">问题添加</el-button>
+      </el-col>
+    </el-row>
+
     <el-table
       :data="dataList"
       border
@@ -169,6 +197,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.keyIndicatorId)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.keyIndicatorId)">删除</el-button>
+          <el-button type="text" size="small" @click="storageHandle(scope.row.keyIndicatorId)">入库</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -191,6 +220,31 @@
   export default {
     data () {
       return {
+        keyIndicatorList: [], //重点管控指标列表（不分页）
+        // 查询参数
+        queryParams: {
+          indicatorId: '',
+          indicatorName: '',
+          indicatorClassification: '',
+          assessmentDepartment: '',
+          sourceDepartment: '',
+          managementContent: '',
+          isManagementOutOfControl: '',
+          isNeedsControl: '',
+          keyElements: '',
+          potentialFailureMode: '',
+          potentialFailureConsequences: '',
+          involvedProduct: '',
+          processName: '',
+          controlPosition: '',
+          controlPersonnel: '',
+          controlMethod: '',
+          evaluationMeasurementTechnique: '',
+          sampleSize: '',
+          samplingFrequency: '',
+          controlList: '',
+          storageFlag: ''
+        },
         dataForm: {
           key: ''
         },
@@ -206,8 +260,9 @@
     components: {
       AddOrUpdate
     },
-    activated () {
-      this.getDataList()
+    async activated () {
+      await this.getIndicatorIdFromQuery();
+      this.getDataList();
     },
     methods: {
       // 获取数据列表
@@ -219,11 +274,12 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.queryParams
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.dataList = data.page.list
+            console.log("data1====>",data)
             this.totalPage = data.page.totalCount
           } else {
             this.dataList = []
@@ -231,6 +287,50 @@
           }
           this.dataListLoading = false
         })
+
+        //获取重点管控指标列表（不分页）
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatorkeyindicators/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 10000,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log("data2====>",data)
+            this.keyIndicatorList = data.page.list
+          } else {
+            this.keyIndicatorList = []
+          }
+        })
+      },
+      //查询重置
+      resetQuery() {
+        this.queryParams = {
+          indicatorId: null,
+          indicatorName: null,
+          indicatorClassification: null,
+          assessmentDepartment: null,
+          sourceDepartment: null,
+          managementContent: null,
+          isManagementOutOfControl: null,
+          isNeedsControl: null,
+          keyElements: null,
+          potentialFailureMode: null,
+          potentialFailureConsequences: null,
+          involvedProduct: null,
+          processName: null,
+          controlPosition: null,
+          controlPersonnel: null,
+          controlMethod: null,
+          evaluationMeasurementTechnique: null,
+          sampleSize: null,
+          samplingFrequency: null,
+          controlList: null,
+          storageFlag: null
+        }
+        this.getDataList()
       },
       // 每页数
       sizeChangeHandle (val) {
@@ -283,6 +383,75 @@
             }
           })
         })
+      },
+      //入知识库
+      storageHandle (id) {
+        console.log("id=====>",id)
+        this.$confirm(`是否入库该指标？`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          if (id !== undefined) {
+            this.$http({
+              url: this.$http.adornUrl(`/indicator/indicatorkeyindicators/info/${this.dataForm.keyIndicatorId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.dataForm.indicatorId = data.indicatorKeyIndicators.indicatorId
+                this.dataForm.indicatorName = data.indicatorKeyIndicators.indicatorName
+                this.dataForm.indicatorClassification = data.indicatorKeyIndicators.indicatorClassification
+                this.dataForm.assessmentDepartment = data.indicatorKeyIndicators.assessmentDepartment
+                this.dataForm.sourceDepartment = data.indicatorKeyIndicators.sourceDepartment
+                this.dataForm.managementContent = data.indicatorKeyIndicators.managementContent
+                this.dataForm.isManagementOutOfControl = data.indicatorKeyIndicators.isManagementOutOfControl
+                this.dataForm.isNeedsControl = data.indicatorKeyIndicators.isNeedsControl
+                this.dataForm.keyElements = data.indicatorKeyIndicators.keyElements
+                this.dataForm.potentialFailureMode = data.indicatorKeyIndicators.potentialFailureMode
+                this.dataForm.potentialFailureConsequences = data.indicatorKeyIndicators.potentialFailureConsequences
+                this.dataForm.involvedProduct = data.indicatorKeyIndicators.involvedProduct
+                this.dataForm.processName = data.indicatorKeyIndicators.processName
+                this.dataForm.controlPosition = data.indicatorKeyIndicators.controlPosition
+                this.dataForm.controlPersonnel = data.indicatorKeyIndicators.controlPersonnel
+                this.dataForm.controlMethod = data.indicatorKeyIndicators.controlMethod
+                this.dataForm.evaluationMeasurementTechnique = data.indicatorKeyIndicators.evaluationMeasurementTechnique
+                this.dataForm.sampleSize = data.indicatorKeyIndicators.sampleSize
+                this.dataForm.samplingFrequency = data.indicatorKeyIndicators.samplingFrequency
+                this.dataForm.controlList = data.indicatorKeyIndicators.controlList
+                this.dataForm.storageFlag = data.indicatorKeyIndicators.storageFlag
+              }
+            })
+          }
+          this.$http({
+            url: this.$http.adornUrl('/indicator/indicatorkeyindicators/update'),
+            method: 'post',
+            data: this.$http.adornData({
+              'keyIndicatorId': id,
+              'storageFlag': 1
+            })
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '入库成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        })
+      },
+      //获取指标页面查看重点管控措施时传递的id
+      getIndicatorIdFromQuery() {
+        const indicatorName = this.$route.query.indicatorName;
+        if (indicatorName) {
+          this.queryParams.indicatorName = indicatorName;
+        }
       },
       //问题模块跳转
       issueHandle() {

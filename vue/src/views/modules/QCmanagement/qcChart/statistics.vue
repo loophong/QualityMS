@@ -118,7 +118,7 @@ export default {
         })
       //各阶段个数
       await this.$http({
-        url: this.$http.adornUrl('/qcSubject/registration/list'),
+        url: this.$http.adornUrl('/qcSubject/registration/all'),
         method: 'get',
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -179,17 +179,19 @@ export default {
 
           });
           this.stageNumData.forEach(item => {
-            if (85 <= item.topicActivityResult) {
-              this.scoreResult.first++
-            } else if (75 <= item.topicActivityResult < 85) {
-              this.scoreResult.second++
-            } else if (65 <= item.topicActivityResult < 75) {
-              this.scoreResult.third++
-            }
-            else if (55 <= item.topicActivityResult < 65) {
-              this.scoreResult.fourth++
-            } else if (45 <= item.topicActivityResult < 55) {
-              this.scoreResult.fifth++
+            if (item.topicActivityResult) {
+              if (85 <= item.topicActivityResult) {
+                this.scoreResult.first++
+              } else if (75 <= item.topicActivityResult < 85) {
+                this.scoreResult.second++
+              } else if (65 <= item.topicActivityResult < 75) {
+                this.scoreResult.third++
+              }
+              else if (55 <= item.topicActivityResult < 65) {
+                this.scoreResult.fourth++
+              } else if (45 <= item.topicActivityResult < 55) {
+                this.scoreResult.fifth++
+              }
             }
           });
         } else {
@@ -297,6 +299,12 @@ export default {
           name: {}
         }
       };
+      let dataR = [(this.currentCount / this.allCount) * 100, this.activityDataResult, (this.countData.countExamined / this.countData.countSubmitted) * 100]
+      let formattedData = [
+        { value: dataR[0], itemStyle: { normal: { color: '#409eff' } } },
+        { value: dataR[1], itemStyle: { normal: { color: '#67c23a' } } },
+        { value: dataR[2], itemStyle: { normal: { color: '#e6a23c' } } }
+      ];
       option = {
         title: {
           text: ''
@@ -440,17 +448,20 @@ export default {
       var myChart = echarts.init(chartDom);
       var option;
       let seriesData = [
-        { value: this.scoreResult.first, name: '一等奖' },
-        { value: this.scoreResult.second, name: '二等奖' },
-        { value: this.scoreResult.third, name: '三等奖' },
-        { value: this.scoreResult.fourth, name: '四等奖' },
-        { value: this.scoreResult.fifth, name: '五等奖' },
+        { value: this.scoreResult.first, name: '一等奖', itemStyle: { normal: { color: '#8dc147' } } },
+        { value: this.scoreResult.second, name: '二等奖', itemStyle: { normal: { color: '#66a2d8' } } },
+        { value: this.scoreResult.third, name: '三等奖', itemStyle: { normal: { color: '#906aae' } } },
+        { value: this.scoreResult.fourth, name: '四等奖', itemStyle: { normal: { color: '#00FF00' } } },
+        { value: this.scoreResult.fifth, name: '鼓励奖', itemStyle: { normal: { color: '#ADD8E6' } } },
       ]
       const filteredSeriesData = seriesData.filter(item => item.value !== 0);
       option = {
         title: {
           text: '课题获奖情况',
-          left: 'center'
+          left: 'center',
+          textStyle: {
+            color: '#ffffff' // 设置字体颜色为白色
+          }
         },
         tooltip: {
           trigger: 'item',
@@ -490,7 +501,6 @@ export default {
       option && myChart.setOption(option);
     }
   },
-
 
 
 }

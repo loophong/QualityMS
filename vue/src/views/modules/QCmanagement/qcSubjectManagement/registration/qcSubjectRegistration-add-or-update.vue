@@ -1,36 +1,42 @@
 <template>
-  <el-dialog :title="!dataForm.qcsrId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="!dataForm.qcsrId ? '新增' : '修改'" :close-on-click-modal="true" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
       label-width="150px">
       <el-form-item label="课题名称" prop="topicName">
         <el-input v-model="dataForm.topicName" placeholder="课题名称"></el-input>
       </el-form-item>
-      <el-form-item label="课题编号" prop="topicNumber">
+      <!-- <el-form-item label="课题编号" prop="topicNumber">
         <el-input v-model="dataForm.topicNumber" placeholder="课题编号"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="小组名称" prop="groupName">
-        <el-select v-model="dataForm.groupName" placeholder="请选择小组名称" @change="updateOptions">
+        <el-select v-model="dataForm.groupName" filterable placeholder="请选择小组名称" @change="updateOptions">
           <el-option v-for="item in groupNameOptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
-      <!-- <el-form-item label="课题组长" prop="topicLeader">
-        <el-input v-model="dataForm.topicLeader" placeholder="课题组长"></el-input>
-      </el-form-item> -->
+      <el-form-item label="课题组长" prop="topicLeader">
+        <el-input v-model="dataForm.topicLeader" placeholder="课题组长" :disabled="true"></el-input>
+      </el-form-item>
       <!-- <el-form-item label="课题顾问" prop="topicConsultant">
         <el-input v-model="dataForm.topicConsultant" placeholder="课题顾问"></el-input>
       </el-form-item> -->
       <el-form-item label="课题顾问" prop="topicConsultant">
-        <el-select v-model="dataForm.topicConsultant" placeholder="请选择课题顾问">
-          <el-option v-for="item in consultantOptions" :key="item.value" :label="item.label" :value="item.value">
-          </el-option>
+        <el-select v-model="dataForm.topicConsultant" filterable placeholder="请选择课题顾问">
+          <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
+            <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
+            </el-option>
+          </el-option-group>
         </el-select>
+        <!-- <el-select v-model="dataForm.topicConsultant" filterable placeholder="请选择课题顾问">
+          <el-option v-for="item in membersOptions" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select> -->
       </el-form-item>
       <!-- <el-form-item label="小组成员" prop="teamNumberIds">
         <el-input v-model="dataForm.teamNumberIds" placeholder="小组成员"></el-input>
       </el-form-item> -->
       <el-form-item label="小组成员" prop="teamNumberIds">
-        <el-select v-model="dataForm.teamNumberIds" multiple placeholder="请选择小组成员">
+        <el-select v-model="dataForm.teamNumberIds" filterable multiple placeholder="请选择小组成员">
           <el-option v-for="item in membersSelect" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
@@ -78,7 +84,7 @@
         <el-input v-model="dataForm.deleteFlag" placeholder="删除标记位"></el-input>
       </el-form-item> -->
       <el-form-item label="备注" prop="note">
-        <el-input type="textarea" v-model="dataForm.note" placeholder="备注"></el-input>
+        <el-input type="textarea" autosize v-model="dataForm.note" placeholder="备注"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -96,6 +102,7 @@ export default {
       groupMemberList: [],
       flag: 1,
       visible: false,
+      membersOptions: [],
       dataForm: {
         qcsrId: 0,
         topicName: '',
@@ -173,36 +180,43 @@ export default {
   methods: {
     updateOptions() {
       // 首先找到匹配的组名的项
-      this.dataForm.topicConsultant = '';
-      this.dataForm.teamNumberIds = '';
-      // console.log(this.dataForm.groupName)
-      // console.log(this.dataForm.topicConsultant)
-      // console.log(this.dataForm.teamNumberIds)
-      const matchedItem = Object.values(this.groupMemberList).find(item => {
-        return item.groupName === this.dataForm.groupName;
-      });
+      try {
+        this.dataForm.topicConsultant = '';
+        this.dataForm.teamNumberIds = '';
 
-
-      if (matchedItem) {
-        // 更新顾问选项
-        this.consultantOptions = matchedItem.children.filter(member => member.roleInTopic === '顾问').map(member => ({
-          value: member.name,
-          label: member.name
-        }));
-
-        // 更新成员选项
-        this.membersSelect = matchedItem.children.filter(member => member.roleInTopic === '成员').map(member => ({
-          value: member.name,
-          label: member.name
-        }));
-      } else {
-        // 如果没有找到匹配项，可以清空选项
-        this.consultantOptions = [];
-        this.membersSelect = [];
+        // console.log(this.dataForm.groupName)
+        // console.log(this.dataForm.topicConsultant)
+        // console.log(this.dataForm.teamNumberIds)
+        console.log(this.groupMemberList)
+        // console.log(this.dataForm)
+        const matchedItem = Object.values(this.groupMemberList).find(item => {
+          return item.groupName === this.dataForm.groupName;
+        });
+        if (matchedItem) {
+          this.dataForm.topicLeader = matchedItem.name
+          // 更新顾问选项
+          this.consultantOptions = matchedItem.children.filter(member => member.roleInTopic === '顾问').map(member => ({
+            value: member.name,
+            label: member.name
+          }));
+          // 更新成员选项
+          this.membersSelect = matchedItem.children.filter(member => member.roleInTopic === '成员').map(member => ({
+            value: member.name,
+            label: member.name
+          }));
+        } else {
+          // 如果没有找到匹配项，可以清空选项
+          this.consultantOptions = [];
+          this.membersSelect = [];
+        }
+      } catch (e) {
+        console.log(e)
       }
+
     },
 
     init(id) {
+
       this.dataForm.qcsrId = id || 0
       this.visible = true
       this.$nextTick(() => {
@@ -234,10 +248,11 @@ export default {
             }
             // data.userName
             console.log(this.groupMemberList)
-            if (this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList)) {
+            if ((this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList) && !this.isAuth('qcManagement:group:admin'))) {
               // 遍历对象
+              console.log('11')
               this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
-                if (this.groupMemberList[key].name == data.userName) {
+                if (this.groupMemberList[key].name == data.userName && this.groupMemberList[key].examineStatus === '通过') {
                   return {
                     value: this.groupMemberList[key].groupName,
                     label: this.groupMemberList[key].groupName
@@ -263,16 +278,100 @@ export default {
                 label: item.groupName
               }));
             } else {
-              console.error('this.groupMemberList is neither an array nor an object');
+              if (this.isAuth('qcManagement:group:admin')) {
+                // 遍历对象
+                this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
+                  if (this.groupMemberList[key].examineStatus === '通过') {
+                    return {
+                      value: this.groupMemberList[key].groupName,
+                      label: this.groupMemberList[key].groupName
+                    };
+                  }
+                });
+                const filteredGroupMemberList = Object.entries(this.groupMemberList).reduce((acc, [key, value]) => {
+                  acc[key] = value;
+                  return acc;
+                }, {});
+
+                // 更新 groupNameOptions
+                this.groupNameOptions = Object.keys(filteredGroupMemberList).map(key => ({
+                  value: filteredGroupMemberList[key].groupName,
+                  label: filteredGroupMemberList[key].groupName
+                }));
+              } else {
+                console.error('this.groupMemberList is neither an array nor an object');
+              }
+
             }
           })
         } else {
+          this.$http({
+            url: this.$http.adornUrl(`/qcSubject/registration/user`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              if ((this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList) && !this.isAuth('qcManagement:group:admin'))) {
+                // 遍历对象
+                this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
+                  if (this.groupMemberList[key].name == data.userName) {
+                    return {
+                      value: this.groupMemberList[key].groupName,
+                      label: this.groupMemberList[key].groupName
+                    };
+                  }
+                });
+                const filteredGroupMemberList = Object.entries(this.groupMemberList).reduce((acc, [key, value]) => {
+                  if (value.name === data.userName) {
+                    acc[key] = value;
+                  }
+                  return acc;
+                }, {});
+
+                // 更新 groupNameOptions
+                this.groupNameOptions = Object.keys(filteredGroupMemberList).map(key => ({
+                  value: filteredGroupMemberList[key].groupName,
+                  label: filteredGroupMemberList[key].groupName
+                }));
+                console.log(this.groupNameOptions)
+              } else if (Array.isArray(this.groupMemberList)) {
+                this.groupNameOptions = this.groupMemberList.map(item => ({
+                  value: item.groupName,
+                  label: item.groupName
+                }));
+              } else {
+                if (this.isAuth('qcManagement:group:admin')) {
+                  // 遍历对象
+                  this.groupNameOptions = Object.keys(this.groupMemberList).map(key => {
+                    if (this.groupMemberList[key].examineStatus == '通过') {
+                      return {
+                        value: this.groupMemberList[key].groupName,
+                        label: this.groupMemberList[key].groupName
+                      };
+                    }
+                  });
+                  const filteredGroupMemberList = Object.entries(this.groupMemberList).reduce((acc, [key, value]) => {
+                    acc[key] = value;
+                    return acc;
+                  }, {});
+
+                  // 更新 groupNameOptions
+                  this.groupNameOptions = Object.keys(filteredGroupMemberList).map(key => ({
+                    value: filteredGroupMemberList[key].groupName,
+                    label: filteredGroupMemberList[key].groupName
+                  }));
+                } else {
+                  console.error('this.groupMemberList is neither an array nor an object');
+                }
+              }
+            }
+          })
 
         }
+
       })
 
     },
-
 
     ifUpdate() {
       if (this.dataForm.qcsrId) {
@@ -311,50 +410,66 @@ export default {
       } else {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-
             const startDatePlan = new Date(this.dataForm.activityPlan[0]);
             const endDatePlan = new Date(this.dataForm.activityPlan[1]);
             startDatePlan.setHours(startDatePlan.getHours() + 13);
             endDatePlan.setHours(endDatePlan.getHours() + 13);
-
             this.$http({
-              url: this.$http.adornUrl(`/qcSubject/registration/${!this.dataForm.qcsrId ? 'save' : 'update'}`),
-              method: 'post',
-              data: this.$http.adornData({
-                'qcsrId': this.dataForm.qcsrId || undefined,
+              url: this.$http.adornUrl('/qcSubject/registration/exist'),
+              method: 'get',
+              params: this.$http.adornParams({
                 'topicName': this.dataForm.topicName,
-                'topicNumber': this.dataForm.topicNumber,
-                'topicLeader': this.dataForm.topicLeader,
-                'topicConsultant': `${this.dataForm.topicConsultant}`,
-                'teamNumberIds': `${this.dataForm.teamNumberIds}`,
-                'topicReviewStatus': this.dataForm.qcsrId ? this.dataForm.topicReviewStatus : 1,
-                'topicDescription': this.dataForm.topicDescription,
-                'topicType': this.dataForm.topicType,
-                'activityCharacteristics': this.dataForm.activityCharacteristics,
-                'activityPlan': startDatePlan,
-                'activityPlanEnd': endDatePlan,
-                'keywords': this.dataForm.keywords,
-                'topicActivityStatus': this.dataForm.topicActivityStatus,
-                'topicActivityResult': this.dataForm.topicActivityResult,
-                'deleteFlag': this.dataForm.deleteFlag,
-                'note': this.dataForm.note,
-                'groupName': this.dataForm.groupName,
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
+                if (!this.dataForm.qcsrId && data.exist) {
+                  this.$message.error('课题名称已存在!')
+                  return
+                } else {
+                  this.$http({
+                    url: this.$http.adornUrl(`/qcSubject/registration/${!this.dataForm.qcsrId ? 'save' : 'update'}`),
+                    method: 'post',
+                    data: this.$http.adornData({
+                      'qcsrId': this.dataForm.qcsrId || undefined,
+                      'topicName': this.dataForm.topicName,
+                      'topicNumber': this.dataForm.topicNumber,
+                      'topicLeader': this.dataForm.topicLeader,
+                      'topicConsultant': `${this.dataForm.topicConsultant}`,
+                      'teamNumberIds': `${this.dataForm.teamNumberIds}`,
+                      'topicReviewStatus': this.dataForm.qcsrId ? this.dataForm.topicReviewStatus : 1,
+                      'topicDescription': this.dataForm.topicDescription ? this.dataForm.topicDescription : '',
+                      'topicType': this.dataForm.topicType,
+                      'activityCharacteristics': this.dataForm.activityCharacteristics,
+                      'activityPlan': startDatePlan,
+                      'activityPlanEnd': endDatePlan,
+                      'keywords': this.dataForm.keywords,
+                      'topicActivityStatus': this.dataForm.topicActivityStatus,
+                      'topicActivityResult': this.dataForm.topicActivityResult,
+                      'deleteFlag': this.dataForm.deleteFlag,
+                      'note': this.dataForm.note,
+                      'groupName': this.dataForm.groupName,
+                    })
+                  }).then(({ data }) => {
+                    if (data && data.code === 0) {
+                      this.$message({
+                        message: '操作成功',
+                        type: 'success',
+                        duration: 1500,
+                        onClose: () => {
+                          this.visible = false
+                          this.$emit('refreshDataList')
+                          this.$emit('refreshLeadList')
+                          this.$emit('refreshJoinList')
+                        }
+                      })
+                    } else {
+                      this.$message.error(data.msg)
+                    }
+                  })
+                }
               }
             })
+
           }
         })
       }

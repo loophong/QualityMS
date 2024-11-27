@@ -156,7 +156,7 @@ export default {
           },
           {
             name: '目标值',
-            type: 'bar',
+            type: 'line',
             data: processedData,
           }
         ],

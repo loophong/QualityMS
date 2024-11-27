@@ -95,5 +95,13 @@ public class QcStepEntity implements Serializable {
 	 * 步骤附件
 	 */
 	private String stageAttachment;
+	/**
+	 * 顾问意见
+	 */
+	private String stageConsultant;
+	/**
+	 * 评审意见
+	 */
+	private String stageReview;
 
 }

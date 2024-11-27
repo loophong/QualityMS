@@ -57,7 +57,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
     IssueTableEntity getByassociate(String associatedRectificationRecords);
 
-    boolean checkReplicateIssue(Integer issueId, String issueCategoryIds);
+    boolean checkReplicateIssue(Integer issueId, String issueCategoryIds,String systematicClassification,String firstFaultyParts,String secondFaultyParts,String faultType,String faultModel);
 
     PageUtils queryPageFinishedList(Map<String, Object> params);
 }

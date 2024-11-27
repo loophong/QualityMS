@@ -12,6 +12,11 @@
         <result property="inspectionDepartment" column="inspection_department"/>
         <result property="inspectionDate" column="inspection_date"/>
         <result property="issueCategoryId" column="issue_category_id"/>
+        <result property="systematicClassification" column="Systematic_classification"/>
+        <result property="firstFaultyParts" column="First_Faulty_parts"/>
+        <result property="secondFaultyParts" column="Second_Faulty_parts"/>
+        <result property="faultType" column="fault_type"/>
+        <result property="faultModel" column="fault_model"/>
         <result property="vehicleTypeId" column="vehicle_type_id"/>
         <result property="vehicleNumberId" column="vehicle_number_id"/>
         <result property="issueDescription" column="issue_description"/>

@@ -203,29 +203,29 @@
         align="center"
         label="实际完成时间">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="rectificationPhotoDeliverable"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="整改照片交付物">-->
-<!--        <template slot-scope="scope">-->
-<!--          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
       <el-table-column
         prop="rectificationPhotoDeliverable"
         header-align="center"
         align="center"
         label="整改照片交付物">
         <template slot-scope="scope">
-          <img
-            :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"
-            alt="整改照片交付物"
-            style="width: 100px; height: auto; cursor: pointer;"
-            @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"
-          />
+          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
         </template>
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="rectificationPhotoDeliverable"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="整改照片交付物">-->
+<!--        <template slot-scope="scope">-->
+<!--          <img-->
+<!--            :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"-->
+<!--            alt="整改照片交付物"-->
+<!--            style="width: 100px; height: auto; cursor: pointer;"-->
+<!--            @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"-->
+<!--          />-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="rectificationResponsiblePerson"
         header-align="center"

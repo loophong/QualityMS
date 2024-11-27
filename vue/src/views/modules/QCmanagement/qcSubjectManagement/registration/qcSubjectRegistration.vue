@@ -102,7 +102,7 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+            <el-button v-if="((isAuth('qcSubject:registration:save')) || groupLead)" type="primary"
               @click="addOrUpdateHandle()">新增</el-button>
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
               @click="reuseVisible = true">课题重用</el-button>
@@ -191,8 +191,8 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getJoinList()">查询</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
-              @click="addOrUpdateHandle()">新增</el-button>
+            <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+              @click="addOrUpdateHandle()">新增</el-button> -->
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
               @click="reuseVisible = true">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
@@ -333,6 +333,7 @@ import AddOrUpdate from './qcSubjectRegistration-add-or-update'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Loading } from "element-ui";
+import { group } from 'd3';
 export default {
   name: 'qcSubjectRegistration',
   data() {
@@ -341,6 +342,7 @@ export default {
       dataForm: {
         key: ''
       },
+      groupLead: false,
       currentUserName: '',
       dataList: [],
       reuseVisible: false,
@@ -409,8 +411,21 @@ export default {
     }).then(({ data }) => {
       this.membersOptions = data;
     });
+    this.ifGroupLead();
   },
   methods: {
+    async ifGroupLead() {
+      this.$http({
+        url: this.$http.adornUrl('/qcSubject/registration/ifGroupLead'),
+        method: 'get',
+        params: this.$http.adornParams({
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.groupLead = data.ifLead
+        }
+      });
+    },
     async getUserName() {
       await this.$http({
         url: this.$http.adornUrl("/qcSubject/registration/user"),

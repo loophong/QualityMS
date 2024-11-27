@@ -15,7 +15,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="课题组长" prop="topicLeader">
-        <el-input v-model="dataForm.topicLeader" placeholder="课题组长"></el-input>
+        <el-input v-model="dataForm.topicLeader" placeholder="课题组长" :disabled="true"></el-input>
       </el-form-item>
       <!-- <el-form-item label="课题顾问" prop="topicConsultant">
         <el-input v-model="dataForm.topicConsultant" placeholder="课题顾问"></el-input>

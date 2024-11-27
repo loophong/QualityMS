@@ -48,14 +48,14 @@ public class IndicatorKeyIndicatorsController {
 
         return R.ok().put("page", page);
     }
-
+/*
     @RequestMapping("/list1")
     @RequiresPermissions("indicator:indicatorkeyindicators:list")
     public R list1(@RequestParam Map<String, Object> params) {
         PageUtils page = indicatorKeyIndicatorsService.queryPageFinishedList(params);
 
         return R.ok().put("page", page);
-    }
+    }*/
 
 
     /**

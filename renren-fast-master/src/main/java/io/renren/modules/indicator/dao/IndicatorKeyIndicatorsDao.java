@@ -14,5 +14,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface IndicatorKeyIndicatorsDao extends BaseMapper<IndicatorKeyIndicatorsEntity> {
-    Page<IndicatorKeyIndicatorsEntity> selectFinishedSubjectList(Page<IndicatorKeyIndicatorsEntity> page);
+//    Page<IndicatorKeyIndicatorsEntity> selectFinishedSubjectList(Page<IndicatorKeyIndicatorsEntity> page);
 }

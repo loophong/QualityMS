@@ -17,10 +17,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 
 
-
 /**
- * 
- *
  * @author chenshun
  * @email sunlightcs@gmail.com
  * @date 2024-07-21 18:47:20
@@ -36,8 +33,16 @@ public class IndicatorKeyIndicatorsController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("indicator:indicatorkeyindicators:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = indicatorKeyIndicatorsService.queryPage(params);
+
+        return R.ok().put("page", page);
+    }
+
+    @RequestMapping("/list1")
+    @RequiresPermissions("indicator:indicatorkeyindicators:list")
+    public R list1(@RequestParam Map<String, Object> params) {
+        PageUtils page = indicatorKeyIndicatorsService.queryPageFinishedList(params);
 
         return R.ok().put("page", page);
     }
@@ -48,8 +53,8 @@ public class IndicatorKeyIndicatorsController {
      */
     @RequestMapping("/info/{keyIndicatorId}")
     @RequiresPermissions("indicator:indicatorkeyindicators:info")
-    public R info(@PathVariable("keyIndicatorId") Integer keyIndicatorId){
-		IndicatorKeyIndicatorsEntity indicatorKeyIndicators = indicatorKeyIndicatorsService.getById(keyIndicatorId);
+    public R info(@PathVariable("keyIndicatorId") Integer keyIndicatorId) {
+        IndicatorKeyIndicatorsEntity indicatorKeyIndicators = indicatorKeyIndicatorsService.getById(keyIndicatorId);
 
         return R.ok().put("indicatorKeyIndicators", indicatorKeyIndicators);
     }
@@ -59,8 +64,8 @@ public class IndicatorKeyIndicatorsController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("indicator:indicatorkeyindicators:save")
-    public R save(@RequestBody IndicatorKeyIndicatorsEntity indicatorKeyIndicators){
-		indicatorKeyIndicatorsService.save(indicatorKeyIndicators);
+    public R save(@RequestBody IndicatorKeyIndicatorsEntity indicatorKeyIndicators) {
+        indicatorKeyIndicatorsService.save(indicatorKeyIndicators);
 
         return R.ok();
     }
@@ -70,8 +75,8 @@ public class IndicatorKeyIndicatorsController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("indicator:indicatorkeyindicators:update")
-    public R update(@RequestBody IndicatorKeyIndicatorsEntity indicatorKeyIndicators){
-		indicatorKeyIndicatorsService.updateById(indicatorKeyIndicators);
+    public R update(@RequestBody IndicatorKeyIndicatorsEntity indicatorKeyIndicators) {
+        indicatorKeyIndicatorsService.updateById(indicatorKeyIndicators);
 
         return R.ok();
     }
@@ -81,8 +86,8 @@ public class IndicatorKeyIndicatorsController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("indicator:indicatorkeyindicators:delete")
-    public R delete(@RequestBody Integer[] keyIndicatorIds){
-		indicatorKeyIndicatorsService.removeByIds(Arrays.asList(keyIndicatorIds));
+    public R delete(@RequestBody Integer[] keyIndicatorIds) {
+        indicatorKeyIndicatorsService.removeByIds(Arrays.asList(keyIndicatorIds));
 
         return R.ok();
     }

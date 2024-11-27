@@ -14,7 +14,8 @@ import java.util.Map;
  * @date 2024-07-21 18:47:20
  */
 public interface IndicatorKeyIndicatorsService extends IService<IndicatorKeyIndicatorsEntity> {
-
+    PageUtils queryPage1(Map<String, Object> params);
     PageUtils queryPage(Map<String, Object> params);
+    public PageUtils queryPageFinishedList(Map<String, Object> params) ;
 }
 

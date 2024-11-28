@@ -97,10 +97,30 @@ public class IndicatorDictionaryEntity implements Serializable {
 	/**
 	 * 指标值上界
 	 */
-	private BigDecimal indicatorValueUpperBound;
+	private Integer indicatorValueUpperBound;
 	/**
 	 * 指标值下界
 	 */
-	private BigDecimal indicatorValueLowerBound;
+	private Integer indicatorValueLowerBound;
+
+	/**
+	* 入库标识符
+	*/
+	private Integer storageFlag;
+
+	/**
+	 * 权重
+	 */
+	private Float weight;
+
+	/**
+	 * 指标目标值
+	 */
+	private BigDecimal indicatorPlannedValue;
+
+	/**
+	 * 指标目标值边界标识符（0表示下边界，1表示上边界）
+	 */
+	private Integer indicatorBoundFlag;
 
 }

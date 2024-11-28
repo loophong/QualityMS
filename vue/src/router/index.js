@@ -50,6 +50,12 @@ const mainRoutes = {
       meta: { title: '工作计划', isDynamic: true, isTab: true }
     },
     // {
+    //   path: 'publicmanagement/instrumenttestmethod',
+    //   component: _import('modules/publicmanagement/instrumenttestmethod.vue'),
+    //   name: 'publicmanagement/instrumenttestmethod',
+    //   meta: { title: '检验方法', isDynamic: true, isTab: true }
+    // },
+    // {
     //   path: '/plan-update-page',
     //   component: _import('modules/taskmanagement/plan/plan-detail-page'),
     //   name: 'plan-update-page',
@@ -62,6 +68,12 @@ const mainRoutes = {
     //     taskId: taskId
     //   }
     // })
+    {
+      path: '/my-tasks',
+      component: _import('modules/taskmanagement/task/my-tasks'),
+      name: 'task-list',
+      meta: { title: '我的任务', isDynamic: true, isTab: true },
+    },
     {
       path: '/task-update-page',
       component: _import('modules/taskmanagement/task/task-update-page'),
@@ -105,8 +117,70 @@ const mainRoutes = {
       name: 'qcExamineStatus',
       meta: { title: '计划审核', isDynamic: true, isTab: false }
     },
+    {
+      path: '/SubjectRegistration',
+      component: _import('modules/QCmanagement/qcSubjectManagement/registration/qcSubjectRegistration'),
+      name: 'qcSubjectRegistration',
+      meta: { title: '课题登记', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/qcTools',
+      component: _import('modules/QCmanagement/qcTools/system'),
+      name: 'qcTools',
+      meta: { title: 'QC工具-系统图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/Scatter',
+      component: _import('modules/QCmanagement/qcTools/Scatter'),
+      name: 'Scatter',
+      meta: { title: 'QC工具-散点图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/histogram',
+      component: _import('modules/QCmanagement/qcTools/histogram'),
+      name: 'histogram',
+      meta: { title: 'QC工具-直方图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/control',
+      component: _import('modules/QCmanagement/qcTools/control'),
+      name: 'control',
+      meta: { title: 'QC工具-控制图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/fishBone',
+      component: _import('modules/QCmanagement/qcTools/fishBone'),
+      name: 'fishBone',
+      meta: { title: 'QC工具-鱼骨图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/lineAndBar',
+      component: _import('modules/QCmanagement/qcTools/lineAndBar'),
+      name: 'lineAndBar',
+      meta: { title: 'QC工具-折线图', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/RelationGraph',
+      component: _import('modules/QCmanagement/qcTools/RelationGraph'),
+      name: 'RelationGraph',
+      meta: { title: 'QC工具-关联图', isDynamic: true, isTab: false }
+    },
 
-    //任务
+    {
+      path: '/issue-issuetable',
+      component: _import('modules/issueRectification/Rectificationissue'),
+      name: 'issue-issueRectification',
+      meta: { title: '任务详情', isDynamic: true, isTab: true }
+    },
+
+  //仪器仪表
+  {
+    path: '/instrument-testmethod',
+    component: _import('modules/publicmanagement/instrumenttestmethod'),
+    name: 'instrument-testmethod',
+    meta: { title: '关联检验方法', isDynamic: true, isTab: true }
+  },
+    //问题
     {
       path: '/issue-issuetable',
       component: _import('modules/issueRectification/Rectificationissue'),
@@ -117,19 +191,25 @@ const mainRoutes = {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/creatorissuemask'),
       name: 'issue-issuemask',
-      meta: { title: '任务详情', isDynamic: true, isTab: true }
+      meta: { title: '任务详情', isDynamic: true, isTab: false }
     },
     {
-      path: '/issue-issuemask',
+      path: '/issue-issueflow',
       component: _import('modules/issuemask/issuemaskflow'),
       name: 'issue-issueflow',
-      meta: { title: '任务流程', isDynamic: true, isTab: true }
+      meta: { title: '任务流程', isDynamic: true, isTab: false }
     },
     {
       path: '/otherToIssue',
       component: _import('modules/issuefind/findissue'),
       name: 'otherToIssue',
       meta: { title: '任务流程', isDynamic: true, isTab: true }
+    },
+    {
+      path: '/issue-issueView',
+      component: _import('modules/issuetable/issueView'),
+      name: 'issue-issueView',
+      meta: { title: '问题展示', isDynamic: true, isTab: false }
     },
     //指标
     // 指标
@@ -139,12 +219,25 @@ const mainRoutes = {
       name: 'indicatorchart',
       meta: { title: '指标详情', isTab: true }
     },
+    {
+      path: '/indicator-keyControlIndicators-indicatorkeyindicators',
+      component: _import('modules/indicator/keyControlIndicators/indicatorkeyindicators'),
+      name: 'indicator-key-indicators',
+      meta: { title: '重点管控指标', isTab: true }
+    },
     // {
     //   path: '/indicator-display-charts-indicatorchart/:indicatorName',
     //   component: _import('modules/indicator/display/charts/indicatorchart'),
     //   name: route => `indicatorchart-${route.params.indicatorName}`, // 动态生成name
     //   meta: { title: '指标详情', isTab: true }
     // }
+    //消息通知
+    {
+      path: '/toNotice',
+      component: _import('modules/notice/messagenotification'),
+      name: 'toNotice',
+      meta: { title: '消息通知', isDynamic: true, isTab: false }
+    },
 
   ],
   beforeEnter(to, from, next) {

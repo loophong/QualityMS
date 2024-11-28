@@ -17,7 +17,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class RenrenPJTwoApplication {
 
+
+
 	public static void main(String[] args) {
+
+//		System.setProperty("user.dir", "E:/QualityMS/renren-fast-master/src/main/resources");
 		SpringApplication.run(RenrenPJTwoApplication.class, args);
 	}
 

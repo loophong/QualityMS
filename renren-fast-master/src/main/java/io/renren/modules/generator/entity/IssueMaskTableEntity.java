@@ -49,6 +49,14 @@ public class IssueMaskTableEntity implements Serializable {
 	 */
 	private String maskcontent;
 	/**
+	 * 处理方案
+	 */
+	private String handlingScenarios;
+	/**
+	 * 附件
+	 */
+	private String annex;
+	/**
 	 * 任务发起人
 	 */
 	private String creator;

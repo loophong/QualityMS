@@ -40,7 +40,7 @@ public class IndicatorIndicatorSummaryEntity implements Serializable {
 	/**
 	 * 指标目标值
 	 */
-	@ExcelProperty(value = "指标目标值")
+	@ExcelIgnore
 	private BigDecimal indicatorValue;
 
 	@ExcelIgnore

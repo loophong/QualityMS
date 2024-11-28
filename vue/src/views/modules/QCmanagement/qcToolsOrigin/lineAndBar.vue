@@ -24,13 +24,15 @@
       <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
     </span>
 
-    <el-dialog title="模版名" :visible.sync="dialogFormVisible">
+
+    <el-dialog title="模版名" :visible.sync="dialogFormVisible" append-to-body>
       <el-input v-model="inputName" placeholder="请输入模版名" style="width:50%"></el-input>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleUp">确 定</el-button>
       </div>
     </el-dialog>
+
   </div>
 
 </template>
@@ -71,9 +73,11 @@ export default {
   mounted() {
     this.getTemplateData()
     this.myChart = echarts.init(this.$refs.main);
+    //initChart()为更新echarts图表，使用数据填充图表
     this.initChart(this.tmpResultList)
   },
   methods: {
+
     //处理下拉框选择变化
     handleSelectChange() {
       let tmpList = {}
@@ -527,7 +531,8 @@ export default {
           //   }
           // }
         ],
-        series: seriesData
+        series: seriesData,
+        animation: false,
       };
       this.option && this.myChart.setOption(this.option);
       // console.log(this.option)

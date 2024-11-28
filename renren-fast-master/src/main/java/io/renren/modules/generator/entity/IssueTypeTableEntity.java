@@ -24,8 +24,18 @@ public class IssueTypeTableEntity implements Serializable {
 	@TableId
 	private Integer issueCategoryId;
 	/**
+	 * 问题等级
+	 */
+	@TableId
+	private String issueGrade;
+	/**
 	 * 具体问题类别
 	 */
 	private String concreteIssueCategory;
+	/**
+	 * 等级说明
+	 */
+	@TableId
+	private String gradeIllustrate;
 
 }

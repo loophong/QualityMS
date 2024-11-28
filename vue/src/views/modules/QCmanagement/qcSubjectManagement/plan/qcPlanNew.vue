@@ -2851,7 +2851,7 @@ export default {
               return item.conplanProcess == this.active2;
             })
           }
-          this.groupDataByType();
+          // this.groupDataByType();
         }
       });
     },
@@ -2949,7 +2949,6 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.planStepList = data.idList;
-
           this.findMatchingItem(1);
           // this.totalPage = data.page.totalCount
         } else {

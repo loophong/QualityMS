@@ -418,10 +418,7 @@ export default {
         params: this.$http.adornParams({
           'page': this.pageIndexJoin,
           'limit': this.pageSizeJoin,
-          // 'topicName': this.myQueryParam.topicName,
-          // 'keywords': this.myQueryParam.keywords
           'key': this.myQueryParamJoin,
-          // 'reuseStepId': 5
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -445,8 +442,6 @@ export default {
         params: this.$http.adornParams({
           'page': this.pageIndexLead,
           'limit': this.pageSizeLead,
-          // 'topicName': this.myQueryParam.topicName,
-          // 'keywords': this.myQueryParam.keywords
           'key': this.myQueryParamLead,
           // 'reuseStepId': 5
         }),

@@ -5,7 +5,9 @@
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+                 <el-button v-if="isAuth('generator:instrumentation:Fuzzy_queries')" type="primary" @click="Fuzzy_queries()">查询</el-button>
+
+        <!-- <el-button @click="getDataList()">查询</el-button> -->
         <el-button v-if="isAuth('generator:instrumentation:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('generator:instrumentation:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -199,6 +201,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="linkedMethod(scope.row.id)">查看检验方法</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -240,6 +243,55 @@
       this.getDataList()
     },
     methods: {
+
+        Fuzzy_queries(){
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/generator/instrumentation/Fuzzy_queries'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.dataForm.key
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
+      },
+       linkedMethod (id) {
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl(`/generator/instrumentation/linkedMethod/${id}`),
+  
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.dataForm.key
+          })
+        }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+      },
+      
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true

@@ -5,7 +5,9 @@
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button  v-if="isAuth('generator:instrumenttestmethod:list')" type="primary" @click="getDataList()">查询</el-button>
+                         <el-button v-if="isAuth('generator:instrumenttestmethod:Fuzzy_queries')" type="primary" @click="Fuzzy_queries()">查询</el-button>
+
+        <!-- <el-button  v-if="isAuth('generator:instrumenttestmethod:list')" type="primary" @click="getDataList()">查询</el-button> -->
         <el-button v-if="isAuth('generator:instrumenttestmethod:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('generator:instrumenttestmethod:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -286,6 +288,28 @@
       this.getDataList()
     },
     methods: {
+
+       Fuzzy_queries(){
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/generator/instrumenttestmethod/Fuzzy_queries'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': this.pageSize,
+            'key': this.dataForm.key
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
+          this.dataListLoading = false
+        })
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true

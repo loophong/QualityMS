@@ -1,9 +1,9 @@
 package io.renren.modules.qcManagement.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
+import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -20,7 +20,7 @@ import java.util.List;
 @Mapper
 public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrationEntity> {
 
-    Page<QcSubjectRegistrationEntity> selectFinishedSubjectList(Page<QcSubjectRegistrationEntity> page);
+   List<QcknowledgebaseEntity> selectFinishedSubjectList(@Param("topicName") String topicName, @Param("keywords") String keywords, @Param("startDate") String startDate, String endDate);
 
     //根据小组名称查询小组成员
     @Select({
@@ -59,6 +59,11 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
     //查询课题名称是否重复
 
     boolean ifExistSubjectName(String name);
+
+    //查询当前用户是否是组长
+    boolean ifGroupLead(String userName);
+
+
     //计算课题活动状态
 //    @Select({
 //            "SELECT *",

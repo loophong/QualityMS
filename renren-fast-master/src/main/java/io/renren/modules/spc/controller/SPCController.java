@@ -7,6 +7,8 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import com.aliyun.oss.ServiceException;
+import io.renren.modules.spc.entity.SpcXrchartEntity;
+import io.renren.modules.spc.service.SpcXrchartService;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -19,9 +21,21 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.ZoneId;
+
+
+
 @RestController
 @RequestMapping("SPC/spc")
 public class SPCController {
+
+    public int  arrayLength = 0;
+    public int arraySize = 0;
+
+    @Resource
+    private SpcXrchartService spcXrchartService;
 
     @RequestMapping(value = "/list", method = RequestMethod.POST)
 //    @RequiresPermissions("SPC:spc:list")
@@ -30,6 +44,12 @@ public class SPCController {
         System.out.println("------------import-------import------------");
         try {
             List<List<Double>> date = parseExcel(excelFile);
+            List<SpcXrchartEntity> dataList = parseExcel2XRchart(excelFile);
+            spcXrchartService.importData(dataList);
+            System.out.println(dataList);
+
+
+
             return ResponseEntity.ok(date);
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,6 +57,135 @@ public class SPCController {
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("excel上传失败");
         }
+    }
+
+    public  List<SpcXrchartEntity> parseExcel2XRchart(MultipartFile file) throws IOException {
+        List<SpcXrchartEntity> dataList = new ArrayList<>();
+
+        ZipSecureFile.setMinInflateRatio(0);
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+
+        /*
+        *
+        X-R图
+        * */
+
+        Sheet sheet = workbook.getSheetAt(0);
+
+        //子组大小
+        arrayLength = getCellValueAsInt(sheet.getRow(3).getCell(12));
+
+        arraySize = getCellValueAsInt(sheet.getRow(5).getCell(12));
+
+        DecimalFormat df = new DecimalFormat("#.00");
+        //标准上限、中心限、下限
+        double Standards_usl = getNumericCellValue(sheet.getRow(3).getCell(10));
+        double Standards_cl = getNumericCellValue(sheet.getRow(4).getCell(10));
+        double Standards_lsl = getNumericCellValue(sheet.getRow(5).getCell(10));
+
+        String formatted_Standards_usl = df.format(Standards_usl);
+        String formatted_Standards_cl = df.format(Standards_cl);
+        String formatted_Standards_lsl = df.format(Standards_lsl);
+
+        double rounded_Standards_usl = Double.parseDouble(formatted_Standards_usl);
+        double rounded_Standards_cl = Double.parseDouble(formatted_Standards_cl);
+        double rounded_Standards_lsl = Double.parseDouble(formatted_Standards_lsl);
+
+        //X图上限、中心限、下限
+        double X_ucl = getNumericCellValue(sheet.getRow(3).getCell(16));
+        double X_cl = getNumericCellValue(sheet.getRow(4).getCell(16));
+        double X_lcl = getNumericCellValue(sheet.getRow(5).getCell(16));
+
+        String formattedX_ucl = df.format(X_ucl);
+        String formattedX_cl = df.format(X_cl);
+        String formattedX_lcl = df.format(X_lcl);
+
+        double roundedX_ucl = Double.parseDouble(formattedX_ucl);
+        double roundedX_cl = Double.parseDouble(formattedX_cl);
+        double roundedX_lcl = Double.parseDouble(formattedX_lcl);
+
+        //R图上限、中心限、下限
+        double R_ucl = getNumericCellValue(sheet.getRow(3).getCell(18));
+        double R_cl = getNumericCellValue(sheet.getRow(4).getCell(18));
+        double R_lcl = getNumericCellValue(sheet.getRow(5).getCell(18));
+
+        String formattedR_ucl = df.format(R_ucl);
+        String formattedR_cl = df.format(R_cl);
+        String formattedR_lcl = df.format(R_lcl);
+
+        double roundedR_ucl = Double.parseDouble(formattedR_ucl);
+        double roundedR_cl = Double.parseDouble(formattedR_cl);
+        double roundedR_lcl = Double.parseDouble(formattedR_lcl);
+
+
+
+        double[][] date = new double[arrayLength][arraySize];
+        int n = 0;
+        for(int i = 8; i < 8 + arrayLength; i++ ){
+            Row row = sheet.getRow(i);
+            int m = 0;
+            for(int j = 2; j < 2 + arraySize; j++){
+                date[n][m] = getNumericCellValue(row.getCell(j));
+                m++;
+            }
+            n++;
+        }
+
+        for (int i = 0; i < date.length; i++){
+            SpcXrchartEntity spcXrchartEntity = new SpcXrchartEntity();
+
+            if (arraySize >= 1) spcXrchartEntity.setDate1((float) date[i][0]);
+            if (arraySize >= 2) spcXrchartEntity.setDate2((float) date[i][1]);
+            if (arraySize >= 3) spcXrchartEntity.setDate3((float) date[i][2]);
+            if (arraySize >= 4) spcXrchartEntity.setDate4((float) date[i][3]);
+            if (arraySize >= 5) spcXrchartEntity.setDate5((float) date[i][4]);
+            if (arraySize >= 6) spcXrchartEntity.setDate6((float) date[i][5]);
+            if (arraySize >= 7) spcXrchartEntity.setDate7((float) date[i][6]);
+            if (arraySize >= 8) spcXrchartEntity.setDate8((float) date[i][7]);
+            if (arraySize >= 9) spcXrchartEntity.setDate9((float) date[i][8]);
+            if (arraySize >= 10) spcXrchartEntity.setDate10((float) date[i][9]);
+            if (arraySize >= 11) spcXrchartEntity.setDate11((float) date[i][10]);
+            if (arraySize >= 12) spcXrchartEntity.setDate12((float) date[i][11]);
+            if (arraySize >= 13) spcXrchartEntity.setDate13((float) date[i][12]);
+            if (arraySize >= 14) spcXrchartEntity.setDate14((float) date[i][13]);
+            if (arraySize >= 15) spcXrchartEntity.setDate15((float) date[i][14]);
+            if (arraySize >= 16) spcXrchartEntity.setDate16((float) date[i][15]);
+            if (arraySize >= 17) spcXrchartEntity.setDate17((float) date[i][16]);
+            if (arraySize >= 18) spcXrchartEntity.setDate18((float) date[i][17]);
+            if (arraySize >= 19) spcXrchartEntity.setDate19((float) date[i][18]);
+            if (arraySize >= 20) spcXrchartEntity.setDate20((float) date[i][19]);
+            if (arraySize >= 21) spcXrchartEntity.setDate21((float) date[i][20]);
+            if (arraySize >= 22) spcXrchartEntity.setDate22((float) date[i][21]);
+            if (arraySize >= 23) spcXrchartEntity.setDate23((float) date[i][22]);
+            if (arraySize >= 24) spcXrchartEntity.setDate24((float) date[i][23]);
+            if (arraySize >= 25) spcXrchartEntity.setDate25((float) date[i][24]);
+            if (arraySize >= 26) spcXrchartEntity.setDate26((float) date[i][25]);
+            if (arraySize >= 27) spcXrchartEntity.setDate27((float) date[i][26]);
+            if (arraySize >= 28) spcXrchartEntity.setDate28((float) date[i][27]);
+            if (arraySize >= 29) spcXrchartEntity.setDate29((float) date[i][28]);
+            if (arraySize >= 30) spcXrchartEntity.setDate30((float) date[i][29]);
+            if (arraySize >= 31) spcXrchartEntity.setDate31((float) date[i][30]);
+
+            spcXrchartEntity.setUpperLimitStandards((float) rounded_Standards_usl);
+            spcXrchartEntity.setCenterLimitStandards((float) rounded_Standards_cl);
+            spcXrchartEntity.setLowerLimitStandards((float) rounded_Standards_lsl);
+
+            spcXrchartEntity.setUpperLimitX((float) roundedX_ucl);
+            spcXrchartEntity.setCenterLimitX((float) roundedX_cl);
+            spcXrchartEntity.setLowerLimitX((float) roundedX_lcl);
+
+            spcXrchartEntity.setUpperLimitR((float) roundedR_ucl);
+            spcXrchartEntity.setCenterLimitR((float) roundedR_cl);
+            spcXrchartEntity.setLowerLimitR((float) roundedR_lcl);
+
+            //存入日期
+            spcXrchartEntity.setDatatime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+            dataList.add(spcXrchartEntity);
+        }
+
+        workbook.close();
+        return dataList;
     }
 
     public static List<List<Double>> parseExcel(MultipartFile file) throws IOException {

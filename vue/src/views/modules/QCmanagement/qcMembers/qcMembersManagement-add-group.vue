@@ -1,24 +1,24 @@
 <template>
   <el-dialog :title="!dataForm.qcgmId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form v-if="!dataForm.qcgmId || !isEditingMember" :model="dataForm" :rules="dataRule" ref="dataForm"
-             @keyup.enter.native="dataFormSubmit()" label-width="120px">
+      @keyup.enter.native="dataFormSubmit()" label-width="140px">
       <el-row :gutter="20" v-show="!isAddMember">
         <el-col :span="12">
           <el-form-item v-if="isAdmin" prop="groupName" label="小组名称">
             <el-input v-model="dataForm.groupName" placeholder="请输入小组名称"></el-input>
           </el-form-item>
           <el-form-item prop="mainName" label="组长姓名">
-<!--             <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input>-->
-<!--            <el-select v-model="dataForm.userId" placeholder="请选择角色">-->
-<!--              <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">-->
-<!--                <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">-->
-<!--                </el-option>-->
-<!--              </el-option-group>-->
-<!--              -->
-<!--            </el-select>-->
-<!--            <el-select v-model="dataForm.userId" placeholder="请选择用户">-->
-<!--              <el-option v-for="item in membersOptions.options" :key="item.value" :label="item.label" :value="item.value"></el-option>-->
-<!--            </el-select>-->
+            <!--             <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input>-->
+            <!--            <el-select v-model="dataForm.userId" placeholder="请选择角色">-->
+            <!--              <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">-->
+            <!--                <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">-->
+            <!--                </el-option>-->
+            <!--              </el-option-group>-->
+            <!--              -->
+            <!--            </el-select>-->
+            <!--            <el-select v-model="dataForm.userId" placeholder="请选择用户">-->
+            <!--              <el-option v-for="item in membersOptions.options" :key="item.value" :label="item.label" :value="item.value"></el-option>-->
+            <!--            </el-select>-->
             <el-select v-model="dataForm.userId" filterable placeholder="请选择用户">
               <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
                 <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value">
@@ -28,9 +28,10 @@
 
 
           </el-form-item>
-          <el-form-item label="角色" >
+          <el-form-item label="角色">
             <el-select v-model="dataForm.memberRole" placeholder="请选择">
-              <el-option v-for="role in roleIdList" :key="role.roleId" :label="role.roleName" :value="role.roleId"></el-option>
+              <el-option v-for="role in roleIdList" :key="role.roleId" :label="role.roleName"
+                :value="role.roleId"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item prop="number" label="员工编号">
@@ -50,25 +51,16 @@
           <el-form-item v-if="!isAdmin" label="组内角色" prop="roleInTopic">
             <el-select v-model="dataForm.roleInTopic" placeholder="请选择组内角色">
               <el-option label="成员" value="成员"></el-option>
-              <el-option label="顾问" value="顾问"></el-option>
-              <el-option label="评审员" value="评审员"></el-option>
-              <el-option label="相关方评审员" value="相关方评审员"></el-option>
-              <el-option label="成果初评管理员" value="成果初评管理员"></el-option>
-              <el-option label="财务科评审员" value="财务科评审员"></el-option>
-              <el-option label="成果复评管理员" value="成果复评管理员"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item prop="participationDate" label="参加QC时间">
+          <el-form-item prop="participationDate" label="创建QC小组时间">
             <el-date-picker v-model="dataForm.participationDate" type="date" value-format="yyyy-MM-dd"
-                            placeholder="请选择日期" clearable></el-date-picker>
+              placeholder="请选择日期" clearable></el-date-picker>
           </el-form-item>
-
-
-
         </el-col>
       </el-row>
       <div v-for="(member, index) in dataForm.members" :key="index" style="background-color:#EEEEEE;"
-           class="members-list-item">
+        class="members-list-item">
         <el-form :model="member" :rules="dataRule" :ref="'dataForm' + index" label-width="120px">
           <el-row :gutter="20">
             <el-col :span="12">
@@ -76,14 +68,14 @@
             </el-col>
             <el-col :span="12" class="button-col">
               <el-button type="text" icon="el-icon-close" size="large" @click="removeMember(member)"
-                         class="remove-member-button"></el-button>
+                class="remove-member-button"></el-button>
             </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="姓名" prop="name">
                 <!-- <el-input v-model="member.name" placeholder="请输入姓名"></el-input> -->
-                <el-select v-model="member.name" placeholder="请选择角色">
+                <el-select v-model="member.name" filterable placeholder="请选择角色">
                   <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
                     <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
                     </el-option>
@@ -96,17 +88,10 @@
               <el-form-item label="组内角色" prop="roleInTopic">
                 <el-select v-model="member.roleInTopic" placeholder="请选择组内角色">
                   <el-option label="成员" value="成员"></el-option>
-                  <el-option label="顾问" value="顾问"></el-option>
-                  <el-option label="评审员" value="评审员"></el-option>
-                  <el-option label="相关方评审员" value="相关方评审员"></el-option>
-                  <el-option label="成果初评管理员" value="成果初评管理员"></el-option>
-                  <el-option label="财务科评审员" value="财务科评审员"></el-option>
-                  <el-option label="成果复评管理员" value="成果复评管理员"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="参加时间" prop="participationDate">
-                <el-date-picker v-model="member.participationDate" type="date"
-                                placeholder="请输入参加时间"></el-date-picker>
+                <el-date-picker v-model="member.participationDate" type="date" placeholder="请输入参加时间"></el-date-picker>
               </el-form-item>
             </el-col>
           </el-row>
@@ -174,16 +159,16 @@ export default {
       },
       dataRule: {
         userId: [
-          {required: true, message: '姓名不能为空', trigger: 'blur'}
+          { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
         name: [
-          {required: true, message: '姓名不能为空', trigger: 'blur'}
+          { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
         // number: [
         //   { required: true, message: '员工编号不能为空', trigger: 'blur' }
         // ],
         participationDate: [
-          {required: true, message: '参加时间不能为空', trigger: 'blur'}
+          { required: true, message: '参加时间不能为空', trigger: 'blur' }
         ],
       }
     }
@@ -211,7 +196,7 @@ export default {
       this.dataForm.members.joinDate = currentDate;
     },
     async init(id) {
-      console.log("传入的"+JSON.stringify(this.membersOptions) )
+      console.log("传入的" + JSON.stringify(this.membersOptions))
       this.dataForm.qcgmId = id || 0;
       this.visible = true;
       this.$nextTick(() => {
@@ -221,7 +206,7 @@ export default {
             url: this.$http.adornUrl(`/qcMembers/qcGroupMember/info/${this.dataForm.qcgmId}`),
             method: 'get',
             params: this.$http.adornParams()
-          }).then(({data}) => {
+          }).then(({ data }) => {
             if (data && data.code === 0) {
               this.dataForm.mainName = data.qcGroupMember.name;
               this.dataForm.userId = data.qcGroupMember.userId;
@@ -270,7 +255,7 @@ export default {
               'examineStatus': '待审核',
               'memberRole': this.dataForm.memberRole
             })
-          }).then(({data}) => {
+          }).then(({ data }) => {
             if (data && data.code === 0) {
               this.$message({
                 message: '操作成功',
@@ -386,14 +371,14 @@ export default {
     },
     editMember(member) {
       this.isEditingMember = true;
-      this.editingMember = {...member};
+      this.editingMember = { ...member };
     },
     updateMember() {
       this.$refs['editingMemberForm'].validate((valid) => {
         if (valid) {
           const index = this.dataForm.members.findIndex(m => m.qcgmId === this.editingMember.qcgmId);
           if (index !== -1) {
-            this.dataForm.members.splice(index, 1, {...this.editingMember});
+            this.dataForm.members.splice(index, 1, { ...this.editingMember });
           }
           this.isEditingMember = false;
         }

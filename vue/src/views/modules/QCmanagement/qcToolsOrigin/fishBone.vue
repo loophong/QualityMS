@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+      <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
@@ -283,6 +283,7 @@ export default {
 
     },
     addTemplate() {
+
       this.$http({
         url: this.$http.adornUrl(`/qcTools/template/save`),
         method: 'post',

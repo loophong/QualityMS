@@ -1,12 +1,12 @@
 <template>
   <div>
-    <!-- <span>
-            <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
-                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                </el-option>
-            </el-select>
-            <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
-        </span> -->
+    <span>
+      <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
+        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
+    </span>
     <div class="content">
       <div class="chart-container">
         <div id="chartSdtV" style="width: 40vw; height: 40vw"></div>
@@ -19,37 +19,19 @@
         <el-button type="primary" @click="addDataPoint">新增数据点</el-button>
         <h3>修改当前数据</h3>
         <select v-model="selectedIndex">
-          <option
-            v-for="(point, index) in dataPoints"
-            :key="index"
-            :value="index"
-          >
+          <option v-for="(point, index) in dataPoints" :key="index" :value="index">
             点{{ index + 1 }}: ({{ point[0] }}, {{ point[1] }})
           </option>
         </select>
         <br />
-        <input
-          v-model="modifiedDataPoint.x"
-          type="number"
-          placeholder="新横坐标值"
-        />
+        <input v-model="modifiedDataPoint.x" type="number" placeholder="新横坐标值" />
 
-        <input
-          v-model="modifiedDataPoint.y"
-          type="number"
-          placeholder="新纵坐标值"
-        />
-        <el-button type="primary" @click="modifyDataPoint"
-          >修改数据点</el-button
-        >
+        <input v-model="modifiedDataPoint.y" type="number" placeholder="新纵坐标值" />
+        <el-button type="primary" @click="modifyDataPoint">修改数据点</el-button>
         <br />
         <h3>删除选中数据</h3>
         <select v-model="selectedIndex2">
-          <option
-            v-for="(point, index) in dataPoints"
-            :key="index"
-            :value="index"
-          >
+          <option v-for="(point, index) in dataPoints" :key="index" :value="index">
             点{{ index + 1 }}: ({{ point[0] }}, {{ point[1] }})
           </option>
         </select>
@@ -60,15 +42,11 @@
         <el-button type="danger" @click="clearCurrent">清空当前数据</el-button>
         <br />
         <br />
-        <!-- <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button> -->
-        <el-button type="success" @click="handleUp">更新当前数据</el-button>
+        <el-button type="success" @click="dialogFormVisible = true">保存当前数据</el-button>
+        <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
       </div>
-      <el-dialog title="模版名" :visible.sync="dialogFormVisible">
-        <el-input
-          v-model="inputName"
-          placeholder="请输入模版名"
-          style="width: 50%"
-        ></el-input>
+      <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
+        <el-input v-model="inputName" placeholder="请输入图名" style="width: 50%"></el-input>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="handleUp">确 定</el-button>
@@ -124,13 +102,29 @@ export default {
       selectedIndex2: null,
       modifiedDataPoint: { x: "", y: "" },
       deleteDataPoint: { x: "", y: "" },
+      currentUserName: '',
     };
   },
   mounted() {
+    this.getUserName();
     this.getTemplateData();
-    // this.init();
+    this.init();
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
     //处理下拉框选择变化
     handleSelectChange() {
       console.log(this.resultList);
@@ -145,22 +139,22 @@ export default {
     },
     async getTemplateData() {
       await this.$http({
-        // url: this.$http.adornUrl("/qcTools/template/templateList"),
-        url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        url: this.$http.adornUrl("/qcTools/template/templateList"),
+        // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
         method: "get",
         params: this.$http.adornParams({
-          conplanType: "散点图",
-          conplanSubject: this.conplanSubject,
-          conplanProcess: this.conplanProcess,
+          templateType: "散点图",
+          // conplanSubject: this.conplanSubject,
+          // conplanProcess: this.conplanProcess,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.resultList = data.resultList.map((row) => ({
-            templateId: row.conplanId,
-            templateName: row.conplanName,
-            templateType: row.conplanType,
-            templateText: row.conplanText,
-            templateSeries: JSON.parse(row.conplanSeries),
+            templateId: row.templateId,
+            templateName: row.templateName,
+            templateType: row.templateType,
+            templateText: row.templateText,
+            templateSeries: JSON.parse(row.templateSeries),
             // templateAxis: JSON.parse(row.conplanAxis),
           }));
           this.options = data.resultList.map((item) => ({
@@ -174,13 +168,13 @@ export default {
       });
       // 渲染数据的更新
       // 将获取的数据传递给 this.dataPoints
-      if (this.resultList.length != 0) {
-        this.resultList.forEach((item) => {
-          this.dataPoints = item.templateSeries;
-        });
-      }
-      // 初始化 渲染数据
-      this.init();
+      // if (this.resultList.length != 0) {
+      //   this.resultList.forEach((item) => {
+      //     this.dataPoints = item.templateSeries;
+      //   });
+      // }
+      // // 初始化 渲染数据
+      // this.init();
     },
     handleUp() {
       console.log(this.updatedSeries);
@@ -228,6 +222,16 @@ export default {
       }
     },
     addTemplate() {
+      let img = new Image()
+      img.src = this.myChart.getDataURL(
+        {
+          type: 'png',
+          // pixelRatio: 1,
+          // backgroundColor: '#fff',
+          excludeComponents: ['toolbox']
+        }
+      )
+
       this.$http({
         // url: this.$http.adornUrl(`/qcTools/template/save`),
         url: this.$http.adornUrl(`/qcTools/conplan/save`),
@@ -241,6 +245,8 @@ export default {
           //   'templateAxis': ,
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanUrl: JSON.stringify(img.src),
+          conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -275,7 +281,7 @@ export default {
             message: "清空成功!",
           });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     addDataPoint() {
       const x = parseFloat(this.newDataPoint.x);
@@ -362,6 +368,7 @@ export default {
           // max: 1
         },
         series: curSeries,
+        animation: false,
       };
       const dom = document.getElementById("chartSdtV");
       this.myChart = echarts.init(dom);

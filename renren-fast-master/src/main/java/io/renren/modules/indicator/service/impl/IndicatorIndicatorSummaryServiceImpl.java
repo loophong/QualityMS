@@ -58,6 +58,8 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
                     String field = entry.getKey();
                     String value = entry.getValue();
 
+                    System.out.println("field: " + field + ", value: " + value);
+
                     if (value != null && !value.isEmpty()) {
                         switch (field) {
                             case "indicatorName":
@@ -66,14 +68,22 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
                             case "indicatorValue":
                                 queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getIndicatorValue, value);
                                 break;
-                            case "yearMonth":
-                                queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getYearMonth, value);
+                            case "startTime":
+                                // 添加 startTime 大于等于条件
+                                queryWrapper.lambda().ge(IndicatorIndicatorSummaryEntity::getYearMonth, value);
+                                break;
+                            case "endTime":
+                                // 添加 endTime 小于等于条件
+                                queryWrapper.lambda().le(IndicatorIndicatorSummaryEntity::getYearMonth, value);
                                 break;
                             case "managementDepartment":
                                 queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getManagementDepartment, value);
                                 break;
                             case "assessmentDepartment":
                                 queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getAssessmentDepartment, value);
+                                break;
+                            case "yearMonth":
+                                queryWrapper.lambda().like(IndicatorIndicatorSummaryEntity::getYearMonth, value);
                                 break;
                         }
                     }
@@ -83,10 +93,13 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
             }
         }
 
+        queryWrapper.orderByDesc("`year_month`").orderByDesc("indicator_id");
+
         IPage<IndicatorIndicatorSummaryEntity> page = this.page(
                 new Query<IndicatorIndicatorSummaryEntity>().getPage(params),
                 queryWrapper
         );
+
 
         return new PageUtils(page);
     }

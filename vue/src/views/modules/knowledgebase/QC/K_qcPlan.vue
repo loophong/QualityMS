@@ -7,6 +7,30 @@
       <el-form-item>
         <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
       </el-form-item>
+       <!-- <el-form-item>
+        <el-input v-model="myQueryParam.startDate" placeholder="开始日期" clearable></el-input>
+      </el-form-item>
+            <el-form-item>
+        <el-input v-model="myQueryParam.endDate" placeholder="结束日期" clearable></el-input>
+      </el-form-item> -->
+      <el-form-item label="开始日期" prop="startDate">
+        <el-date-picker
+          v-model="myQueryParam.startDate"
+          type="date"
+          placeholder="选择日期"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
+      </el-form-item>
+        <el-form-item label="结束日期" prop="endDate">
+        <el-date-picker
+          v-model="myQueryParam.endDate"
+          type="date"
+          placeholder="选择日期"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
+      </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <!-- <el-button v-if="isAuth('qcSubject:plan:submit')" type="primary"
@@ -20,6 +44,11 @@
           :disabled="dataListSelections.length != 1">审核状态</el-button> -->
         <!-- <el-button type="danger" @click="toIssue()">问题添加</el-button> -->
       </el-form-item>
+     <el-row :gutter="10" class="mb8">
+       <el-col :span="1.5">
+        <el-button  type="primary" @click="exportAll()">导出</el-button>
+      </el-col>
+      </el-row>
     </el-form>
     <el-table :data="filteredDataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
       style="width: 100%;">
@@ -31,8 +60,8 @@
       </el-table-column>
       <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
       </el-table-column>
-      <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
-      </el-table-column> -->
+      <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+      </el-table-column>
       <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
       </el-table-column>
       <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
@@ -64,11 +93,27 @@
           <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
           <span v-else>--</span> <!-- 处理未知状态 -->
         </template>
-      </el-table-column>
-
+        </el-table-column>
       <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
       </el-table-column>
       <el-table-column prop="note" header-align="center" align="center" label="备注">
+      </el-table-column>
+
+      <el-table-column prop="qcTwoContent" header-align="center" align="center" label="成果认定审核意见" width="180">
+      </el-table-column>
+      <el-table-column prop="qcThreeContent" header-align="center" align="center" label="相关方审核意见" width="180">
+      </el-table-column>
+      <el-table-column prop="qcFourContent" header-align="center" align="center" label="成果初评审核意见" width="180">
+      </el-table-column>
+       <el-table-column prop="qcFirstScore" header-align="center" align="center" label="成果初评分数" width="120">
+      </el-table-column>
+       <el-table-column prop="qcSecondScore" header-align="center" align="center" label="成果复评分数" width="120">
+      </el-table-column>
+        <el-table-column prop="qcFiveContent" header-align="center" align="center" label="成果复评审核意见" width="180">
+      </el-table-column>
+         <el-table-column prop="qcSixContent" header-align="center" align="center" label="财务部审核意见" width="180">
+      </el-table-column>
+       <el-table-column prop="qcSevenContent" header-align="center" align="center" label="终评审核意见" width="180">
       </el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
@@ -92,6 +137,9 @@
 
 <script>
 import AddOrUpdate from './K_qcPlan-add-or-update'
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import {Loading} from "element-ui";
 export default {
   data() {
     return {
@@ -99,6 +147,7 @@ export default {
         key: ''
       },
       dataList: [],
+      dataList01: [], //列表数据(不分页)
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
@@ -108,6 +157,8 @@ export default {
       myQueryParam: {
         topicName: '',
         keywords: '',
+        startDate: '',
+        endDate: '',
       }
     }
   },
@@ -269,7 +320,9 @@ export default {
           'page': this.pageIndex,
           'limit': this.pageSize,
           'topicName': this.myQueryParam.topicName,
-          'keywords': this.myQueryParam.keywords
+          'keywords': this.myQueryParam.keywords,
+          'startDate': this.myQueryParam.startDate,
+          'endDate': this.myQueryParam.endDate,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -293,6 +346,7 @@ export default {
       this.pageIndex = val
       this.getDataList()
     },
+
     // 多选
     selectionChangeHandle(val) {
       this.dataListSelections = val
@@ -335,7 +389,81 @@ export default {
           }
         })
       })
+    },
+    //导出excel
+    exportAll(){
+        this.$http({
+          url: this.$http.adornUrl('/qcSubject/registration/finishedList01'),
+          method: 'get',
+          params: this.$http.adornParams({
+          'topicName': this.myQueryParam.topicName,
+          'keywords': this.myQueryParam.keywords,
+          'startDate': this.myQueryParam.startDate,
+          'endDate': this.myQueryParam.endDate,
+          })
+        }).then(({data}) => {
+          if (data) {
+            this.dataList01 = data
+          } else {
+            this.dataList01 = []
+          }
+        })
+        const loadingInstance = Loading.service({
+          lock: true,
+          text: "正在导出，请稍后...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
+
+        const promises = this.dataList01.map((tableRow, index) => {
+            return {
+              序号: index + 1,
+              课题ID:tableRow.qcsrId,
+              课题名称: tableRow.topicName,
+              课题编号:tableRow.topicNumber,
+              课题组长:tableRow.topicLeader,
+              课题顾问:tableRow.topicConsultant,
+              小组成员:tableRow.teamNumberIds,
+              开始日期:tableRow.startDate,
+              结束日期:tableRow.endDate,
+              课题描述:tableRow.topicDescription,
+              课题类型:tableRow.topicType,
+              活动特性:tableRow.activityCharacteristics,
+              课题关键字:tableRow.keywords,
+              课题活动评分结果:tableRow.topicActivityResult,
+              提交类型:tableRow.resultType,
+              成果认定审核意见:tableRow.qcTwoContent,
+              相关方审核意见:tableRow.qcThreeContent,
+              成果初评分数:tableRow.qcFirstScore,
+              成果复评分数:tableRow.qcSecondScore,
+              成果复评审核意见:tableRow.qcFiveContent,
+              财务部审核意见:tableRow.qcSixContent,
+              终评审核意见:tableRow.qcSixContent
+            };
+        });
+        Promise.all(promises)
+          .then((data) => {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+            saveAs(
+              new Blob([wbout], { type: "application/octet-stream" }),
+              "QC知识库数据.xlsx"
+            );
+
+            // // 提交数据到Vuex Store
+            // this.updateExportedData(data);
+          })
+          .finally(() => {
+            loadingInstance.close();
+          })
+          .catch((error) => {
+            console.error("导出失败:", error);
+            loadingInstance.close();
+          });
+      },
     }
   }
-}
-</script>
+  </script>

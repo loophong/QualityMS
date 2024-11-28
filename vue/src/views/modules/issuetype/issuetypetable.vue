@@ -49,12 +49,12 @@
         align="center"
         label="具体问题类别">
       </el-table-column>
-      <el-table-column
-        prop="gradeIllustrate"
-        header-align="center"
-        align="center"
-        label="等级说明">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="gradeIllustrate"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="等级说明">-->
+<!--      </el-table-column>-->
       <el-table-column
         fixed="right"
         header-align="center"

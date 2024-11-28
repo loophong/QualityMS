@@ -40,7 +40,7 @@ public class IndicatorIndicatorSummaryEntity implements Serializable {
 	/**
 	 * 指标目标值
 	 */
-	@ExcelProperty(value = "指标目标值")
+	@ExcelIgnore
 	private BigDecimal indicatorValue;
 
 	@ExcelIgnore
@@ -143,6 +143,12 @@ public class IndicatorIndicatorSummaryEntity implements Serializable {
 	 */
 	@ExcelIgnore
 	private String indicatorChildNode;
+
+	/**
+	 * 指指标完成情况（完成为 1，未完成为 0）
+	 */
+	@ExcelIgnore
+	private Integer finishedFlag;
 
 
 }

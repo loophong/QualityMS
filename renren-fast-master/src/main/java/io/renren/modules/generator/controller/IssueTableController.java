@@ -140,44 +140,6 @@ public class IssueTableController {
 //        return R.ok();
     }
 
-//    @PostMapping("/minioimage")
-//    @RequiresPermissions("generator:issuetable:update")
-//    public R uploadImageMinio(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-//        try {
-//            // 检查存储桶是否存在
-//            String bucketName = "your-bucket-name";  // 替换为你的存储桶名称
-//            boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-//
-//            if (!isBucketExists) {
-//                // 如果存储桶不存在，可以选择创建一个新的存储桶
-//                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-//            }
-//
-//            // 生成唯一的文件名
-//            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-//
-//            // 上传文件到 MinIO
-//            minioClient.putObject(PutObjectArgs.builder()
-//                    .bucket(bucketName)  // 设置存储桶名称
-//                    .object(fileName)    // 设置上传的对象名称
-//                    .stream(file.getInputStream(), file.getSize(), -1) // 文件流
-//                    .contentType(file.getContentType()) // 文件类型
-//                    .build());
-//
-//            // 构造文件的访问链接
-//            String fileUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
-//                            .bucket(bucketName)
-//                            .object(fileName)
-//                            .build()
-//                    );
-//            System.out.println("获得图片的路径为;" +fileUrl);
-//            // 返回成功响应
-//            return R.ok().put("fileUrl", fileUrl);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return R.error("文件上传失败: " + e.getMessage());
-//        }
-//    }
 
     /**
      * 检查车号和问题类别是否重复
@@ -236,9 +198,15 @@ public class IssueTableController {
         // 获取前端传递的车号列表和问题类别ID字符串
         Integer issueId = (Integer) params.get("issueId"); // 问题ID是一个整数
         String issueCategoryIds = (String) params.get("issueCategoryId"); // 问题类别ID是一个字符串
+        String systematicClassification = (String) params.get("systematicClassification"); // 系统分类是一个字符串
+        String firstFaultyParts = (String) params.get("firstFaultyParts"); // 问题类别ID是一个字符串
+        String secondFaultyParts = (String) params.get("secondFaultyParts"); // 问题类别ID是一个字符串
+        String faultType = (String) params.get("faultType"); // 问题类别ID是一个字符串
+        String faultModel = (String) params.get("faultModel"); // 问题类别ID是一个字符串
+
 
         // 调用服务层方法检查是否有重复的车号和问题类别
-        boolean isDuplicate = issueTableService.checkReplicateIssue(issueId, issueCategoryIds);
+        boolean isDuplicate = issueTableService.checkReplicateIssue(issueId,systematicClassification,firstFaultyParts,secondFaultyParts,faultType,faultModel);
 //        System.out.println("结束检查车号和问题类别是否重复"+isDuplicate);
         if (isDuplicate) {
             return R.ok("相同问题已发生");
@@ -314,7 +282,16 @@ public class IssueTableController {
     public R closeRelatedTasks(@PathVariable("issueId") Long issueId) {
         return issueTableService.closeRelatedTasks(issueId); // 直接调用服务层方法
     }
-
+    /**
+     * 问题编号
+     */
+    @RequestMapping("/newIssueNumber")
+    @RequiresPermissions("generator:issuetable:save")
+    public R newIssueNumber() {
+        String useID = issueTableService.newIssueNumber(); // 直接调用服务层方法
+        System.out.println("获取的新编号为：" + useID);
+        return R.ok().put("useID", useID);
+    }
     /**
      * 获取问题统计
      */

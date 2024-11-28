@@ -11,9 +11,10 @@
         <result property="conplanSeries" column="conplan_series"/>
         <result property="conplanAxis" column="conplan_axis"/>
         <result property="conplanText" column="conplan_text"/>
-
         <result property="conplanSubject" column="conplan_subject"/>
         <result property="conplanProcess" column="conplan_process"/>
+        <result property="conplanUrl" column="conplan_url"/>
+        <result property="conplanUser" column="conplan_user"/>
 
     </resultMap>
 

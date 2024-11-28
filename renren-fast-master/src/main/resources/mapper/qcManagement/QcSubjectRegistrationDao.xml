@@ -29,7 +29,99 @@
         <result property="examineId" column="examine_id"/>
         <result property="groupName" column="group_name"/>
     </resultMap>
-    <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity"> SELECT * FROM qc_subject_registration WHERE qcsr_id IN (SELECT qc_examine_subject FROM qc_examine_status WHERE qc_status_seven = 1 ) </select>
+    <resultMap type="io.renren.modules.qcManagement.entity.QcknowledgebaseEntity" id="qcSubjectRegistrationMap1">
+        <result property="qcsrId" column="qcsr_id"/>
+        <result property="topicName" column="topic_name"/>
+        <result property="topicNumber" column="topic_number"/>
+        <result property="topicLeader" column="topic_leader"/>
+        <result property="topicConsultant" column="topic_consultant"/>
+        <result property="teamNumberIds" column="team_number_ids"/>
+        <result property="createDate" column="create_date"/>
+        <result property="creator" column="creator"/>
+        <result property="modificationDate" column="modification_date"/>
+        <result property="modifier" column="modifier"/>
+        <result property="topicReviewStatus" column="topic_review_status"/>
+        <result property="topicDescription" column="topic_description"/>
+        <result property="topicType" column="topic_type"/>
+        <result property="activityCharacteristics" column="activity_characteristics"/>
+        <result property="activityPlan" column="activity_plan"/>
+        <result property="activityPlanEnd" column="activity_plan_end"/>
+        <result property="keywords" column="keywords"/>
+        <result property="topicActivityStatus" column="topic_activity_status"/>
+        <result property="topicActivityResult" column="topic_activity_result"/>
+        <result property="deleteFlag" column="delete_flag"/>
+        <result property="note" column="note"/>
+        <result property="resultType" column="result_type"/>
+        <result property="examineId" column="examine_id"/>
+        <result property="groupName" column="group_name"/>
+        <result property="qcExamineId" column="qc_examine_id"/>
+        <result property="qcExamineSubject" column="qc_examine_subject"/>
+        <result property="qcExamineCurrent" column="qc_examine_current"/>
+        <result property="qcStatusOne" column="qc_status_one"/>
+        <result property="qcStatusTwo" column="qc_status_two"/>
+        <result property="qcStatusThree" column="qc_status_three"/>
+        <result property="qcStatusFour" column="qc_status_four"/>
+        <result property="qcStatusFive" column="qc_status_five"/>
+        <result property="qcStatusSix" column="qc_status_six"/>
+        <result property="qcStatusSeven" column="qc_status_seven"/>
+        <result property="qcSevenContent" column="qc_seven_content"/>
+        <result property="qcSixContent" column="qc_six_content"/>
+        <result property="qcFiveContent" column="qc_five_content"/>
+        <result property="qcSecondScore" column="qc_second_score"/>
+        <result property="qcFourContent" column="qc_four_content"/>
+        <result property="qcFirstScore" column="qc_first_score"/>
+        <result property="qcThreeContent" column="qc_three_content"/>
+        <result property="qcTwoContent" column="qc_two_content"/>
+        <result property="qcOneContent" column="qc_one_content"/>
+        <result property="qcFirstTotal" column="qc_first_total"/>
+        <result property="qcFirstLevel" column="qc_first_level"/>
+        <result property="qcSecondTotal" column="qc_second_total"/>
+        <result property="qcSecondLevel" column="qc_second_level"/>
+
+    </resultMap>
+<!--    <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity">-->
+<!--        SELECT *-->
+<!--        FROM qc_subject_registration-->
+<!--        <where>-->
+<!--            <if test="topicName != null and topicName != ''">-->
+<!--                AND topic_name LIKE CONCAT('%', #{topicName}, '%')-->
+<!--            </if>-->
+<!--            <if test="keywords != null and keywords != ''">-->
+<!--                AND keywords LIKE CONCAT('%', #{keywords}, '%')-->
+<!--            </if>-->
+<!--            <if test="startDate != null and startDate != ''">-->
+<!--                AND start_date = STR_TO_DATE(#{startDate}, '%Y-%m-%d')-->
+<!--            </if>-->
+<!--            <if test="endDate != null and endDate != ''">-->
+<!--                AND end_date = STR_TO_DATE(#{endDate}, '%Y-%m-%d')-->
+<!--            </if>-->
+<!--            AND qcsr_id IN (-->
+<!--            SELECT qc_examine_subject-->
+<!--            FROM qc_examine_status-->
+<!--            WHERE qc_status_seven = 1-->
+<!--            )-->
+<!--        </where>-->
+<!--    </select>-->
+   <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcknowledgebaseEntity">
+    SELECT *
+    FROM qc_subject_registration s
+    LEFT JOIN qc_examine_status e ON s.qcsr_id = e.qc_examine_subject
+    <where>
+        <if test="topicName != null and topicName != ''">
+            AND s.topic_name LIKE CONCAT('%', #{topicName}, '%')
+        </if>
+        <if test="keywords != null and keywords != ''">
+            AND s.keywords LIKE CONCAT('%', #{keywords}, '%')
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND s.start_date = STR_TO_DATE(#{startDate}, '%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND s.end_date = STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+        </if>
+            AND e.qc_status_seven = 1
+    </where>
+</select>
 
     <select id="ifExistSubjectName" resultType="boolean">
         SELECT EXISTS (
@@ -49,7 +141,11 @@
                 AND keywords like concat('%',#{keywords},'%')
             </if>
         </where>
-
+    </select>
+    <select id="ifGroupLead" resultType="java.lang.Boolean">
+        SELECT EXISTS (
+            SELECT * FROM qc_group_members WHERE member_name = #{userName} AND role_in_topic = '组长'
+        )
     </select>
 
     <!--    <select id="getMembersOfGroup" resultType="QcGroupMemberEntity">-->

@@ -11,6 +11,7 @@
             <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <el-button type="warning" @click="exportAll()">小组导出</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="tableData" stripe border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -19,12 +20,12 @@
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="120">
             <template slot-scope="scope">
-              <span v-if="scope.row.examineStatus === '待审核'" style="color: blue;">{{ scope.row.examineStatus }}</span>
-              <span v-else-if="scope.row.examineStatus === '未通过'" style="color: red;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else-if="scope.row.examineStatus == '通过'" style="color: #8dc146;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else>-</span> <!-- 处理未知状态 -->
+              <el-tag v-if="scope.row.examineStatus === '待审核'">{{ scope.row.examineStatus }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
@@ -72,6 +73,7 @@
             <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <el-button type="warning" @click="exportAll()">小组导出</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="dataList" stripe border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -82,12 +84,12 @@
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
             <template slot-scope="scope">
-              <span v-if="scope.row.examineStatus === '待审核'" style="color: blue;">{{ scope.row.examineStatus }}</span>
-              <span v-else-if="scope.row.examineStatus === '未通过'" style="color: red;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else-if="scope.row.examineStatus == '通过'" style="color: #8dc146;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else>-</span> <!-- 处理未知状态 -->
+              <el-tag v-if="scope.row.examineStatus === '待审核'">{{ scope.row.examineStatus }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
           <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="120">
@@ -107,14 +109,16 @@
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作">
             <template slot-scope="scope">
-              <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
-                @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
+              <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.admitEdit)"
+                type="text" size="small" @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
               <el-button
                 v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus === '未通过')"
                 type="text" size="small" @click="handleReexamine(scope.row.id)">提交审核</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:update')"
+              <el-button type="text" size="small"
+                v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.admitEdit)"
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
+              <el-button type="text" size="small"
+                v-if="(isAuth('qcMembers:qcGroupMember:delete') && scope.row.admitEdit)"
                 @click="deleteHandle(scope.row.id)">删除</el-button>
               <el-button type="text" size="small" v-if="scope.row.parentId && scope.row.management"
                 @click="changeHandle(scope.row.id, scope.row.parentId)">移交组长</el-button>
@@ -140,17 +144,17 @@
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
             <template slot-scope="scope">
-              <span v-if="scope.row.examineStatus === '待审核'" style="color: blue;">{{ scope.row.examineStatus }}</span>
-              <span v-else-if="scope.row.examineStatus === '未通过'" style="color: red;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else-if="scope.row.examineStatus == '通过'" style="color: #8dc146;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else>-</span> <!-- 处理未知状态 -->
+              <el-tag v-if="scope.row.examineStatus === '待审核'">{{ scope.row.examineStatus }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
-          <el-table-column prop="name" header-align="center" align="center" label="姓名" width="160">
+          <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="160">
           </el-table-column>
           <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column>
@@ -208,7 +212,10 @@
 <script>
 import AddOrUpdate from './qcMembersManagement-add-or-update'
 import AddGroupDialog from './qcMembersManagement-add-group'
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { Loading } from "element-ui";
+import { group } from 'd3';
 export default {
   data() {
     return {
@@ -245,6 +252,8 @@ export default {
 
       // 角色列表
       roleIdList: [],
+
+      exportList: [],
     }
   },
   components: {
@@ -259,6 +268,21 @@ export default {
     if ((this.isAuth('qcManagement:group:admin')) || (this.isAuth('qcManagement:group:examine'))) {
       await this.getDataList().then(groupList => {
         this.groupList = groupList;
+      });
+      console.log(this.tableData)
+      this.tableData.sort(function (a, b) {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        // 比较两个日期对象，降序排列
+        return dateB - dateA;
+      })
+      this.tableData.forEach(e => {
+        e.children.sort(function (a, b) {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          // 比较两个日期对象，降序排列
+          return dateB - dateA;
+        });
       });
       console.log(this.tableData)
       this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
@@ -322,6 +346,7 @@ export default {
           // this.dataList = data.page.list
           data.page.list.forEach(item => {
             if (item.memberName == data.userName) {
+              item.admitEdit = 1 //标识当前角色可修改
               sameList.push(item)
             }
           });
@@ -346,6 +371,7 @@ export default {
               data.page.list.forEach(row => {
                 if (row.parentId == item.qcgmId && !seen.has(row.qcgmId)) {
                   row.management = 1 //标识当前角色为组长，可以移交组长
+                  row.admitEdit = 1 //标识当前角色可修改
                   resultList.push(row);
                   seen.add(row.qcgmId);
                 }
@@ -366,6 +392,7 @@ export default {
                 groupName: item.groupName,
                 roleInTopic: '组长',
                 team: item.team,
+                admitEdit: item.admitEdit,
                 department: item.department,
                 examineStatus: item.examineStatus,
                 registrationNum: item.registrationNum,
@@ -381,6 +408,7 @@ export default {
                 memberName: item.memberName,
                 number: item.number,
                 management: item.management,
+                admitEdit: item.admitEdit,
                 department: item.department,
                 roleInTopic: item.roleInTopic,
                 parentId: item.parentId,
@@ -391,6 +419,20 @@ export default {
           console.log(map)
           this.dataList = Object.values(map);
           // this.dataList = resultList
+          this.dataList.sort(function (a, b) {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            // 比较两个日期对象，降序排列
+            return dateB - dateA;
+          })
+          this.dataList.forEach(e => {
+            e.children.sort(function (a, b) {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              // 比较两个日期对象，降序排列
+              return dateB - dateA;
+            });
+          });
           console.log(this.dataList)
           this.totalPageGroup = resultList.length
         } else {
@@ -411,6 +453,90 @@ export default {
           this.activeName = '2'
         }
       }
+    },
+    // 导出
+    async exportAll() {
+      await this.$http({
+        url: this.$http.adornUrl(`/qcMembers/qcGroupMember/list`),
+        method: 'get',
+        params: this.$http.adornParams({
+          'page': 1,
+          'limit': 100000,
+        })
+      }).then(({ data }) => {
+        if (data) {
+          this.exportList = data.page.list
+          let seen = []
+          this.exportList.forEach(e => {
+            if (e.examineStatus === '待审核') {
+              seen.push(e)
+              this.exportList = this.exportList.filter(e => e.examineStatus !== '待审核');
+            }
+          });
+          seen.forEach(s => {
+            this.exportList = this.exportList.filter(e => e.parentId != s.qcgmId);
+          })
+          console.log('----------before------------')
+          console.log(this.exportList)
+
+          this.exportList.sort((a, b) => {
+            if (a.groupName === b.groupName) {
+              // 如果groupName相同，则按roleInTopic是否为"组长"排序
+              return a.roleInTopic === "组长" ? -1 : (b.roleInTopic === "组长" ? 1 : 0);
+            }
+            // 如果groupName不同，则按groupName字母顺序排序
+            return a.groupName.localeCompare(b.groupName);
+          });
+          console.log('----------after------------')
+          console.log(this.exportList)
+
+        } else {
+          this.exportList = []
+        }
+      })
+      const loadingInstance = Loading.service({
+        lock: true,
+        text: "正在导出，请稍后...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      // console.log(this.exportList)
+      const promises = this.exportList.map((tableRow, index) => {
+        return {
+          序号: index + 1,
+          小组名: tableRow.groupName,
+          组内角色: tableRow.roleInTopic,
+          姓名: tableRow.memberName,
+          员工编号: tableRow.number,
+          单位: tableRow.department,
+          小组类型: tableRow.team,
+          注册号: tableRow.registrationNum,
+          创建小组时间: tableRow.participationDate,
+        };
+      });
+      Promise.all(promises)
+        .then((data) => {
+          const ws = XLSX.utils.json_to_sheet(data);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+          const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+          saveAs(
+            new Blob([wbout], { type: "application/octet-stream" }),
+            "课题登记表.xlsx"
+          );
+
+          // 提交数据到Vuex Store
+          // this.updateExportedData(data);
+
+        })
+        .finally(() => {
+          loadingInstance.close();
+        })
+        .catch((error) => {
+          console.error("导出失败:", error);
+          loadingInstance.close();
+        });
     },
     // 获取数据列表
     getDataList() {

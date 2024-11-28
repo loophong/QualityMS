@@ -201,7 +201,8 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button type="text" size="small" @click="linkedMethod(scope.row.id)">查看检验方法</el-button>
+          <el-button type="text" size="small" @click="linked_method(scope.row.id,scope.row.toolNumber)">关联检验方法</el-button>
+
         </template>
       </el-table-column>
     </el-table>
@@ -243,55 +244,22 @@
       this.getDataList()
     },
     methods: {
+      //点击关联检验方法按钮，携带对应的toolNumber，跳到instrumenttestmethod.vue页面，
+      // 并且调整后发送后端请求到检验方法的control模块，只显示包含toolNumber的所有检验方法。
 
-        Fuzzy_queries(){
-        this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl('/generator/instrumentation/Fuzzy_queries'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'key': this.dataForm.key
-          })
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
-          } else {
-            this.dataList = []
-            this.totalPage = 0
-          }
-          this.dataListLoading = false
-        })
-      },
-       linkedMethod (id) {
-        this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl(`/generator/instrumentation/linkedMethod/${id}`),
-  
-          method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'key': this.dataForm.key
-          })
-        }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-      },
-      
+    linked_method(id, toolNumber) {
+    this.$router.push({
+      name: 'instrument-testmethod', // 确保这是在路由配置中定义的路由名称
+      params: {
+        id: id,
+        toolNumber: toolNumber
+      }
+    });
+  },
+
+
+
+
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true

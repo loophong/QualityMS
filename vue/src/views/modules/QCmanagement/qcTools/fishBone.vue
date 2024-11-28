@@ -1,30 +1,25 @@
 <template>
   <div>
-    <!-- <div>
-      <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+    <div>
+      <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
-      <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
-    </div> -->
+      <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
+    </div>
     <div class="button-container">
       <el-form>
         <el-form-item>
           <br />
           <el-button type="primary" @click="addEdge">新增分支节点</el-button>
           <el-button type="success" @click="downloadAsImage">下载图片</el-button>
-          <!-- <el-button type="success" @click="dialogVisibleSave = true">保存为模版</el-button> -->
-          <el-button type="success" @click="handleUp">更新当前数据</el-button>
+          <el-button type="success" @click="dialogVisibleSave = true">保存当前数据</el-button>
+          <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
         </el-form-item>
       </el-form>
     </div>
     <div id="fishBone">
-      <el-dialog
-        title="编辑节点"
-        :visible.sync="editDialogVisible"
-        width="30%"
-        :modal="false"
-      >
+      <el-dialog title="编辑节点" :visible.sync="editDialogVisible" width="30%" :modal="false">
         <el-form :model="editableNode">
           <el-form-item label="节点名称">
             <el-input v-model="editableNode.name"></el-input>
@@ -35,24 +30,14 @@
           <el-button type="primary" @click="saveChanges">确定</el-button>
         </div>
       </el-dialog>
-      <el-dialog
-        title="新增节点"
-        :visible.sync="addDialogVisible"
-        width="30%"
-        :modal="false"
-      >
+      <el-dialog title="新增节点" :visible.sync="addDialogVisible" width="30%" :modal="false">
         <el-form :model="newNode">
           <el-form-item label="节点名称">
             <el-input v-model="newNode.name"></el-input>
           </el-form-item>
           <el-form-item label="父节点">
             <el-select v-model="newNode.parentId" placeholder="请选择父节点">
-              <el-option
-                v-for="item in nodeNames"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
+              <el-option v-for="item in nodeNames" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -62,12 +47,8 @@
           <el-button type="primary" @click="addNode">确定</el-button>
         </div>
       </el-dialog>
-      <el-dialog title="模版名" :visible.sync="dialogVisibleSave">
-        <el-input
-          v-model="inputName"
-          placeholder="请输入模版名"
-          style="width: 50%"
-        ></el-input>
+      <el-dialog title="自定义图名" :visible.sync="dialogVisibleSave" append-to-body>
+        <el-input v-model="inputName" placeholder="请输入图名" style="width: 50%"></el-input>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogVisibleSave = false">取 消</el-button>
           <el-button type="primary" @click="handleUp">确 定</el-button>
@@ -127,14 +108,31 @@ export default {
       resultList: [],
       nodeNames: [], // 用于存储节点名称数组
       options: [], // 用于存储节点名称数组
+      currentUserName: '',
+      imageData: "",
     };
   },
   mounted() {
+    this.getUserName();
     this.getTemplateData();
-    // this.initFishBone();
-    // this.getNodeNames(this.testFishData);
+    this.initFishBone();
+    this.getNodeNames(this.testFishData);
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
     initFishBone() {
       console.log("initFishBone");
       new FishBones({
@@ -237,6 +235,8 @@ export default {
         const imgData = canvas.toDataURL("image/png");
         const a = document.createElement("a");
         a.href = imgData;
+        console.log(canvas)
+        console.log(imgData)
         a.download = "fishbone_image.png";
         a.click();
       });
@@ -256,22 +256,23 @@ export default {
     },
     async getTemplateData() {
       await this.$http({
-        url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        url: this.$http.adornUrl("/qcTools/template/templateList"),
         method: "get",
         params: this.$http.adornParams({
-          conplanType: "鱼骨图",
-          conplanSubject: this.conplanSubject,
-          conplanProcess: this.conplanProcess,
+          templateType: "鱼骨图",
+          // conplanSubject: this.conplanSubject,
+          // conplanProcess: this.conplanProcess,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.resultList = data.resultList.map((row) => ({
-            templateId: row.conplanId,
-            templateName: row.conplanName,
-            templateType: row.conplanType,
-            templateText: row.conplanText,
-            templateSeries: JSON.parse(row.conplanSeries),
-            templateAxis: JSON.parse(row.conplanAxis),
+            templateId: row.templateId,
+            templateName: row.templateName,
+            templateType: row.templateType,
+            templateText: row.templateText,
+            templateSeries: JSON.parse(row.templateSeries),
+            templateAxis: JSON.parse(row.templateAxis),
           }));
           this.options = data.resultList.map((item) => ({
             value: item.templateId,
@@ -284,15 +285,15 @@ export default {
       });
 
       //查询到有用户暂存的数据,就使用该数据渲染echarts
-      if (this.resultList.length != 0) {
-        this.resultList.forEach((item) => {
-          this.testFishData = item.templateSeries;
-          this.name = item.templateName;
-        });
-      }
-      console.log("this.testFishData=====xht=====>", this.testFishData);
-      this.initFishBone();
-      this.getNodeNames(this.testFishData);
+      // if (this.resultList.length != 0) {
+      //   this.resultList.forEach((item) => {
+      //     this.testFishData = item.templateSeries;
+      //     this.name = item.templateName;
+      //   });
+      // }
+      // console.log("this.testFishData=====xht=====>", this.testFishData);
+      // this.initFishBone();
+      // this.getNodeNames(this.testFishData);
     },
     handleUp() {
       console.log(this.updatedSeries);
@@ -339,7 +340,11 @@ export default {
         });
       }
     },
-    addTemplate() {
+    async addTemplate() {
+      await html2canvas(document.querySelector('#fishBone')).then(canvas => {
+        this.imgData = canvas.toDataURL('image/png')
+      })
+      console.log(this.imgData)
       this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/save`),
         method: "post",
@@ -352,6 +357,8 @@ export default {
           // 'templateAxis': JSON.stringify(tmp),
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanUrl: JSON.stringify(this.imgData),
+          conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {

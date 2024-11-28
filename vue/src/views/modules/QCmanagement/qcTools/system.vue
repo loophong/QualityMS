@@ -1,40 +1,30 @@
 <template>
   <div>
-    <!-- <div>
+    <div>
       <span>
-        <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+        <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
-        <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
+        <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
       </span>
-    </div> -->
+    </div>
     <div>
-      <vue2-org-tree
-        :data="treeData"
-        horizontal
-        collapsable
-        :render-content="renderContent"
-        @on-expand="onExpand"
-        @on-node-click="NodeClick"
-      />
+      <vue2-org-tree :data="treeData" horizontal collapsable :render-content="renderContent" @on-expand="onExpand"
+        @on-node-click="NodeClick" />
       <div v-if="showMenu" class="context-menu" :style="menuStyle">
         <button @click="editNode(selectedNode)">编辑</button>
         <button @click="addNode(selectedNode)">添加</button>
         <button @click="deleteNode(selectedNode.id)">删除</button>
       </div>
 
-      <!-- <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button> -->
-      <el-button type="success" @click="handleUp">更新当前数据</el-button>
+      <el-button type="success" @click="dialogFormVisible = true">保存当前数据</el-button>
+      <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
 
       <el-button type="warning" @click="downloadScreenshot">下载截图</el-button>
     </div>
-    <el-dialog title="模版名" :visible.sync="dialogFormVisible">
-      <el-input
-        v-model="inputName"
-        placeholder="请输入模版名"
-        style="width: 50%"
-      ></el-input>
+    <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
+      <el-input v-model="inputName" placeholder="请输入图名" style="width: 50%"></el-input>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleUp">确 定</el-button>
@@ -122,15 +112,31 @@ export default {
         left: "0px",
       },
       selectedNode: null,
+      currentUserName: '',
     };
   },
 
   created() {
     this.toggleExpand(this.treeData, true);
+    this.getUserName();
     this.getTemplateData();
   },
 
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
     handleUp() {
       console.log(this.treeData);
       console.log(this.inputName);
@@ -140,6 +146,11 @@ export default {
     },
     //保存为模版
     async addTemplate() {
+      let imgData;
+      const element = document.querySelector(".org-tree-container"); // 获取需要截图的元素
+      await html2canvas(element).then((canvas) => {
+        imgData = canvas.toDataURL("image/png");
+      });
       await this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/save`),
         method: "post",
@@ -152,6 +163,8 @@ export default {
           conplanAxis: undefined,
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanUrl: JSON.stringify(imgData),
+          conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -172,27 +185,21 @@ export default {
     //获取模版数据
     async getTemplateData() {
       await this.$http({
-        // url: this.$http.adornUrl("/qcTools/template/templateList"),
-        url: this.$http.adornUrl("/qcTools/conplan/TspList"),
+        url: this.$http.adornUrl("/qcTools/template/templateList"),
+        // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
         method: "get",
         params: this.$http.adornParams({
-          conplanType: "系统图",
-          conplanSubject: this.conplanSubject,
-          conplanProcess: this.conplanProcess,
+          templateType: "系统图",
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.resultList = data.resultList.map((row) => ({
-            // templateId: row.templateId,
-            // templateName: row.templateName,
-            // templateType: row.templateType,
-            // templateText: row.templateText,
-            // templateSeries: JSON.parse(row.templateSeries),
-            templateId: row.conplanId,
-            templateName: row.conplanName,
-            templateType: row.conplanType,
-            templateText: row.conplanText,
-            templateSeries: JSON.parse(row.conplanSeries),
+            templateId: row.templateId,
+            templateName: row.templateName,
+            templateType: row.templateType,
+            templateText: row.templateText,
+            templateSeries: JSON.parse(row.templateSeries),
+
           }));
           this.options = data.resultList.map((item) => ({
             value: item.templateId,
@@ -203,14 +210,14 @@ export default {
           this.options = [];
         }
 
-        // 将获取的数据传递给 this.treeData
-        if (this.resultList.length != 0) {
-          this.resultList.forEach((item) => {
-            this.treeData = item.templateSeries;
-          });
-        }
-        //渲染数据
-        this.toggleExpand(this.treeData, true);
+        // // 将获取的数据传递给 this.treeData
+        // if (this.resultList.length != 0) {
+        //   this.resultList.forEach((item) => {
+        //     this.treeData = item.templateSeries;
+        //   });
+        // }
+        // //渲染数据
+        // this.toggleExpand(this.treeData, true);
       });
     },
     //删除当前模版
@@ -371,7 +378,9 @@ export default {
       const element = document.querySelector(".org-tree-container"); // 获取需要截图的元素
       html2canvas(element).then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
+        console.log(imgData);
         const blob = this.dataURLtoBlob(imgData);
+        console.log(blob);
         saveAs(blob, "tree-screenshot.png");
       });
     },

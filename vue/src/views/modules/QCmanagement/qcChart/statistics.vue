@@ -118,7 +118,7 @@ export default {
         })
       //各阶段个数
       await this.$http({
-        url: this.$http.adornUrl('/qcSubject/registration/list'),
+        url: this.$http.adornUrl('/qcSubject/registration/all'),
         method: 'get',
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -307,7 +307,8 @@ export default {
       ];
       option = {
         title: {
-          text: ''
+          text: '点检统计',
+          left: 'center', // 居中对齐
         },
         tooltip: {
           trigger: 'axis',
@@ -315,9 +316,7 @@ export default {
             type: 'shadow'
           }
         },
-        legend: {
-          data: ['普及率', '活动率', '成果率']
-        },
+
         toolbox: {
           show: false,
           orient: 'vertical',
@@ -335,43 +334,35 @@ export default {
           {
             type: 'category',
             axisTick: { show: false },
-            data: ['点检统计']
+            data: ['普及率', '活动率', '成果率'],
           }
         ],
         yAxis: [
           {
-            type: 'value'
+            type: 'value',
+            splitLine: {
+              show: true,
+            }
           }
         ],
         series: [
           {
-            name: '普及率',
+            name: '值',
             type: 'bar',
             barGap: 0,
             label: labelOption,
             emphasis: {
               focus: 'series'
             },
-            data: [(this.currentCount / this.allCount) * 100]
+            // itemStyle: {
+            //   normal: {
+            //     color: '#17b3a3' // 设置柱状图颜色为橙色
+            //   }
+            // },
+            data: formattedData
           },
-          {
-            name: '活动率',
-            type: 'bar',
-            label: labelOption,
-            emphasis: {
-              focus: 'series'
-            },
-            data: [this.activityDataResult]
-          },
-          {
-            name: '成果率',
-            type: 'bar',
-            label: labelOption,
-            emphasis: {
-              focus: 'series'
-            },
-            data: [(this.countData.countExamined / this.countData.countSubmitted) * 100]
-          },
+
+          // },
 
         ]
       };
@@ -444,57 +435,168 @@ export default {
     },
     //课题获奖情况饼图
     pieChart2() {
+      var app = {};
+
       var chartDom = document.getElementById('pieChart2');
       var myChart = echarts.init(chartDom);
       var option;
-      let seriesData = [
-        { value: this.scoreResult.first, name: '一等奖', itemStyle: { normal: { color: '#8dc147' } } },
-        { value: this.scoreResult.second, name: '二等奖', itemStyle: { normal: { color: '#66a2d8' } } },
-        { value: this.scoreResult.third, name: '三等奖', itemStyle: { normal: { color: '#906aae' } } },
-        { value: this.scoreResult.fourth, name: '四等奖', itemStyle: { normal: { color: '#00FF00' } } },
-        { value: this.scoreResult.fifth, name: '鼓励奖', itemStyle: { normal: { color: '#ADD8E6' } } },
-      ]
-      const filteredSeriesData = seriesData.filter(item => item.value !== 0);
+
+      const posList = [
+        'left',
+        'right',
+        'top',
+        'bottom',
+        'inside',
+        'insideTop',
+        'insideLeft',
+        'insideRight',
+        'insideBottom',
+        'insideTopLeft',
+        'insideTopRight',
+        'insideBottomLeft',
+        'insideBottomRight'
+      ];
+      app.configParameters = {
+        rotate: {
+          min: -90,
+          max: 90
+        },
+        align: {
+          options: {
+            left: 'left',
+            center: 'center',
+            right: 'right'
+          }
+        },
+        verticalAlign: {
+          options: {
+            top: 'top',
+            middle: 'middle',
+            bottom: 'bottom'
+          }
+        },
+        position: {
+          options: posList.reduce(function (map, pos) {
+            map[pos] = pos;
+            return map;
+          }, {})
+        },
+        distance: {
+          min: 0,
+          max: 100
+        }
+      };
+      app.config = {
+        rotate: 90,
+        align: 'left',
+        verticalAlign: 'middle',
+        position: 'top',
+        distance: 15,
+        onChange: function () {
+          const labelOption = {
+            rotate: app.config.rotate,
+            align: app.config.align,
+            verticalAlign: app.config.verticalAlign,
+            position: app.config.position,
+            distance: app.config.distance
+          };
+          myChart.setOption({
+            series: [
+              {
+                label: labelOption
+              },
+              {
+                label: labelOption
+              },
+              {
+                label: labelOption
+              },
+              {
+                label: labelOption
+              }
+            ]
+          });
+        }
+      };
+      const labelOption = {
+        show: true,
+        position: app.config.position,
+        distance: app.config.distance,
+        align: app.config.align,
+        verticalAlign: app.config.verticalAlign,
+        rotate: app.config.rotate,
+        formatter: '{c} %',
+        fontSize: 16,
+        rich: {
+          name: {}
+        }
+      };
+      let formattedData = [
+        { value: this.scoreResult.first, itemStyle: { normal: { color: '#8dc147' } } },
+        { value: this.scoreResult.second, itemStyle: { normal: { color: '#66a2d8' } } },
+        { value: this.scoreResult.third, itemStyle: { normal: { color: '#906aae' } } },
+        { value: this.scoreResult.fourth, itemStyle: { normal: { color: '#00FF00' } } },
+        { value: this.scoreResult.fifth, itemStyle: { normal: { color: '#ADD8E6' } } },
+      ];
       option = {
         title: {
-          text: '课题获奖情况',
-          left: 'center',
-          textStyle: {
-            color: '#ffffff' // 设置字体颜色为白色
-          }
+          text: '课题获奖状态',
+          left: 'center', // 居中对齐
         },
         tooltip: {
-          trigger: 'item',
-          formatter: "{a} <br/>{b}: {c} ({d}%)"
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
         },
-        legend: {
+
+        toolbox: {
+          show: false,
           orient: 'vertical',
-          left: 'left'
+          left: 'right',
+          top: 'center',
+          feature: {
+            mark: { show: true },
+            dataView: { show: true, readOnly: false },
+            magicType: { show: true, type: ['line', 'bar'] },
+            restore: { show: true },
+            saveAsImage: { show: true }
+          }
         },
-        series: [
+        xAxis: [
           {
-            name: '个数',
-            type: 'pie',
-            radius: '50%',
-            center: ['50%', '50%'], // 饼图位置
-            data: filteredSeriesData,
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            },
-            label: {
+            type: 'category',
+            axisTick: { show: false },
+            data: ['一等奖', '二等奖', '三等奖', '四等奖', '鼓励奖'],
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            splitLine: {
               show: true,
-              position: 'outside', // 标签位置,inside、outside、top、bottom、left、right
-              formatter: '{b}: {c} ({d}%)'
-            },
-            labelLine: {
-              show: true,
-              smooth: 0.2,
             }
           }
+        ],
+        series: [
+          {
+            name: '值',
+            type: 'bar',
+            barGap: 0,
+            label: labelOption,
+            emphasis: {
+              focus: 'series'
+            },
+            // itemStyle: {
+            //   normal: {
+            //     color: '#17b3a3' // 设置柱状图颜色为橙色
+            //   }
+            // },
+            data: formattedData
+          },
+
+          // },
+
         ]
       };
 

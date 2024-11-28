@@ -51,8 +51,15 @@ public class QcToolsConplanEntity implements Serializable {
     /**
      * 所属process
      */
-
     private  Integer conplanProcess;
+	/**
+	 * 图片url
+	 */
+	private  String conplanUrl;
+	/**
+	 * 实例上传人
+	 */
+	private  String conplanUser;
 
 
 }

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.spc.dao.SpcXrchartDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.spc.entity.SpcXrchartEntity" id="spcXrchartMap">
+        <result property="spcxrId" column="spcXR_id"/>
+        <result property="date1" column="date_1"/>
+        <result property="date2" column="date_2"/>
+        <result property="date3" column="date_3"/>
+        <result property="date4" column="date_4"/>
+        <result property="date5" column="date_5"/>
+        <result property="date6" column="date_6"/>
+        <result property="date7" column="date_7"/>
+        <result property="date8" column="date_8"/>
+        <result property="date9" column="date_9"/>
+        <result property="date10" column="date_10"/>
+        <result property="date11" column="date_11"/>
+        <result property="date12" column="date_12"/>
+        <result property="date13" column="date_13"/>
+        <result property="date14" column="date_14"/>
+        <result property="date15" column="date_15"/>
+        <result property="date16" column="date_16"/>
+        <result property="date17" column="date_17"/>
+        <result property="date18" column="date_18"/>
+        <result property="date19" column="date_19"/>
+        <result property="date20" column="date_20"/>
+        <result property="date21" column="date_21"/>
+        <result property="date22" column="date_22"/>
+        <result property="date23" column="date_23"/>
+        <result property="date24" column="date_24"/>
+        <result property="date25" column="date_25"/>
+        <result property="date26" column="date_26"/>
+        <result property="date27" column="date_27"/>
+        <result property="date28" column="date_28"/>
+        <result property="date29" column="date_29"/>
+        <result property="date30" column="date_30"/>
+        <result property="date31" column="date_31"/>
+        <result property="datatime" column="datatime"/>
+        <result property="upperLimitStandards" column="upper_limit_standards"/>
+        <result property="centerLimitStandards" column="center_limit_standards"/>
+        <result property="lowerLimitStandards" column="lower_limit_standards"/>
+        <result property="upperLimitX" column="upper_limit_X"/>
+        <result property="centerLimitX" column="center_limit_X"/>
+        <result property="lowerLimitX" column="lower_limit_X"/>
+        <result property="upperLimitR" column="upper_limit_R"/>
+        <result property="centerLimitR" column="center_limit_R"/>
+        <result property="lowerLimitR" column="lower_limit_R"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="alternateFields1" column="alternate_fields1"/>
+        <result property="alternateFields2" column="alternate_fields2"/>
+        <result property="alternateFields3" column="alternate_fields3"/>
+        <result property="alternateFields4" column="alternate_fields4"/>
+        <result property="deleteFlag" column="delete_flag"/>
+    </resultMap>
+
+
+    <!-- 根据月份删除数据 -->
+    <delete id="deleteDataByMonth" parameterType="java.util.Date">
+        DELETE FROM spc_XRchart
+        WHERE MONTH(datatime) = MONTH(#{datatime})
+        AND YEAR(datatime) = YEAR(#{datatime})
+    </delete>
+
+    <!-- 批量插入数据 -->
+    <insert id="batchInsertSpcXrcharts" parameterType="java.util.List">
+        INSERT INTO spc_XRchart (
+        spcXR_id, date1, date2, date3, date4, date5, date6, date7,
+        date8, date9, date10, date11, date12, date13, date14, date15,
+        date16, date17, date18, date19, date20, date21, date22, date23,
+        date24, date25, date26, date27, date28, date29, date30, date31,
+        datatime, upper_limit_standards, center_limit_standards, lower_limit_standards,
+        upper_limit_X, center_limit_X, lower_limit_X, upper_limit_R, center_limit_R,
+        lower_limit_R, create_by, create_time, alternate_fields1, alternate_fields2,
+        alternate_fields3, alternate_fields4, delete_flag
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.spcxrId}, #{item.date1}, #{item.date2}, #{item.date3}, #{item.date4},
+            #{item.date5}, #{item.date6}, #{item.date7}, #{item.date8}, #{item.date9},
+            #{item.date10}, #{item.date11}, #{item.date12}, #{item.date13}, #{item.date14},
+            #{item.date15}, #{item.date16}, #{item.date17}, #{item.date18}, #{item.date19},
+            #{item.date20}, #{item.date21}, #{item.date22}, #{item.date23}, #{item.date24},
+            #{item.date25}, #{item.date26}, #{item.date27}, #{item.date28}, #{item.date29},
+            #{item.date30}, #{item.date31}, #{item.datatime}, #{item.upperLimitStandards},
+            #{item.centerLimitStandards}, #{item.lowerLimitStandards}, #{item.upperLimitX},
+            #{item.centerLimitX}, #{item.lowerLimitX}, #{item.upperLimitR}, #{item.centerLimitR},
+            #{item.lowerLimitR}, #{item.createBy}, #{item.createTime}, #{item.alternateFields1},
+            #{item.alternateFields2}, #{item.alternateFields3}, #{item.alternateFields4}, #{item.deleteFlag})
+        </foreach>
+    </insert>
+
+
+</mapper>

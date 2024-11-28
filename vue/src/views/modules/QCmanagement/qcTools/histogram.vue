@@ -1,7 +1,7 @@
 <template>
   <div>
     <span>
-      <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+      <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
@@ -12,11 +12,7 @@
       <div class="input-group">
         <span>
           <input v-model="newCategory" placeholder="请输入横坐标数据" />
-          <input
-            v-model="newValue"
-            type="text"
-            placeholder="请输入纵坐标数据"
-          />
+          <input v-model="newValue" type="text" placeholder="请输入纵坐标数据" />
         </span>
       </div>
       <br />
@@ -31,11 +27,7 @@
       </div>
     </div>
     <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
-      <el-input
-        v-model="inputName"
-        placeholder="请输入图名"
-        style="width: 50%"
-      ></el-input>
+      <el-input v-model="inputName" placeholder="请输入图名" style="width: 50%"></el-input>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleUp">确 定</el-button>
@@ -83,15 +75,31 @@ export default {
       options: [], //下拉框选择
       history: [], // 记录历史状态
       editingCategory: null, // 记录当前编辑的横坐标
+      currentUserName: '',
     };
   },
   mounted() {
+    this.getUserName();
     this.getTemplateData();
     this.drawChart();
     this.updateStatistics(); // 计算初始统计数据
     this.updateChart(); // 更新图表以显示初始数据
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
     //处理下拉框选择变化
     handleSelectChange() {
       console.log(this.resultList);
@@ -194,7 +202,17 @@ export default {
         });
       }
     },
-    addTemplate() {
+    async addTemplate() {
+      let img = new Image()
+      img.src = await this.myChart.getDataURL(
+        {
+          type: 'png',
+          // pixelRatio: 1,
+          // backgroundColor: '#fff',
+          excludeComponents: ['toolbox']
+        }
+      )
+
       this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/save`),
         method: "post",
@@ -209,6 +227,8 @@ export default {
           conplanProcess: this.conplanProcess,
           conplanIssue: this.conplanIssue,
 
+          conplanUrl: JSON.stringify(img.src),
+          conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -269,6 +289,7 @@ export default {
             },
           },
         ],
+        animation: false,
         graphic: {
           elements: [
             {
@@ -409,9 +430,9 @@ export default {
       const variance =
         this.totalFrequency > 1
           ? this.data.reduce((sum, freq, index) => {
-              const value = Number(this.categories[index]);
-              return sum + freq * Math.pow(value - this.weightedMean, 2);
-            }, 0) / this.totalFrequency
+            const value = Number(this.categories[index]);
+            return sum + freq * Math.pow(value - this.weightedMean, 2);
+          }, 0) / this.totalFrequency
           : 0;
 
       this.standardDeviation = Math.sqrt(variance).toFixed(2); // 计算标准差

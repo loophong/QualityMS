@@ -120,7 +120,7 @@
         prop="indicatorActualValue"
         header-align="center"
         align="center"
-        label="指标值">
+        label="指标完成值">
       </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="indicatorValueUpperBound"-->
@@ -146,12 +146,23 @@
         align="center"
         label="考核部门">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="managementContentCurrentAnalysis"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="管理内容（现状分析）">-->
-<!--      </el-table-column>-->
+      <el-table-column
+        prop="finishedFlag"
+        header-align="center"
+        align="center"
+        label="完成情况">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.finishedFlag === 1" type="success">
+            达标
+          </el-tag>
+          <el-tag v-else-if="scope.row.finishedFlag === 0" type="danger">
+            未达标
+          </el-tag>
+          <el-tag v-else type="info">
+            -
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="indicatorCreatTime"
         header-align="center"
@@ -227,7 +238,8 @@
           startTime: '',
           endTime: '',
           indicatorState: '',
-          indicatorChildNode: ''
+          indicatorChildNode: '',
+          finishedFlag: ''
         },
         form: {
           indicatorId: 0,
@@ -251,7 +263,8 @@
           indicatorCreatTime: '',
           yearMonth: '',
           indicatorState: '',
-          indicatorChildNode: ''
+          indicatorChildNode: '',
+          finishedFlag: ''
         },
         dataList: [],
         dataList01: [], //列表数据(不分页)

@@ -22,11 +22,7 @@
       <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
 
       <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
-        <el-input
-          v-model="inputName"
-          placeholder="请输入图名"
-          style="width: 50%"
-        ></el-input>
+        <el-input v-model="inputName" placeholder="请输入图名" style="width: 50%"></el-input>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="handleUp">确 定</el-button>
@@ -79,14 +75,30 @@ export default {
       inputName: "",
       name: "",
       options: [], // 模版列表
+      currentUserName: '',
     };
   },
   mounted() {
+    this.getUserName();
     this.getTemplateData();
     this.initSvg();
     this.renderGraph();
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
     handleUp() {
       console.log(this.nodes);
       console.log("inputName:" + this.inputName);
@@ -96,6 +108,10 @@ export default {
     },
     //保存为模版
     async addTemplate() {
+      let imgData;
+      await html2canvas(document.querySelector("#chart")).then((canvas) => {
+        imgData = canvas.toDataURL("image/png");
+      });
       await this.$http({
         // url: this.$http.adornUrl(`/qcTools/template/save`),
         url: this.$http.adornUrl(`/qcTools/conplan/save`),
@@ -111,6 +127,8 @@ export default {
           conplanProcess: this.conplanProcess,
           conplanIssue: this.conplanIssue,
 
+          conplanUrl: JSON.stringify(imgData),
+          conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {

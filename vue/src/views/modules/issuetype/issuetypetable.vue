@@ -37,12 +37,12 @@
 <!--        align="center"-->
 <!--        label="问题类别ID">-->
 <!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="issueGrade"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="问题等级">-->
-<!--      </el-table-column>-->
+      <el-table-column
+        prop="issueGrade"
+        header-align="center"
+        align="center"
+        label="问题等级">
+      </el-table-column>
       <el-table-column
         prop="concreteIssueCategory"
         header-align="center"

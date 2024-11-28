@@ -50,9 +50,9 @@ public class IssueTypeTableController {
     public R list(){
 //        System.out.println("=====获取问题列表----开始");
         List<IssueTypeTableEntity> category = issueTypeTableService.listAll();
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", 0);
-        response.put("issueTable", category);
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("code", 0);
+//        response.put("issueTable", category);
 //        System.out.println(response);
 //        System.out.println("=====获取问题列表----结束");
         return R.ok().put("category", category);

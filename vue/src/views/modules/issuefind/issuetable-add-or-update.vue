@@ -840,14 +840,30 @@ export default {
       this.$emit('refreshDataList'); // 可选：触发数据刷新
     },
     //问题编号
-    generateSerialNumber() {
+    async generateSerialNumber() {
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const day = String(now.getDate()).padStart(2, '0');
-      const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-      return `ZL-IS-${year}${month}-${day}${random}`;
+
+      try {
+        // 向后端发送请求，获取新的随机数（四字符字符串）
+        const response = await this.$http({
+          url: this.$http.adornUrl(`/generator/issuetable/newIssueNumber`),
+          method: 'get',
+        });
+        console.log('Successfully fetched new issue number:', response.data.useID);
+
+        // 返回问题编号，确保 random 是从后端返回的字符串
+        const random = response.data.useID;
+        return `ZL-IS-${year}${month}${day}-${random}`;
+      } catch (error) {
+        console.error('Failed to fetch new issue number:', error);
+        throw new Error('Failed to generate serial number');
+      }
     },
+
+
     // 处理图片预览
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url || file.preview;
@@ -1294,102 +1310,173 @@ export default {
     //     }
     //   });
     // },
-    dataFormSubmit () {
-      this.$refs['dataForm'].validate((valid) => {
-        console.log(valid);
+    // dataFormSubmit () {
+    //   this.$refs['dataForm'].validate((valid) => {
+    //     console.log(valid);
+    //     if (valid) {
+    //       this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId);
+    //       this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber);
+    //       console.log("this.dataForm.issueCategoryId", this.dataForm.issueCategoryId);
+    //       console.log("this.dataForm.vehicleNumbers", this.dataForm.vehicleNumbers);
+    //
+    //       // 调用检查重复问题的方法
+    //       this.checkDuplicateIssue()
+    //         .then(() => {
+    //           // 调用 /generator/issuetable/checkReplicateIssue 请求
+    //           return this.$http({
+    //             url: this.$http.adornUrl('/generator/issuetable/checkReplicateIssue'),
+    //             method: 'post',
+    //             data: this.$http.adornData({
+    //               issueId: this.dataForm.issueId,
+    //               issueCategoryId: this.dataForm.issueCategoryId,
+    //               systematicClassification: this.selectedSystematic,
+    //               firstFaultyParts: this.selectedFirstFaultyParts,
+    //               secondFaultyParts: this.selectedSecondFaultyParts,
+    //               faultType: this.selectedFaultType,
+    //               faultModel: this.selectedFaultModel
+    //             })
+    //           });
+    //         })
+    //         .then(({ data }) => {
+    //           // console.log('checkReplicateIssue', data);
+    //           // console.log('issueNumber', this.generateSerialNumber());
+    //
+    //           if (data && data.code === 0) {
+    //             // 重复检查通过，继续提交数据
+    //             return this.$http({
+    //               url: this.$http.adornUrl(`/generator/issuetable/${!this.dataForm.issueId ? 'save' : 'update'}`),
+    //               method: 'post',
+    //               data: this.$http.adornData({
+    //                 'issueId': this.dataForm.issueId || undefined,
+    //                 'serialNumber': this.dataForm.serialNumber,
+    //                 'issueNumber': this.generateSerialNumber(),
+    //                 'inspectionDepartment': this.dataForm.inspectionDepartment,
+    //                 'inspectionDate': this.dataForm.inspectionDate,
+    //                 'issueCategoryId': this.dataForm.issueCategoryId,
+    //                 'vehicleTypeId': this.dataForm.vehicleTypeIds.join(','),
+    //                 'vehicleNumberId': this.dataForm.vehicleNumbers.join(','),
+    //                 'issueDescription': this.dataForm.issueDescription,
+    //                 'systematicClassification': this.selectedSystematic,
+    //                 'firstFaultyParts': this.selectedFirstFaultyParts,
+    //                'secondFaultyParts': this.selectedSecondFaultyParts,
+    //                 'faultType': this.selectedFaultType,
+    //                 'faultModel': this.selectedFaultModel,
+    //                 'issuePhoto': this.dataForm.issuePhoto,
+    //                 'rectificationRequirement': this.dataForm.rectificationRequirement,
+    //                 'peliminaryAnalysis': this.dataForm.peliminaryAnalysis,
+    //                 'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+    //                 'responsibleDepartment': this.dataForm.responsibleDepartment,
+    //                 'rectificationStatus': this.dataForm.rectificationStatus,
+    //                 'actualCompletionTime': this.dataForm.actualCompletionTime,
+    //                 'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,
+    //                 'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+    //                 'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
+    //                 'remark': this.dataForm.remark,
+    //                 'creator': this.dataForm.creator,
+    //                 'creationTime': this.dataForm.creationTime,
+    //                 'lastModifier': this.dataForm.lastModifier,
+    //                 'lastModificationTime': this.dataForm.lastModificationTime,
+    //                 'associatedRectificationRecords': this.dataForm.associatedRectificationRecords,
+    //                 'associatedIssueAddition': this.dataForm.associatedIssueIds.join(','),
+    //                 'creationDuration': this.dataForm.creationDuration,
+    //                 'causeAnalysis': this.dataForm.causeAnalysis,
+    //                 'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
+    //                 'verificationConclusion': this.dataForm.verificationConclusion,
+    //                 'verifier': this.dataForm.verifier,
+    //                 'level': this.dataForm.level,
+    //                 'state': this.dataForm.state,
+    //                 'formula': this.dataForm.formula
+    //               })
+    //             });
+    //           } else {
+    //             throw new Error("操作失败: " + data.msg);
+    //           }
+    //         })
+    //         .then(({ data }) => {
+    //           if (data && data.code === 0) {
+    //             this.visible = false;
+    //             this.visibleR = false;
+    //             this.$emit('refreshDataList');
+    //             this.$message.success("操作成功");
+    //           } else {
+    //             this.$message.error(data.msg);
+    //           }
+    //         })
+    //         .catch(error => {
+    //           console.error(error);
+    //         });
+    //     }
+    //   });
+    // },
+    dataFormSubmit() {
+      this.$refs['dataForm'].validate(async (valid) => {
         if (valid) {
-          this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId);
-          this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber);
-          console.log("this.dataForm.issueCategoryId", this.dataForm.issueCategoryId);
-          console.log("this.dataForm.vehicleNumbers", this.dataForm.vehicleNumbers);
+          try {
+            this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId);
+            this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber);
 
-          // 调用检查重复问题的方法
-          this.checkDuplicateIssue()
-            .then(() => {
-              // 调用 /generator/issuetable/checkReplicateIssue 请求
-              return this.$http({
-                url: this.$http.adornUrl('/generator/issuetable/checkReplicateIssue'),
+            console.log("this.dataForm.issueCategoryId", this.dataForm.issueCategoryId);
+            console.log("this.dataForm.vehicleNumbers", this.dataForm.vehicleNumbers);
+
+            // 调用检查重复问题的方法
+            // await this.checkDuplicateIssue();
+
+            // 调用后端重复检查接口
+            const { data: checkData } = await this.$http({
+              url: this.$http.adornUrl('/generator/issuetable/checkReplicateIssue'),
+              method: 'post',
+              data: this.$http.adornData({
+                issueId: this.dataForm.issueId,
+                issueCategoryId: this.dataForm.issueCategoryId,
+                systematicClassification: this.selectedSystematic,
+                firstFaultyParts: this.selectedFirstFaultyParts,
+                secondFaultyParts: this.selectedSecondFaultyParts,
+                faultType: this.selectedFaultType,
+                faultModel: this.selectedFaultModel,
+              }),
+            });
+
+            if (checkData && checkData.code === 0) {
+              // 生成问题编号
+              const issueNumber = await this.generateSerialNumber();
+              this.dataForm.issueNumber = issueNumber; // 确保是字符串
+
+              // 提交保存或更新请求
+              const { data: saveData } = await this.$http({
+                url: this.$http.adornUrl(`/generator/issuetable/${!this.dataForm.issueId ? 'save' : 'update'}`),
                 method: 'post',
                 data: this.$http.adornData({
-                  issueId: this.dataForm.issueId,
-                  issueCategoryId: this.dataForm.issueCategoryId,
+                  ...this.dataForm, // 展开表单数据
                   systematicClassification: this.selectedSystematic,
                   firstFaultyParts: this.selectedFirstFaultyParts,
                   secondFaultyParts: this.selectedSecondFaultyParts,
                   faultType: this.selectedFaultType,
-                  faultModel: this.selectedFaultModel
-                })
+                  faultModel: this.selectedFaultModel,
+                  vehicleTypeId: this.dataForm.vehicleTypeIds.join(','),
+                  vehicleNumberId: this.dataForm.vehicleNumbers.join(','),
+                  associatedIssueAddition: this.dataForm.associatedIssueIds.join(','),
+                }),
               });
-            })
-            .then(({ data }) => {
-              console.log('checkReplicateIssue', data);
-              if (data && data.code === 0) {
-                // 重复检查通过，继续提交数据
-                return this.$http({
-                  url: this.$http.adornUrl(`/generator/issuetable/${!this.dataForm.issueId ? 'save' : 'update'}`),
-                  method: 'post',
-                  data: this.$http.adornData({
-                    'issueId': this.dataForm.issueId || undefined,
-                    'serialNumber': this.dataForm.serialNumber,
-                    'issueNumber': this.generateSerialNumber(),
-                    'inspectionDepartment': this.dataForm.inspectionDepartment,
-                    'inspectionDate': this.dataForm.inspectionDate,
-                    'issueCategoryId': this.dataForm.issueCategoryId,
-                    'vehicleTypeId': this.dataForm.vehicleTypeIds.join(','),
-                    'vehicleNumberId': this.dataForm.vehicleNumbers.join(','),
-                    'issueDescription': this.dataForm.issueDescription,
-                    'systematicClassification': this.selectedSystematic,
-                    'firstFaultyParts': this.selectedFirstFaultyParts,
-                   'secondFaultyParts': this.selectedSecondFaultyParts,
-                    'faultType': this.selectedFaultType,
-                    'faultModel': this.selectedFaultModel,
-                    'issuePhoto': this.dataForm.issuePhoto,
-                    'rectificationRequirement': this.dataForm.rectificationRequirement,
-                    'peliminaryAnalysis': this.dataForm.peliminaryAnalysis,
-                    'requiredCompletionTime': this.dataForm.requiredCompletionTime,
-                    'responsibleDepartment': this.dataForm.responsibleDepartment,
-                    'rectificationStatus': this.dataForm.rectificationStatus,
-                    'actualCompletionTime': this.dataForm.actualCompletionTime,
-                    'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,
-                    'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
-                    'requiredSecondRectificationTime': this.dataForm.requiredSecondRectificationTime,
-                    'remark': this.dataForm.remark,
-                    'creator': this.dataForm.creator,
-                    'creationTime': this.dataForm.creationTime,
-                    'lastModifier': this.dataForm.lastModifier,
-                    'lastModificationTime': this.dataForm.lastModificationTime,
-                    'associatedRectificationRecords': this.dataForm.associatedRectificationRecords,
-                    'associatedIssueAddition': this.dataForm.associatedIssueIds.join(','),
-                    'creationDuration': this.dataForm.creationDuration,
-                    'causeAnalysis': this.dataForm.causeAnalysis,
-                    'rectificationVerificationStatus': this.dataForm.rectificationVerificationStatus,
-                    'verificationConclusion': this.dataForm.verificationConclusion,
-                    'verifier': this.dataForm.verifier,
-                    'level': this.dataForm.level,
-                    'state': this.dataForm.state,
-                    'formula': this.dataForm.formula
-                  })
-                });
-              } else {
-                throw new Error("操作失败: " + data.msg);
-              }
-            })
-            .then(({ data }) => {
-              if (data && data.code === 0) {
+
+              if (saveData && saveData.code === 0) {
                 this.visible = false;
                 this.visibleR = false;
                 this.$emit('refreshDataList');
                 this.$message.success("操作成功");
               } else {
-                this.$message.error(data.msg);
+                throw new Error(saveData.msg);
               }
-            })
-            .catch(error => {
-              console.error(error);
-            });
+            } else {
+              throw new Error("操作失败: " + checkData.msg);
+            }
+          } catch (error) {
+            console.error(error);
+            this.$message.error(error.message || "操作失败");
+          }
         }
       });
-    },
+    }
+,
 
     reuseIssue (id) {
       this.dataForm.issueId = id

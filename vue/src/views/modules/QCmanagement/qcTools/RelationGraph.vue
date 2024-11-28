@@ -52,6 +52,10 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -105,6 +109,8 @@ export default {
           conplanAxis: JSON.stringify(this.links),
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanIssue: this.conplanIssue,
+
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -161,7 +167,7 @@ export default {
       //     this.links = item.templateAxis;
       //   });
       // }
- 
+
       // this.initSvg();
       // this.renderGraph();
     },

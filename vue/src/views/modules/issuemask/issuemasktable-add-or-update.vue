@@ -164,6 +164,7 @@
   export default {
     data () {
       return {
+        stepAttachment: "",
         fileList: [],
         uploadUrl: "",
         uploadAllListVisible: false,
@@ -523,7 +524,7 @@
               'maskcontent': this.dataForm.maskcontent,
               'handlingScenarios': this.dataForm.handlingscenarios,
               // 'annex': this.dataForm.annex,
-              'annex': this.tmpAllList.length ? tmpListString : this.form.stepAttachment,
+              'annex': this.tmpAllList.length ? tmpListString : this.stepAttachment,
               'creator': this.dataForm.creator,
               'creationTime': this.dataForm.creationTime,
               'state': this.dataForm.state

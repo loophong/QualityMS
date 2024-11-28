@@ -50,6 +50,19 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     }
 
     @Override
+    public PageUtils managerqueryPage(Map<String, Object> params) {
+        String issueNumber = (String) params.get("issueNumber");
+
+        QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<IssueMaskTableEntity>()
+                .eq("issue_number", issueNumber);
+        IPage<IssueMaskTableEntity> page = this.page(
+                new Query<IssueMaskTableEntity>().getPage(params),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
     public PageUtils AuditqueryPage(Map<String, Object> params) {
         SysUserEntity role = ShiroUtils.getUserEntity();
         String rolename = role.getUsername();

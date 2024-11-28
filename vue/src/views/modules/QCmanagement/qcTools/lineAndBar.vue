@@ -74,6 +74,10 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
 
   data() {
@@ -239,6 +243,8 @@ export default {
           conplanAxis: JSON.stringify(tmp),
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanIssue: this.conplanIssue,
+
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -251,7 +257,7 @@ export default {
               this.visible = false;
             },
           });
-          
+
         } else {
           this.$message.error(data.msg);
         }

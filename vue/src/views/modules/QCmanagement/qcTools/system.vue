@@ -58,6 +58,10 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -152,6 +156,8 @@ export default {
           conplanAxis: undefined,
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanIssue: this.conplanIssue,
+
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -186,7 +192,7 @@ export default {
             templateType: row.templateType,
             templateText: row.templateText,
             templateSeries: JSON.parse(row.templateSeries),
-         
+
           }));
           this.options = data.resultList.map((item) => ({
             value: item.templateId,

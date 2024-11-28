@@ -276,12 +276,15 @@ public class IssueTableController {
     /**
      * 关闭相关任务
      */
-    // 关闭相关任务
-    @RequestMapping("/closeRelatedTasks/{issueId}")
+    @RequestMapping("/closeRelatedTasks/{issueId}/{closeRelated}")
     @RequiresPermissions("generator:issuetable:delete")
-    public R closeRelatedTasks(@PathVariable("issueId") Long issueId) {
-        return issueTableService.closeRelatedTasks(issueId); // 直接调用服务层方法
+    public R closeRelatedTasks(
+            @PathVariable("issueId") Long issueId,
+            @PathVariable("closeRelated") Integer closeRelated) {
+        // 调用服务层方法，并传递新参数
+        return issueTableService.closeRelatedTasks(issueId, closeRelated);
     }
+
     /**
      * 问题编号
      */

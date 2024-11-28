@@ -85,6 +85,10 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -234,7 +238,9 @@ export default {
         name: series.name,
         data: series.data,
       }));
-      console.log(filteredData);
+      // console.log(filteredData);
+      // console.log('issue', this.conplanIssue);
+      // console.log('conplanSubject', this.conplanSubject);
       this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/save`),
         method: "post",
@@ -245,6 +251,7 @@ export default {
           conplanText: this.textBy || "未命名",
           conplanSeries: JSON.stringify(filteredData),
           conplanAxis: JSON.stringify(tmp),
+          conplanIssue: this.conplanIssue,
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
         }),

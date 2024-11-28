@@ -223,6 +223,7 @@
             </el-option>
           </el-select>
         </el-form-item>
+
         <el-upload
           class="upload-button right-aligned"
           :show-file-list="false"
@@ -267,26 +268,74 @@
             </el-option-group>
           </el-select>
         </el-form-item>
+        <!-- QC工具行 -->
+        <el-form-item label="QC工具添加" class="qc-tools">
+          <div>
+<!--            <span>添加QC工具实例：</span>-->
+            <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+            <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
+            <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
+            <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
+            <el-button size="small" type="primary" @click="toggleScatter">散点图</el-button>
+            <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
+            <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
+          </div>
+        </el-form-item>
+        <!-- 已引用QC工具行 -->
+        <el-form-item label="已添加QC工具实例" class="qc-tools">
+          <div>
+            <template v-for="(group, type) in groupedData">
+              <template v-for="(item, index) in group">
+                <el-button v-if="item.conplanIssue === conplanIssue" :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
+                  {{ item.conplanName }}
+                </el-button>
+              </template>
+            </template>
+          </div>
+        </el-form-item>
         <el-form-item label="关联相关问题" prop="isRelatedIssue">
           <el-radio-group v-model="dataForm.isRelatedIssue">
             <el-radio label="是">是</el-radio>
             <el-radio label="否">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-upload
-          class="upload-button right-aligned"
-          :show-file-list="false"
-          :before-upload="beforeUpload"
-          :on-change="handleFileChange1"
-          :auto-upload="false"
-        >
-          <el-button type="primary">上传文件</el-button>
-        </el-upload>
+<!--        <el-upload-->
+<!--          class="upload-button right-aligned"-->
+<!--          :show-file-list="false"-->
+<!--          :before-upload="beforeUpload"-->
+<!--          :on-change="handleFileChange1"-->
+<!--          :auto-upload="false"-->
+<!--        >-->
+<!--          <el-button type="primary">上传整改文件</el-button>-->
+<!--        </el-upload>-->
+        <el-form-item label="上传整改附件">
+          <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
+                     :on-change="handleFileChange2" :auto-upload="false">
+            <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+          </el-upload>
+          <el-button class="upload-preview-btn" type="primary" size="middle"
+                     @click="uploadAllListVisible = true">附件预览</el-button>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="cancel()">取消</el-button>
-        <el-button type="primary" @click="dataFormSubmitR()">确定</el-button>
-      </span>
+    <el-button @click="cancel()">取消</el-button>
+    <el-button type="primary" @click="dataFormSubmitR()">确定</el-button>
+  </span>
+    </el-dialog>
+    <el-dialog title="附件预览" :visible.sync="uploadAllListVisible">
+      <div style="color: orange">
+        注：若原先存在文件，则点击备注下方的确定后，将会用新上传文件替换原文件
+      </div>
+      <br />
+      <el-table :data="uploadAllList" border style="width: 100%">
+        <el-table-column prop="name" label="文件名"> </el-table-column>
+        <el-table-column prop="url" label="预览">
+          <template slot-scope="scope">
+            <el-button v-if="scope.row.url" @click="previewDoc(scope.row.url)">点击预览</el-button>
+            <span v-else>--</span>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-dialog>
     <el-dialog
       :title="'验证指定'"
@@ -572,15 +621,193 @@
       </span>
     </el-dialog>
 
+    <!-- 引用的组件s -->
+    <el-dialog title="折柱混合图" :close-on-click-modal="false" :visible.sync="dialogVisible" width="80%"
+               v-if="dialogVisible" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <!-- <line-and-bar ref="qcChart"></line-and-bar> -->
+        <line-and-bar ref="qcChart" :conplanIssue="conplanIssue"></line-and-bar>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="鱼骨图" :close-on-click-modal="false" :visible.sync="fishBonedialogVisible" width="80%"
+               v-if="fishBonedialogVisible" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <fish-bone ref="fishBone" :conplanIssue="conplanIssue"></fish-bone>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="控制图" :visible.sync="dialogVisibleControl" :close-on-click-modal="false" width="80%"
+               v-if="dialogVisibleControl" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <control ref="qcChart" :conplanIssue="conplanIssue" ></control>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="系统图" :visible.sync="dialogVisibleSystem" :close-on-click-modal="false" width="80%"
+               v-if="dialogVisibleSystem" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <system ref="qcChart" :conplanIssue="conplanIssue" ></system>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="散点图" :visible.sync="dialogVisibleScatter" :close-on-click-modal="false" width="80%"
+               v-if="dialogVisibleScatter" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <Scatter ref="qcChart" :conplanIssue="conplanIssue" ></Scatter>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="关联图" :visible.sync="dialogVisibleRelation" :close-on-click-modal="false" width="80%"
+               v-if="dialogVisibleRelation" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <RelationGraph ref="qcChart" :conplanIssue="conplanIssue"></RelationGraph>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="直方图" :visible.sync="dialogVisibleHistogram" :close-on-click-modal="false" width="80%"
+               v-if="dialogVisibleHistogram" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <histogram ref="qcChart" :conplanIssue="conplanIssue" ></histogram>
+      </div>
+    </el-dialog>
+
+    <!-- 引用的组件s deliver-->
+    <!-- 1、折柱图 -->
+    <el-dialog :title="this.selectedItem.conplanName" :close-on-click-modal="false" :visible.sync="dialogVisibleDeliver"
+               width="80%" v-if="dialogVisibleDeliver" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <line-and-bar-deliver ref="qcChart" :item="selectedItem"></line-and-bar-deliver>
+      </div>
+    </el-dialog>
+
+    <!-- 2、控制图 -->
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleControlDeliver"
+               :close-on-click-modal="false" width="80%" v-if="dialogVisibleControlDeliver" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <control-deliver ref="qcChart" :item="selectedItem"></control-deliver>
+      </div>
+    </el-dialog>
+
+    <!-- 3、鱼骨图 -->
+    <el-dialog :title="this.selectedItem.conplanName" :close-on-click-modal="false"
+               :visible.sync="fishBonedialogVisibleDeliver" width="80%" v-if="fishBonedialogVisibleDeliver"
+               @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <fish-bone-deliver ref="fishBone" :item="selectedItem"></fish-bone-deliver>
+      </div>
+    </el-dialog>
+
+    <!-- 4、系统图 -->
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleSystemDeliver"
+               :close-on-click-modal="false" width="80%" v-if="dialogVisibleSystemDeliver" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <system-deliver ref="qcChart" :item="selectedItem"></system-deliver>
+      </div>
+    </el-dialog>
+
+    <!-- 5、散点图 -->
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleScatterDeliver"
+               :close-on-click-modal="false" width="80%" v-if="dialogVisibleScatterDeliver" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <Scatter-deliver ref="qcChart" :item="selectedItem"></Scatter-deliver>
+      </div>
+    </el-dialog>
+
+    <!-- 6、关联图 -->
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleRelationDeliver"
+               :close-on-click-modal="false" width="80%" v-if="dialogVisibleRelationDeliver" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <RelationGraph-deliver ref="qcChart" :item="selectedItem"></RelationGraph-deliver>
+      </div>
+    </el-dialog>
+
+    <!-- 7、直方图 -->
+    <el-dialog :title="this.selectedItem.conplanName" :visible.sync="dialogVisibleHistogramDeliver"
+               :close-on-click-modal="false" width="80%" v-if="dialogVisibleHistogramDeliver" @close="handleDialogClose">
+      <div style="width: 100%; height: 100%">
+        <histogram-deliver ref="qcChart" :item="selectedItem"></histogram-deliver>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 // import axios from 'axios'
+import { FishBones } from "@/components/fishbone/FishBone";
+import fishBone from "../QCmanagement/qcTools/fishBone.vue";
+import control from "@/views/modules/QCmanagement/qcTools/control.vue";
+import histogram from "@/views/modules/QCmanagement/qcTools/histogram.vue";
+import RelationGraph from "@/views/modules/QCmanagement/qcTools/RelationGraph.vue";
+import Scatter from "@/views/modules/QCmanagement/qcTools/Scatter.vue";
+import system from "@/views/modules/QCmanagement/qcTools/system.vue";
+import lineAndBar from "@/views/modules/QCmanagement/qcTools/lineAndBar.vue"; //折柱混合图 引用组件
+
+import lineAndBarDeliver from "@/views/modules/QCmanagement/qcToolsDeliver/lineAndBar.vue"; //折柱混合图 引用组件
+import fishBoneDeliver from "../QCmanagement/qcToolsDeliver/fishBone.vue";
+import controlDeliver from "@/views/modules/QCmanagement/qcToolsDeliver/control.vue";
+import histogramDeliver from "@/views/modules/QCmanagement/qcToolsDeliver/histogram.vue";
+import RelationGraphDeliver from "@/views/modules/QCmanagement/qcToolsDeliver/RelationGraph.vue";
+import ScatterDeliver from "@/views/modules/QCmanagement/qcToolsDeliver/Scatter.vue";
+import systemDeliver from "@/views/modules/QCmanagement/qcToolsDeliver/system.vue";
 
 export default {
+  components: {
+    fishBone,
+    control,
+    histogram,
+    RelationGraph,
+    Scatter,
+    system,
+    lineAndBar,
+
+    lineAndBarDeliver,
+    fishBoneDeliver,
+    controlDeliver,
+    histogramDeliver,
+    RelationGraphDeliver,
+    ScatterDeliver,
+    systemDeliver,},
   data () {
     return {
+      stepAttachment: "",
+      // fileList: [],
+      // uploadUrl: "",
+      uploadAllListVisible: false,
+      uploadUrlList: [],
+      uploadNameList: [],
+      uploadAllList: [],
+      tmpAllList: [],
+      //ref 传递参数
+      conplanIssue: 0, // 示例默认数据
+      // conplanProcess: 0, // 示例默认数据
+      selectedItem: null, // 用于存储当前选中的 item 数据
+      groupedData: {
+        mixChart: [], // 折柱混合图
+        controlChart: [], // 控制图
+        fishboneChart: [], // 鱼骨图
+        systemChart: [], // 系统图
+        scatterChart: [], // 散点图
+        associationChart: [], // 关联图
+        histogram: [], // 直方图
+      },
+      dialogVisible: false, //折线柱状混合图
+      dialogVisibleControl: false, //控制图弹窗
+      dialogVisibleSystem: false, //系统图弹窗
+      dialogVisibleRelation: false, //关联图弹窗
+      dialogVisibleScatter: false, //散点图弹窗
+      dialogVisibleHistogram: false, //直方图弹窗
+      fishBonedialogVisible: false, //鱼骨图弹窗
+
+      //Deliver
+      dialogVisibleDeliver: false, //折线柱状混合图
+      dialogVisibleControlDeliver: false, //控制图弹窗
+      dialogVisibleSystemDeliver: false, //系统图弹窗
+      dialogVisibleRelationDeliver: false, //关联图弹窗
+      dialogVisibleScatterDeliver: false, //散点图弹窗
+      dialogVisibleHistogramDeliver: false, //直方图弹窗
+      fishBonedialogVisibleDeliver: false, //鱼骨图弹窗
       // 全部选项数据
       allOptions: [],
       // 各级筛选后的选项
@@ -615,12 +842,13 @@ export default {
       file: null,
       dialogImageUrl: '',
       imageList: [],
-      dialogVisible: false,
+      dialogVisible1: false,
       visibleUpload: false, // 上传对话框的可见性
       url: '',
       num: 0,
       successNum: 0,
       fileList: [],
+      uploadUrl: "",
       dataForm: {
         userinfo: '',
         vehicles: [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }],
@@ -680,7 +908,8 @@ export default {
       issueOptions: [], // 所有问题编号选项
       taskList: [], // 任务列表
       departmentOptions: [],
-
+      // 数据列表
+      conplanDataList: [],
       dataRule: {
       },
       options: ''
@@ -710,6 +939,128 @@ export default {
 
   },
   methods: {
+    //文件预览
+    previewDoc(fileflag) {
+      const token = this.$cookie.get("token"); // 获取当前的 token
+      if (!token) {
+        console.error("Token not found!");
+        return;
+      }
+      // console.log("获取的地址 ", fileflag);
+      // 拼接带有 token 的请求地址
+      const url = `${this.$http.adornUrl(
+        `/generator/issuetable/${fileflag}`
+      )}?token=${token}`;
+      window.open(url);
+    },
+    toggleLineAndBarShow(item) {
+      this.selectedItem = item; // 设置当前选中的 item 数据
+      if (item.conplanType === "折柱图") {
+        this.dialogVisibleDeliver = !this.dialogVisibleDeliver;
+      } else if (item.conplanType === "控制图") {
+        this.dialogVisibleControlDeliver = !this.dialogVisibleControlDeliver;
+      } else if (item.conplanType === "鱼骨图") {
+        this.fishBonedialogVisibleDeliver = !this.fishBonedialogVisibleDeliver;
+      } else if (item.conplanType === "系统图") {
+        this.dialogVisibleSystemDeliver = !this.dialogVisibleSystemDeliver;
+      } else if (item.conplanType === "散点图") {
+        this.dialogVisibleScatterDeliver = !this.dialogVisibleScatterDeliver;
+      } else if (item.conplanType === "关联图") {
+        this.dialogVisibleRelationDeliver = !this.dialogVisibleRelationDeliver;
+      } else if (item.conplanType === "直方图") {
+        this.dialogVisibleHistogramDeliver =
+          !this.dialogVisibleHistogramDeliver;
+      }
+    },
+    // 监听关闭事件
+    handleDialogClose() {
+      this.getTemplateData();
+    },
+    //1119 lbbx 添加控制图
+    //根据查询到的控制图数据, 提取其中的conplanType，根据包含的类型，来显示当前页面保存的对应的图标数据
+    //conplanType:折柱混合图、控制图、鱼骨图、系统图、散点图、关联图、直方图
+    async getTemplateData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/IList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanIssue: this.conplanIssue,
+          // conplanProcess: this.conplanProcess,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.conplanDataList = data.resultList;
+          this.groupDataByType();
+        }
+      });
+    },
+    // 按照conplanType对数据进行分类
+    groupDataByType() {
+      this.groupedData = {
+        mixChart: [],
+        controlChart: [],
+        fishboneChart: [],
+        systemChart: [],
+        scatterChart: [],
+        associationChart: [],
+        histogram: [],
+      };
+
+      this.conplanDataList.forEach((item) => {
+        switch (item.conplanType) {
+          case "折柱图":
+            this.groupedData.mixChart.push(item);
+            break;
+          case "控制图":
+            this.groupedData.controlChart.push(item);
+            break;
+          case "鱼骨图":
+            this.groupedData.fishboneChart.push(item);
+            break;
+          case "系统图":
+            this.groupedData.systemChart.push(item);
+            break;
+          case "散点图":
+            this.groupedData.scatterChart.push(item);
+            break;
+          case "关联图":
+            this.groupedData.associationChart.push(item);
+            break;
+          case "直方图":
+            this.groupedData.histogram.push(item);
+            break;
+          default:
+            break;
+        }
+      });
+    },
+    toggleLineAndBar() {
+      this.dialogVisible = !this.dialogVisible;
+    },
+    // 鱼骨图弹窗
+    fishBonetoggleLineAndBar() {
+      this.fishBonedialogVisible = !this.fishBonedialogVisible;
+    },
+    //控制图弹窗
+    toggleControl() {
+      this.dialogVisibleControl = !this.dialogVisibleControl;
+    },
+    //系统图弹窗
+    toggleSystem() {
+      this.dialogVisibleSystem = !this.dialogVisibleSystem;
+    },
+    //散点图弹窗
+    toggleScatter() {
+      this.dialogVisibleScatter = !this.dialogVisibleScatter;
+    },
+    //关联图弹窗
+    toggleRelation() {
+      this.dialogVisibleRelation = !this.dialogVisibleRelation;
+    },
+    //直方图弹窗
+    toggleHistogram() {
+      this.dialogVisibleHistogram = !this.dialogVisibleHistogram;
+    },
     // 通用数组去重方法
     removeDuplicates(array, key) {
       const seen = new Set();
@@ -769,6 +1120,53 @@ export default {
       // 存储待上传的文件
       this.uploadingFile = file.raw; // 获取 File 对象
       this.uploadFile(file.raw); // 调用上传方法
+    },
+    handleFileChange2(file) {
+      // 存储待上传的文件
+
+      this.uploadingFile = file.raw; // 获取 File 对象
+
+      this.uploadNameList.push(file.raw.name);
+      this.uploadFile2(file.raw); // 调用上传方法
+    },
+    uploadFile2(file) {
+      const formData = new FormData();
+      let file2 = file;
+      formData.append("file", file); // 将文件添加到 FormData
+      this.$http({
+        url: this.$http.adornUrl("/generator/issuetable/upload"), // 替换为实际上传接口
+        method: "post",
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data", // 指定为文件上传
+        },
+      })
+        .then(({ data }) => {
+          if (data && data.code === 0) {
+            // 保存后端返回的url到变量中
+            this.dataForm.rectificationPhotoDeliverable = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+            this.uploadUrlList.push(data.uploadurl);
+            let fileTmp = {
+              name: file2.name,
+              url: data.uploadurl,
+            };
+            // this.uploadAllList = []
+            this.tmpAllList.push(fileTmp);
+            // console.log('上传文件列表 ：', fileTmp)
+            this.uploadAllList.push(fileTmp);
+            console.log("上传文件列表 ：", this.uploadAllList);
+            // console.log('上传文件名字列表 ：', this.uploadNameList)
+            // this.form.stepFile = data.uploadurl
+            // this.$message.success('文件上传成功');
+            // 处理成功后的逻辑，例如更新状态
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+        .catch((error) => {
+          this.$message.error("上传失败");
+          console.error(error);
+        });
     },
     uploadFile1(file) {
       const formData = new FormData();
@@ -867,7 +1265,7 @@ export default {
     // 处理图片预览
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url || file.preview;
-      this.dialogVisible = true;
+      this.dialogVisible1 = true;
     },
     cancel () {
       // 重置 vehicles 数组，只保留一个初始组合
@@ -1581,6 +1979,7 @@ export default {
       this.fetchVehicleTypes()
       this.fetchIssueOptions() // 获取所有问题编号选项
       this.dataForm.issueId = id || 0
+
       this.visible = true
       // console.log("成功获取用户名：" ,this.dataForm.userinfo)
       this.$nextTick(() => {
@@ -1635,6 +2034,9 @@ export default {
       this.dataForm.issueId = id || 0
       this.visibleR = true
       // console.log("成功获取用户名：" ,this.dataForm.userinfo)
+      this.conplanIssue = this.dataForm.issueId
+      console.log("成功获取ID：" ,this.dataForm.issueId);
+      this.getTemplateData();
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.issueId) {
@@ -2069,6 +2471,10 @@ export default {
     // },
     // 表单提交
     dataFormSubmitR () {
+      let tmpListString = [];
+      if (this.tmpAllList.length) {
+        tmpListString = JSON.stringify(this.tmpAllList);
+      }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
@@ -2088,7 +2494,7 @@ export default {
               'issueId': this.dataForm.issueId || undefined,
               'rectificationStatus': this.dataForm.rectificationStatus,
               'actualCompletionTime': this.dataForm.actualCompletionTime,
-              'rectificationPhotoDeliverable': this.dataForm.rectificationPhotoDeliverable,
+              'rectificationPhotoDeliverable': this.tmpAllList.length ? tmpListString : this.stepAttachment,
               'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
               'causeAnalysis': this.dataForm.causeAnalysis,
               'verificationDeadline': this.dataForm.verificationDeadline,
@@ -2299,4 +2705,5 @@ export default {
 .right-aligned {
   margin-left: 80px; /* 可根据需要调整移动的距离 */
 }
+
 </style>

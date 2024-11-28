@@ -73,6 +73,16 @@ public class IssueMaskTableController {
 
         return R.ok().put("page", page);
     }
+    /**
+     * 列表，管理人员可见
+     */
+    @RequestMapping("/managerlist")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R managerlist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueMaskTableService.managerqueryPage(params);
+
+        return R.ok().put("page", page);
+    }
 
     /**
      * 列表，审核人可见
@@ -84,6 +94,7 @@ public class IssueMaskTableController {
 
         return R.ok().put("page", page);
     }
+
     /**
      * 获取所有任务列表
      */
@@ -92,11 +103,11 @@ public class IssueMaskTableController {
     public R list(@RequestParam String issueNumber){
         System.out.println("=====获取任务列表----开始"+issueNumber+"****");
         List<IssueMaskTableEntity> issues = issueMaskTableService.listAll(issueNumber);
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", 0);
-        response.put("issueTable", issues);
-        System.out.println(response);
-        System.out.println("=====获取任务列表----结束");
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("code", 0);
+//        response.put("issueTable", issues);
+//        System.out.println(response);
+//        System.out.println("=====获取任务列表----结束");
         return R.ok().put("issues", issues);
     }
     /**

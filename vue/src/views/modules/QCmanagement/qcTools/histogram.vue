@@ -26,7 +26,7 @@
         <el-button @click="modifyData">修改数据</el-button>
         <el-button @click="restoreData">恢复数据</el-button>
         <el-button type="success" @click="dialogFormVisible = true">保存当前数据</el-button>
-         
+
         <!-- <el-button type="success" @click="handleUp">更新当前数据</el-button> -->
       </div>
     </div>
@@ -57,6 +57,10 @@ export default {
       required: true,
     },
     conplanProcess: {
+      type: Number,
+      required: true,
+    },
+    conplanIssue: {
       type: Number,
       required: true,
     },
@@ -203,6 +207,8 @@ export default {
           conplanAxis: JSON.stringify(this.categories),
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanIssue: this.conplanIssue,
+
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {

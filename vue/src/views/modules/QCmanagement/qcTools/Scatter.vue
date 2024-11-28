@@ -91,6 +91,10 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -241,6 +245,8 @@ export default {
           //   'templateAxis': ,
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanIssue: this.conplanIssue,
+
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {

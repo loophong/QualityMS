@@ -93,7 +93,7 @@ public class TaskController {
         log.info("已完成的任务数量为：" + finishedList);
         log.info("已完成的任务数量为：" + finishedList.size());
         // 将上面两个数封装成json返回给前端
-        return R.ok().put("unfinishedList", unfinishedList.size()).put("finishedList", finishedList.size());
+        return R.ok().put("unfinishedNum", unfinishedList.size()).put("finishedNum", finishedList.size());
     }
 
 
@@ -113,7 +113,7 @@ public class TaskController {
         log.info("指标任务数：" + list);
         log.info("指标任务数：" + list.size());
 
-        return R.ok().put("unfinishedList", list.size());
+        return R.ok().put("indicatorRelatedTaskNum", list.size());
     }
 
 
@@ -183,7 +183,6 @@ public class TaskController {
      * @author: hong
      * @date: 2024/8/24 18:50
      */
-
     @Transactional
     @RequestMapping("/submitApprover")
     //    @RequiresPermissions("taskmanagement:task:list")

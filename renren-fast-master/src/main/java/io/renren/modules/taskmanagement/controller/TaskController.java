@@ -16,6 +16,7 @@ import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.taskmanagement.dto.TaskQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.ApprovalService;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,51 @@ public class TaskController {
     @GetMapping("/taskStatistics")
     public TaskStatisticsDTO taskStatistics(String planId) {
         return taskService.taskStatistics(planId);
+    }
+
+
+    /** 
+     * @description: 小屏问题，任务进度，与任务关联的指标中，显示指标的已完成和未完成数
+     * @return: io.renren.common.utils.R 
+     * @author: hong
+     * @date: 2024/11/28 14:49
+     */ 
+    @RequestMapping("/statisticsOnTaskRelatedIndicators")
+    public R statisticsOnTaskRelatedIndicators() {
+        List<TaskEntity> unfinishedList = taskService.list(
+                new QueryWrapper<TaskEntity>()
+                .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id","")
+                .eq("task_is_completed", 0));
+        List<TaskEntity> finishedList = taskService.list(
+                new QueryWrapper<TaskEntity>()
+                .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id","")
+                .eq("task_is_completed", 1));
+        log.info("未完成的任务数量为：" + unfinishedList);
+        log.info("未完成的任务数量为：" + unfinishedList.size());
+        log.info("已完成的任务数量为：" + finishedList);
+        log.info("已完成的任务数量为：" + finishedList.size());
+        // 将上面两个数封装成json返回给前端
+        return R.ok().put("unfinishedList", unfinishedList.size()).put("finishedList", finishedList.size());
+    }
+
+
+    /** 
+     * @description: 小屏问题，指标任务数
+     * @return: io.renren.common.utils.R 
+     * @author: hong
+     * @date: 2024/11/28 15:01
+     */ 
+    @RequestMapping("/countTaskRelatedIndicatorsNum")
+    public R countTaskRelatedIndicatorsNum() {
+        List<TaskEntity> list = taskService.list(
+                new QueryWrapper<TaskEntity>()
+                .isNotNull("task_associated_indicators_id")
+                        .ne("task_associated_indicators_id",""));
+
+        log.info("指标任务数：" + list);
+        log.info("指标任务数：" + list.size());
+
+        return R.ok().put("unfinishedList", list.size());
     }
 
 

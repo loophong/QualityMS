@@ -14,6 +14,7 @@
 
         <result property="conplanSubject" column="conplan_subject"/>
         <result property="conplanProcess" column="conplan_process"/>
+        <result property="conplanUrl" column="conplan_url"/>
 
     </resultMap>
 

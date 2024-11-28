@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="!dataForm.qcsrId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="!dataForm.qcsrId ? '新增' : '修改'" :close-on-click-modal="true" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
       label-width="150px">
       <el-form-item label="课题名称" prop="topicName">
@@ -15,7 +15,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="课题组长" prop="topicLeader">
-        <el-input v-model="dataForm.topicLeader" placeholder="课题组长"></el-input>
+        <el-input v-model="dataForm.topicLeader" placeholder="课题组长" :disabled="true"></el-input>
       </el-form-item>
       <!-- <el-form-item label="课题顾问" prop="topicConsultant">
         <el-input v-model="dataForm.topicConsultant" placeholder="课题顾问"></el-input>

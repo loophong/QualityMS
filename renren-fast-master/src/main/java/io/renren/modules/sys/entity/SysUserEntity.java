@@ -30,7 +30,7 @@ import java.util.List;
 @TableName("sys_user")
 public class SysUserEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * 用户ID
 	 */
@@ -89,5 +89,13 @@ public class SysUserEntity implements Serializable {
 	 * 创建时间
 	 */
 	private Date createTime;
+
+    /**
+     * 2024/11/26 新增
+     * 所属部门
+     */
+    private String dept;
+
+
 
 }

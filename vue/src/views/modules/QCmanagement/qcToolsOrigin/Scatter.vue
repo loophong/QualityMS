@@ -310,7 +310,8 @@ export default {
                     // min: 0,
                     // max: 1
                 },
-                series: curSeries
+                series: curSeries,
+                animation: false,
             };
             const dom = document.getElementById("chartSdtV");
             this.myChart = echarts.init(dom);

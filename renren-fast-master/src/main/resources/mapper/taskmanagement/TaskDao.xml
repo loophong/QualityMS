@@ -54,6 +54,9 @@
             <if test="task.taskIsCompleted != null ">
                 AND task_is_completed = #{task.taskIsCompleted}
             </if>
+            <if test="task.taskAssociatedIndicatorsId != null and task.taskAssociatedIndicatorsId != ''">
+                AND task_associated_indicators_id = #{task.taskAssociatedIndicatorsId}
+            </if>
             <if test="userId != null">
                 AND ( task_executor like concat('%','"',#{userId},'"','%') or task_principal = #{userId} )
             </if>

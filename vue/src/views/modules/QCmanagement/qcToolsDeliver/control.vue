@@ -21,17 +21,9 @@
     <div class="editOne">
       <span>
         <label for="xAxisDataBy">横坐标:</label>
-        <el-input
-          v-model="xAxisDataBy"
-          placeholder="请输入内容"
-          style="width: 35%"
-        ></el-input>
+        <el-input v-model="xAxisDataBy" placeholder="请输入内容" style="width: 35%"></el-input>
         <label for="seriesDataBy">折线数:</label>
-        <el-input
-          v-model="seriesDataBy"
-          placeholder="请输入内容"
-          style="width: 35%"
-        ></el-input>
+        <el-input v-model="seriesDataBy" placeholder="请输入内容" style="width: 35%"></el-input>
       </span>
       <br />
       <br />
@@ -39,14 +31,8 @@
     <div class="editTwo">
       <span>
         <label for="textBy">图标题:</label>
-        <el-input
-          v-model="textBy"
-          placeholder="请输入内容"
-          style="width: 30%"
-        ></el-input>
-        <el-button type="primary" @click="initChart(tmpResultList)"
-          >更新图表</el-button
-        >
+        <el-input v-model="textBy" placeholder="请输入内容" style="width: 30%"></el-input>
+        <el-button type="primary" @click="initChart(tmpResultList)">更新图表</el-button>
         <!-- <el-button type="success" @click="dialogFormVisible = true"
           >保存为模版</el-button
         > -->
@@ -54,7 +40,7 @@
         <el-button type="success" @click="handleUp">更新当前数据</el-button>
       </span>
     </div>
-<!-- 
+    <!-- 
     <el-dialog title="模版名" :visible.sync="dialogFormVisible">
       <el-input
         v-model="inputName"
@@ -156,7 +142,7 @@ export default {
         }
       });
 
-       //查询到有用户暂存的数据,就使用该数据渲染echarts
+      //查询到有用户暂存的数据,就使用该数据渲染echarts
       if (this.resultList.length != 0) {
         let tmpList = {};
         this.resultList.forEach((item) => {
@@ -604,6 +590,7 @@ export default {
           // }
         ],
         series: seriesData,
+        animation: false,
       };
       this.option && this.myChart.setOption(this.option);
       // console.log(this.option)

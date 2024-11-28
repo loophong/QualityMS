@@ -226,6 +226,8 @@ export default {
             }
           }
         ],
+
+        animation: false,
         graphic: {
           elements: [
             {

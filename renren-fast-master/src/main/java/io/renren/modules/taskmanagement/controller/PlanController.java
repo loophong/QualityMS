@@ -112,21 +112,28 @@ public class PlanController {
         System.out.println(page.getList().toString());
         return R.ok().put("page", page);
     }
+
+    /**
+     * @description: 分页查询，查询未完成的任务
+     * @param: planQueryParamDTO
+     * @return: io.renren.common.utils.R
+     * @author: hong
+     * @date: 2024/11/13 15:47
+     */
     @RequestMapping("/queryUnfinished")
     @RequiresPermissions("taskmanagement:plan:list")
     public R queryUnfinished(@RequestBody PlanQueryParamDTO planQueryParamDTO) {
-        log.info("计划查询条件：" + planQueryParamDTO);
+        log.info("计划查询条件：{}", planQueryParamDTO);
         PageUtils page = planService.queryPageByParams(planQueryParamDTO);
-//        PageUtils page = planService.queryPageUnfinishedPlan(params);
-//        System.out.println(page.getList().toString());
         return R.ok().put("page", page);
     }
 
     /**
-     * @description: 查询已完成-历史计划
+     * @description: 分页查询已完成的任务
+     * @param: planQueryParamDTO
+     * @return: io.renren.common.utils.R
      * @author: hong
-     * @date: 2024/10/15 15:11
-     * @version: 1.0
+     * @date: 2024/11/13 15:48
      */
     @RequestMapping("/finished")
     @RequiresPermissions("taskmanagement:plan:list")
@@ -135,13 +142,13 @@ public class PlanController {
         PageUtils page = planService.queryPageFinishedPlan(planQueryParamDTO);
         return R.ok().put("page", page);
     }
-//    @RequestMapping("/finished")
-//    @RequiresPermissions("taskmanagement:plan:list")
-//    public R finishedList(@RequestParam Map<String, Object> params) {
-//        PageUtils page = planService.queryPageFinishedPlan(params);
-//        System.out.println(page.getList().toString());
-//        return R.ok().put("page", page);
-//    }
+    @RequestMapping("/finish")
+    @RequiresPermissions("taskmanagement:plan:list")
+    public R finishedList(@RequestParam Map<String, Object> params) {
+        PageUtils page = planService.queryPageFinishedPlan(params);
+        System.out.println(page.getList().toString());
+        return R.ok().put("page", page);
+    }
 
 
     /**
@@ -186,6 +193,7 @@ public class PlanController {
 //
 //        return R.ok();
 //    }
+
     /**
      * @description: 保存计划，直系任务，文件
      * @param: planDTO
@@ -230,8 +238,6 @@ public class PlanController {
 //
 //        return R.ok();
 //    }
-
-
     @RequestMapping("/update")
     @RequiresPermissions("taskmanagement:plan:update")
     public R update(@RequestBody PlanDTO planDTO) {
@@ -248,6 +254,7 @@ public class PlanController {
     @RequestMapping("/delete/{planId}")
     @RequiresPermissions("taskmanagement:plan:delete")
     public R delete(@PathVariable String planId) {
+        log.info("删除计划的全部信息：{}", planId);
         QueryWrapper<PlanEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("plan_id", planId);
         planService.remove(queryWrapper);
@@ -262,7 +269,6 @@ public class PlanController {
 
         // 删除所有的审批信息
         approvalService.remove(new LambdaQueryWrapper<ApprovalEntity>().eq(ApprovalEntity::getTaskAssociatedIndicatorsId, planId));
-
 
         return R.ok();
     }
@@ -296,6 +302,7 @@ public class PlanController {
 //
 //        return planAndTaskDTO;
 //    }
+
     /**
      * @description: 查询计划的全部信息、直属任务、文件
      * @param: planId
@@ -305,12 +312,13 @@ public class PlanController {
      */
     @GetMapping("/getPlanAllInfo")
     public PlanDTO getPlanAllInfo(@RequestParam String planId) {
+        log.info("planId:{}", planId);
 
         PlanDTO planDTO = new PlanDTO();
 
         PlanEntity plan = planService.getOne(new LambdaQueryWrapper<PlanEntity>().eq(PlanEntity::getPlanId, planId));
         List<TaskEntity> taskList = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, planId));
-        List<FileEntity> fileList =  fileService.list(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
+        List<FileEntity> fileList = fileService.list(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
 
         planDTO.setPlan(plan);
         planDTO.setTasks(taskList);
@@ -339,14 +347,14 @@ public class PlanController {
     public List<TaskEntity> getTasksByUserId(@RequestParam Long userId) {
         return taskService.getTasksByUserId(userId);
     }
-    
-    /** 
+
+    /**
      * @description: 获取当前计划的全部附件
-     * @param: planId 
-     * @return: java.util.List<io.renren.modules.taskmanagement.entity.FileEntity> 
+     * @param: planId
+     * @return: java.util.List<io.renren.modules.taskmanagement.entity.FileEntity>
      * @author: hong
      * @date: 2024/11/12 10:50
-     */ 
+     */
     @GetMapping("/files/{planId}")
     public R getFiles(@PathVariable String planId) {
         List<FileEntity> list = fileService.list(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));

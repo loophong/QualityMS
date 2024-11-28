@@ -6,14 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:peliminaryanalysistable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:peliminaryanalysistable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-upload class="upload-demo" :before-upload="beforeUpload" :show-file-list="false"
-                   :on-success="handleUploadSuccess" :on-error="handleUploadError">
-          <el-button size="small" type="primary">点击上传 Excel</el-button>
-        </el-upload>
+        <el-button v-if="isAuth('generator:issuetypegradetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('generator:issuetypegradetable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -28,17 +22,23 @@
         align="center"
         width="50">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="analysisId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="主键">-->
-<!--      </el-table-column>-->
       <el-table-column
-        prop="peliminaryAnalysis"
+        prop="gradeId"
         header-align="center"
         align="center"
-        label="初步分析">
+        label="id">
+      </el-table-column>
+      <el-table-column
+        prop="grade"
+        header-align="center"
+        align="center"
+        label="等级">
+      </el-table-column>
+      <el-table-column
+        prop="gradeIllustrate"
+        header-align="center"
+        align="center"
+        label="等级说明">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -47,8 +47,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.analysisId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.analysisId)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.gradeId)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.gradeId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './peliminaryanalysistable-add-or-update'
+  import AddOrUpdate from './issuetypegradetable-add-or-update'
   export default {
     data () {
       return {
@@ -90,52 +90,11 @@
       this.getDataList()
     },
     methods: {
-      // 在上传前的检查
-      beforeUpload(file) {
-        const isExcel = file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-        const isLt2M = file.size / 1024 / 1024 < 2; // 限制文件大小为2MB
-
-        if (!isExcel) {
-          this.$message.error('上传文件只能是 Excel 文件!');
-          return false; // 返回 false，阻止上传
-        }
-
-        if (!isLt2M) {
-          this.$message.error('上传文件大小不能超过 2MB!');
-          return false; // 返回 false，阻止上传
-        }
-
-        // 使用 FormData 创建上传文件数据
-        const formData = new FormData();
-        formData.append('file', file);
-
-        // 开始上传请求
-        this.$http({
-          url: this.$http.adornUrl('/generator/peliminaryanalysistable/uploadExcel'),
-          method: 'post',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data' // 重要：设置请求头
-          }
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.$message.success('文件上传成功！');
-            this.getDataList(); // 上传成功后可以重新获取数据
-          } else {
-            this.$message.error('文件上传失败：' + data.msg);
-          }
-        }).catch(error => {
-          this.$message.error('文件上传错误：' + error.message);
-        });
-
-        return false; // 返回 false，阻止 el-upload 的自动上传
-      }
-      ,
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/generator/peliminaryanalysistable/list'),
+          url: this.$http.adornUrl('/generator/issuetypegradetable/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -152,19 +111,6 @@
           }
           this.dataListLoading = false
         })
-      },
-      // 上传成功的处理
-      handleUploadSuccess(response, file) {
-        if (response && response.code === 0) {
-          this.$message.success('文件上传成功！');
-          this.getDataList(); // 上传成功后可以重新获取数据
-        } else {
-          this.$message.error('文件上传失败：' + response.msg);
-        }
-      },
-      handleUploadError(error) {
-        console.error('上传错误:', error);  // 打印错误对象
-        this.$message.error('文件上传失败：' + (error.response ? error.response.data.message : error.message)); // 提供更详细的错误信息
       },
       // 每页数
       sizeChangeHandle (val) {
@@ -191,7 +137,7 @@
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.analysisId
+          return item.gradeId
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
@@ -199,7 +145,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/generator/peliminaryanalysistable/delete'),
+            url: this.$http.adornUrl('/generator/issuetypegradetable/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.qcManagement.entity.QcGroupMemberEntity;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
+import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -28,5 +29,7 @@ public interface QcSubjectRegistrationService extends IService<QcSubjectRegistra
     PageUtils queryPageFinishedList(Map<String, Object> params) ;
 
     PageUtils queryPageAll(Map<String, Object> params);
+
+    List<QcknowledgebaseEntity>queryFinishedList1(Map<String, Object> params);
 }
 

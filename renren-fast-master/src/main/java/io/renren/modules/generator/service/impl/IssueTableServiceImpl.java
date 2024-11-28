@@ -72,6 +72,38 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         return new PageUtils(page);
     }
 
+    @Override
+    public String newIssueNumber() {
+        // 查询所有的问题
+        List<IssueTableEntity> issues = this.list();
+
+        // 如果数据库为空，返回默认值 "0001"
+        if (issues.isEmpty()) {
+            return "0001";
+        }
+
+        // 找到 ID 最大的问题
+        IssueTableEntity maxIssue = issues.stream()
+                .max(Comparator.comparingLong(IssueTableEntity::getIssueId)) // 根据 ID 获取最大值
+                .orElse(null); // 如果没有记录，返回 null
+
+        if (maxIssue != null) {
+            // 获取最大问题的编号
+            String currentIssueNumber = maxIssue.getIssueNumber(); // 假设有一个方法 getIssueNumber()
+
+            // 处理问题编号，取后四位并加1
+            String lastFourDigits = currentIssueNumber.substring(currentIssueNumber.length() - 4);
+            int newNumber = Integer.parseInt(lastFourDigits) + 1;
+
+            // 返回格式化的编号（例如补零）
+            return String.format("%04d", newNumber); // 修改这里返回字符串
+        }
+
+        return "0001"; // 如果理论上没有找到最大问题，返回默认值
+    }
+
+
+
     @Autowired
     private IssueMaskTableDao issueMaskTableDao; // 新增的 DAO
 
@@ -853,12 +885,11 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
     }
 
     @Override
-    public boolean checkReplicateIssue(Integer issueId, String issueCategoryIds, String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
+    public boolean checkReplicateIssue(Integer issueId, String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
                 // 构建查询条件
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
 
-            queryWrapper.eq("issue_category_id", issueCategoryIds)
-                    .eq("Systematic_classification",systematicClassification )
+            queryWrapper.eq("Systematic_classification",systematicClassification )
                     .eq("fault_type", faultType)
                     .eq("First_Faulty_parts", firstFaultyParts)
                     .eq("Second_Faulty_parts", secondFaultyParts)

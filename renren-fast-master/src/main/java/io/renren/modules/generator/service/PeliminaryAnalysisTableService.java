@@ -2,7 +2,9 @@ package io.renren.modules.generator.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.generator.entity.PeliminaryAnalysisTableEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -19,5 +21,7 @@ public interface PeliminaryAnalysisTableService extends IService<PeliminaryAnaly
     PageUtils queryPage(Map<String, Object> params);
 
     List<PeliminaryAnalysisTableEntity> listAll();
+
+    R uploadExcelFile(MultipartFile file);
 }
 

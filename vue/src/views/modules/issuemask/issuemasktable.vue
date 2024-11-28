@@ -63,17 +63,29 @@
           align="center"
           label="处理方案">
         </el-table-column>
+<!--        <el-table-column-->
+<!--          prop="annex"-->
+<!--          header-align="center"-->
+<!--          align="center"-->
+<!--          label="附件">-->
+<!--          <template slot-scope="scope">-->
+<!--            <el-button type="text" @click="handleFileAction(scope.row.annex, scope.row.issuemaskId)">-->
+<!--              预览-->
+<!--            </el-button>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
         <el-table-column
           prop="annex"
           header-align="center"
           align="center"
           label="附件">
           <template slot-scope="scope">
-            <el-button type="text" @click="handleFileAction(scope.row.annex, scope.row.issuemaskId)">
+            <el-button type="text" @click="showFileList(scope.row.annex)">
               预览
             </el-button>
           </template>
         </el-table-column>
+
         <el-table-column
           prop="creator"
           header-align="center"
@@ -132,7 +144,25 @@
           </template>
         </el-table-column>
       </el-table>
-
+    <!-- 文件列表的弹出框 -->
+    <el-dialog
+      title="附件预览"
+      :visible.sync="fileDialogVisible"
+      width="50%">
+      <el-table :data="fileList" style="width: 100%">
+        <el-table-column prop="name" label="文件名称" align="left"></el-table-column>
+        <el-table-column label="操作" align="center">
+          <template slot-scope="scope">
+            <el-button type="text" @click="previewFile(scope.row.url)">
+              点击预览
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="fileDialogVisible = false">关闭</el-button>
+      </div>
+    </el-dialog>
 
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -159,6 +189,8 @@
   export default {
     data () {
       return {
+        fileDialogVisible: false, // 控制文件预览弹窗显示
+        fileList: [], // 存储当前记录的附件列表
         showButtons: true,
         showCompleteButton: false,
         assertOrUpdateVisible: false,
@@ -184,6 +216,55 @@
       this.recigetDataList()
     },
     methods: {
+      // 显示文件列表弹窗
+      showFileList(annex) {
+        try {
+          if (!annex) {
+            this.$message.warning("没有附件可预览！");
+            return;
+          }
+          // 解析数据库中存储的附件信息
+          const parsedAnnex = JSON.parse(annex);
+          if (Array.isArray(parsedAnnex) && parsedAnnex.length > 0) {
+            this.fileList = parsedAnnex;
+            this.fileDialogVisible = true; // 打开弹窗
+          } else {
+            this.$message.warning("附件数据格式不正确！");
+          }
+        } catch (error) {
+          console.error("附件解析失败:", error);
+          this.$message.error("附件数据解析失败！");
+        }
+      },
+      // 点击预览具体文件
+      previewFile(fileUrl) {
+        const token = this.$cookie.get("token"); // 获取当前的 token
+        if (!fileUrl) {
+          this.$message.warning("文件路径为空，无法预览！");
+          return;
+        }
+        if (!token) {
+          this.$message.error("登录已过期，请重新登录！");
+          return;
+        }
+        // 拼接带有 token 的预览地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileUrl}`)}?token=${token}`;
+        window.open(url, "_blank");
+      },
+      //文件预览
+      previewDoc(fileflag) {
+        const token = this.$cookie.get("token"); // 获取当前的 token
+        if (!token) {
+          console.error("Token not found!");
+          return;
+        }
+        // console.log("获取的地址 ", fileflag);
+        // 拼接带有 token 的请求地址
+        const url = `${this.$http.adornUrl(
+          `/generator/issuetable/${fileflag}`
+        )}?token=${token}`;
+        window.open(url);
+      },
       getImageUrl(fileflag) {
         const token = this.$cookie.get('token'); // 获取当前的 token
         if (!token) {

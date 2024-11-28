@@ -17,6 +17,8 @@ public interface IndicatorKeyIndicatorsService extends IService<IndicatorKeyIndi
 
     PageUtils queryPage(Map<String, Object> params);
 
-    PageUtils queryPageFinishedList(Map<String, Object> params);
+//    PageUtils queryPageFinishedList(Map<String, Object> params);
+
+    PageUtils queryPage1(Map<String, Object> params);
 }
 

@@ -43,7 +43,7 @@
         <br />
         <br />
         <!-- <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button> -->
-        <el-button type="success" @click="handleUp">更新当前数据</el-button>
+        <el-button type="success" @click="handleUp" v-if="admitEdit">更新当前数据</el-button>
       </div>
       <el-dialog title="模版名" :visible.sync="dialogFormVisible">
         <el-input v-model="inputName" placeholder="请输入模版名" style="width: 50%"></el-input>
@@ -98,13 +98,31 @@ export default {
       selectedIndex2: null,
       modifiedDataPoint: { x: "", y: "" },
       deleteDataPoint: { x: "", y: "" },
+      currentUserName: '',
+      admitEdit: false,
     };
   },
   mounted() {
+    this.getUserName();
     this.getTemplateData();
     // this.init();
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
+
     //处理下拉框选择变化
     handleSelectChange() {
       console.log(this.resultList);
@@ -127,6 +145,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
+          if (data.resultList.length != 0) {
+            if (data.resultList[0].conplanUser == this.currentUserName) {
+              this.admitEdit = true;
+            }
+          }
           this.resultList = data.resultList.map((row) => ({
             templateId: row.conplanId,
             templateName: row.conplanName,
@@ -202,6 +225,16 @@ export default {
       }
     },
     addTemplate() {
+
+      let img = new Image()
+      img.src = this.myChart.getDataURL(
+        {
+          type: 'png',
+          // pixelRatio: 1,
+          // backgroundColor: '#fff',
+          excludeComponents: ['toolbox']
+        }
+      )
       this.$http({
         // url: this.$http.adornUrl(`/qcTools/template/save`),
         url: this.$http.adornUrl(`/qcTools/conplan/update`),
@@ -224,6 +257,8 @@ export default {
           // conplanAxis: JSON.stringify(tmp),
           conplanSubject: this.resultList[0].conplanSubject,
           conplanProcess: this.resultList[0].conplanProcess,
+          conplanUrl: JSON.stringify(img.src),
+          // conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {

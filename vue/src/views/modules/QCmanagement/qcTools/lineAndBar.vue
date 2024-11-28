@@ -1,7 +1,7 @@
 <template>
   <div>
     <span>
-      <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+      <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
@@ -11,30 +11,16 @@
     <div id="main" ref="main"></div>
     <span>
       <label for="xAxisDataBy">横坐标:</label>
-      <el-input
-        v-model="xAxisDataBy"
-        placeholder="请输入内容"
-        style="width: 30%"
-      ></el-input>
+      <el-input v-model="xAxisDataBy" placeholder="请输入内容" style="width: 30%"></el-input>
       <label for="seriesDataBy">折线数:</label>
-      <el-input
-        v-model="seriesDataBy"
-        placeholder="请输入内容"
-        style="width: 30%"
-      ></el-input>
+      <el-input v-model="seriesDataBy" placeholder="请输入内容" style="width: 30%"></el-input>
     </span>
     <br />
     <br />
     <span>
       <label for="textBy">图标题:</label>
-      <el-input
-        v-model="textBy"
-        placeholder="请输入内容"
-        style="width: 15%"
-      ></el-input>
-      <el-button type="primary" @click="initChart(tmpResultList)"
-        >更新图表</el-button
-      >
+      <el-input v-model="textBy" placeholder="请输入内容" style="width: 15%"></el-input>
+      <el-button type="primary" @click="initChart(tmpResultList)">更新图表</el-button>
       <!-- 保存为模板 change to 暂存当前数据  -->
       <el-button type="success" @click="dialogFormVisible = true">保存当前数据</el-button>
       <!-- <el-button type="success" @click="handleUp">保存当前数据</el-button> -->
@@ -48,7 +34,7 @@
       </div>
     </el-dialog>
 
-  <!-- <qc-plan-new ref="qcPlanNew"> </qc-plan-new>  -->
+    <!-- <qc-plan-new ref="qcPlanNew"> </qc-plan-new>  -->
 
 
   </div>
@@ -100,11 +86,13 @@ export default {
       tmpSeriesList: [],
       tmpAxisList: [],
       tmpAxisList: [],
+      currentUserName: '',
     };
   },
   computed: {},
   mounted() {
     this.getTemplateData();
+    this.getUserName();
     this.myChart = echarts.init(this.$refs.main);
     //initChart()为更新echarts图表，使用数据填充图表
     this.initChart(this.tmpResultList);
@@ -120,6 +108,20 @@ export default {
         }
       });
       this.initChart(tmpList);
+    },
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
     },
     async getTemplateData() {
       await this.$http({
@@ -227,6 +229,17 @@ export default {
         data: series.data,
       }));
       console.log(filteredData);
+
+      let img = new Image()
+      img.src = this.myChart.getDataURL(
+        {
+          type: 'png',
+          // pixelRatio: 1,
+          // backgroundColor: '#fff',
+          excludeComponents: ['toolbox']
+        }
+      )
+      console.log(img.src)
       this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/save`),
         method: "post",
@@ -239,6 +252,8 @@ export default {
           conplanAxis: JSON.stringify(tmp),
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanUrl: JSON.stringify(img.src),
+          conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -251,7 +266,7 @@ export default {
               this.visible = false;
             },
           });
-          
+
         } else {
           this.$message.error(data.msg);
         }
@@ -597,6 +612,7 @@ export default {
           // }
         ],
         series: seriesData,
+        animation: false,
       };
       this.option && this.myChart.setOption(this.option);
       // console.log(this.option)

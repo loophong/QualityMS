@@ -2,7 +2,7 @@
   <div>
     <div>
       <span>
-        <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+        <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
@@ -325,9 +325,9 @@ export default {
       const element = document.querySelector('.org-tree-container'); // 获取需要截图的元素
       html2canvas(element).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
-        console.log(imgData)
+        // console.log(imgData)
         const blob = this.dataURLtoBlob(imgData);
-        console.log(blob)
+        // console.log(blob)
         saveAs(blob, 'tree-screenshot.png');
       });
     },

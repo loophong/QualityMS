@@ -37,7 +37,7 @@
           >保存为模版</el-button
         > -->
 
-        <el-button type="success" @click="handleUp">更新当前数据</el-button>
+        <el-button type="success" @click="handleUp" v-if="admitEdit">更新当前数据</el-button>
       </span>
     </div>
     <!-- 
@@ -92,15 +92,33 @@ export default {
       },
       tmpSeriesList: [],
       tmpAxisList: [],
+      currentUserName: '',
+      admitEdit: false,
     };
   },
   computed: {},
   mounted() {
+    this.getUserName();
     this.getTemplateData();
     this.myChart = echarts.init(this.$refs.main);
     // this.initChart(this.tmpResultList);
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
+
     //处理下拉框选择变化
     handleSelectChange() {
       console.log(this.value);
@@ -121,7 +139,13 @@ export default {
           conplanId: this.item.conplanId,
         }),
       }).then(({ data }) => {
+
         if (data && data.code === 0) {
+          if (data.resultList.length != 0) {
+            if (data.resultList[0].conplanUser == this.currentUserName) {
+              this.admitEdit = true;
+            }
+          }
           this.resultList = data.resultList.map((row) => ({
             templateId: row.conplanId,
             templateName: row.conplanName,
@@ -136,6 +160,7 @@ export default {
             value: item.templateId,
             label: item.templateName,
           }));
+          console.log(this.currentUserName)
           console.log(this.resultList);
         } else {
           this.options = [];
@@ -216,6 +241,18 @@ export default {
         data: series.data,
       }));
       console.log(filteredData);
+
+
+      let img = new Image()
+      img.src = this.myChart.getDataURL(
+        {
+          type: 'png',
+          // pixelRatio: 1,
+          // backgroundColor: '#fff',
+          excludeComponents: ['toolbox']
+        }
+      )
+
       this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/update`),
         method: "post",
@@ -228,6 +265,8 @@ export default {
           conplanAxis: JSON.stringify(tmp),
           conplanSubject: this.resultList[0].conplanSubject,
           conplanProcess: this.resultList[0].conplanProcess,
+          conplanUrl: JSON.stringify(img.src),
+          // conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {

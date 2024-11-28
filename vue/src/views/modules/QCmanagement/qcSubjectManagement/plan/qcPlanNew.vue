@@ -32,7 +32,7 @@
       <br />
       <br />
       <el-card class="formZone" shadow="hover">
-        <div v-if="active1 === 1">
+        <div v-if="active1 === 1" :key="1">
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
@@ -49,7 +49,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -70,16 +70,24 @@
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
+
+
+
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button v-if="
-                    item.conplanSubject === conplanSubject &&
-                    item.conplanProcess === active1
-                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
+                  <el-button v-if="item.conplanSubject === conplanSubject && item.conplanProcess === active1"
+                    :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -113,7 +121,7 @@
           </el-form>
         </div>
 
-        <div v-if="active1 === 2">
+        <div v-if="active1 === 2" :key="2">
           <br />
           <el-form>
             <br />
@@ -131,7 +139,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -151,6 +159,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -193,7 +208,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active1 === 3">
+        <div v-if="active1 === 3" :key="3">
           <br />
           <el-form>
             <br />
@@ -212,7 +227,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -232,7 +247,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -275,7 +296,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active1 === 4">
+        <div v-if="active1 === 4" :key="4">
           <br />
           <el-form>
             <br />
@@ -293,7 +314,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -361,7 +382,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active1 === 5">
+        <div v-if="active1 === 5" :key="5">
           <br />
           <el-form>
             <br />
@@ -379,7 +400,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -399,7 +420,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -441,7 +468,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active1 === 6">
+        <div v-if="active1 === 6" :key="6">
           <br />
           <el-form>
             <br />
@@ -459,7 +486,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -479,7 +506,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -521,7 +554,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active1 === 7">
+        <div v-if="active1 === 7" :key="7">
           <br />
           <el-form>
             <br />
@@ -539,7 +572,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -559,7 +592,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -601,7 +640,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active1 === 8">
+        <div v-if="active1 === 8" :key="8">
           <br />
           <el-form>
             <br />
@@ -619,7 +658,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -645,7 +684,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -687,7 +732,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active1 === 9">
+        <div v-if="active1 === 9" :key="9">
           <br />
           <el-form>
             <br />
@@ -705,7 +750,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -725,7 +770,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -767,7 +818,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active1 === 10">
+        <div v-if="active1 === 10" :key="10">
           <br />
           <el-form>
             <br />
@@ -785,7 +836,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -805,7 +856,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -871,7 +928,7 @@
       <br />
       <br />
       <el-card class="formZone" shadow="hover">
-        <div v-if="active2 === 1">
+        <div v-if="active2 === 1" :key="11">
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
@@ -888,7 +945,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -908,7 +965,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -950,7 +1013,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active2 === 2">
+        <div v-if="active2 === 2" :key="12">
           <br />
           <el-form>
             <br />
@@ -968,7 +1031,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.participants" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -988,7 +1051,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -1030,7 +1099,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active2 === 3">
+        <div v-if="active2 === 3" :key="13">
           <br />
           <el-form>
             <br />
@@ -1048,7 +1117,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.participants" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1068,7 +1137,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -1110,7 +1185,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active2 === 4">
+        <div v-if="active2 === 4" :key="14">
           <br />
           <el-form>
             <br />
@@ -1128,7 +1203,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.participants" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1148,7 +1223,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -1190,7 +1271,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active2 === 5">
+        <div v-if="active2 === 5" :key="15">
           <br />
           <el-form>
             <br />
@@ -1208,7 +1289,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.participants" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1228,7 +1309,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -1270,7 +1357,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active2 === 6">
+        <div v-if="active2 === 6" :key="16">
           <br />
           <el-form>
             <br />
@@ -1288,7 +1375,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.participants" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1308,7 +1395,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -1350,7 +1443,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active2 === 7">
+        <div v-if="active2 === 7" :key="17">
           <br />
           <el-form>
             <br />
@@ -1368,7 +1461,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.participants" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1388,6 +1481,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -1429,7 +1529,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active2 === 8">
+        <div v-if="active2 === 8" :key="18">
           <br />
           <el-form>
             <br />
@@ -1447,7 +1547,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.participants" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1473,7 +1573,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -1515,7 +1621,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active2 === 9">
+        <div v-if="active2 === 9" :key="19">
           <br />
           <el-form>
             <br />
@@ -1533,7 +1639,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.participants" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1553,7 +1659,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -1595,7 +1707,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active2 === 10">
+        <div v-if="active2 === 10" :key="20">
           <br />
           <el-form>
             <br />
@@ -1613,7 +1725,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.participants" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.participants" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1633,7 +1745,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -1697,8 +1815,8 @@
       <br />
       <br />
       <el-card class="formZone" shadow="hover">
-        <div v-if="active3 === 1">
-          <el-form>
+        <div v-if="active3 === 1" :key="21">
+          <el-form ref="form">
             <br />
             <el-form-item label="阶段名称" prop="stageName">
               <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
@@ -1714,7 +1832,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1735,16 +1853,22 @@
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
+
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button v-if="
-                    item.conplanSubject === conplanSubject &&
-                    item.conplanProcess === active3
-                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
+                  <el-button v-if="item.conplanSubject === conplanSubject && item.conplanProcess === active3"
+                    :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -1776,7 +1900,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active3 === 2">
+        <div v-if="active3 === 2" :key="22">
           <br />
           <el-form>
             <br />
@@ -1794,7 +1918,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1815,16 +1939,22 @@
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
 
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
+
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
               <template v-for="(group, type) in groupedData">
                 <template v-for="(item, index) in group">
                   <!-- 判断条件修改为显示符合条件的数据 -->
-                  <el-button v-if="
-                    item.conplanSubject === conplanSubject &&
-                    item.conplanProcess === active3
-                  " :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
+                  <el-button v-if="item.conplanSubject === conplanSubject && item.conplanProcess === active3"
+                    :key="type + '-' + index" size="small" type="primary" @click="toggleLineAndBarShow(item)">
                     {{ item.conplanName }}
                   </el-button>
                 </template>
@@ -1858,7 +1988,7 @@
           </el-form>
         </div>
 
-        <div v-if="active3 === 3">
+        <div v-if="active3 === 3" :key="23">
           <br />
           <el-form>
             <br />
@@ -1876,7 +2006,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -1939,7 +2069,7 @@
           </el-form>
         </div>
 
-        <div v-if="active3 === 4">
+        <div v-if="active3 === 4" :key="24">
           <br />
           <el-form>
             <br />
@@ -1957,7 +2087,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -2020,7 +2150,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active3 === 5">
+        <div v-if="active3 === 5" :key="25">
           <br />
           <el-form>
             <br />
@@ -2038,7 +2168,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -2101,7 +2231,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active3 === 6">
+        <div v-if="active3 === 6" :key="26">
           <br />
           <el-form>
             <br />
@@ -2119,7 +2249,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -2188,7 +2318,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active3 === 7">
+        <div v-if="active3 === 7" :key="27">
           <br />
           <el-form>
             <br />
@@ -2206,7 +2336,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -2269,7 +2399,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="active3 === 8">
+        <div v-if="active3 === 8" :key="28">
           <br />
           <el-form>
             <br />
@@ -2287,7 +2417,7 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item label="阶段主要参与人员">
-              <el-select v-model="form.stagePeople" multiple placeholder="请选择主要参与人员">
+              <el-select v-model="form.stagePeople" multiple filterable placeholder="请选择主要参与人员">
                 <el-option v-for="participant in participantOptions" :key="participant.value" :label="participant.label"
                   :value="participant.value">
                 </el-option>
@@ -2520,6 +2650,7 @@ export default {
   },
   data() {
     return {
+      tmp: '',
       fileList: [],
       uploadUrl: "",
       uploadAllListVisible: false,
@@ -2593,8 +2724,7 @@ export default {
       },
 
       participantOptions: [
-        { value: "participant1", label: "参与人员1" },
-        { value: "participant2", label: "参与人员2" },
+
       ],
 
       value: "问题解决型",
@@ -2618,6 +2748,7 @@ export default {
 
       // 数据列表
       conplanDataList: [],
+      originList: [],
       // 基于conplanType分组的数据
       groupedData: {
         mixChart: [], // 折柱混合图
@@ -2630,6 +2761,8 @@ export default {
       },
 
       selectedItem: null, // 用于存储当前选中的 item 数据
+
+      currentUserName: "", // 当前登录用户
     };
   },
 
@@ -2638,6 +2771,7 @@ export default {
     this.initRouterParam();
     this.getDictWorkFlowList();
     this.getPlanStepDataList();
+    this.getUserName();
   },
   computed: {
     lastDisabled1() {
@@ -2669,6 +2803,21 @@ export default {
     },
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
+
     // 监听关闭事件
     handleDialogClose() {
       this.getTemplateData();
@@ -2687,14 +2836,29 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
+          this.originList = data.resultList;
           this.conplanDataList = data.resultList;
+          if (this.routerParam.topicType == '问题解决型') {
+            this.conplanDataList = this.conplanDataList.filter(item => {
+              return item.conplanProcess == this.active1;
+            })
+          } else if (this.routerParam.topicType == '创新型') {
+            this.conplanDataList = this.conplanDataList.filter(item => {
+              return item.conplanProcess == this.active3;
+            })
+          } else {
+            this.conplanDataList = this.conplanDataList.filter(item => {
+              return item.conplanProcess == this.active2;
+            })
+          }
           this.groupDataByType();
         }
       });
     },
 
     // 按照conplanType对数据进行分类
-    groupDataByType() {
+    //跳
+    async groupDataByType(selected) {
       this.groupedData = {
         mixChart: [],
         controlChart: [],
@@ -2704,7 +2868,39 @@ export default {
         associationChart: [],
         histogram: [],
       };
-
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/SList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanSubject: this.conplanSubject,
+          // conplanProcess: this.conplanProcess,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.conplanDataList = data.resultList;
+          if (this.routerParam.topicType == '问题解决型') {
+            this.conplanDataList = this.conplanDataList.filter(item => {
+              return item.conplanProcess == this.active1;
+            })
+          } else if (this.routerParam.topicType == '创新型') {
+            this.conplanDataList = this.conplanDataList.filter(item => {
+              return item.conplanProcess == this.active3;
+            })
+          } else {
+            this.conplanDataList = this.conplanDataList.filter(item => {
+              return item.conplanProcess == this.active2;
+            })
+          }
+        }
+      });
+      let tmpList = [];
+      if (selected) {
+        this.conplanDataList = this.conplanDataList.filter(item => {
+          return item.conplanName.toLowerCase().includes(selected.toLowerCase());
+        });
+        console.log('+++++')
+        console.log(this.conplanDataList)
+      }
       this.conplanDataList.forEach((item) => {
         switch (item.conplanType) {
           case "折柱图":
@@ -2732,6 +2928,9 @@ export default {
             break;
         }
       });
+
+      console.log('----------------')
+      console.log(this.groupedData)
     },
 
     // click() {
@@ -2797,7 +2996,6 @@ export default {
       });
     },
     handleClickToStep(id) {
-      console.log(this.routerParam);
       if (this.routerParam.topicType == "问题解决型") {
         this.active1 = id;
         this.findMatchingItem(this.active1);
@@ -2813,6 +3011,7 @@ export default {
     findMatchingItem(id) {
       this.initForm();
       this.uploadAllList = [];
+
       // console.log('++++++++++++++++')
       for (let item of this.planStepList) {
         if (item.stepProcess === id) {
@@ -2866,6 +3065,7 @@ export default {
 
         }
       }
+      this.groupDataByType()
     },
     getDictWorkFlowList() {
       this.$http({
@@ -3012,7 +3212,6 @@ export default {
       // 存储待上传的文件
 
       this.uploadingFile = file.raw; // 获取 File 对象
-
       this.uploadNameList.push(file.raw.name);
       this.uploadFile(file.raw); // 调用上传方法
     },

@@ -19,14 +19,10 @@
       <el-button @click="modifyLink">修改链接</el-button>
       <el-button type="warning" @click="downloadAsImage">保存图片</el-button>
       <!-- <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button> -->
-      <el-button type="success" @click="handleUp">更新当前数据</el-button>
+      <el-button type="success" @click="handleUp" v-if="admitEdit">更新当前数据</el-button>
 
       <el-dialog title="模版名" :visible.sync="dialogFormVisible">
-        <el-input
-          v-model="inputName"
-          placeholder="请输入模版名"
-          style="width: 50%"
-        ></el-input>
+        <el-input v-model="inputName" placeholder="请输入模版名" style="width: 50%"></el-input>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="handleUp">确 定</el-button>
@@ -71,14 +67,32 @@ export default {
       inputName: "",
       name: "",
       options: [], // 模版列表
+      currentUserName: '',
+      admitEdit: false,
     };
   },
   mounted() {
+    this.getUserName();
     this.getTemplateData();
     // this.initSvg();
     // this.renderGraph();
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
+
     handleUp() {
       console.log(this.nodes);
       console.log("inputName:" + this.inputName);
@@ -88,6 +102,10 @@ export default {
     },
     //保存为模版
     async addTemplate() {
+      let imgData;
+      html2canvas(document.querySelector("#chart")).then((canvas) => {
+        imgData = canvas.toDataURL("image/png");
+      });
       await this.$http({
         // url: this.$http.adornUrl(`/qcTools/template/save`),
         url: this.$http.adornUrl(`/qcTools/conplan/update`),
@@ -110,6 +128,8 @@ export default {
           conplanAxis: JSON.stringify(this.links),
           conplanSubject: this.resultList[0].conplanSubject,
           conplanProcess: this.resultList[0].conplanProcess,
+          conplanUrl: JSON.stringify(imgData),
+          // conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -137,6 +157,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
+          if (data.resultList.length != 0) {
+            if (data.resultList[0].conplanUser == this.currentUserName) {
+              this.admitEdit = true;
+            }
+          }
           this.resultList = data.resultList.map((row) => ({
             templateId: row.conplanId,
             templateName: row.conplanName,

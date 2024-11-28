@@ -16,7 +16,7 @@
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
               @click="reuseVisible = true">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
-            <!-- <el-button type="primary" @click="exportAll('list')">课题导出</el-button> -->
+            <el-button type="primary" @click="exportAll('list')">课题导出</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -29,11 +29,11 @@
           </el-table-column>
           <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
             <template slot-scope="scope">
-              <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
-              <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
-              <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
-              <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
-              <span v-else>-</span> <!-- 处理未知状态 -->
+              <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 2">审核中</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
+              <el-tag v-else>-</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
@@ -107,7 +107,7 @@
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
               @click="reuseVisible = true">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
-            <!-- <el-button type="primary" @click="exportAll('leadList')">课题导出</el-button> -->
+            <el-button type="primary" @click="exportAll('leadList')">课题导出</el-button>
             <!-- <el-badge :value="superScriptNumber" class="item">
               <el-button type="warning" @click="dialogMessageVisible = true">消息详情</el-button>
             </el-badge> -->
@@ -123,11 +123,11 @@
           </el-table-column>
           <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
             <template slot-scope="scope">
-              <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
-              <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
-              <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
-              <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
-              <span v-else>-</span>
+              <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 2">审核中</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
+              <el-tag v-else>-</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
@@ -168,7 +168,8 @@
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
-              <el-button type="text" size="small" @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
+              <el-button type="text" size="small" v-if="scope.row.topicReviewStatus != 3"
+                @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -196,7 +197,7 @@
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
               @click="reuseVisible = true">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
-            <!-- <el-button type="primary" @click="exportAll('myList')">课题导出</el-button> -->
+            <el-button type="primary" @click="exportAll('myList')">课题导出</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="subjectJoinList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -207,11 +208,11 @@
           </el-table-column>
           <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
             <template slot-scope="scope">
-              <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
-              <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
-              <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
-              <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
-              <span v-else>-</span>
+              <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 2">审核中</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
+              <el-tag v-else>-</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
@@ -251,7 +252,8 @@
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
-              <el-button type="text" size="small" @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
+              <el-button type="text" size="small" v-if="scope.row.topicReviewStatus != 3"
+                @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
             </template>
           </el-table-column>
         </el-table>

@@ -56,6 +56,10 @@ public class QcToolsConplanEntity implements Serializable {
 	 * 图片url
 	 */
 	private  String conplanUrl;
+	/**
+	 * 实例上传人
+	 */
+	private  String conplanUser;
 
 
 }

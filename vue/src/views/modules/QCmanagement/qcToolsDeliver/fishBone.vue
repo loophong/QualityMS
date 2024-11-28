@@ -6,21 +6,14 @@
           <br />
           <el-button type="danger" @click="handleDelete">删除当前QC图</el-button>
           <el-button type="primary" @click="addEdge">新增分支节点</el-button>
-          <el-button type="success" @click="downloadAsImage"
-            >下载图片</el-button
-          >
+          <el-button type="success" @click="downloadAsImage">下载图片</el-button>
           <!-- <el-button type="success" @click="dialogVisibleSave = true">保存为模版</el-button> -->
-          <el-button type="success" @click="handleUp">更新当前数据</el-button>
+          <el-button type="success" @click="handleUp" v-if="admitEdit">更新当前数据</el-button>
         </el-form-item>
       </el-form>
     </div>
     <div id="fishBone">
-      <el-dialog
-        title="编辑节点"
-        :visible.sync="editDialogVisible"
-        width="30%"
-        :modal="false"
-      >
+      <el-dialog title="编辑节点" :visible.sync="editDialogVisible" width="30%" :modal="false">
         <el-form :model="editableNode">
           <el-form-item label="节点名称">
             <el-input v-model="editableNode.name"></el-input>
@@ -31,24 +24,14 @@
           <el-button type="primary" @click="saveChanges">确定</el-button>
         </div>
       </el-dialog>
-      <el-dialog
-        title="新增节点"
-        :visible.sync="addDialogVisible"
-        width="30%"
-        :modal="false"
-      >
+      <el-dialog title="新增节点" :visible.sync="addDialogVisible" width="30%" :modal="false">
         <el-form :model="newNode">
           <el-form-item label="节点名称">
             <el-input v-model="newNode.name"></el-input>
           </el-form-item>
           <el-form-item label="父节点">
             <el-select v-model="newNode.parentId" placeholder="请选择父节点">
-              <el-option
-                v-for="item in nodeNames"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
+              <el-option v-for="item in nodeNames" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -59,11 +42,7 @@
         </div>
       </el-dialog>
       <el-dialog title="模版名" :visible.sync="dialogVisibleSave">
-        <el-input
-          v-model="inputName"
-          placeholder="请输入模版名"
-          style="width: 50%"
-        ></el-input>
+        <el-input v-model="inputName" placeholder="请输入模版名" style="width: 50%"></el-input>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogVisibleSave = false">取 消</el-button>
           <el-button type="primary" @click="handleUp">确 定</el-button>
@@ -119,14 +98,32 @@ export default {
       resultList: [],
       nodeNames: [], // 用于存储节点名称数组
       options: [], // 用于存储节点名称数组
+      currentUserName: '',
+      admitEdit: false,
     };
   },
   mounted() {
+    this.getUserName();
     this.getTemplateData();
     // this.initFishBone();
     // this.getNodeNames(this.testFishData);
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
+
     initFishBone() {
       console.log("initFishBone");
       new FishBones({
@@ -255,6 +252,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
+          if (data.resultList.length != 0) {
+            if (data.resultList[0].conplanUser == this.currentUserName) {
+              this.admitEdit = true;
+            }
+          }
           this.resultList = data.resultList.map((row) => ({
             templateId: row.conplanId,
             templateName: row.conplanName,
@@ -332,6 +334,11 @@ export default {
       }
     },
     addTemplate() {
+      let imgData;
+
+      html2canvas(document.querySelector('#fishBone')).then(canvas => {
+        imgData = canvas.toDataURL('image/png')
+      })
       this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/update`),
         method: "post",
@@ -344,6 +351,8 @@ export default {
           // conplanAxis: JSON.stringify(tmp),
           conplanSubject: this.resultList[0].conplanSubject,
           conplanProcess: this.resultList[0].conplanProcess,
+          conplanUrl: JSON.stringify(imgData),
+          // conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {

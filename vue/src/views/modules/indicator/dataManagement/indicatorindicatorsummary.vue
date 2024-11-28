@@ -120,7 +120,7 @@
         prop="indicatorActualValue"
         header-align="center"
         align="center"
-        label="指标值">
+        label="指标完成值">
       </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="indicatorValueUpperBound"-->

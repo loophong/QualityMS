@@ -1,11 +1,13 @@
 package io.renren.modules.taskmanagement.controller;
 
+import java.io.IOException;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import cn.hutool.log.Log;
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
@@ -14,6 +16,7 @@ import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.ApprovalService;
 import io.renren.modules.taskmanagement.service.FileService;
 import io.renren.modules.taskmanagement.service.TaskService;
+import io.renren.modules.taskmanagement.vo.PlanExportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import io.renren.modules.taskmanagement.service.PlanService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+
+import javax.servlet.http.HttpServletResponse;
 
 import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
@@ -47,6 +52,18 @@ public class PlanController {
     private FileService fileService;
     @Autowired
     private ApprovalService approvalService;
+
+    @RequestMapping("/export")
+    public void export(HttpServletResponse response){
+        List<PlanExportVO> planExportVO = planService.export();
+        String fileName = "任务表" + System.currentTimeMillis() + ".xlsx";
+        try {
+            EasyExcel.write(response.getOutputStream(), PlanExportVO.class).sheet("任务表").doWrite(planExportVO);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     /**
      * @description: PlanStatisticsLabelDto

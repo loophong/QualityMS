@@ -18,11 +18,14 @@ import io.renren.modules.app.entity.UserEntity;
 import io.renren.modules.app.form.LoginForm;
 import io.renren.modules.app.service.UserService;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 @Service("userService")
 public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements UserService {
+	@Autowired
+	private UserDao userDao;
 
 	@Override
 	public UserEntity queryByMobile(String mobile) {
@@ -40,5 +43,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 		}
 
 		return user.getUserId();
+	}
+
+	@Override
+	public String getUsernameById(String id) {
+		return userDao.getUsernameById(id);
 	}
 }

@@ -4,6 +4,8 @@ import cn.hutool.core.util.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.renren.common.utils.DateUtils;
+import io.renren.modules.app.service.UserService;
+import io.renren.modules.indicator.service.IndicatorDictionaryService;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.taskmanagement.dao.TaskDao;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
@@ -11,15 +13,13 @@ import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.FileService;
 import io.renren.modules.taskmanagement.service.TaskService;
+import io.renren.modules.taskmanagement.vo.PlanExportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -33,6 +33,8 @@ import io.renren.modules.taskmanagement.service.PlanService;
 @Slf4j
 @Service("planService")
 public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements PlanService {
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private PlanDao planDao;
@@ -42,6 +44,8 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
     private TaskService taskService;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private IndicatorDictionaryService indicatorDictionaryService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -132,9 +136,100 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
 //        plan.setPlanCurrentState(TaskStatus.COMPLETED);
         plan.setPlanIsCompleted(1);
         Page<PlanEntity> page = new Page<>(planQueryParamDTO.getPage(), planQueryParamDTO.getLimit());
-        Page<PlanEntity> result = planDao.queryPageByParams(page,plan);
+        Page<PlanEntity> result = planDao.queryPageByParams(page, plan);
         return new PageUtils(result);
     }
+
+    @Override
+    public List<PlanExportVO> export() {
+        List<PlanExportVO> planList = planDao.export();
+        List<PlanExportVO> planExportVO = new ArrayList<>();
+        log.info("planExportVOS" + planList);
+        for (PlanExportVO plan : planList) {
+            planExportVO.add(plan);
+            List<PlanExportVO> taskList = taskDao.selectTaskByPlanId(plan.getPlanId());
+            log.info("taskList" + taskList);
+            planExportVO.addAll(taskList);
+        }
+
+        // 统一将VO中的用户ID转为名称
+        for (PlanExportVO plan : planExportVO) {
+            convert(plan);
+        }
+
+        log.info("转换后的vo：" + planExportVO);
+        return planExportVO;
+    }
+
+    private void convert(PlanExportVO plan) {
+
+        if (plan.getPrincipal() != null) {
+            String username = userService.getUsernameById(plan.getPrincipal());
+            if (username != null) {
+                plan.setPrincipal(username);
+            }
+        }
+
+        if (plan.getAuditor() != null) {
+            String username = userService.getUsernameById(plan.getAuditor());
+            if (username != null) {
+                plan.setAuditor(username);
+            }
+        }
+
+        if (plan.getExecutor() != null) {
+            String input = plan.getExecutor();
+            // 使用replaceAll 去掉[]
+            input = input.replaceAll("\\[|\\]", "");
+            // 使用replaceAll 去掉"
+            input = input.replaceAll("\"", "");
+            String[] output = input.split(","); // 按逗号分割
+            log.info("output: " + Arrays.toString(output));
+
+            StringBuilder result = new StringBuilder();
+            for (int i = 0; i < output.length; i++) {
+                String username = userService.getUsernameById(output[i]);
+                if (username != null) {
+                    result.append(username);
+                }
+                if (i < output.length - 1) {
+                    result.append(",");
+                }
+            }
+            log.info("result: " + result);
+            plan.setExecutor(result.toString());
+        }
+
+        if (plan.getAssociatedIndicatorsId() != null && !"".equals(plan.getAssociatedIndicatorsId())) {
+            log.info("indicatorId: " + plan.getAssociatedIndicatorsId());
+            String indicatorName = indicatorDictionaryService.getById(plan.getAssociatedIndicatorsId()).getIndicatorName();
+            plan.setAssociatedIndicatorsId(indicatorName);
+            log.info("indicatorName: " + indicatorName);
+        }
+
+        if(plan.getCurrentState() != null){
+            switch (plan.getCurrentState()) {
+                case "COMPLETED":
+                    plan.setCurrentState("已完成");
+                    break;
+                case "OVERDUE":
+                    plan.setCurrentState("超期");
+                    break;
+                case "IN_PROGRESS":
+                    plan.setCurrentState("进行中");
+                    break;
+                case "NOT_STARTED":
+                    plan.setCurrentState("未开始");
+                    break;
+                case "APPROVAL_IN_PROGRESS":
+                    plan.setCurrentState("审核中");
+                    break;
+            }
+        }
+
+
+    }
+
 
     /**
      * @description: 获取任务-知识库
@@ -152,13 +247,13 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         return new PageUtils(page);
     }
 
-    /** 
+    /**
      * @description: 保存计划，直系任务，文件
-     * @param: planDTO 
-     * @return: void 
+     * @param: planDTO
+     * @return: void
      * @author: hong
      * @date: 2024/11/10 17:25
-     */ 
+     */
     @Override
     public void saveAllPlanInfo(PlanDTO planDTO) {
         // 保存计划信息
@@ -213,12 +308,11 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         plan.setPlanIsCompleted(0);
         log.info("查询前的plan: " + plan);
         Page<PlanEntity> page = new Page<>(planQueryParamDTO.getPage(), planQueryParamDTO.getLimit());
-        Page<PlanEntity> result = planDao.queryPageByParams(page,plan);
+        Page<PlanEntity> result = planDao.queryPageByParams(page, plan);
         // 封装分页结果
         return new PageUtils(result);
 
     }
-
 
 
 }

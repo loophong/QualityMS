@@ -144,5 +144,11 @@ public class IndicatorIndicatorSummaryEntity implements Serializable {
 	@ExcelIgnore
 	private String indicatorChildNode;
 
+	/**
+	 * 指指标完成情况（完成为 1，未完成为 0）
+	 */
+	@ExcelIgnore
+	private Integer finishedFlag;
+
 
 }

@@ -93,12 +93,13 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
             }
         }
 
-        queryWrapper.orderByDesc("`year_month`");
+        queryWrapper.orderByDesc("`year_month`").orderByDesc("indicator_id");
 
         IPage<IndicatorIndicatorSummaryEntity> page = this.page(
                 new Query<IndicatorIndicatorSummaryEntity>().getPage(params),
                 queryWrapper
         );
+
 
         return new PageUtils(page);
     }

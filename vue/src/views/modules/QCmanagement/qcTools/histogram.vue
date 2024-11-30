@@ -7,6 +7,12 @@
       </el-select>
       <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
     </span>
+    <span>
+      <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+        <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+    </span>
     <div class="container">
       <div ref="chart" style="width: 900px; height: 500px"></div>
       <div class="input-group">
@@ -55,6 +61,8 @@ export default {
   },
   data() {
     return {
+      valueConPlan: "",
+      optionsConPlan: [],
       myChart: null,
       categories: ["0", "5", "10", "15", "20", "25"],
       data: [5, 10, 25, 30, 20, 10],
@@ -77,6 +85,7 @@ export default {
   mounted() {
     this.getUserName();
     this.getTemplateData();
+    this.getConPlanData();
     this.drawChart();
     this.updateStatistics(); // 计算初始统计数据
     this.updateChart(); // 更新图表以显示初始数据
@@ -98,7 +107,7 @@ export default {
     },
     //处理下拉框选择变化
     handleSelectChange() {
-      console.log(this.resultList);
+      this.valueConPlan = ''
       this.resultList.forEach((item) => {
         if (item.templateId == this.value) {
           this.data = item.templateSeries;
@@ -106,6 +115,17 @@ export default {
           this.name = item.templateName;
         }
       });
+      this.updateChart();
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
+          this.data = item.templateSeries;
+          this.categories = item.templateAxis;
+          this.name = item.templateName;
+        }
+      })
       this.updateChart();
     },
     async getTemplateData() {
@@ -151,6 +171,39 @@ export default {
       // this.drawChart();
       // this.updateStatistics(); // 计算初始统计数据
       // this.updateChart(); // 更新图表以显示初始数据
+    },
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "直方图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
+
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
+      // }
     },
     handleUp() {
       console.log(this.updatedSeries);

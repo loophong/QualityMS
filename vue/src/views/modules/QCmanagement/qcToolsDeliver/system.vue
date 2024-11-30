@@ -97,6 +97,7 @@ export default {
           },
         ],
       },
+      resultList: [],
       options: [],
       value: "",
       name: "",

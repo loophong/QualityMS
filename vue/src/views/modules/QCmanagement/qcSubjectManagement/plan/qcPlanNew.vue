@@ -325,7 +325,7 @@
             </el-form-item>
 
             <el-form-item>
-              <span>添加添加QC工具实例实例： </span>
+              <span>添加QC工具实例： </span>
               <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
@@ -334,7 +334,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -2026,7 +2032,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -2107,7 +2119,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -2188,7 +2206,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -2275,7 +2299,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -2356,7 +2386,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -2437,7 +2473,13 @@
               <el-button size="small" type="primary" @click="toggleRelation">关联图</el-button>
               <el-button size="small" type="primary" @click="toggleHistogram">直方图</el-button>
             </el-form-item>
-
+            <el-form-item label="查找已添加实例">
+              <el-select v-model="tmp" filterable @change="groupDataByType(tmp)" clearable>
+                <el-option v-for="(item, index) in conplanDataList" :key="index" :label="item.conplanName"
+                  :value="item.conplanName">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- 动态生成的按钮组 -->
             <el-form-item>
               <span>已添加QC工具实例：</span>
@@ -2594,15 +2636,13 @@
     <!-- Deliver over -->
 
     <el-dialog title="附件预览" :visible.sync="uploadAllListVisible">
-      <div style="color: orange">
-        注：若原先存在文件，则点击备注下方的确定后，将会用新上传文件替换原文件
-      </div>
-      <br />
+
       <el-table :data="uploadAllList" border style="width: 100%">
         <el-table-column prop="name" label="文件名"> </el-table-column>
-        <el-table-column prop="url" label="预览">
+        <el-table-column prop="url" label="操作" width="300px">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.url" @click="previewDoc(scope.row.url)">点击预览</el-button>
+            <el-button v-if="scope.row.url" @click="previewDoc(scope.row.url)" type="primary">下载</el-button>
+            <el-button v-if="scope.row.name" @click="previewDocRemove(scope.row.name)" type="warning">移除</el-button>
             <span v-else>--</span>
           </template>
         </el-table-column>
@@ -2612,7 +2652,6 @@
 </template>
 
 <script>
-import * as echarts from "echarts";
 import { FishBones } from "@/components/fishbone/FishBone";
 import fishBone from "../../qcTools/fishBone.vue";
 import control from "@/views/modules/QCmanagement/qcTools/control.vue";
@@ -2650,7 +2689,7 @@ export default {
   },
   data() {
     return {
-      tmp: '',
+      tmp: '',//查找实例
       fileList: [],
       uploadUrl: "",
       uploadAllListVisible: false,
@@ -2820,7 +2859,9 @@ export default {
 
     // 监听关闭事件
     handleDialogClose() {
-      this.getTemplateData();
+      if (!this.tmp) {//已有查找实例时，防止加载所有实例
+        this.groupDataByType();
+      }
     },
 
     //1119 lbbx 添加控制图
@@ -3146,6 +3187,7 @@ export default {
     lastStep1() {
       if (this.active1 > 1) {
         this.active1--;
+        this.tmp = '';
         this.conplanProcess = this.active1;
         console.log("this.this.active1 ===xht==>" + this.active1);
       }
@@ -3155,6 +3197,7 @@ export default {
     nextStep1() {
       if (this.active1 < 10) {
         this.active1++;
+        this.tmp = '';
         this.conplanProcess = this.active1;
         console.log("this.this.active1 ===xht==>" + this.active1);
       }
@@ -3163,6 +3206,7 @@ export default {
     lastStep2() {
       if (this.active2 > 1) {
         this.active2--;
+        this.tmp = '';
         this.conplanProcess = this.active2;
       }
       this.findMatchingItem(this.active2);
@@ -3170,6 +3214,7 @@ export default {
     nextStep2() {
       if (this.active2 < 10) {
         this.active2++;
+        this.tmp = '';
         this.conplanProcess = this.active2;
       }
       this.findMatchingItem(this.active2);
@@ -3177,6 +3222,7 @@ export default {
     lastStep3() {
       if (this.active3 > 1) {
         this.active3--;
+        this.tmp = '';
         this.conplanProcess = this.active3;
       }
       this.findMatchingItem(this.active3);
@@ -3184,6 +3230,7 @@ export default {
     nextStep3() {
       if (this.active3 < 8) {
         this.active3++;
+        this.tmp = '';
         this.conplanProcess = this.active3;
       }
       this.findMatchingItem(this.active3);
@@ -3229,7 +3276,7 @@ export default {
         .then(({ data }) => {
           if (data && data.code === 0) {
             // 保存后端返回的url到变量中
-            this.dataForm.rectificationPhotoDeliverable = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+            this.dataForm.rectificationPhotoDeliverable = data.uploadurl;
             // console.log('获得的文件地址 ：', data.uploadurl)
             // console.log('获得的文件 ：', data)
             this.uploadUrlList.push(data.uploadurl);
@@ -3268,6 +3315,13 @@ export default {
         `/generator/issuetable/${fileflag}`
       )}?token=${token}`;
       window.open(url);
+    },
+    previewDocRemove(name) {
+      console.log("删除的名字 ", name);
+      console.log("上传文件列表 ：", this.uploadAllList);
+      this.uploadAllList = this.uploadAllList.filter((item) => item.name !== name);
+      this.tmpAllList = this.tmpAllList.filter((item) => item.name !== name);
+      console.log("上传文件列表after ：", this.uploadAllList);
     },
 
     initForm() {
@@ -3324,8 +3378,11 @@ export default {
     // 表单提交
     dataFormSubmit(id) {
       let tmpListString = [];
-      if (this.tmpAllList.length) {
-        tmpListString = JSON.stringify(this.tmpAllList);
+      // if (this.tmpAllList.length) {
+      //   tmpListString = JSON.stringify(this.tmpAllList);
+      // }
+      if (this.uploadAllList.length) {
+        tmpListString = JSON.stringify(this.uploadAllList);
       }
       const tmpStagePeople = JSON.stringify(this.form.stagePeople);
       this.$http({
@@ -3351,7 +3408,7 @@ export default {
           stageConsultant: this.form.stageConsultant || "",
           stageConsolidate: this.form.stageConsolidate || "",
           stageReview: this.form.stageReview || "",
-          stageAttachment: this.tmpAllList.length ? tmpListString : this.form.stepAttachment,
+          stageAttachment: this.uploadAllList.length ? tmpListString : this.form.stepAttachment,
         }),
       })
         .then(({ data }) => {

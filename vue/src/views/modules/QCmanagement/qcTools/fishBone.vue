@@ -1,12 +1,18 @@
 <template>
   <div>
-    <div>
+    <span>
       <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
       <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
-    </div>
+    </span>
+    <span>
+      <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+        <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+    </span>
     <div class="button-container">
       <el-form>
         <el-form-item>
@@ -76,6 +82,8 @@ export default {
   },
   data() {
     return {
+      valueConPlan: "",
+      optionsConPlan: [],
       testFishData: [
         {
           id: "1",
@@ -115,6 +123,7 @@ export default {
   mounted() {
     this.getUserName();
     this.getTemplateData();
+    this.getConPlanData();
     this.initFishBone();
     this.getNodeNames(this.testFishData);
   },
@@ -243,14 +252,24 @@ export default {
     },
     //处理下拉框选择变化
     handleSelectChange() {
-      console.log(this.value);
-
+      this.valueConPlan = ''
       this.resultList.forEach((item) => {
         if (item.templateId == this.value) {
           this.testFishData = item.templateSeries;
           this.name = item.templateName;
         }
       });
+      this.initFishBone();
+      this.getNodeNames(this.testFishData);
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
+          this.testFishData = item.templateSeries;
+          this.name = item.templateName;
+        }
+      })
       this.initFishBone();
       this.getNodeNames(this.testFishData);
     },
@@ -294,6 +313,39 @@ export default {
       // console.log("this.testFishData=====xht=====>", this.testFishData);
       // this.initFishBone();
       // this.getNodeNames(this.testFishData);
+    },
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "鱼骨图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
+
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
+      // }
     },
     handleUp() {
       console.log(this.updatedSeries);

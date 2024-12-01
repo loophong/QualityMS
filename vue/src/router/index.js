@@ -194,6 +194,12 @@ const mainRoutes = {
       meta: { title: '任务详情', isDynamic: true, isTab: false }
     },
     {
+      path: '/issue-issuemask',
+      component: _import('modules/issuemask/issueAllmask'),
+      name: 'issue-issueAllmask',
+      meta: { title: '任务详情', isDynamic: true, isTab: false }
+    },
+    {
       path: '/issue-issueflow',
       component: _import('modules/issuemask/issuemaskflow'),
       name: 'issue-issueflow',

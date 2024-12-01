@@ -1,6 +1,7 @@
 package io.renren.modules.spc.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -86,6 +87,28 @@ public class SpcXrchartController {
 		spcXrchartService.removeByIds(Arrays.asList(spcxrIds));
 
         return R.ok();
+    }
+
+
+    @RequestMapping("/chart/Xbar_R")
+    public R getXbar_RChart(){
+
+        return R.ok().put("Xbar-R_Info", spcXrchartService.getXbar_RChart());
+    }
+
+    @RequestMapping("/chart/Xbar_S")
+    public R getXbar_SChart(){
+        return R.ok().put("Xbar-S_Info", spcXrchartService.getXbar_SChart());
+    }
+
+    @RequestMapping("/chart/Me_R")
+    public R getMe_RChart(){
+        return R.ok().put("Me-R_Info", spcXrchartService.getMe_RChart());
+    }
+
+    @RequestMapping("/chart/I_MR")
+    public R getI_MRChart(){
+        return R.ok().put("I-MR_Info", spcXrchartService.getI_MRChart());
     }
 
 }

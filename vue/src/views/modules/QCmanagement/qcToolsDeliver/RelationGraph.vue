@@ -66,6 +66,7 @@ export default {
       value: "",
       inputName: "",
       name: "",
+      resultList: [],
       options: [], // 模版列表
       currentUserName: '',
       admitEdit: false,

@@ -209,9 +209,20 @@
         align="center"
         label="整改照片交付物">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+          <el-button type="text" @click="showFileList(scope.row.rectificationPhotoDeliverable)">
+            预览
+          </el-button>
         </template>
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="rectificationPhotoDeliverable"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="整改照片交付物">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
 <!--      <el-table-column-->
 <!--        prop="rectificationPhotoDeliverable"-->
 <!--        header-align="center"-->
@@ -367,7 +378,9 @@
 <!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.issueId)">修改</el-button>-->
           <el-button type="text" size="small" @click="showTaskDetails(scope.row.issueNumber, scope.row.issueId)">完成情况</el-button>
           <el-button type="text" size="small" @click="reuseTask(scope.row.issueId)">问题重写</el-button>
-          <el-button type="text" size="small" @click="closeRelatedTasks(scope.row.issueId)">问题关闭</el-button>
+          <el-button type="text" size="small" @click="openCloseDialog(scope.row.issueId)">
+            问题关闭
+          </el-button>
           <el-button type="text" size="small" @click="showAssociatedIssues(scope.row.associatedRectificationRecords)">关联问题</el-button>
         </template>
       </el-table-column>
@@ -391,6 +404,41 @@
       <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible3 = false">关闭</el-button>
     </span>
+    </el-dialog>
+    <el-dialog
+      title="附件预览"
+      :visible.sync="fileDialogVisible"
+      width="50%">
+      <el-table :data="fileList" style="width: 100%">
+        <el-table-column prop="name" label="文件名称" align="left"></el-table-column>
+        <el-table-column label="操作" align="center">
+          <template slot-scope="scope">
+            <el-button type="text" @click="previewFile(scope.row.url)">
+              点击预览
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="fileDialogVisible = false">关闭</el-button>
+      </div>
+    </el-dialog>
+    <!-- 弹窗 -->
+    <el-dialog
+      title="关闭问题"
+      :visible.sync="showCloseDialog"
+      width="400px"
+      @close="cancelCloseDialog"
+    >
+      <p>是否关闭此问题以及关联问题？</p>
+      <el-radio-group v-model="selectedOption" style="margin-top: 10px;">
+        <el-radio :label="1">关闭关联问题</el-radio>
+        <el-radio :label="0">不关闭关联问题</el-radio>
+      </el-radio-group>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelCloseDialog">取消</el-button>
+        <el-button type="primary" @click="closeRelatedTasks">确定</el-button>
+      </span>
     </el-dialog>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -416,6 +464,13 @@
   export default {
     data () {
       return {
+        //关闭问题
+        showCloseDialog: false, // 控制弹窗的显示
+        selectedOption: 0, // 默认选项，0：不关闭关联问题，1：关闭关联问题
+        currentIssueId: null, // 当前操作的问题ID
+        //文件预览
+        fileDialogVisible: false, // 控制文件预览弹窗显示
+        fileList: [], // 存储当前记录的附件列表
         //查询参数
         options:[],
         queryParams:{
@@ -492,6 +547,41 @@
       // this.fetchData()
     },
     methods: {
+      // 显示文件列表弹窗
+      showFileList(annex) {
+        try {
+          if (!annex) {
+            this.$message.warning("没有附件可预览！");
+            return;
+          }
+          // 解析数据库中存储的附件信息
+          const parsedAnnex = JSON.parse(annex);
+          if (Array.isArray(parsedAnnex) && parsedAnnex.length > 0) {
+            this.fileList = parsedAnnex;
+            this.fileDialogVisible = true; // 打开弹窗
+          } else {
+            this.$message.warning("附件数据格式不正确！");
+          }
+        } catch (error) {
+          console.error("附件解析失败:", error);
+          this.$message.error("附件数据解析失败！");
+        }
+      },
+      // 点击预览具体文件
+      previewFile(fileUrl) {
+        const token = this.$cookie.get("token"); // 获取当前的 token
+        if (!fileUrl) {
+          this.$message.warning("文件路径为空，无法预览！");
+          return;
+        }
+        if (!token) {
+          this.$message.error("登录已过期，请重新登录！");
+          return;
+        }
+        // 拼接带有 token 的预览地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileUrl}`)}?token=${token}`;
+        window.open(url, "_blank");
+      },
       getUsernameByUserId(auditorId) {
         for (const category of this.options) {
           for (const auditor of category.options) {
@@ -522,7 +612,7 @@
         // console.log('打开任务列表', this.tempParams.issueNumber)
         this.taskDetailVisible = false;
         this.$router.push({
-          name: 'issue-issuemask',
+          name: 'issue-issueAllmask',
           params: {
             issueId: this.tempParams.issueId,
             issueNumber: this.tempParams.issueNumber
@@ -635,39 +725,47 @@
       //   return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
       // },
       // 关闭相关任务
-      closeRelatedTasks(id) {
-        // 提示用户确认
-        this.$confirm(`是否删除此问题并删除关联问题？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          // 用户确认后执行删除请求
-          this.$http({
-            url: this.$http.adornUrl(`/generator/issuetable/closeRelatedTasks/${id}`), // 修改为正确的URL
-            method: 'post'
-            // 此处不需要 data，因为我们在方法定义中直接使用了@PathVariable来接收ID
-          }).then(({data}) => {
+      // 打开弹窗
+      openCloseDialog(issueId) {
+        this.currentIssueId = issueId; // 记录当前问题ID
+        this.showCloseDialog = true; // 显示弹窗
+      },
+      // 提交关闭问题请求
+      closeRelatedTasks() {
+        this.$http({
+          url: this.$http.adornUrl(
+            `/generator/issuetable/closeRelatedTasks/${this.currentIssueId}/${this.selectedOption}`
+          ),
+          method: 'post',
+        })
+          .then(({ data }) => {
             if (data && data.code === 0) {
-              // 删除成功的提示
+              // 关闭成功提示
               this.$message({
                 message: '任务已成功关闭',
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  // 删除成功后刷新数据列表
+                  // 刷新列表
                   this.getDataList();
-                }
+                },
               });
             } else {
-              // 删除失败的提示
+              // 失败提示
               this.$message.error(data.msg);
             }
+          })
+          .catch(() => {
+            this.$message.error('操作失败，请稍后重试');
+          })
+          .finally(() => {
+            this.showCloseDialog = false; // 关闭弹窗
           });
-        }).catch(() => {
-          // 用户点击了取消，不执行任何操作
-          this.$message.info('操作已取消');
-        });
+      },
+      // 取消操作
+      cancelCloseDialog() {
+        this.showCloseDialog = false; // 隐藏弹窗
+        // this.$message.info('操作已取消');
       },
 
       // fetchData () {

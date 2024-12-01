@@ -24,4 +24,29 @@ public interface SpcXrchartDao extends BaseMapper<SpcXrchartEntity> {
     // 批量插入数据
     void batchInsertSpcXrcharts(@Param("list") List<SpcXrchartEntity> list);
 
+    List<SpcXrchartEntity> getSpcXrchartEntityByMonth(@Param("datatime") Date datatime);
+
+    Double getConstantForXbarR_A2(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForXbarR_D3(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForXbarR_D4(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForXbarS_A3(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForXbarS_B3(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForXbarS_B4(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForXbarS_A4(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForMeR_D3(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForMeR_D4(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForIMR_E2(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForIMR_D3(@Param("subarray") int subarray_capacity);
+
+    Double getConstantForIMR_D4(@Param("subarray") int subarray_capacity);
 }

@@ -7,6 +7,12 @@
       </el-select>
       <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
     </span>
+    <span>
+      <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+        <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+    </span>
     <div class="content">
       <div class="chart-container">
         <div id="chartSdtV" style="width: 40vw; height: 40vw"></div>
@@ -69,9 +75,15 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
+      valueConPlan: "",
+      optionsConPlan: [],
       dataPoints: [
         [0.166, 0.948],
         [0.366, 0.248],
@@ -108,6 +120,7 @@ export default {
   mounted() {
     this.getUserName();
     this.getTemplateData();
+    this.getConPlanData();
     this.init();
   },
   methods: {
@@ -127,14 +140,23 @@ export default {
     },
     //处理下拉框选择变化
     handleSelectChange() {
-      console.log(this.resultList);
+      this.valueConPlan = ''
       this.resultList.forEach((item) => {
         if (item.templateId == this.value) {
           this.dataPoints = item.templateSeries;
           this.name = item.templateName;
         }
       });
-      console.log(this.dataPoints);
+      this.updateChart();
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
+          this.dataPoints = item.templateSeries;
+          this.name = item.templateName;
+        }
+      })
       this.updateChart();
     },
     async getTemplateData() {
@@ -175,6 +197,39 @@ export default {
       // }
       // // 初始化 渲染数据
       // this.init();
+    },
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "散点图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
+
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
+      // }
     },
     handleUp() {
       console.log(this.updatedSeries);
@@ -245,6 +300,8 @@ export default {
           //   'templateAxis': ,
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanIssue: this.conplanIssue,
+
           conplanUrl: JSON.stringify(img.src),
           conplanUser: this.currentUserName,
         }),

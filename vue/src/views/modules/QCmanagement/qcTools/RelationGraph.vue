@@ -8,6 +8,12 @@
         </el-select>
         <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
       </span>
+      <span>
+        <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+          <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+      </span>
     </div>
     <br />
     <div id="chart" ref="chart">
@@ -48,9 +54,15 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
+      valueConPlan: "",
+      optionsConPlan: [],
       nodes: [
         { id: "A", x: 100, y: 100, size: 1, label: "A" },
         { id: "B", x: 300, y: 100, size: 1, label: "B" },
@@ -77,6 +89,7 @@ export default {
   mounted() {
     this.getUserName();
     this.getTemplateData();
+    this.getConPlanData();
     this.initSvg();
     this.renderGraph();
   },
@@ -121,6 +134,8 @@ export default {
           conplanAxis: JSON.stringify(this.links),
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanIssue: this.conplanIssue,
+
           conplanUrl: JSON.stringify(imgData),
           conplanUser: this.currentUserName,
         }),
@@ -146,21 +161,18 @@ export default {
         // url: this.$http.adornUrl("/qcTools/conplan/TspList"),
         method: "get",
         params: this.$http.adornParams({
-          conplanType: "关联图",
-          conplanSubject: this.conplanSubject,
-          conplanProcess: this.conplanProcess,
+          templateType: "关联图",
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.resultList = data.resultList.map((row) => ({
-            templateId: row.conplanId,
-            templateName: row.conplanName,
-            templateType: row.conplanType,
-            templateText: row.conplanText,
-            templateSeries: JSON.parse(row.conplanSeries),
-            templateAxis: JSON.parse(row.conplanAxis),
+            templateId: row.templateId,
+            templateName: row.templateName,
+            templateType: row.templateType,
+            templateText: row.templateText,
+            templateSeries: JSON.parse(row.templateSeries),
+            templateAxis: JSON.parse(row.templateAxis),
           }));
-
           this.options = data.resultList.map((item) => ({
             value: item.templateId,
             label: item.templateName,
@@ -183,16 +195,60 @@ export default {
       // this.initSvg();
       // this.renderGraph();
     },
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "关联图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
+
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
+      // }
+    },
     //处理下拉框选项变化
     handleSelectChange() {
+      this.valueConPlan = ''
       this.resultList.forEach((item) => {
         if (item.templateId == this.value) {
-          console.log(item.templateSeries);
           this.nodes = item.templateSeries;
           this.links = item.templateAxis;
           this.name = item.templateName;
         }
       });
+      this.renderGraph();
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
+          this.nodes = item.templateSeries;
+          this.links = item.templateAxis;
+          this.name = item.templateName;
+        }
+      })
       this.renderGraph();
     },
     //删除当前模版

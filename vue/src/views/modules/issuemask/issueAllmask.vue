@@ -1,12 +1,12 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="creatorDataList()">
-<!--      <el-form-item>-->
-<!--        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-<!--      </el-form-item>-->
+      <!--      <el-form-item>-->
+      <!--        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+      <!--      </el-form-item>-->
       <el-form-item>
-<!--        <el-button @click="creatorDataList()">查询</el-button>-->
-<!--        <el-button v-if="isAuth('generator:issuemasktable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+        <!--        <el-button @click="creatorDataList()">查询</el-button>-->
+        <!--        <el-button v-if="isAuth('generator:issuemasktable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
         <el-button v-if="isAuth('generator:issuemasktable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -22,12 +22,12 @@
         align="center"
         width="50">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="issuemaskId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="">-->
-<!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="issuemaskId"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="">-->
+      <!--      </el-table-column>-->
       <el-table-column
         prop="serialNumber"
         header-align="center"
@@ -81,17 +81,17 @@
           </el-button>
         </template>
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="annex"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="附件">-->
-<!--        <template slot-scope="scope">-->
-<!--          <el-button type="text" @click="handleFileAction(scope.row.annex, scope.row.issuemaskId)">-->
-<!--            预览-->
-<!--          </el-button>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="annex"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="附件">-->
+      <!--        <template slot-scope="scope">-->
+      <!--          <el-button type="text" @click="handleFileAction(scope.row.annex, scope.row.issuemaskId)">-->
+      <!--            预览-->
+      <!--          </el-button>-->
+      <!--        </template>-->
+      <!--      </el-table-column>-->
       <el-table-column
         prop="creator"
         header-align="center"
@@ -110,12 +110,12 @@
         align="center"
         label="要求完成时间">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="state"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="状态">-->
-<!--      </el-table-column>-->
+      <!--      <el-table-column-->
+      <!--        prop="state"-->
+      <!--        header-align="center"-->
+      <!--        align="center"-->
+      <!--        label="状态">-->
+      <!--      </el-table-column>-->
       <el-table-column prop="state" header-align="center" align="center" label="状态">
         <template slot-scope="scope">
     <span v-if="scope.row.state === '审核中'">
@@ -136,21 +136,21 @@
           <span v-else>-</span> <!-- 处理未知状态 -->
         </template>
       </el-table-column>
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="150"
-        label="操作">
-        <template slot-scope="scope">
-          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>
-          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>
-<!--          <el-button v-if="showButtons" type="text" size="small" @click="executeHandle(scope.row.issuemaskId)">执行</el-button>-->
-<!--          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">派发</el-button>-->
-          <!-- 完成按钮 -->
-          <el-button v-if="showCompleteButton" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>
-        </template>
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        fixed="right"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        width="150"-->
+<!--        label="操作">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>-->
+<!--          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>-->
+<!--          &lt;!&ndash;          <el-button v-if="showButtons" type="text" size="small" @click="executeHandle(scope.row.issuemaskId)">执行</el-button>&ndash;&gt;-->
+<!--          &lt;!&ndash;          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">派发</el-button>&ndash;&gt;-->
+<!--          &lt;!&ndash; 完成按钮 &ndash;&gt;-->
+<!--          <el-button v-if="showCompleteButton" type="text" size="small" @click="completeHandle(scope.row.issuemaskId)">完成</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
     </el-table>
     <!-- 文件列表的弹出框 -->
     <el-dialog
@@ -306,7 +306,7 @@ export default {
       const issueNumber = this.$route.params.issueNumber
       console.log('Successfully fetched issueNumber :', issueNumber)
       this.$http({
-        url: this.$http.adornUrl('/generator/issuemasktable/creatorlist'),
+        url: this.$http.adornUrl('/generator/issuemasktable/managerlist'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,

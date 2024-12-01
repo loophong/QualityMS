@@ -7,6 +7,12 @@
       </el-select>
       <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
     </span>
+    <span>
+      <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+        <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+    </span>
 
     <div id="main" ref="main"></div>
     <div class="editOne">
@@ -63,6 +69,8 @@ export default {
   },
   data() {
     return {
+      valueConPlan: "",
+      optionsConPlan: [],
       loading: false,
       dialogFormVisible: false,
       inputName: "",
@@ -92,6 +100,7 @@ export default {
   mounted() {
     this.getUserName();
     this.getTemplateData();
+    this.getConPlanData();
     this.myChart = echarts.init(this.$refs.main);
     this.initChart(this.tmpResultList);
   },
@@ -112,8 +121,7 @@ export default {
     },
     //处理下拉框选择变化
     handleSelectChange() {
-      console.log(this.value);
-      let tmpList = {};
+      this.valueConPlan = "";
       this.resultList.forEach((item) => {
         if (item.templateId == this.value) {
           tmpList = item;
@@ -121,6 +129,17 @@ export default {
         }
       });
       this.initChart(tmpList);
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      let tmpList = {}
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
+          tmpList = item
+          this.name = item.templateName
+        }
+      })
+      this.initChart(tmpList)
     },
     async getTemplateData() {
       await this.$http({
@@ -151,21 +170,67 @@ export default {
           this.options = [];
         }
       });
+    },
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "控制图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
 
-      //查询到有用户暂存的数据,就使用该数据渲染echarts
-      // if (this.resultList.length != 0) {
-      //   let tmpList = {};
-      //   this.resultList.forEach((item) => {
-      //     tmpList = item;
-      //     this.name = item.templateName;
-      //   });
-      //   console.log(tmpList);
-      //   this.initChart(tmpList);
-      // } else {
-      //   //否则使用默认数据渲染echarts
-      //   this.initChart(this.tmpResultList);
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
       // }
     },
+    // async getConPlanData() {
+    //   await this.$http({
+    //     url: this.$http.adornUrl("/qcTools/template/templateList"),
+    //     method: "get",
+    //     params: this.$http.adornParams({
+    //       conplanType: "控制图",
+    //     }),
+    //   }).then(({ data }) => {
+    //     if (data && data.code === 0) {
+    //       this.resultList = data.resultList.map((row) => ({
+    //         templateId: row.templateId,
+    //         templateName: row.templateName,
+    //         templateType: row.templateType,
+    //         templateText: row.templateText,
+    //         templateSeries: JSON.parse(row.templateSeries),
+    //         templateAxis: JSON.parse(row.templateAxis),
+    //       }));
+    //       this.options = data.resultList.map((item) => ({
+    //         value: item.templateId,
+    //         label: item.templateName,
+    //       }));
+    //       console.log(this.resultList);
+    //     } else {
+    //       this.options = [];
+    //     }
+    //   });
+    // },
     handleUp() {
       console.log(this.updatedSeries);
       console.log(this.test);

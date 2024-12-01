@@ -991,7 +991,6 @@ export default {
         }
         this.mySubmitApprovalListLoading = false
 
-
       })
     }
     ,

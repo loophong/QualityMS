@@ -8,6 +8,12 @@
         </el-select>
         <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button> -->
       </span>
+      <span>
+        <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+          <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+      </span>
     </div>
     <div>
       <vue2-org-tree :data="treeData" horizontal collapsable :render-content="renderContent" @on-expand="onExpand"
@@ -55,6 +61,8 @@ export default {
   },
   data() {
     return {
+      valueConPlan: "",
+      optionsConPlan: [],
       treeData: {
         id: "0",
         label: "直拉钢丝亮丝不良",
@@ -124,6 +132,7 @@ export default {
     this.toggleExpand(this.treeData, true);
     this.getUserName();
     this.getTemplateData();
+    this.getConPlanData();
   },
 
   methods: {
@@ -226,6 +235,39 @@ export default {
         // this.toggleExpand(this.treeData, true);
       });
     },
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "系统图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
+
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
+      // }
+    },
     //删除当前模版
     handleDelete() {
       let ids = [this.value];
@@ -267,14 +309,22 @@ export default {
       }
     },
     handleSelectChange(value) {
-      console.log(this.treeData);
+      this.valueConPlan = ''
       this.resultList.forEach((item) => {
         if (item.templateId == this.value) {
-          console.log(item.templateSeries);
           this.treeData = item.templateSeries;
           this.name = item.templateName;
         }
       });
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
+          this.treeData = item.templateSeries;
+          this.name = item.templateName;
+        }
+      })
     },
 
     addNode(data) {

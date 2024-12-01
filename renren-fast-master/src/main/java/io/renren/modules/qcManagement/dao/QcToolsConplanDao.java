@@ -22,6 +22,10 @@ public interface QcToolsConplanDao extends BaseMapper<QcToolsConplanEntity> {
     @Select("select * from qc_tools_conplan where conplan_type = #{conplanType} and conplan_subject = #{conplanSubject} and conplan_process = #{conplanProcess}")
     List<QcToolsConplanEntity> getDataByTSP(String conplanType, Integer conplanSubject, Integer conplanProcess);
 
+    // 根据T查询
+    @Select("select * from qc_tools_conplan where conplan_type = #{conplanType} ")
+    List<QcToolsConplanEntity> getDataByT(String conplanType);
+
     // 根据SP查询
     @Select("select * from qc_tools_conplan where conplan_subject = #{conplanSubject} and conplan_process = #{conplanProcess}")
     List<QcToolsConplanEntity> getDataBySP(Integer conplanSubject, Integer conplanProcess);

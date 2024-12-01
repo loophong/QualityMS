@@ -4,12 +4,12 @@
 
 
       <el-form :inline="true" :model="finishedDataForm" @keyup.enter.native="getFinishedPlanList()">
-        <el-form-item>
-          <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button @click="getFinishedPlanList()">查询</el-button>
-        </el-form-item>
+<!--        <el-form-item>-->
+<!--          <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--        </el-form-item>-->
+<!--        <el-form-item>-->
+<!--          <el-button @click="getFinishedPlanList()">查询</el-button>-->
+<!--        </el-form-item>-->
       </el-form>
       <el-table :data="finishedPlanList" border v-loading="finishedListLoading"
                 @selection-change="selectionChangeHandle"
@@ -22,7 +22,7 @@
         </el-table-column>
         <el-table-column prop="planContent" header-align="center" align="center" label="计划内容">
         </el-table-column>
-        <el-table-column prop="planStartDate" header-align="center" align="center" label="开始日期" width="110">
+        <el-table-column prop="planStartDate" header-align="center" align="cent er" label="开始日期" width="110">
         </el-table-column>
         <el-table-column prop="planScheduleCompletionDate" header-align="center" align="center" label="计划完成日期"
                          width="110">
@@ -248,7 +248,7 @@ export default {
     getFinishedPlanList() {
       this.finishedListLoading = true
       this.$http({
-        url: this.$http.adornUrl('/taskmanagement/plan/finished'),
+        url: this.$http.adornUrl('/taskmanagement/plan/finish'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.finishedPageIndex,

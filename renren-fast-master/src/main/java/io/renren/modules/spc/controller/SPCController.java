@@ -7,7 +7,9 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import com.aliyun.oss.ServiceException;
+import io.renren.modules.spc.entity.SpcPchartEntity;
 import io.renren.modules.spc.entity.SpcXrchartEntity;
+import io.renren.modules.spc.service.SpcPchartService;
 import io.renren.modules.spc.service.SpcXrchartService;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.*;
@@ -37,19 +39,36 @@ public class SPCController {
     @Resource
     private SpcXrchartService spcXrchartService;
 
+    @Resource
+    private SpcPchartService spcPchartService;
+
     @RequestMapping(value = "/list", method = RequestMethod.POST)
 //    @RequiresPermissions("SPC:spc:list")
     public ResponseEntity<?> list(@RequestParam("file") MultipartFile excelFile){
 
         System.out.println("------------import-------import------------");
         try {
+
+            /**
+             * 导入X-R图表数据
+             * 从表中获取一些固定值，包括9个基准值，当前日期（以上传日期为准）
+             * */
+            List<SpcXrchartEntity> XRchartDataList = parseExcel2XRchart(excelFile);
+            spcXrchartService.importData(XRchartDataList);
+
+
+            /**
+             * 导入P-chart图表数据
+             * 从表中获取一些固定值，当前日期（以上传日期为准）
+             * */
+
+            List<SpcPchartEntity> PchartDataList = parseExcel2Pchart(excelFile);
+            System.out.println(PchartDataList);
+            spcPchartService.importData(PchartDataList);
+
+
+            //旧版本代码
             List<List<Double>> date = parseExcel(excelFile);
-            List<SpcXrchartEntity> dataList = parseExcel2XRchart(excelFile);
-            spcXrchartService.importData(dataList);
-            System.out.println(dataList);
-
-
-
             return ResponseEntity.ok(date);
         } catch (IOException e) {
             e.printStackTrace();
@@ -59,7 +78,7 @@ public class SPCController {
         }
     }
 
-    public  List<SpcXrchartEntity> parseExcel2XRchart(MultipartFile file) throws IOException {
+    public List<SpcXrchartEntity> parseExcel2XRchart(MultipartFile file) throws IOException {
         List<SpcXrchartEntity> dataList = new ArrayList<>();
 
         ZipSecureFile.setMinInflateRatio(0);
@@ -134,37 +153,9 @@ public class SPCController {
         for (int i = 0; i < date.length; i++){
             SpcXrchartEntity spcXrchartEntity = new SpcXrchartEntity();
 
-            if (arraySize >= 1) spcXrchartEntity.setDate1((float) date[i][0]);
-            if (arraySize >= 2) spcXrchartEntity.setDate2((float) date[i][1]);
-            if (arraySize >= 3) spcXrchartEntity.setDate3((float) date[i][2]);
-            if (arraySize >= 4) spcXrchartEntity.setDate4((float) date[i][3]);
-            if (arraySize >= 5) spcXrchartEntity.setDate5((float) date[i][4]);
-            if (arraySize >= 6) spcXrchartEntity.setDate6((float) date[i][5]);
-            if (arraySize >= 7) spcXrchartEntity.setDate7((float) date[i][6]);
-            if (arraySize >= 8) spcXrchartEntity.setDate8((float) date[i][7]);
-            if (arraySize >= 9) spcXrchartEntity.setDate9((float) date[i][8]);
-            if (arraySize >= 10) spcXrchartEntity.setDate10((float) date[i][9]);
-            if (arraySize >= 11) spcXrchartEntity.setDate11((float) date[i][10]);
-            if (arraySize >= 12) spcXrchartEntity.setDate12((float) date[i][11]);
-            if (arraySize >= 13) spcXrchartEntity.setDate13((float) date[i][12]);
-            if (arraySize >= 14) spcXrchartEntity.setDate14((float) date[i][13]);
-            if (arraySize >= 15) spcXrchartEntity.setDate15((float) date[i][14]);
-            if (arraySize >= 16) spcXrchartEntity.setDate16((float) date[i][15]);
-            if (arraySize >= 17) spcXrchartEntity.setDate17((float) date[i][16]);
-            if (arraySize >= 18) spcXrchartEntity.setDate18((float) date[i][17]);
-            if (arraySize >= 19) spcXrchartEntity.setDate19((float) date[i][18]);
-            if (arraySize >= 20) spcXrchartEntity.setDate20((float) date[i][19]);
-            if (arraySize >= 21) spcXrchartEntity.setDate21((float) date[i][20]);
-            if (arraySize >= 22) spcXrchartEntity.setDate22((float) date[i][21]);
-            if (arraySize >= 23) spcXrchartEntity.setDate23((float) date[i][22]);
-            if (arraySize >= 24) spcXrchartEntity.setDate24((float) date[i][23]);
-            if (arraySize >= 25) spcXrchartEntity.setDate25((float) date[i][24]);
-            if (arraySize >= 26) spcXrchartEntity.setDate26((float) date[i][25]);
-            if (arraySize >= 27) spcXrchartEntity.setDate27((float) date[i][26]);
-            if (arraySize >= 28) spcXrchartEntity.setDate28((float) date[i][27]);
-            if (arraySize >= 29) spcXrchartEntity.setDate29((float) date[i][28]);
-            if (arraySize >= 30) spcXrchartEntity.setDate30((float) date[i][29]);
-            if (arraySize >= 31) spcXrchartEntity.setDate31((float) date[i][30]);
+            for (int j = 0; j < Math.min(arraySize, 31); j++) {
+                spcXrchartEntity.setData(j + 1, (float) date[i][j]);
+            }
 
             spcXrchartEntity.setUpperLimitStandards((float) rounded_Standards_usl);
             spcXrchartEntity.setCenterLimitStandards((float) rounded_Standards_cl);
@@ -187,6 +178,78 @@ public class SPCController {
         workbook.close();
         return dataList;
     }
+
+    public List<SpcPchartEntity> parseExcel2Pchart(MultipartFile file) throws IOException{
+        List<SpcPchartEntity> dataList = new ArrayList<>();
+
+        ZipSecureFile.setMinInflateRatio(0);
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+
+        /*
+        *
+        P-chart图
+        * */
+
+        Sheet sheet = workbook.getSheetAt(1);
+
+        int[] sampling_Tests_Number = new int[arraySize];
+        int[] defects_Number = new int[arraySize];
+
+        Row row6 = sheet.getRow(5);   //抽检数一行
+        Row row7 = sheet.getRow(6);   //不良数一行
+
+        for (int i = 1; i < 1 + arraySize; i++){
+            sampling_Tests_Number[i-1] = getCellValueAsInt(row6.getCell(i));
+            defects_Number[i-1] = getCellValueAsInt(row7.getCell(i));
+
+        }
+
+        int sum_sampling_Tests_Number = 0;
+        int sum_defects_Number = 0;
+
+
+
+        //对抽检数进行格式转换
+        SpcPchartEntity sampling_SpcPchartEntity = new SpcPchartEntity();
+
+        //对不良数进行格式转换
+        SpcPchartEntity defects_SpcPchartEntity = new SpcPchartEntity();
+
+        //存入31天的数据，如果不足31天，剩余没有数据则不填
+        for (int i = 0; i < Math.min(arraySize, 31); i++) {
+            // 根据索引设置值
+            sampling_SpcPchartEntity.setDate(i + 1, sampling_Tests_Number[i]);
+            defects_SpcPchartEntity.setDate(i + 1, defects_Number[i]);
+
+            //计算总和
+            sum_sampling_Tests_Number += sampling_Tests_Number[i];
+            sum_defects_Number += defects_Number[i];
+        }
+
+
+        System.out.println("========="+sum_sampling_Tests_Number);
+        System.out.println("========="+sum_defects_Number);
+        //存入补充数据,合计、数据日期、数据内容（抽检数/不良数）
+
+        //合计
+        sampling_SpcPchartEntity.setSum(sum_sampling_Tests_Number);
+        defects_SpcPchartEntity.setSum(sum_defects_Number);
+
+
+        //数据日期
+        sampling_SpcPchartEntity.setDatatime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        defects_SpcPchartEntity.setDatatime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        //数据内容（抽检数/不良数）
+        sampling_SpcPchartEntity.setDataContent("抽检数");
+        defects_SpcPchartEntity.setDataContent("不良数");
+
+        dataList.add(sampling_SpcPchartEntity);
+        dataList.add(defects_SpcPchartEntity);
+
+        return dataList;
+    }
+
 
     public static List<List<Double>> parseExcel(MultipartFile file) throws IOException {
         List<List<Double>> dataList = new ArrayList<>();

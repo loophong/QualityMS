@@ -23,5 +23,13 @@ public interface SpcXrchartService extends IService<SpcXrchartEntity> {
 
 
     void importData(List<SpcXrchartEntity> datalist);
+
+    List<List<Double>> getXbar_RChart();
+
+    List<List<Double>> getXbar_SChart();
+
+    List<List<Double>> getMe_RChart();
+
+    List<List<Double>> getI_MRChart();
 }
 

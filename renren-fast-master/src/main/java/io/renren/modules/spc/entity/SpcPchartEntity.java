@@ -189,4 +189,41 @@ public class SpcPchartEntity implements Serializable {
 	 */
 	private Integer deleteFlag;
 
+
+	// 对 sampling_SpcPchartEntity 的示例方法
+	public void setDate(int index, int value) {
+		switch (index) {
+			case 1: setDate1(value); break;
+			case 2: setDate2(value); break;
+			case 3: setDate3(value); break;
+			case 4: setDate4(value); break;
+			case 5: setDate5(value); break;
+			case 6: setDate6(value); break;
+			case 7: setDate7(value); break;
+			case 8: setDate8(value); break;
+			case 9: setDate9(value); break;
+			case 10: setDate10(value); break;
+			case 11: setDate11(value); break;
+			case 12: setDate12(value); break;
+			case 13: setDate13(value); break;
+			case 14: setDate14(value); break;
+			case 15: setDate15(value); break;
+			case 16: setDate16(value); break;
+			case 17: setDate17(value); break;
+			case 18: setDate18(value); break;
+			case 19: setDate19(value); break;
+			case 20: setDate20(value); break;
+			case 21: setDate21(value); break;
+			case 22: setDate22(value); break;
+			case 23: setDate23(value); break;
+			case 24: setDate24(value); break;
+			case 25: setDate25(value); break;
+			case 26: setDate26(value); break;
+			case 27: setDate27(value); break;
+			case 28: setDate28(value); break;
+			case 29: setDate29(value); break;
+			case 30: setDate30(value); break;
+			case 31: setDate31(value); break;
+		}
+	}
 }

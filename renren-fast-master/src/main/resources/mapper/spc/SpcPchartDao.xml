@@ -50,4 +50,35 @@
     </resultMap>
 
 
+    <!-- 根据月份删除数据 -->
+    <delete id="deleteDataByMonth" parameterType="java.util.Date">
+        DELETE FROM spc_Pchart
+        WHERE MONTH(datatime) = MONTH(#{datatime})
+        AND YEAR(datatime) = YEAR(#{datatime})
+    </delete>
+
+    <!-- 批量插入数据 -->
+    <insert id="batchInsertSpcPcharts" parameterType="java.util.List">
+        INSERT INTO spc_Pchart (
+        spcP_id, date1, date2, date3, date4, date5, date6, date7,
+        date8, date9, date10, date11, date12, date13, date14, date15,
+        date16, date17, date18, date19, date20, date21, date22, date23,
+        date24, date25, date26, date27, date28, date29, date30, date31,
+        sum,datatime,data_content, create_by, create_time, alternate_fields1,
+        alternate_fields2,alternate_fields3, alternate_fields4, delete_flag
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.spcpId}, #{item.date1}, #{item.date2}, #{item.date3}, #{item.date4},
+            #{item.date5}, #{item.date6}, #{item.date7}, #{item.date8}, #{item.date9},
+            #{item.date10}, #{item.date11}, #{item.date12}, #{item.date13}, #{item.date14},
+            #{item.date15}, #{item.date16}, #{item.date17}, #{item.date18}, #{item.date19},
+            #{item.date20}, #{item.date21}, #{item.date22}, #{item.date23}, #{item.date24},
+            #{item.date25}, #{item.date26}, #{item.date27}, #{item.date28}, #{item.date29},
+            #{item.date30}, #{item.date31}, #{item.sum}, #{item.datatime},
+            #{item.dataContent}, #{item.createBy}, #{item.createTime},
+            #{item.alternateFields1}, #{item.alternateFields2}, #{item.alternateFields3}, #{item.alternateFields4},
+            #{item.deleteFlag})
+        </foreach>
+    </insert>
+
 </mapper>

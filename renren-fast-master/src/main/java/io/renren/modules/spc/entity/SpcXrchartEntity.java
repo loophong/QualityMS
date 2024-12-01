@@ -217,4 +217,78 @@ public class SpcXrchartEntity implements Serializable {
 	 */
 	private Integer deleteFlag;
 
+	// 在 spcXrchartEntity 中新增的示例方法
+	public void setData(int index, float value) {
+		switch (index) {
+			case 1: setDate1(value); break;
+			case 2: setDate2(value); break;
+			case 3: setDate3(value); break;
+			case 4: setDate4(value); break;
+			case 5: setDate5(value); break;
+			case 6: setDate6(value); break;
+			case 7: setDate7(value); break;
+			case 8: setDate8(value); break;
+			case 9: setDate9(value); break;
+			case 10: setDate10(value); break;
+			case 11: setDate11(value); break;
+			case 12: setDate12(value); break;
+			case 13: setDate13(value); break;
+			case 14: setDate14(value); break;
+			case 15: setDate15(value); break;
+			case 16: setDate16(value); break;
+			case 17: setDate17(value); break;
+			case 18: setDate18(value); break;
+			case 19: setDate19(value); break;
+			case 20: setDate20(value); break;
+			case 21: setDate21(value); break;
+			case 22: setDate22(value); break;
+			case 23: setDate23(value); break;
+			case 24: setDate24(value); break;
+			case 25: setDate25(value); break;
+			case 26: setDate26(value); break;
+			case 27: setDate27(value); break;
+			case 28: setDate28(value); break;
+			case 29: setDate29(value); break;
+			case 30: setDate30(value); break;
+			case 31: setDate31(value); break;
+		}
+	}
+
+	public Float getData(int index) {
+		switch (index) {
+			case 1: return getDate1();
+			case 2: return getDate2();
+			case 3: return getDate3();
+			case 4: return getDate4();
+			case 5: return getDate5();
+			case 6: return getDate6();
+			case 7: return getDate7();
+			case 8: return getDate8();
+			case 9: return getDate9();
+			case 10: return getDate10();
+			case 11: return getDate11();
+			case 12: return getDate12();
+			case 13: return getDate13();
+			case 14: return getDate14();
+			case 15: return getDate15();
+			case 16: return getDate16();
+			case 17: return getDate17();
+			case 18: return getDate18();
+			case 19: return getDate19();
+			case 20: return getDate20();
+			case 21: return getDate21();
+			case 22: return getDate22();
+			case 23: return getDate23();
+			case 24: return getDate24();
+			case 25: return getDate25();
+			case 26: return getDate26();
+			case 27: return getDate27();
+			case 28: return getDate28();
+			case 29: return getDate29();
+			case 30: return getDate30();
+			case 31: return getDate31();
+			default: throw new IllegalArgumentException("Invalid index: " + index);
+		}
+	}
+
 }

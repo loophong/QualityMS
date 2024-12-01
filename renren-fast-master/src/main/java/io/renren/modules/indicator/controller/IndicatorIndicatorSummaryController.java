@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.aliyun.oss.ServiceException;
+import io.renren.modules.indicator.entity.IndicatorChart1Entity;
+import io.renren.modules.indicator.entity.IndicatorChart2Entity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -130,6 +132,32 @@ public class IndicatorIndicatorSummaryController {
             System.out.println("读取 " + multipartFile.getName() + " 文件失败, 原因: " + e.getMessage());
             throw new ServiceException("读取 " + multipartFile.getName() + " 文件失败", e);
         }
+    }
+
+    /**
+     * 查询图表1数据
+     */
+    @RequestMapping("/chart1")
+    public List<IndicatorChart1Entity> queryChart1(IndicatorChart1Entity indicatorChart1Entity){
+    	List<IndicatorChart1Entity> list = indicatorIndicatorSummaryService.queryChart1List(indicatorChart1Entity);
+        // 打印 list 中的每个元素
+        for (IndicatorChart1Entity entity : list) {
+            System.out.println(entity);
+        }
+    	return list;
+    }
+
+    /**
+     * 查询图表2数据
+     */
+    @RequestMapping("/chart2")
+    public List<IndicatorChart2Entity> queryChart2(IndicatorChart2Entity indicatorChart2Entity){
+        List<IndicatorChart2Entity> list = indicatorIndicatorSummaryService.queryChart2List(indicatorChart2Entity);
+        // 打印 list 中的每个元素
+        for (IndicatorChart2Entity entity : list) {
+            System.out.println(entity);
+        }
+        return list;
     }
 
 

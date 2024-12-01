@@ -6,17 +6,10 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class IndicatorChart1Entity {
+public class IndicatorChart2Entity {
     @JsonFormat(pattern = "yyyy-MM")
     private Date yearMonth;
-
-    /**
-     * 达成的指标数量
-     * */
+    private String indicatorClassification;
     private Integer finishedCounts;
-
-    /**
-     * 未达成的指标数量
-     * */
     private Integer unfinishedCounts;
 }

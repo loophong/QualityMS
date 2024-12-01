@@ -6,7 +6,9 @@
 	<!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="io.renren.modules.generator.entity.IssueTypeTableEntity" id="issueTypeTableMap">
         <result property="issueCategoryId" column="issue_category_id"/>
+        <result property="issueGrade" column="issue_grade"/>
         <result property="concreteIssueCategory" column="concrete_issue_category"/>
+        <result property="gradeIllustrate" column="grade_illustrate"/>
     </resultMap>
 
 

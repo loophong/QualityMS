@@ -22,7 +22,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="上级指标" prop="indicatorParentNode">
-        <el-select v-model="queryParams.indicatorParentNode" filterable placeholder="请选择上级指标">
+        <el-select v-model="queryParams.indicatorParentNode" filterable clearable placeholder="请选择上级指标">
           <el-option v-for="field in indicatorDictionaryList1" :key="field.indicatorId" :value="field.indicatorName">
             {{ field.indicatorName }}
           </el-option>
@@ -45,7 +45,6 @@
 
     <el-table
       :data="dataList"
-      :row-style="getRowStyle"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -67,12 +66,6 @@
           {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
         </template>
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="indicatorId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="指标ID">-->
-<!--      </el-table-column>-->
       <el-table-column
         prop="indicatorName"
         header-align="center"
@@ -103,65 +96,55 @@
         align="center"
         label="指标分级">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="managementContentCurrentAnalysis"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="管理内容（现状分析）">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="dataId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="数据ID">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="sourceDepartment"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="来源部门">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="collectionMethod"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="收集方法">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="collectionFrequency"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="收集频次">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="planId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="关联计划">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="taskId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="关联任务id">-->
-<!--      </el-table-column>-->
+      <el-table-column
+        prop="indicatorPlannedValue"
+        header-align="center"
+        align="center"
+        label="指标目标值">
+      </el-table-column>
+      <el-table-column
+        prop="weight"
+        header-align="center"
+        align="center"
+        label="指标权重">
+        <template slot-scope="scope">
+          <span v-if="scope.row.weight !== null && scope.row.weight !== ''">
+          {{ scope.row.weight }}%
+        </span>
+          <span v-else>
+          {{ scope.row.weight }}
+        </span>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="indicatorParentNode"
         header-align="center"
         align="center"
         label="上级指标">
       </el-table-column>
+      <el-table-column
+        prop="planId"
+        header-align="center"
+        align="center"
+        label="关联计划">
+      </el-table-column>
+      <el-table-column
+        prop="taskId"
+        header-align="center"
+        align="center"
+        label="关联任务">
+      </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="indicatorValueLowerBound"-->
 <!--        header-align="center"-->
 <!--        align="center"-->
-<!--        label="指标值下界">-->
+<!--        label="目标值下界">-->
 <!--      </el-table-column>-->
 <!--      <el-table-column-->
 <!--        prop="indicatorValueUpperBound"-->
 <!--        header-align="center"-->
 <!--        align="center"-->
-<!--        label="指标值上界">-->
+<!--        label="目标值上界">-->
 <!--      </el-table-column>-->
       <el-table-column
         prop="indicatorCreatTime"
@@ -169,18 +152,6 @@
         align="center"
         label="指标创建时间">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="indicatorState"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="0表示弃用，1表示使用中">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="indicatorChildNode"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="指标子节点">-->
-<!--      </el-table-column>-->
       <el-table-column
         fixed="right"
         header-align="center"
@@ -191,6 +162,10 @@
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.indicatorId)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.indicatorId)">删除</el-button>
           <el-button type="text" size="small" @click="keyControlHandle(scope.row.indicatorId)">重点管控</el-button>
+          <el-button type="text" size="small" @click="queryKeyControlHandle(scope.row.indicatorName)">查看重点管控措施</el-button>
+          <el-button type="text" size="small" @click="addPlanHandle(scope.row.indicatorId)">新建计划</el-button>
+          <el-button type="text" size="small" @click="queryPlanHandle(scope.row.indicatorId)">关联计划</el-button>
+          <el-button type="text" size="small" @click="queryTaskHandle(scope.row.indicatorId)">关联任务</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -205,6 +180,7 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-plan v-if="addPlanVisible" ref="addPlan" @refreshDataList="getDataList"></add-plan>
     <key-control v-if="keyControlVisible" ref="keyControl" @refreshDataList="getDataList"></key-control>
   </div>
 </template>
@@ -212,6 +188,7 @@
 <script>
   import AddOrUpdate from './indicatordictionary-add-or-update'
   import KeyControl from './keyindicator-add'
+  import AddPlan from "../../taskmanagement/plan/plan-add-page";
   export default {
     data () {
       return {
@@ -237,7 +214,11 @@
           indicatorState: '',
           indicatorChildNode: '',
           indicatorValueUpperBound: '',
-          indicatorValueLowerBound: ''
+          indicatorValueLowerBound: '',
+          storageFlag: '',
+          weight: '',
+          indicatorPlannedValue: '',
+          indicatorBoundFlag: ''
         },
         dataList: [],
         indicatorSummaryList: [],    //指标summary列表
@@ -249,112 +230,21 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
+        addPlanVisible: false, //新建计划
         // 关键指标
         keyControlVisible: false
       }
     },
     components: {
       AddOrUpdate,
-      KeyControl
+      AddPlan,
+      KeyControl,
     },
     mounted () {
       this.getDataList()
     },
     methods: {
       // 获取数据列表
-      // async getDataList() {
-      //   this.dataListLoading = true; // Set loading state before starting requests
-      //
-      //   try {
-      //     // Create an array of promises
-      //     const promises = [];
-      //
-      //     // Add the first HTTP request to the promises array
-      //     promises.push(
-      //       this.$http({
-      //         url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
-      //         method: 'get',
-      //         params: this.$http.adornParams({ 'page': this.pageIndex, 'limit': 10000, 'key': this.queryParams })
-      //       }).then(({data}) => {
-      //         if (data && data.code === 0) {
-      //           this.indicatorSummaryList = data.page.list;
-      //           console.log("this.indicatorSummaryList====>", this.indicatorSummaryList);
-      //         } else {
-      //           this.indicatorSummaryList = [];
-      //         }
-      //       })
-      //     );
-      //
-      //     // Add the second HTTP request to the promises array
-      //     promises.push(
-      //       this.$http({
-      //         url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
-      //         method: 'get',
-      //         params: this.$http.adornParams({
-      //           'page': this.pageIndex,
-      //           'limit': this.pageSize,
-      //           'key': this.queryParams
-      //         })
-      //       }).then(({data}) => {
-      //         if (data && data.code === 0) {
-      //           this.dataList = data.page.list;
-      //           this.totalPage = data.page.totalCount;
-      //         } else {
-      //           this.dataList = [];
-      //           this.totalPage = 0;
-      //         }
-      //       })
-      //     );
-      //
-      //     // Add the third HTTP request to the promises array
-      //     promises.push(
-      //       this.$http({
-      //         url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
-      //         method: 'get',
-      //         params: this.$http.adornParams({
-      //           'page': this.pageIndex,
-      //           'limit': 10000,
-      //         })
-      //       }).then(({data}) => {
-      //         if (data && data.code === 0) {
-      //           console.log("data2====>", data);
-      //           this.indicatorDictionaryList = data.page.list;
-      //         } else {
-      //           this.indicatorDictionaryList = [];
-      //         }
-      //       })
-      //     );
-      //
-      //     // Add the fourth HTTP request to the promises array
-      //     promises.push(
-      //       this.$http({
-      //         url: this.$http.adornUrl('/indicator/indicatordictionary/list'),
-      //         method: 'get',
-      //         params: this.$http.adornParams({
-      //           'limit': 10000,
-      //         })
-      //       }).then(({ data }) => {
-      //         if (data && data.code === 0) {
-      //           console.log("data=====>", data);
-      //           this.indicatorDictionaryList1 = data.page.list;
-      //           // 在数组最前面添加新的对象
-      //           this.indicatorDictionaryList1.unshift({
-      //             indicatorId: 1,
-      //             indicatorName: '公司质量指标管控体系',
-      //             indicatorParentNode: ''
-      //           });
-      //         }
-      //       })
-      //     );
-      //
-      //     // Wait for all promises to complete
-      //     await Promise.all(promises);
-      //   } catch (error) {
-      //     console.error("An error occurred while fetching data:", error);
-      //   } finally {
-      //     this.dataListLoading = false; // Reset loading state
-      //   }
-      // },
       async getDataList () {
         // 查询指标summary列表
         this.$http({
@@ -451,7 +341,11 @@
           indicatorState: null,
           indicatorChildNode: null,
           indicatorValueLowerBound: null,
-          indicatorValueUpperBound: null
+          indicatorValueUpperBound: null,
+          storageFlag: null,
+          weight: null,
+          indicatorPlannedValue: null,
+          indicatorBoundFlag: null
         }
         this.getDataList()
       },
@@ -477,12 +371,45 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
+      // 新建计划
+      addPlanHandle (id) {
+        this.$router.push({
+          name: 'plan-add-page',
+          query: {
+            indicatorId: id
+          }
+        });
+      },
+      // 查看计划
+      queryPlanHandle (id) {
+        this.$router.push({
+          name: 'plan-list'
+        });
+      },
+      // 查看任务
+      queryTaskHandle (id) {
+        this.$router.push({
+          name: 'task-list',
+          query: {
+            indicatorId: id
+          }
+        });
+      },
       //重点指标管控
       keyControlHandle (id) {
         this.keyControlVisible = true
         this.$nextTick(() => {
           this.$refs.keyControl.init(id)
         })
+      },
+      //查询重点管控措施
+      queryKeyControlHandle (id) {
+        this.$router.push({
+          name: 'indicator-key-indicators',
+          query: {
+            indicatorName: id
+          }
+        });
       },
       // 删除
       deleteHandle (id) {
@@ -532,24 +459,24 @@
       //     }
       //   })
       // },
-      getRowStyle(row, rowIndex) {
-        console.log("1111111111====>",this.indicatorSummaryList)
-        console.log("2222222====>",this.indicatorDictionaryList)
-        const summaryItems = this.indicatorSummaryList.filter(
-          item => item.indicatorName === row.indicatorName
-        );
-        console.log("summaryItems====>",summaryItems)
-
-        for (const summaryItem of summaryItems) {
-          if (summaryItem.indicatorValue < row.lowerBound || summaryItem.indicatorValue > row.upperBound) {
-            console.log(`Row ${row.indicatorName} is out of bounds`);
-            return { backgroundColor: 'red' };
-          }
-        }
-
-        console.log(`Row ${row.indicatorName} is within bounds`);
-        return {};
-      }
+      // getRowStyle(row, rowIndex) {
+      //   console.log("1111111111====>",this.indicatorSummaryList)
+      //   console.log("2222222====>",this.indicatorDictionaryList)
+      //   const summaryItems = this.indicatorSummaryList.filter(
+      //     item => item.indicatorName === row.indicatorName
+      //   );
+      //   console.log("summaryItems====>",summaryItems)
+      //
+      //   for (const summaryItem of summaryItems) {
+      //     if (summaryItem.indicatorValue < row.lowerBound || summaryItem.indicatorValue > row.upperBound) {
+      //       console.log(`Row ${row.indicatorName} is out of bounds`);
+      //       return { backgroundColor: 'red' };
+      //     }
+      //   }
+      //
+      //   console.log(`Row ${row.indicatorName} is within bounds`);
+      //   return {};
+      // }
 
     }
   }

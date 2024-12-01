@@ -3,7 +3,7 @@
 
 <mapper namespace="io.renren.modules.taskmanagement.dao.PlanDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="io.renren.modules.taskmanagement.entity.PlanEntity" id="planMap">
         <result property="tmPid" column="tm_pid"/>
         <result property="planId" column="plan_id"/>
@@ -18,7 +18,8 @@
         <result property="planAssociatedTasksId" column="plan_associated_tasks_id"/>
         <result property="planSchedule" column="plan_schedule"/>
         <result property="planPrincipal" column="plan_principal"/>
-        <result property="planExecutor" column="plan_executor" typeHandler="io.renren.modules.taskmanagement.utils.JacksonListTypeHandler"/>
+        <result property="planExecutor" column="plan_executor"
+                typeHandler="io.renren.modules.taskmanagement.utils.JacksonListTypeHandler"/>
         <result property="planAuditor" column="plan_auditor"/>
         <result property="planCurrentState" column="plan_current_state"/>
         <result property="planIsCompleted" column="plan_is_completed"/>
@@ -32,13 +33,50 @@
     </resultMap>
 
     <select id="getPlansByUserId" resultMap="planMap">
-        SELECT * FROM task_management_plan
-        WHERE plan_principal = #{userId} or plan_auditor = #{userId}
-            or  plan_executor LIKE concat( '%"', #{userId}, '"%' )
+        SELECT *
+        FROM task_management_plan
+        WHERE plan_principal = #{userId}
+           or plan_auditor = #{userId}
+           or plan_executor LIKE concat('%"', #{userId}, '"%')
     </select>
 
     <select id="getPlanLabel" resultType="io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto">
         SELECT plan_name as label, plan_id as value
+        FROM task_management_plan
+    </select>
+    <select id="queryPageByParams" resultType="io.renren.modules.taskmanagement.entity.PlanEntity">
+        SELECT * FROM task_management_plan
+        <where>
+            plan_is_completed = #{plan.planIsCompleted}
+            <if test="plan.planName != null and plan.planName != ''">
+                and plan_name like concat('%',#{plan.planName},'%')
+            </if>
+            <if test="plan.planId != null and plan.planId != ''">
+                and plan_id like concat('%',#{plan.planId},'%')
+            </if>
+        </where>
+    </select>
+    <select id="export" resultType="io.renren.modules.taskmanagement.vo.PlanExportVO">
+        SELECT plan_id                       as planId,
+               plan_name                     as name,
+               plan_content                  as content,
+               plan_start_date               as startDate,
+               plan_schedule_completion_date as scheduleCompletionDate,
+               plan_schedule_days            as scheduleDays,
+               plan_actual_completion_date   as actualCompletionDate,
+               plan_actual_days              as actualDays,
+               plan_schedule                 as schedule,
+               plan_principal                as principal,
+               plan_executor                 as executor,
+               plan_auditor                  as auditor,
+               plan_current_state            as currentState,
+               plan_is_completed             as isCompleted,
+               plan_is_overdue               as isOverdue,
+               plan_is_on_time               as isOnTime,
+               plan_early_completion_days    as earlyCompletionDays,
+               plan_lag_days                 as lagDays,
+               plan_lag_reasons              as lagReasons,
+               plan_associated_Indicators_id as associatedIndicatorsId
         FROM task_management_plan
     </select>
 

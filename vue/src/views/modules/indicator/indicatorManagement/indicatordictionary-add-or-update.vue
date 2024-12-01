@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="!dataForm.indicatorId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
-      label-width="80px">
+      label-width="100px">
       <el-form-item label="指标名称" prop="indicatorName">
         <el-input v-model="dataForm.indicatorName" placeholder="请输入指标名称"></el-input>
       </el-form-item>
@@ -46,40 +46,33 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <!-- <el-form-item label="数据ID" prop="dataId">
-      <el-input v-model="dataForm.dataId" placeholder="数据ID"></el-input>
-    </el-form-item>
-    <el-form-item label="来源部门" prop="sourceDepartment">
-      <el-input v-model="dataForm.sourceDepartment" placeholder="来源部门"></el-input>
-    </el-form-item>
-    <el-form-item label="收集方法" prop="collectionMethod">
-      <el-input v-model="dataForm.collectionMethod" placeholder="收集方法"></el-input>
-    </el-form-item>
-    <el-form-item label="收集频次" prop="collectionFrequency">
-      <el-input v-model="dataForm.collectionFrequency" placeholder="收集频次"></el-input>
-    </el-form-item> -->
-<!--      <el-form-item label="关联计划" prop="planId">-->
-<!--        <el-input v-model="dataForm.planId" placeholder="关联计划"></el-input>-->
-<!--      </el-form-item>-->
-      <!-- <el-form-item label="关联任务id" prop="taskId">
-      <el-input v-model="dataForm.taskId" placeholder="关联任务id"></el-input>
-    </el-form-item> -->
-<!--      <el-form-item label="上级指标" prop="indicatorParentNode">-->
-<!--        <el-input v-model="dataForm.indicatorParentNode" placeholder="上级指标"></el-input>-->
-<!--      </el-form-item>-->
+      <el-form-item label="指标目标值" prop="indicatorPlannedValue">
+        <el-input v-model="dataForm.indicatorPlannedValue" placeholder="请输入指标目标值" style="width: 202px;"></el-input>
+        <el-radio-group v-model="dataForm.indicatorBoundFlag" style="margin-left: 20px;">
+          <el-radio label="1">上界</el-radio>
+          <el-radio label="0">下界</el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item label="上级指标" prop="indicatorParentNode">
-        <el-select v-model="dataForm.indicatorParentNode" placeholder="请选择指标名称" >
+        <el-select v-model="dataForm.indicatorParentNode" clearable placeholder="请选择指标名称"  @change="calculateTotalWeight">
           <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
             {{ field.indicatorName }}
           </el-option>
         </el-select>
       </el-form-item>
-<!--      <el-form-item label="指标值下界" prop="indicatorValueLowerBound" >-->
-<!--        <el-input v-model="dataForm.indicatorValueLowerBound" placeholder="请输入指标值下界"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="指标值上界" prop="indicatorValueUpperBound"  >-->
-<!--        <el-input v-model="dataForm.indicatorValueUpperBound" placeholder="请输入指标值上界"></el-input>-->
-<!--      </el-form-item>-->
+      <el-form-item label="指标权重" prop="weight">
+        <div style="display: flex; align-items: center;">
+          <el-input
+            v-model="dataForm.weight"            style="width: 80px;"
+            @input="calculateRemainingWeight"
+          ></el-input>
+          <span style="margin-left: 5px;">%</span>
+          <span style="color: red; margin-left: 10px;" v-if="weightError">{{ weightError }}</span>
+        </div>
+        <div style="margin-top: 5px;">
+          剩余权重: {{ remainingWeight }}%
+        </div>
+      </el-form-item>
       <el-form-item label="指标创建时间" prop="indicatorCreatTime">
         <el-date-picker
           v-model="dataForm.indicatorCreatTime"
@@ -106,6 +99,13 @@
 export default {
   data() {
     return {
+      selectedBound: '', // 中间变量，用于控制单选状态
+
+      totalWeight: 0,  // 所有指标的权重之和
+      originalWeight: 0, // 当前指标权重（修改时使用）
+      remainingWeight: 100, // 剩余权重
+      weightError: '',  // 错误提示
+
       //指标公式
       formulas: [
         { id: 1, name: 'a', template: 'a'},
@@ -121,6 +121,7 @@ export default {
       ],
       dataList: [],  // 指标数据源列表
       indicatorDictionaryList: [], //指标列表
+      indicatorChildrenList: [],  // 指标子节点列表
       selectedFormula: null,
       placeholders: [],
       placeholderMapping: {},
@@ -146,7 +147,11 @@ export default {
         indicatorState: '',
         indicatorChildNode: '',
         indicatorValueUpperBound: '',
-        indicatorValueLowerBound: ''
+        indicatorValueLowerBound: '',
+        storageFlag: '',
+        weight: '',
+        indicatorPlannedValue: '',
+        indicatorBoundFlag: ''
       },
       dataDictionaryForm: {},  // 指标数据字典表
       dataRule: {
@@ -187,9 +192,9 @@ export default {
         // taskId: [
         //   { required: true, message: '关联任务id不能为空', trigger: 'blur' }
         // ],
-        indicatorParentNode: [
-          { required: true, message: '指标父节点不能为空', trigger: 'blur' }
-        ],
+        // indicatorParentNode: [
+        //   { required: true, message: '指标父节点不能为空', trigger: 'blur' }
+        // ],
         indicatorCreatTime: [
           { required: true, message: '指标创建时间不能为空', trigger: 'blur' }
         ],
@@ -217,6 +222,39 @@ export default {
     this.getDataDictionaryList()
   },
   methods: {
+    calculateTotalWeight() {
+      // 计算所有子节点的权重总和
+      const children = this.getChildren(this.dataForm.indicatorParentNode);
+      console.log("children===>",children);
+      this.totalWeight = children.reduce((sum, child) => sum + (child.weight || 0), 0);
+      console.log("this.totalWeight===>",this.totalWeight)
+      this.remainingWeight = 100 - this.totalWeight;
+      this.weightError = '';
+    },
+    getChildren(parentNode) {
+      this.indicatorChildrenList = this.indicatorDictionaryList;
+      // 获取父节点的所有子节点
+      return this.indicatorChildrenList.filter(item => item.indicatorParentNode === parentNode);
+    },
+    // 编辑指标时计算剩余权重
+    calculateRemainingWeight() {
+      const newWeight = parseFloat(this.dataForm.weight) || 0;
+      console.log("newWeight===>",newWeight)
+      let newTotalWeight;
+      if (this.dataForm.indicatorId) { // 修改时
+        newTotalWeight = this.totalWeight - (this.originalWeight || 0) + newWeight;
+      } else { // 新增时
+        newTotalWeight = this.totalWeight + newWeight;
+      }
+      console.log("newTotalWeight===>",newTotalWeight)
+      if (newTotalWeight > 100) {
+        this.weightError = '权重总和不能超过100%';
+      } else {
+        this.weightError = '';
+      }
+      this.remainingWeight = 100 - newTotalWeight;
+      console.log("this.weightError===>",this.weightError)
+    },
     //新增指标时验证是否有同名指标
     validateIndicatorName(rule, value, callback) {
       if (!value) {
@@ -317,6 +355,12 @@ export default {
               this.dataForm.indicatorChildNode = data.indicatorDictionary.indicatorChildNode
               this.dataForm.indicatorValueLowerBound = data.indicatorDictionary.indicatorValueLowerBound
               this.dataForm.indicatorValueUpperBound = data.indicatorDictionary.indicatorValueUpperBound
+              this.dataForm.weight = data.indicatorDictionary.weight
+              this.dataForm.indicatorPlannedValue = data.indicatorDictionary.indicatorPlannedValue
+              this.dataForm.indicatorBoundFlag = data.indicatorDictionary.indicatorBoundFlag
+              this.dataForm.storageFlag = data.indicatorDictionary.storageFlag
+              this.originalWeight = this.dataForm.weight;
+              console.log("this.originalWeight====>",this.originalWeight)
             }
           })
         }
@@ -326,6 +370,12 @@ export default {
     dataFormSubmit() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          if (this.weightError) {
+            this.$message.error('权重总和不能超过100%');
+            return;
+          }
+
+          console.log("this.dataForm2=====>",this.dataForm)
           this.$http({
             url: this.$http.adornUrl(`/indicator/indicatordictionary/${!this.dataForm.indicatorId ? 'save' : 'update'}`),
             method: 'post',
@@ -348,10 +398,14 @@ export default {
               'indicatorState': this.dataForm.indicatorState,
               'indicatorChildNode': this.dataForm.indicatorChildNode,
               'indicatorValueLowerBound': this.dataForm.indicatorValueLowerBound,
-              'indicatorValueUpperBound': this.dataForm.indicatorValueUpperBound
+              'indicatorValueUpperBound': this.dataForm.indicatorValueUpperBound,
+              'weight': this.dataForm.weight,
+              'indicatorPlannedValue': this.dataForm.indicatorPlannedValue,
+              'indicatorBoundFlag': this.dataForm.indicatorBoundFlag
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {
+              console.log("data222=====>",data)
               this.$message({
                 message: '操作成功',
                 type: 'success',
@@ -361,7 +415,9 @@ export default {
                   this.selectedFormula = null;
                   this.placeholders = [];
                   this.placeholderMapping = {};
+                  this.indicatorChildrenList = []; // 清空指标子节点
                   this.$emit('refreshDataList')
+                  this.getDataDictionaryList();
                 }
               })
             } else {

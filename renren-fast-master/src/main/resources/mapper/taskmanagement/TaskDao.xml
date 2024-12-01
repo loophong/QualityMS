@@ -41,7 +41,52 @@
         FROM task_management_task
         where task_associated_plan_id = #{planId}
     </select>
-<!--    private String taskId;-->
+
+    <select id="queryPageByParams" resultType="io.renren.modules.taskmanagement.entity.TaskEntity">
+        SELECT * FROM task_management_task
+        <where>
+            <if test="task.taskId != null and task.taskId != ''">
+                AND task_id like concat('%',#{task.taskId},'%')
+            </if>
+            <if test="task.taskName != null and task.taskName != ''">
+                AND task_name like concat('%',#{task.taskName},'%')
+            </if>
+            <if test="task.taskIsCompleted != null ">
+                AND task_is_completed = #{task.taskIsCompleted}
+            </if>
+            <if test="task.taskAssociatedIndicatorsId != null and task.taskAssociatedIndicatorsId != ''">
+                AND task_associated_indicators_id = #{task.taskAssociatedIndicatorsId}
+            </if>
+            <if test="userId != null">
+                AND ( task_executor like concat('%','"',#{userId},'"','%') or task_principal = #{userId} )
+            </if>
+        </where>
+    </select>
+    <select id="selectTaskByPlanId" resultType="io.renren.modules.taskmanagement.vo.PlanExportVO">
+        SELECT task_id                       as taskId,
+               task_name                     as name,
+               task_content                  as content,
+               task_start_date               as startDate,
+               task_schedule_completion_date as scheduleCompletionDate,
+               task_schedule_days            as scheduleDays,
+               task_actual_completion_date   as actualCompletionDate,
+               task_actual_days              as actualDays,
+               task_schedule                 as schedule,
+               task_principal                as principal,
+               task_executor                 as executor,
+               task_auditor                  as auditor,
+               task_current_state            as currentState,
+               task_is_completed             as isCompleted,
+               task_is_overdue               as isOverdue,
+               task_is_on_time               as isOnTime,
+               task_early_completion_days    as earlyCompletionDays,
+               task_lag_days                 as lagDays,
+               task_lag_reasons              as lagReasons,
+               task_associated_indicators_id as associatedIndicatorsId
+        FROM task_management_task
+        WHERE task_associated_plan_id = #{planId}
+    </select>
+    <!--    private String taskId;-->
 
 <!--    private Integer taskStartTime;-->
 

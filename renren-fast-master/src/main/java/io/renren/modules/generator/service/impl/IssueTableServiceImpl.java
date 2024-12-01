@@ -3,6 +3,7 @@ package io.renren.modules.generator.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
@@ -15,6 +16,7 @@ import io.renren.modules.generator.entity.IssueMaskTableEntity;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
+import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -35,10 +37,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service("issueTableService")
 public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTableEntity> implements IssueTableService {
     private final String uploadDir;
-
+    @Autowired
+    private IssueTableDao issueTableDao;
 //    @Value("${file.upload.dir}")
     private String uploadPath;
 
@@ -55,6 +59,50 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     public IssueTableServiceImpl(FileUploadProperties fileUploadProperties) {
         this.uploadDir = fileUploadProperties.getUploadDir();
     }
+    @Override
+    public PageUtils queryPageFinishedList(Map<String, Object> params) {
+        log.info("param"+params.get("page")+"------"+ params.get("limit"));
+
+        long p = Long.parseLong((String) params.get("page"));
+        long l = Long.parseLong((String) params.get("limit"));
+        Page<IssueTableEntity> page = new Page<IssueTableEntity>(p,l);
+
+        Page<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(page);
+        log.info("result"+result);
+        return new PageUtils(page);
+    }
+
+    @Override
+    public String newIssueNumber() {
+        // 查询所有的问题
+        List<IssueTableEntity> issues = this.list();
+
+        // 如果数据库为空，返回默认值 "0001"
+        if (issues.isEmpty()) {
+            return "0001";
+        }
+
+        // 找到 ID 最大的问题
+        IssueTableEntity maxIssue = issues.stream()
+                .max(Comparator.comparingLong(IssueTableEntity::getIssueId)) // 根据 ID 获取最大值
+                .orElse(null); // 如果没有记录，返回 null
+
+        if (maxIssue != null) {
+            // 获取最大问题的编号
+            String currentIssueNumber = maxIssue.getIssueNumber(); // 假设有一个方法 getIssueNumber()
+
+            // 处理问题编号，取后四位并加1
+            String lastFourDigits = currentIssueNumber.substring(currentIssueNumber.length() - 4);
+            int newNumber = Integer.parseInt(lastFourDigits) + 1;
+
+            // 返回格式化的编号（例如补零）
+            return String.format("%04d", newNumber); // 修改这里返回字符串
+        }
+
+        return "0001"; // 如果理论上没有找到最大问题，返回默认值
+    }
+
+
 
     @Autowired
     private IssueMaskTableDao issueMaskTableDao; // 新增的 DAO
@@ -77,8 +125,10 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
         // 构建查询条件
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
-        // 添加条件：查询创建人为 rolename 的数据
-        queryWrapper.eq("creator", rolename); // 假设 "creator" 是 IssueTableEntity 中表示创建人的字段名
+        // 添加条件：查询创建人、rectificationResponsiblePerson 或 verifier 为 rolename 的数据
+        queryWrapper.eq("creator", rolename)
+                .or().eq("rectification_responsible_person", rolename)
+                .or().eq("verifier", rolename);
 
         // 执行分页查询
         IPage<IssueTableEntity> page = this.page(
@@ -323,14 +373,17 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 // 读取车辆号码ID
                 issue.setVehicleNumberId(getCellValueAsString(row.getCell(6)));
 
+                // 读取初步分析
+                issue.setPeliminaryAnalysis(getCellValueAsString(row.getCell(7)));
+
                 // 读取问题描述
-                issue.setIssueDescription(getCellValueAsString(row.getCell(7)));
+                issue.setIssueDescription(getCellValueAsString(row.getCell(8)));
 
                 // 读取整改要求
-                issue.setRectificationRequirement(getCellValueAsString(row.getCell(8)));
+                issue.setRectificationRequirement(getCellValueAsString(row.getCell(9)));
 
                 // 读取要求完成时间
-                Cell requiredCompletionTimeCell = row.getCell(9);
+                Cell requiredCompletionTimeCell = row.getCell(10);
                 if (requiredCompletionTimeCell != null && requiredCompletionTimeCell.getCellType() == CellType.NUMERIC
                         && DateUtil.isCellDateFormatted(requiredCompletionTimeCell)) {
                     Date requiredCompletionTime = requiredCompletionTimeCell.getDateCellValue();
@@ -340,13 +393,13 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 }
 
                 // 读取责任部门
-                issue.setResponsibleDepartment(getCellValueAsString(row.getCell(10)));
+                issue.setResponsibleDepartment(getCellValueAsString(row.getCell(11)));
 
                 // 读取整改状态
-                issue.setRectificationStatus(getCellValueAsString(row.getCell(11)));
+                issue.setRectificationStatus(getCellValueAsString(row.getCell(12)));
 
                 // 读取实际完成时间
-                Cell actualCompletionTimeCell = row.getCell(12);
+                Cell actualCompletionTimeCell = row.getCell(13);
                 if (actualCompletionTimeCell != null && actualCompletionTimeCell.getCellType() == CellType.NUMERIC
                         && DateUtil.isCellDateFormatted(actualCompletionTimeCell)) {
                     Date actualCompletionTime = actualCompletionTimeCell.getDateCellValue();
@@ -356,17 +409,17 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 }
 
                 // 读取整改责任人
-                issue.setRectificationResponsiblePerson(getCellValueAsString(row.getCell(13)));
+                issue.setRectificationResponsiblePerson(getCellValueAsString(row.getCell(14)));
 
                 // 读取要求二次整改时间
-                Cell requiredSecondRectificationTimeCell = row.getCell(14);
-                if (requiredSecondRectificationTimeCell != null && requiredSecondRectificationTimeCell.getCellType() == CellType.NUMERIC
-                        && DateUtil.isCellDateFormatted(requiredSecondRectificationTimeCell)) {
-                    Date requiredSecondRectificationTime = requiredSecondRectificationTimeCell.getDateCellValue();
-                    issue.setRequiredSecondRectificationTime(requiredSecondRectificationTime);
-                } else {
-                    issue.setRequiredSecondRectificationTime(null);
-                }
+//                Cell requiredSecondRectificationTimeCell = row.getCell(14);
+//                if (requiredSecondRectificationTimeCell != null && requiredSecondRectificationTimeCell.getCellType() == CellType.NUMERIC
+//                        && DateUtil.isCellDateFormatted(requiredSecondRectificationTimeCell)) {
+//                    Date requiredSecondRectificationTime = requiredSecondRectificationTimeCell.getDateCellValue();
+//                    issue.setRequiredSecondRectificationTime(requiredSecondRectificationTime);
+//                } else {
+//                    issue.setRequiredSecondRectificationTime(null);
+//                }
 
                 // 读取备注
                 issue.setRemark(getCellValueAsString(row.getCell(15)));
@@ -385,10 +438,10 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 }
 
                 // 读取最后修改人
-                issue.setLastModifier(getCellValueAsString(row.getCell(18)));
+//                issue.setLastModifier(getCellValueAsString(row.getCell(18)));
 
                 // 读取最后修改时间
-                Cell lastModificationTimeCell = row.getCell(19);
+                Cell lastModificationTimeCell = row.getCell(18);
                 if (lastModificationTimeCell != null && lastModificationTimeCell.getCellType() == CellType.NUMERIC
                         && DateUtil.isCellDateFormatted(lastModificationTimeCell)) {
                     Date lastModificationTime = lastModificationTimeCell.getDateCellValue();
@@ -398,28 +451,38 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 }
 
                 // 读取关联整改记录
-                issue.setAssociatedRectificationRecords(getCellValueAsString(row.getCell(20)));
+                issue.setAssociatedRectificationRecords(getCellValueAsString(row.getCell(19)));
 
                 // 读取关联问题编号
-                issue.setAssociatedIssueAddition(getCellValueAsString(row.getCell(21)));
+//                issue.setAssociatedIssueAddition(getCellValueAsString(row.getCell(21)));
+
+                // 读取实际完成时间
+                Cell VerificationDeadline = row.getCell(20);
+                if (VerificationDeadline != null && VerificationDeadline.getCellType() == CellType.NUMERIC
+                        && DateUtil.isCellDateFormatted(VerificationDeadline)) {
+                    Date actualCompletionTime = VerificationDeadline.getDateCellValue();
+                    issue.setVerificationDeadline(actualCompletionTime);
+                } else {
+                    issue.setVerificationDeadline(null);
+                }
 
                 // 读取创建时长
-                issue.setCreationDuration(getCellValueAsString(row.getCell(22)));
+                issue.setCreationDuration(getCellValueAsString(row.getCell(21)));
 
                 // 读取原因分析
-                issue.setCauseAnalysis(getCellValueAsString(row.getCell(23)));
+                issue.setCauseAnalysis(getCellValueAsString(row.getCell(22)));
 
                 // 读取整改验证状态
-                issue.setRectificationVerificationStatus(getCellValueAsString(row.getCell(24)));
+                issue.setRectificationVerificationStatus(getCellValueAsString(row.getCell(23)));
 
                 // 读取验证结论
-                issue.setVerificationConclusion(getCellValueAsString(row.getCell(25)));
+                issue.setVerificationConclusion(getCellValueAsString(row.getCell(24)));
 
                 // 读取验证人
-                issue.setVerifier(getCellValueAsString(row.getCell(26)));
+                issue.setVerifier(getCellValueAsString(row.getCell(25)));
 
                 // 读取公式
-                issue.setFormula(getCellValueAsString(row.getCell(27)));
+                issue.setFormula(getCellValueAsString(row.getCell(26)));
 
                 // 将 issue 对象添加到列表中
                 issueList.add(issue);
@@ -436,29 +499,48 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         }
     }
 
+//    @Override
+//    public Map<String, Integer> getCurrentMonthVerificationConclusionStatistics() {
+//        Map<String, Integer> statistics = new HashMap<>();
+//
+//        // 定义可能的验证结论状态
+//        List<String> verificationConclusions = Arrays.asList("暂缓", "结项");
+//
+//        // 获取当前月份起止日期
+//        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
+//        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+//        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
+////        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+//
+//        // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
+//        statistics.put("持续", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
+//
+//        // 对其他验证结论进行统计
+//        for (String conclusion : verificationConclusions) {
+//            statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion, currentMonthStart, nextMonthFirstDayString));
+//        }
+//
+//        return statistics;
+//    }
+
     @Override
     public Map<String, Integer> getCurrentMonthVerificationConclusionStatistics() {
         Map<String, Integer> statistics = new HashMap<>();
 
         // 定义可能的验证结论状态
-        List<String> verificationConclusions = Arrays.asList("暂停", "未完成", "已完成", "结项");
-
-        // 获取当前月份起止日期
-        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
-        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
-        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
-//        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        List<String> verificationConclusions = Arrays.asList("暂缓", "结项");
 
         // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
-        statistics.put("未完成", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
+        statistics.put("持续", countIssuesByCreationCondition());
 
         // 对其他验证结论进行统计
         for (String conclusion : verificationConclusions) {
-            statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion, currentMonthStart, nextMonthFirstDayString));
+            statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion));
         }
 
         return statistics;
     }
+
 
     @Override
     public IssueTableEntity getByissueNumber(String issueNumber) {
@@ -546,12 +628,22 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         // 5. 遍历所有相关问题，处理其 associatedRectificationRecords 字段
         for (IssueTableEntity issue : relatedIssues) {
             String associatedRecords = issue.getAssociatedRectificationRecords();
+            System.out.println("问题关联记录: " + associatedRecords + " + " ); // 打印更新过程
             // 如果 records 不为空，前面加上逗号，并添加问题编号
             if (associatedRecords != null && !associatedRecords.isEmpty()) {
                 associatedRectificationRecordsBuilder.append(",").append(issueNumber);
+                String newAssociatedRecords = associatedRecords + associatedRectificationRecordsBuilder;
+//                System.out.println("associatedRectificationRecordsBuilder1: " + associatedRectificationRecordsBuilder); // 打印更新过程
+//                System.out.println("associatedRectificationRecordsBuilder1: " + newAssociatedRecords); // 打印更新过程
+                issue.setAssociatedRectificationRecords(newAssociatedRecords);
                 System.out.println("更新相关问题的关联整改记录: " + associatedRecords + " + " + issueNumber); // 打印更新过程
+                boolean relatedUpdateSuccess = this.updateById(issue);
             }
-
+            else {
+                System.out.println("无记录的空问题处理: " + associatedRecords + " + " + issueNumber); // 打印更新过程
+                issue.setAssociatedRectificationRecords(issueNumber);
+                boolean relatedUpdateSuccess = this.updateById(issue);
+            }
             // 收集车号
             String vehicleNumber = issue.getIssueNumber(); //
             if (vehicleNumber != null && !vehicleNumber.isEmpty()) {
@@ -562,11 +654,11 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         // 6. 将当前问题的 associatedRectificationRecords 修改为收集到的所有车号
         String newAssociatedRecords = String.join(",", relatedVehicleNumbers);
         currentIssue.setAssociatedRectificationRecords(newAssociatedRecords);
-        System.out.println("更新当前问题的 associatedRectificationRecords: " + currentIssue); // 打印更新后的记录
+//        System.out.println("更新当前问题的 associatedRectificationRecords: " + currentIssue); // 打印更新后的记录
 
         // 7. 更新当前问题的实体
         boolean updateSuccess = this.updateById(currentIssue);
-        System.out.println("当前问题更新操作成功: " + updateSuccess); // 打印更新操作结果
+//        System.out.println("当前问题更新操作成功: " + updateSuccess); // 打印更新操作结果
 
 //        // 8. 更新所有相关问题的 associatedRectificationRecords
 //        for (IssueTableEntity issue : relatedIssues) {
@@ -584,15 +676,15 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 //            System.out.println("相关问题ID: " + issue.getIssueId() + " 更新操作成功: " + relatedUpdateSuccess); // 打印每个相关问题的更新结果
 //        }
         // 8. 更新所有相关问题的 associatedRectificationRecords
-        for (IssueTableEntity issue : relatedIssues) {
-            // 将每个相关问题的 associatedRectificationRecords 修改为 newAssociatedRecords
-            issue.setAssociatedRectificationRecords(newAssociatedRecords);
-            System.out.println("更新相关问题ID: " + issue.getIssueId() + " 的关联整改记录为: " + newAssociatedRecords); // 打印更新后的记录
-
-            // 更新每个相关问题
-            boolean relatedUpdateSuccess = this.updateById(issue);
-            System.out.println("相关问题ID: " + issue.getIssueId() + " 更新操作成功: " + relatedUpdateSuccess); // 打印每个相关问题的更新结果
-        }
+//        for (IssueTableEntity issue : relatedIssues) {
+//            // 将每个相关问题的 associatedRectificationRecords 修改为 newAssociatedRecords
+//            issue.setAssociatedRectificationRecords(newAssociatedRecords);
+//            System.out.println("更新相关问题ID: " + issue.getIssueId() + " 的关联整改记录为: " + newAssociatedRecords); // 打印更新后的记录
+//
+//            // 更新每个相关问题
+//            boolean relatedUpdateSuccess = this.updateById(issue);
+//            System.out.println("相关问题ID: " + issue.getIssueId() + " 更新操作成功: " + relatedUpdateSuccess); // 打印每个相关问题的更新结果
+//        }
 
     }
 
@@ -616,6 +708,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         fieldDescriptionMap.put("issueCategoryId", "问题类别");
         fieldDescriptionMap.put("vehicleTypeId", "车型");
         fieldDescriptionMap.put("vehicleNumberId", "车号");
+        fieldDescriptionMap.put("peliminaryAnalysis", "初步要求");
         fieldDescriptionMap.put("issueDescription", "问题描述");
         fieldDescriptionMap.put("rectificationRequirement", "整改要求");
         fieldDescriptionMap.put("requiredCompletionTime", "要求完成时间");
@@ -623,15 +716,16 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         fieldDescriptionMap.put("rectificationStatus", "整改情况");
         fieldDescriptionMap.put("actualCompletionTime", "实际完成时间");
         fieldDescriptionMap.put("rectificationResponsiblePerson", "整改责任人");
-        fieldDescriptionMap.put("requiredSecondRectificationTime", "要求二次整改时间");
+//        fieldDescriptionMap.put("requiredSecondRectificationTime", "要求二次整改时间");
         fieldDescriptionMap.put("remark", "备注");
         fieldDescriptionMap.put("creator", "创建人");
         fieldDescriptionMap.put("creationTime", "创建时间");
-        fieldDescriptionMap.put("lastModifier", "最后修改人");
+//        fieldDescriptionMap.put("lastModifier", "最后修改人");
         fieldDescriptionMap.put("lastModificationTime", "最后修改时间");
         fieldDescriptionMap.put("associatedRectificationRecords", "关联问题整改记录");
-        fieldDescriptionMap.put("associatedIssueAddition", "关联问题添加");
-        fieldDescriptionMap.put("creationDuration", "创建时长");
+//        fieldDescriptionMap.put("associatedIssueAddition", "关联问题添加");
+        fieldDescriptionMap.put("verificationDeadline", "要求二次整改时间");
+        fieldDescriptionMap.put("creationDuration", "整改时长");
         fieldDescriptionMap.put("causeAnalysis", "原因分析");
         fieldDescriptionMap.put("rectificationVerificationStatus", "整改验证情况");
         fieldDescriptionMap.put("verificationConclusion", "验证结论");
@@ -697,50 +791,179 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
     }
 
+//    @Override
+//    public Map<String, Integer> getCurrentMonthCompletionRate() {
+//        // 获取当前月的起始和结束日期
+//        LocalDate now = LocalDate.now();
+//        String startDate = now.withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 本月第一天
+//        String endDate = now.plusMonths(1).withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 下月第一天
+//
+//        // 统计当前月份已完成和未完成的条数
+//        int completedCount = countIssuesByVerificationConclusion("已完成", startDate, endDate);
+//        int notCompletedCount = countIssuesByVerificationConclusion("未完成", startDate, endDate);
+//        int pauseCount = countIssuesByVerificationConclusion("暂停", startDate, endDate);
+//        int conclusionCount = countIssuesByVerificationConclusion("结项", startDate, endDate);
+//        int profoundCount1 = countIssuesByVerificationConclusion("",startDate,endDate);
+////        int profoundCount2 = countIssuesByVerificationConclusion(null,startDate,endDate);
+//        int tolCompleted = notCompletedCount + pauseCount + conclusionCount + profoundCount1 ;
+//        // 创建一个结果Map用于存放完成率数据
+//        Map<String, Integer> completionRate = new HashMap<>();
+//        completionRate.put("completed", completedCount);
+//        completionRate.put("tolCompleted", tolCompleted);
+//
+//        return completionRate;
+//    }
+@Override
+public Map<String, Integer> getCurrentMonthCompletionRate() {
+    // 统计已完成、未完成、暂停、结项等状态的条数
+    int completedCount = countIssuesByVerificationConclusion("结项");
+    int notCompletedCount = countIssuesByVerificationConclusion("持续");
+    int pauseCount = countIssuesByVerificationConclusion("暂缓");
+//    int conclusionCount = countIssuesByVerificationConclusion("结项");
+    int profoundCount1 = countIssuesByVerificationConclusion("");  // 空字符串表示没有结论的情况
+
+    // 计算总的已完成条数
+    int tolCompleted = countAllIssues();  // 查询所有记录的总数
+
+    // 创建一个结果Map用于存放完成率数据
+    Map<String, Integer> completionRate = new HashMap<>();
+    completionRate.put("completed", completedCount);
+    completionRate.put("tolCompleted", tolCompleted);
+
+    return completionRate;
+}
+
     @Override
-    public Map<String, Integer> getCurrentMonthCompletionRate() {
-        // 获取当前月的起始和结束日期
-        LocalDate now = LocalDate.now();
-        String startDate = now.withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 本月第一天
-        String endDate = now.plusMonths(1).withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE); // 下月第一天
+    public boolean checkDuplicateIssue(List<String> vehicleNumbers, String issueCategoryIds) {
+        // 1. 查询与问题类别相同的所有记录
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("issue_category_id", issueCategoryIds);
 
-        // 统计当前月份已完成和未完成的条数
-        int completedCount = countIssuesByStateAndDate("已完成", startDate, endDate);
-        int notCompletedCount = countIssuesByStateAndDate("未完成", startDate, endDate);
-        int pauseCount = countIssuesByStateAndDate("暂停", startDate, endDate);
-        int conclusionCount = countIssuesByStateAndDate("结项", startDate, endDate);
-        int noCount = notCompletedCount + pauseCount + conclusionCount ;
-        // 创建一个结果Map用于存放完成率数据
-        Map<String, Integer> completionRate = new HashMap<>();
-        completionRate.put("completed", completedCount);
-        completionRate.put("notCompleted", noCount);
+        List<IssueTableEntity> issueList = this.list(queryWrapper); // 获取所有符合条件的记录
+        Set<String> vehicleNumbersFromDb = new HashSet<>();  // 用于存储从数据库中提取的车号
 
-        return completionRate;
+        // 2. 处理每条记录的 vehicle_number_id 字段，按逗号分割并保存到集合中
+        for (IssueTableEntity issue : issueList) {
+            String vehicleNumberId = issue.getVehicleNumberId();  // 获取车号字段
+            if (vehicleNumberId != null) {
+                String[] vehicleNumberArray = vehicleNumberId.split(","); // 按逗号分隔车号
+                for (String vehicleNumber : vehicleNumberArray) {
+                    vehicleNumbersFromDb.add(vehicleNumber.trim());  // 添加到集合中，去除前后空格
+                }
+            }
+        }
+
+        System.out.println("从数据库中提取的车号: " + vehicleNumbersFromDb);
+
+        // 3. 用传入的车号列表与从数据库中提取的车号进行匹配
+        int count = 0;
+        for (String vehicleNumber : vehicleNumbers) {
+            if (vehicleNumbersFromDb.contains(vehicleNumber)) {
+                count++; // 如果传入的车号在数据库中存在，计数加一
+            }
+        }
+
+        System.out.println("匹配到的车号数量: " + count);
+        // 如果有至少一个车号匹配，则返回 true
+        return count > 0;
     }
+
+
+
+
+
+
+    @Override
+    public IssueTableEntity getByassociate(String associatedRectificationRecords) {
+        // 使用 QueryWrapper 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+//        System.out.println("associatedRectificationRecords: " + associatedRectificationRecords);
+        queryWrapper.eq("issue_number", associatedRectificationRecords); // 根据问题编号查询
+
+        // 调用 MyBatis-Plus 的方法查找对应的实体
+        return this.getOne(queryWrapper, false); // 这里的 false 表示如果没有找到记录不会抛出异常
+    }
+
+    @Override
+    public boolean checkReplicateIssue(Integer issueId, String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
+                // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+            queryWrapper.eq("Systematic_classification",systematicClassification )
+                    .eq("fault_type", faultType)
+                    .eq("First_Faulty_parts", firstFaultyParts)
+                    .eq("Second_Faulty_parts", secondFaultyParts)
+                    .eq("fault_model",faultModel );
+
+
+
+        // 查询符合条件的记录
+        List<IssueTableEntity> issues = this.list(queryWrapper);
+
+        // 判断是否存在重复记录
+        boolean isDuplicate = !issues.isEmpty();
+
+        // 更新 overdue 属性为 true
+        for (IssueTableEntity issue : issues) {
+            issue.setOverDue("true");
+            this.updateById(issue);
+        }
+
+        return isDuplicate; // 返回是否存在重复记录
+    }
+
+
+
+
+
+    private Integer countAllIssues() {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        // 查询所有记录
+        return this.count(queryWrapper);
+    }
+
 
 
 
     // 统计“创建”的条件
-    private Integer countIssuesByCreationCondition(String startDate, String endDate) {
+//    private Integer countIssuesByCreationCondition(String startDate, String endDate) {
+//        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.and(wrapper ->
+//                        wrapper.isNull("verification_conclusion")
+//                                .or().eq("verification_conclusion", "")
+//                                .or().like("verification_conclusion", "持续")
+//                )
+//                .ge("creation_time", startDate)
+//                .le("creation_time", endDate);
+//
+//        return this.count(queryWrapper);
+//    }
+    private Integer countIssuesByCreationCondition() {
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.and(wrapper ->
-                        wrapper.isNull("verification_conclusion")
-                                .or().eq("verification_conclusion", "")
-                )
-                .ge("creation_time", startDate)
-                .le("creation_time", endDate);
+                wrapper.isNull("verification_conclusion")
+                        .or().eq("verification_conclusion", "")
+                        .or().like("verification_conclusion", "持续")
+        );
 
         return this.count(queryWrapper);
     }
 
-    // 根据 verification_conclusion 统计数量，处理包含多个状态的组合
-    private Integer countIssuesByVerificationConclusion(String conclusion, String startDate, String endDate) {
-        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
 
-        // 使用 FIND_IN_SET() 函数判断字段中是否包含该状态
-        queryWrapper.ge("creation_time", startDate)
-                .le("creation_time", endDate)
-                .like("verification_conclusion", conclusion); // 使用 LIKE 查询
+    // 根据 verification_conclusion 统计数量，处理包含多个状态的组合
+//    private Integer countIssuesByVerificationConclusion(String conclusion, String startDate, String endDate) {
+//        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+//
+//        // 使用 FIND_IN_SET() 函数判断字段中是否包含该状态
+//        queryWrapper.ge("creation_time", startDate)
+//                .le("creation_time", endDate)
+//                .like("verification_conclusion", conclusion); // 使用 LIKE 查询
+//
+//        return this.count(queryWrapper);
+//    }
+    private Integer countIssuesByVerificationConclusion(String conclusion) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("verification_conclusion", conclusion); // 使用 LIKE 查询
 
         return this.count(queryWrapper);
     }

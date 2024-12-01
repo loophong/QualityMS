@@ -9,14 +9,14 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="年月" prop="yearMonth">
+      <el-form-item label="年月">
         <el-date-picker
-          v-model="queryParams.yearMonth"
-          type="month"
-          placeholder="选择月份"
-          format="yyyy-MM"
-          value-format="yyyy-MM"
-        ></el-date-picker>
+          v-model="selectedDate"
+          type="monthrange"
+          start-placeholder="开始月份"
+          end-placeholder="结束月份"
+          @change="handleDateChange">
+        </el-date-picker>
       </el-form-item>
       <el-form-item label="管理部门" prop="managementDepartment">
         <el-input v-model="queryParams.managementDepartment" placeholder="请输入管理部门"></el-input>
@@ -66,7 +66,7 @@
       </el-col>
 
       <el-col :span="1.5">
-        <el-button v-if="isAuth('indicator:indicatorindicatorsummary:list')" type="primary" @click="exportAll()">导出</el-button>
+        <el-button  type="primary" @click="exportAll()">导出</el-button>
       </el-col>
     </el-row>
     <el-table
@@ -120,7 +120,7 @@
         prop="indicatorActualValue"
         header-align="center"
         align="center"
-        label="指标值">
+        label="指标完成值">
       </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="indicatorValueUpperBound"-->
@@ -146,12 +146,23 @@
         align="center"
         label="考核部门">
       </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="managementContentCurrentAnalysis"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="管理内容（现状分析）">-->
-<!--      </el-table-column>-->
+      <el-table-column
+        prop="finishedFlag"
+        header-align="center"
+        align="center"
+        label="完成情况">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.finishedFlag === 1" type="success">
+            达标
+          </el-tag>
+          <el-tag v-else-if="scope.row.finishedFlag === 0" type="danger">
+            未达标
+          </el-tag>
+          <el-tag v-else type="info">
+            -
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="indicatorCreatTime"
         header-align="center"
@@ -195,6 +206,7 @@
   export default {
     data () {
       return {
+        selectedDate: [],  // 选择日期范围
         indicatorDictionaryList: {},
 
         //excel上传
@@ -223,8 +235,11 @@
           indicatorParentNode: '',
           indicatorCreatTime: '',
           yearMonth: '',
+          startTime: '',
+          endTime: '',
           indicatorState: '',
-          indicatorChildNode: ''
+          indicatorChildNode: '',
+          finishedFlag: ''
         },
         form: {
           indicatorId: 0,
@@ -248,7 +263,8 @@
           indicatorCreatTime: '',
           yearMonth: '',
           indicatorState: '',
-          indicatorChildNode: ''
+          indicatorChildNode: '',
+          finishedFlag: ''
         },
         dataList: [],
         dataList01: [], //列表数据(不分页)
@@ -271,6 +287,7 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
+        console.log('this.queryParams',this.queryParams);
         this.$http({
           url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
           method: 'get',
@@ -306,6 +323,16 @@
           managementContentCurrentAnalysis: null,
         }
         this.getDataList()
+      },
+      handleDateChange(value) {
+        if (value && value[1]) {
+          let endDate = new Date(value[1]);
+          endDate.setMonth(endDate.getMonth() + 1);
+          endDate.setDate(0);
+          this.selectedDate[1] = endDate;
+          this.queryParams.startTime = this.selectedDate[0];
+          this.queryParams.endTime = this.selectedDate[1];
+        }
       },
       //获取全部指标列表
       getIndicatorDictionaryList() {
@@ -396,7 +423,7 @@
           }).then(({data}) => {
             if (data && data.code === 0 && data.page.totalCount === 0) {
               console.log("data123====>",data)
-              this.dataList = data.page.list
+              this.dataList = data.page.list;
               const aimUrl = http.adornUrl('/indicator/indicatorindicatorsummary/upload');
               uploadFile(formData, aimUrl)
                 .then(response => {

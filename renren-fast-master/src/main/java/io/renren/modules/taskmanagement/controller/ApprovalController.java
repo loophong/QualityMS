@@ -6,6 +6,8 @@ import java.util.Map;
 
 import io.renren.common.utils.DateUtils;
 import io.renren.common.utils.ShiroUtils;
+import io.renren.modules.notice.entity.CreateNoticeParams;
+import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.taskmanagement.entity.ApprovalStatus;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.entity.TaskStatus;
@@ -13,11 +15,8 @@ import io.renren.modules.taskmanagement.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.taskmanagement.entity.ApprovalEntity;
 import io.renren.modules.taskmanagement.service.ApprovalService;
@@ -42,25 +41,48 @@ public class ApprovalController {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private MessageNotificationService messageService;
+
     /**
      * @description: 取消审批
      * @author: hong
      * @date: 2024/8/30 17:17
      * @version: 1.0
      */
-//    @RequestMapping("/update")
-//    @RequiresPermissions("taskmanagement:approval:update")
-//    public R update(@RequestBody String taskId) {
-//
-//        //检查任务是否存在
-//        if (taskService.getByTaskId(taskId) == null) {
-//            return R.error("任务不存在");
-//        }
-//        TaskEntity task = taskService.getByTaskId(taskId);
-//        task.setTaskCurrentState(TaskStatus.IN_PROGRESS);
-//
-//        return approvalService.query().eq("task_id", taskId).eq("approval_status",ApprovalStatus.PENDING);
-//    }
+    @GetMapping("/cancelApproval")
+    @Transactional
+//    @RequiresPermissions("taskmanagement:approval:cancelApproval")
+    public R cancelApproval(@RequestParam String taskId) {
+
+        log.info("取消审批" + taskId);
+
+        //检查任务是否存在
+        if (taskService.getByTaskId(taskId) == null) {
+            return R.error("任务不存在");
+        }
+
+        // 通过任务id获取任务信息
+        TaskEntity task = taskService.getByTaskId(taskId);
+        if (task.getTaskCurrentState() != TaskStatus.APPROVAL_IN_PROGRESS) {
+            return R.error("当前任务状态不允许取消审批");
+        }else {
+            task.setTaskCurrentState(TaskStatus.IN_PROGRESS);
+        }
+
+        // 通过任务id获取审批信息
+        ApprovalEntity approvalEntity = approvalService.query().eq("task_id", taskId).eq("approval_status",ApprovalStatus.PENDING).one();
+        if (approvalEntity != null){
+            approvalEntity.setApprovalStatus(ApprovalStatus.CANCEL);
+        }else {
+            return R.error("当前任务不存在审批信息");
+        }
+
+        taskService.updateById(task);
+        approvalService.updateById(approvalEntity);
+
+        return R.ok();
+    }
 
     /**
      * @description: 获取我提交的审批getMySubmitApprovalList
@@ -223,6 +245,12 @@ public class ApprovalController {
         }
         taskService.updateById(task);
         approvalService.updateById(taskManagementApprovalTable);
+
+        // 发送消息
+        messageService.sendMessages(new CreateNoticeParams( Long.parseLong(taskManagementApprovalTable.getApprover()), new Long[]{Long.valueOf(taskManagementApprovalTable.getSubmitter())} ,
+                "您有一个任务审批结果，请及时查看！", "任务审批结果通知"));
+
+
         return R.ok();
     }
 

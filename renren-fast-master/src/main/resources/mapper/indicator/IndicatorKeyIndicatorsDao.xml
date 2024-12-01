@@ -26,7 +26,8 @@
         <result property="sampleSize" column="sample_size"/>
         <result property="samplingFrequency" column="sampling_frequency"/>
         <result property="controlList" column="control_list"/>
+        <result property="storageFlag" column="storage_flag"/>
     </resultMap>
-
+<!--    <select id="selectFinishedSubjectList" resultType="io.renren.modules.indicator.entity.IndicatorKeyIndicatorsEntity"> SELECT * FROM indicator_key_indicators WHERE storage_flag = 1 </select>-->
 
 </mapper>

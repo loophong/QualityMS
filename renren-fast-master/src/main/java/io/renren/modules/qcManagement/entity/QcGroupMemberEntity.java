@@ -29,7 +29,7 @@ public class QcGroupMemberEntity implements Serializable {
 	/**
 	 * 姓名
 	 */
-	private String name;
+	private String memberName;
 	/**
 	 * 性别
 	 */
@@ -43,9 +43,13 @@ public class QcGroupMemberEntity implements Serializable {
 	 */
 	private String number;
 	/**
-	 * 学历
+	 * 角色id
 	 */
-	private String education;
+	private Long memberRole;
+	/**
+	 * 用户id
+	 */
+	private Long userId;
 	/**
 	 * 单位
 	 */

@@ -250,10 +250,7 @@
         method: 'get',
       }).then(({ data }) => {
         this.options = data;
-        console.log(data);
-        // if (data && data.code === 0) {
-        //   console.log(data);
-        // }
+        // console.log("所有的用户信息" ,data);
       })
     },
     activated () {
@@ -305,7 +302,7 @@
         const day = String(now.getDate()).padStart(2, '0');
         const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         console.log('执行随机+++++')
-        return `ZL-TA-${year}${month}${day}${random}`;
+        return `ZL-TA-${year}${month}${day}-${random}`;
       },
       cancel1 () {
         // 重置 subtasks 数组，只保留一个初始组合
@@ -350,12 +347,62 @@
           console.error('There was an error fetching the vehicle types!', error)
         })
       },
-      submitForm (formName) {
-        this.fetchuserinform()
-        console.log('Successfully fetched user info4:', this.dataForm.creator)
+      // submitForm (formName) {
+      //   this.fetchuserinform()
+      //   console.log('Successfully fetched user info4:', this.dataForm.creator)
+      //   this.$refs['dataForm'].validate((valid) => {
+      //     if (valid) {
+      //       this.dataForm.subtasks.forEach(subtask => {
+      //         this.$http({
+      //           url: this.$http.adornUrl(`/generator/issuemasktable/save`),
+      //           method: 'post',
+      //           data: this.$http.adornData({
+      //             'issuemaskId': this.dataForm.issuemaskId || undefined,
+      //             'serialNumber': subtask.serialNumber,
+      //             'issueNumber': this.dataForm.issueNumber,
+      //             'reviewers': this.dataForm.reviewers,
+      //             'recipients': subtask.assignee,
+      //             'maskcontent': subtask.name,
+      //             'creator': this.dataForm.creator,
+      //             'creationTime': this.dataForm.creationTime,
+      //             'requiredCompletionTime': this.dataForm.requiredCompletionTime,
+      //             'superiorMask': subtask.parentTask, // 确保上级任务数据被包含                  'nextMask': this.dataForm.nextMask,
+      //             'state': '审核中'
+      //           })
+      //         }).then(({data}) => {
+      //           if (data && data.code === 0) {
+      //             this.$message({
+      //               message: '操作成功',
+      //               type: 'success',
+      //               duration: 1500,
+      //               onClose: () => {
+      //                 this.visible = false
+      //                 this.$emit('refreshDataList')
+      //               }
+      //             })
+      //           } else {
+      //             this.$message.error(data.msg)
+      //           }
+      //         })
+      //         console.log('时间:', this.dataForm.requiredCompletionTime)
+      //         console.log('发起人:', this.dataForm.userinfo)
+      //       })
+      //     }
+      //     // 重置 subtasks 数组，只保留一个初始组合
+      //     this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
+      //     this.visible1 = false // 关闭对话框或重置其他状态
+      //   })
+      // },
+      submitForm(formName) {
+        this.fetchuserinform();
+        console.log('Successfully fetched user info4:', this.dataForm.creator);
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.dataForm.subtasks.forEach(subtask => {
+              // 获取审核人和发起人的 ID
+              const receiverId = this.getUserIdByUsername(this.dataForm.reviewers);
+              const creatorId = this.getUserIdByUsername(this.dataForm.creator);
+              console.log("用户的id为：" ,receiverId)
               this.$http({
                 url: this.$http.adornUrl(`/generator/issuemasktable/save`),
                 method: 'post',
@@ -369,32 +416,56 @@
                   'creator': this.dataForm.creator,
                   'creationTime': this.dataForm.creationTime,
                   'requiredCompletionTime': this.dataForm.requiredCompletionTime,
-                  'superiorMask': subtask.parentTask, // 确保上级任务数据被包含                  'nextMask': this.dataForm.nextMask,
+                  'superiorMask': subtask.parentTask,
+                  'nextMask': this.dataForm.nextMask,
                   'state': '审核中'
                 })
-              }).then(({data}) => {
+              }).then(({ data }) => {
                 if (data && data.code === 0) {
                   this.$message({
                     message: '操作成功',
                     type: 'success',
                     duration: 1500,
                     onClose: () => {
-                      this.visible = false
-                      this.$emit('refreshDataList')
+                      this.visible = false;
+                      this.$emit('refreshDataList');
                     }
-                  })
+                  });
+
+                  // 发送消息通知给审核人
+                  this.$http({
+                    url: this.$http.adornUrl(`/notice/save`),
+                    method: 'post',
+                    data: this.$http.adornData({
+                      'receiverId': receiverId, // 审核人ID
+                      'senderId': creatorId, // 发起人ID
+                      'content': `有新的任务需要审核`, // 消息内容
+                      'type': '任务审核' // 消息类型
+                    })
+                  });
                 } else {
-                  this.$message.error(data.msg)
+                  this.$message.error(data.msg);
                 }
-              })
-              console.log('时间:', this.dataForm.requiredCompletionTime)
-              console.log('发起人:', this.dataForm.userinfo)
-            })
+              });
+
+              console.log('时间:', this.dataForm.requiredCompletionTime);
+              console.log('发起人:', this.dataForm.userinfo);
+            });
           }
           // 重置 subtasks 数组，只保留一个初始组合
-          this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
-          this.visible1 = false // 关闭对话框或重置其他状态
-        })
+          this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }];
+          this.visible1 = false; // 关闭对话框或重置其他状态
+        });
+      },
+      getUserIdByUsername(username) {
+        for (const category of this.options) {
+          for (const auditor of category.options) {
+            if (auditor.label === username) { // 根据标签匹配
+              return auditor.value; // 返回对应的ID
+            }
+          }
+        }
+        return null; // 如果没有找到，返回null
       },
       resetForm (formName) {
         // 重置 subtasks 数组，只保留一个初始组合

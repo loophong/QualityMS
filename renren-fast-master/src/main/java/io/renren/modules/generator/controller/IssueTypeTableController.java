@@ -48,13 +48,13 @@ public class IssueTypeTableController {
     @RequestMapping("/issuestype")
     @RequiresPermissions("generator:issuetypetable:list")
     public R list(){
-        System.out.println("=====获取问题列表----开始");
+//        System.out.println("=====获取问题列表----开始");
         List<IssueTypeTableEntity> category = issueTypeTableService.listAll();
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", 0);
-        response.put("issueTable", category);
-        System.out.println(response);
-        System.out.println("=====获取问题列表----结束");
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("code", 0);
+//        response.put("issueTable", category);
+//        System.out.println(response);
+//        System.out.println("=====获取问题列表----结束");
         return R.ok().put("category", category);
     }
 

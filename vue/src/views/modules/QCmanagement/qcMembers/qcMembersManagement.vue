@@ -3,33 +3,34 @@
     <el-tab-pane label="管理员" name="1" v-if="isAuth('qcManagement:group:admin')">
       <div class="mod-config">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-          <el-form-item>
+          <!-- <el-form-item>
             <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
-            <el-button @click="getDataList()">查询</el-button>
+            <!-- <el-button @click="getDataList()">查询</el-button> -->
             <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <el-button type="warning" @click="exportAll()">小组导出</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="tableData" stripe border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
           style="width: 100%;" row-key="id">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
-          <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
+          <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="120">
             <template slot-scope="scope">
-              <span v-if="scope.row.examineStatus === '待审核'" style="color: blue;">{{ scope.row.examineStatus }}</span>
-              <span v-else-if="scope.row.examineStatus === '未通过'" style="color: red;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else-if="scope.row.examineStatus == '通过'" style="color: #8dc146;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else>-</span> <!-- 处理未知状态 -->
+              <el-tag v-if="scope.row.examineStatus === '待审核'">{{ scope.row.examineStatus }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
-          <el-table-column prop="name" header-align="center" align="center" label="姓名" width="120">
+          <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="120">
           </el-table-column>
           <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column>
@@ -39,26 +40,28 @@
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
-          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
+          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="160">
           </el-table-column>
           <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="180">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
-            align="center" label="操作" width="160">
+            align="center" label="操作">
             <template slot-scope="scope">
               <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
-                @click="addMemberHandle(scope.row.id)">新增成员</el-button>
+                @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:update')"
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
                 @click="deleteHandle(scope.row.id)">删除</el-button>
+              <!-- <el-button type="text" size="small" v-if="scope.row.parentId&&isAuth('qcMembers:leader:change')"
+                @click="leaderChangeHandle(scope.row.id, scope.row.parentId)">移交组长</el-button> -->
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
           :page-sizes="[10, 20, 50, 100, 1000]" :page-size="1000" :total="totalPage"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination>
+        </el-pagination> -->
 
       </div>
     </el-tab-pane>
@@ -70,6 +73,7 @@
             <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
+            <el-button type="warning" @click="exportAll()">小组导出</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="dataList" stripe border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -80,15 +84,15 @@
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
             <template slot-scope="scope">
-              <span v-if="scope.row.examineStatus === '待审核'" style="color: blue;">{{ scope.row.examineStatus }}</span>
-              <span v-else-if="scope.row.examineStatus === '未通过'" style="color: red;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else-if="scope.row.examineStatus == '通过'" style="color: #8dc146;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else>-</span> <!-- 处理未知状态 -->
+              <el-tag v-if="scope.row.examineStatus === '待审核'">{{ scope.row.examineStatus }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
-          <el-table-column prop="name" header-align="center" align="center" label="姓名" width="120">
+          <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="120">
           </el-table-column>
           <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column>
@@ -98,29 +102,34 @@
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
-          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
+          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="160">
           </el-table-column>
           <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="180">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作">
             <template slot-scope="scope">
-              <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
-                @click="addMemberHandle(scope.row.id)">新增成员</el-button>
+              <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.admitEdit)"
+                type="text" size="small" @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
               <el-button
                 v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus === '未通过')"
                 type="text" size="small" @click="handleReexamine(scope.row.id)">提交审核</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:update')"
+              <el-button type="text" size="small"
+                v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.admitEdit)"
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
+              <el-button type="text" size="small"
+                v-if="(isAuth('qcMembers:qcGroupMember:delete') && scope.row.admitEdit)"
                 @click="deleteHandle(scope.row.id)">删除</el-button>
+              <el-button type="text" size="small" v-if="scope.row.parentId && scope.row.management"
+                @click="changeHandle(scope.row.id, scope.row.parentId)">移交组长</el-button>
+              <!-- <el-button type="text" size="small" @click="ad(scope.row)">移交组长</el-button> -->
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
           :page-sizes="[10, 20, 50, 100, 999]" :page-size="999" :total="totalPageGroup"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination>
+        </el-pagination> -->
         <!-- 弹窗, 新增 / 修改 -->
         <!-- <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update> -->
       </div>
@@ -135,29 +144,29 @@
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
             <template slot-scope="scope">
-              <span v-if="scope.row.examineStatus === '待审核'" style="color: blue;">{{ scope.row.examineStatus }}</span>
-              <span v-else-if="scope.row.examineStatus === '未通过'" style="color: red;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else-if="scope.row.examineStatus == '通过'" style="color: #8dc146;">{{ scope.row.examineStatus
-                }}</span>
-              <span v-else>-</span> <!-- 处理未知状态 -->
+              <el-tag v-if="scope.row.examineStatus === '待审核'">{{ scope.row.examineStatus }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
-          <el-table-column prop="name" header-align="center" align="center" label="姓名" width="120">
+          <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="160">
           </el-table-column>
           <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column>
-          <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="140">
+          <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="160">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="140">
+          <el-table-column prop="department" header-align="center" align="center" label="单位" width="160">
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
-          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
-          </el-table-column>
-          <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="180">
+          <!-- <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
+          </el-table-column> -->
+          <el-table-column prop="date" header-align="center" align="center" label="加入小组时间">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作" width="160">
@@ -171,10 +180,10 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
           :page-sizes="[10, 20, 50, 100, 1000]" :page-size="1000" :total="totalPageExamine"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination>
+        </el-pagination> -->
         <el-dialog :title="'处理审核'" :close-on-click-modal="false" :visible.sync="dialogFormVisible">
           <el-form :model="examineFrom">
             <el-form-item label="审核结果">
@@ -194,13 +203,19 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"
       @refreshCommonList="getGroupList"></add-or-update>
+    <add-group-dialog v-if="AddGroupDialogVisible" ref="AddGroupDialog" @refreshDataList="getDataList"
+      @refreshCommonList="getGroupList"></add-group-dialog>
   </el-tabs>
 
 </template>
 
 <script>
 import AddOrUpdate from './qcMembersManagement-add-or-update'
-
+import AddGroupDialog from './qcMembersManagement-add-group'
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { Loading } from "element-ui";
+import { group } from 'd3';
 export default {
   data() {
     return {
@@ -216,6 +231,7 @@ export default {
       },
       dialogFormVisible: false,
       dataList: [],
+      tmpList: [],
       groupList: [],
       examineList: [],
       originList: [],
@@ -228,34 +244,62 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
+      // 新增弹窗
+      AddGroupDialogVisible: false,
       map: {},
       GroupMemberList: [],
-      membersOptions: []
+      membersOptions: [],
+
+      // 角色列表
+      roleIdList: [],
+
+      exportList: [],
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    AddGroupDialog
+  },
+  async created() {
+    await this.getRoleList();
   },
   async activated() {
     this.initActiveName();
-    if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
+    if ((this.isAuth('qcManagement:group:admin')) || (this.isAuth('qcManagement:group:examine'))) {
       await this.getDataList().then(groupList => {
         this.groupList = groupList;
+      });
+      console.log(this.tableData)
+      this.tableData.sort(function (a, b) {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        // 比较两个日期对象，降序排列
+        return dateB - dateA;
+      })
+      this.tableData.forEach(e => {
+        e.children.sort(function (a, b) {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          // 比较两个日期对象，降序排列
+          return dateB - dateA;
+        });
       });
       console.log(this.tableData)
       this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
       this.totalPageExamine = this.examineList.length;
       console.log(this.examineList.length)
-    } else {
+    }
+    if (!this.isAuth('qcManagement:group:admin')) {
       await this.getGroupList();
     }
+
+
     // 获取分组后的员工数据
     await this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
     }).then(({ data }) => {
       this.membersOptions = data;
-      // console.log(this.membersOptions);
     });
   },
   computed: {
@@ -280,8 +324,10 @@ export default {
     }
   },
   methods: {
-
-    // 获取小组数据列表
+    ad(s) {
+      console.log(s)
+    },
+    // 获取我的小组数据列表
     async getGroupList() {
       this.dataListLoading = true
       await this.$http({
@@ -289,36 +335,45 @@ export default {
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
-          'limit': this.pageSize,
+          'limit': 1000,
           // 'key': 1,
           // 'reuseStepId': 5
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
+          console.log(data)
           const sameList = [];
           // this.dataList = data.page.list
-          data.username = '管理22'
           data.page.list.forEach(item => {
-            if (item.name == data.username) {
+            if (item.memberName == data.userName) {
+              item.admitEdit = 1 //标识当前角色可修改
               sameList.push(item)
             }
           });
           console.log(sameList)
           const resultList = [];
+          const seen = new Set(); // 用于去重
+
           sameList.forEach(item => {
-            resultList.push(item)
+            if (!seen.has(item.qcgmId)) {
+              resultList.push(item);
+              seen.add(item.qcgmId);
+            }
+
             if (item.parentId) {
               data.page.list.forEach(row => {
-                if (row.parentId == item.parentId) {
-                  resultList.push(row)
-                } else if (row.qcgmId == item.parentId) {
-                  resultList.push(row)
+                if ((row.parentId == item.parentId || row.qcgmId == item.parentId) && !seen.has(row.qcgmId)) {
+                  resultList.push(row);
+                  seen.add(row.qcgmId);
                 }
               });
             } else {
               data.page.list.forEach(row => {
-                if (row.parentId == item.qcgmId) {
-                  resultList.push(row)
+                if (row.parentId == item.qcgmId && !seen.has(row.qcgmId)) {
+                  row.management = 1 //标识当前角色为组长，可以移交组长
+                  row.admitEdit = 1 //标识当前角色可修改
+                  resultList.push(row);
+                  seen.add(row.qcgmId);
                 }
               });
             }
@@ -332,13 +387,15 @@ export default {
               map[item.qcgmId] = {
                 id: item.qcgmId,
                 date: item.participationDate,
-                name: item.name,
+                memberName: item.memberName,
                 number: item.number,
                 groupName: item.groupName,
                 roleInTopic: '组长',
                 team: item.team,
+                admitEdit: item.admitEdit,
                 department: item.department,
                 examineStatus: item.examineStatus,
+                registrationNum: item.registrationNum,
                 children: []
               };
             }
@@ -348,8 +405,11 @@ export default {
               map[item.parentId].children.push({
                 id: item.qcgmId,
                 date: item.participationDate,
-                name: item.name,
+                memberName: item.memberName,
                 number: item.number,
+                management: item.management,
+                admitEdit: item.admitEdit,
+                department: item.department,
                 roleInTopic: item.roleInTopic,
                 parentId: item.parentId,
               });
@@ -359,6 +419,20 @@ export default {
           console.log(map)
           this.dataList = Object.values(map);
           // this.dataList = resultList
+          this.dataList.sort(function (a, b) {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            // 比较两个日期对象，降序排列
+            return dateB - dateA;
+          })
+          this.dataList.forEach(e => {
+            e.children.sort(function (a, b) {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              // 比较两个日期对象，降序排列
+              return dateB - dateA;
+            });
+          });
           console.log(this.dataList)
           this.totalPageGroup = resultList.length
         } else {
@@ -380,6 +454,90 @@ export default {
         }
       }
     },
+    // 导出
+    async exportAll() {
+      await this.$http({
+        url: this.$http.adornUrl(`/qcMembers/qcGroupMember/list`),
+        method: 'get',
+        params: this.$http.adornParams({
+          'page': 1,
+          'limit': 100000,
+        })
+      }).then(({ data }) => {
+        if (data) {
+          this.exportList = data.page.list
+          let seen = []
+          this.exportList.forEach(e => {
+            if (e.examineStatus === '待审核') {
+              seen.push(e)
+              this.exportList = this.exportList.filter(e => e.examineStatus !== '待审核');
+            }
+          });
+          seen.forEach(s => {
+            this.exportList = this.exportList.filter(e => e.parentId != s.qcgmId);
+          })
+          console.log('----------before------------')
+          console.log(this.exportList)
+
+          this.exportList.sort((a, b) => {
+            if (a.groupName === b.groupName) {
+              // 如果groupName相同，则按roleInTopic是否为"组长"排序
+              return a.roleInTopic === "组长" ? -1 : (b.roleInTopic === "组长" ? 1 : 0);
+            }
+            // 如果groupName不同，则按groupName字母顺序排序
+            return a.groupName.localeCompare(b.groupName);
+          });
+          console.log('----------after------------')
+          console.log(this.exportList)
+
+        } else {
+          this.exportList = []
+        }
+      })
+      const loadingInstance = Loading.service({
+        lock: true,
+        text: "正在导出，请稍后...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      // console.log(this.exportList)
+      const promises = this.exportList.map((tableRow, index) => {
+        return {
+          序号: index + 1,
+          小组名: tableRow.groupName,
+          组内角色: tableRow.roleInTopic,
+          姓名: tableRow.memberName,
+          员工编号: tableRow.number,
+          单位: tableRow.department,
+          小组类型: tableRow.team,
+          注册号: tableRow.registrationNum,
+          创建小组时间: tableRow.participationDate,
+        };
+      });
+      Promise.all(promises)
+        .then((data) => {
+          const ws = XLSX.utils.json_to_sheet(data);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+          const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+          saveAs(
+            new Blob([wbout], { type: "application/octet-stream" }),
+            "课题登记表.xlsx"
+          );
+
+          // 提交数据到Vuex Store
+          // this.updateExportedData(data);
+
+        })
+        .finally(() => {
+          loadingInstance.close();
+        })
+        .catch((error) => {
+          console.error("导出失败:", error);
+          loadingInstance.close();
+        });
+    },
     // 获取数据列表
     getDataList() {
       return new Promise((resolve, reject) => {
@@ -395,9 +553,9 @@ export default {
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
-            this.dataList = data.page.list;
+            this.tmpList = data.page.list;
             this.totalPage = data.page.totalCount;
-            groupList = this.dataList.filter(function (item) {
+            groupList = this.tmpList.filter(function (item) {
               return item.deleteFlag !== 1;
             });
             console.log(groupList);
@@ -409,13 +567,14 @@ export default {
                 map[item.qcgmId] = {
                   id: item.qcgmId,
                   date: item.participationDate,
-                  name: item.name,
+                  memberName: item.memberName,
                   number: item.number,
                   groupName: item.groupName,
                   roleInTopic: '组长',
                   team: item.team,
                   department: item.department,
                   examineStatus: item.examineStatus,
+                  registrationNum: item.registrationNum,
                   children: []
                 };
               }
@@ -425,23 +584,25 @@ export default {
                 map[item.parentId].children.push({
                   id: item.qcgmId,
                   date: item.participationDate,
-                  name: item.name,
+                  memberName: item.memberName,
                   number: item.number,
                   roleInTopic: item.roleInTopic,
+                  department: item.department,
                   parentId: item.parentId,
                 });
               }
             });
+            console.log(map)
             this.tableData = Object.values(map);
           } else {
-            this.dataList = [];
+            this.tmpList = [];
             this.totalPage = 0;
           }
           this.dataListLoading = false;
           resolve(groupList);
         }).catch(error => {
           console.error('Error fetching data:', error);
-          this.dataList = [];
+          this.tmpList = [];
           this.totalPage = 0;
           this.dataListLoading = false;
           reject(error);
@@ -449,7 +610,33 @@ export default {
       });
 
     },
-
+    //移交组长
+    async changeHandle(id, parentId) {
+      console.log("传入id为" + id + "父节点为" + parentId)
+      await this.$http({
+        url: this.$http.adornUrl('/qcMembers/qcGroupMember/change'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'id': id,
+          'parentId': parentId,
+          // 'key': 1,
+          // 'reuseStepId': 5
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getDataList()
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
     parseTime(time) {
       return new Date(time).toLocaleString();
     },
@@ -474,19 +661,37 @@ export default {
           name: 'otherToIssue',
         });
     },
+
     // 新增 / 修改
     addOrUpdateHandle(id) {
-      this.addOrUpdateVisible = true
-      this.$nextTick(() => {
-        this.$refs.addOrUpdate.isAddMember = false;
-        this.$refs.addOrUpdate.membersOptions = this.membersOptions;
-        this.$refs.addOrUpdate.init(id)
-      })
+      console.log("传入id为" + id)
+
+      if (id === undefined) {
+        this.AddGroupDialogVisible = true
+        this.$nextTick(() => {
+          this.$refs.AddGroupDialog.membersOptions = this.membersOptions;
+          this.$refs.AddGroupDialog.roleIdList = this.roleIdList;
+          this.$refs.AddGroupDialog.init(id)
+        })
+      } else {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.isAddMember = false;
+          this.$refs.addOrUpdate.membersOptions = this.membersOptions;
+          this.$refs.addOrUpdate.init(id)
+        })
+      }
+
     },
     // 新增成员
-    addMemberHandle(id) {
+    addMemberHandle(id, name) {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
+        let tmp = this.membersOptions
+        tmp.forEach(item => {
+          item.options = item.options.filter(row => row.label !== name);
+        });
+        this.$refs.addOrUpdate.membersOptions = tmp
         this.$refs.addOrUpdate.isAddMember = true;
         this.$refs.addOrUpdate.init(id)
       })
@@ -540,7 +745,6 @@ export default {
               this.getDataList();
               this.examineList = this.tableData.filter(item => item.examineStatus === '待审核');
               this.totalPageExamine = this.examineList.length;
-
             }
           })
         } else {
@@ -640,7 +844,18 @@ export default {
           }
         })
       })
-    }
+    },
+
+    // 获取全角色列表
+    async getRoleList() {
+      await this.$http({
+        url: this.$http.adornUrl('/sys/role/select'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({ data }) => {
+        this.roleIdList = data && data.code === 0 ? data.list : []
+      })
+    },
   }
 }
 </script>

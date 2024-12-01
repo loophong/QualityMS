@@ -12,6 +12,8 @@
         <result property="reviewerOpinion" column="Reviewer_opinion"/>
         <result property="recipients" column="Recipients"/>
         <result property="maskcontent" column="maskcontent"/>
+        <result property="handlingScenarios" column="handling_scenarios"/>
+        <result property="annex" column="annex"/>
         <result property="creator" column="creator"/>
         <result property="creationTime" column="creation_time"/>
         <result property="requiredCompletionTime" column="required_completion_time"/>

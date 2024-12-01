@@ -20,7 +20,7 @@ import io.renren.common.utils.R;
 
 
 /**
- * 
+ *
  *
  * @author hong
  * @email ${email}

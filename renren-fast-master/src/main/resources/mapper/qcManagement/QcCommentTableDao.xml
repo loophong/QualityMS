@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.qcManagement.dao.QcCommentTableDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.qcManagement.entity.QcCommentTableEntity" id="qcCommentTableMap">
+        <result property="qcTableId" column="qc_table_id"/>
+        <result property="tableType" column="table_type"/>
+        <result property="tableNumber" column="table_number"/>
+        <result property="tableTag" column="table_tag"/>
+        <result property="tableComment" column="table_comment"/>
+        <result property="tableExtra" column="table_extra"/>
+    </resultMap>
+
+
+</mapper>

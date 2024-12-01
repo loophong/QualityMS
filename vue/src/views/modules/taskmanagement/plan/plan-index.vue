@@ -3,13 +3,18 @@
     <el-tabs type="border-card">
       <el-tab-pane label="当前计划">
 
-        <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-          <el-form-item>
-            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataQueryList()">
+          <el-form-item label="计划编号">
+            <el-input v-model="queryParamsUnfinished.planId" placeholder="参数名"></el-input>
+          </el-form-item>
+          <el-form-item label="计划名">
+            <el-input v-model="queryParamsUnfinished.planName" placeholder="计划名"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button @click="getDataList()">查询</el-button>
+            <el-button @click="getDataQueryList()">查询</el-button>
+            <el-button @click="clearUnfinishedPage()">重置</el-button>
             <el-button v-if="isAuth('taskmanagement:plan:save')" type="primary" @click="addPlanPage()">新增</el-button>
+            <el-button @click="exportFile()">导出</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -134,9 +139,10 @@
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <!--     如果planFile不为null,显示下载附件按钮     -->
-              <el-button v-if="scope.row.planFile !== null" type="text" size="small"
-                         @click="downloadFile(scope.row.planFile)">下载附件
-              </el-button>
+              <!--              <el-button v-if="scope.row.planFile !== null" type="text" size="small"-->
+              <!--                         @click="downloadFile(scope.row.planFile)">下载附件-->
+              <!--              </el-button>-->
+              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
               <el-button type="text" size="small" @click="updatePlanPage(scope.row.planId)">修改</el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row)">删除</el-button>
@@ -152,14 +158,28 @@
 
       <el-tab-pane label="已完成计划">
 
-        <el-form :inline="true" :model="finishedDataForm" @keyup.enter.native="getFinishedPlanList()">
-          <el-form-item>
-            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <!--        <el-form :inline="true" :model="finishedDataForm" @keyup.enter.native="getFinishedPlanList()">-->
+        <!--          <el-form-item>-->
+        <!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+        <!--          </el-form-item>-->
+        <!--          <el-form-item>-->
+        <!--            <el-button @click="getFinishedPlanList()">查询</el-button>-->
+        <!--          </el-form-item>-->
+        <!--        </el-form>-->
+
+        <el-form :inline="true" @keyup.enter.native="getFinishedPlanList()">
+          <el-form-item label="计划编号">
+            <el-input v-model="queryParamsFinished.planId" placeholder="参数名"></el-input>
+          </el-form-item>
+          <el-form-item label="计划名">
+            <el-input v-model="queryParamsFinished.planName" placeholder="计划名"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button @click="getFinishedPlanList()">查询</el-button>
+            <el-button @click="clearFinishedPage()">重置</el-button>
           </el-form-item>
         </el-form>
+
         <el-table :data="finishedPlanList" border v-loading="finishedListLoading"
                   @selection-change="selectionChangeHandle"
                   style="width: 100%;">
@@ -180,14 +200,14 @@
           </el-table-column>
           <el-table-column prop="planActualCompletionDate" header-align="center" align="center" label="实际完成日期"
                            width="110">
-            <template slot-scope="scope">
-              <span v-if="scope.row.planActualCompletionDate === null" style="color: gray;">-</span>
-            </template>
+            <!--            <template slot-scope="scope">-->
+            <!--              <span v-if="scope.row.planActualCompletionDate === null" style="color: gray;">-</span>-->
+            <!--            </template>-->
           </el-table-column>
           <el-table-column prop="planActualDays" header-align="center" align="center" label="实际天数">
-            <template slot-scope="scope">
-              <span v-if="scope.row.planActualDays === null" style="color: gray;">-</span>
-            </template>
+            <!--            <template slot-scope="scope">-->
+            <!--              <span v-if="scope.row.planActualDays === null" style="color: gray;">-</span>-->
+            <!--            </template>-->
           </el-table-column>
           <el-table-column prop="planTasksAssignment" header-align="center" align="center" label="任务派发">
           </el-table-column>
@@ -283,9 +303,10 @@
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <!--     如果planFile不为null,显示下载附件按钮     -->
-              <el-button v-if="scope.row.planFile !== null" type="text" size="small"
-                         @click="downloadFile(scope.row.planFile)">下载附件
-              </el-button>
+              <!--              <el-button v-if="scope.row.planFile !== null" type="text" size="small"-->
+              <!--                         @click="downloadFile(scope.row.planFile)">下载附件-->
+              <!--              </el-button>-->
+              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
               <el-button type="text" size="small" @click="updatePlanPage(scope.row.planId)">修改</el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row)">删除</el-button>
@@ -303,8 +324,44 @@
     </el-tabs>
 
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataQueryList"></add-or-update>
+
+
+    <div>
+      <!--       弹窗组件-->
+      <el-dialog :visible.sync="filesDialogVisible" title="附件列表">
+        <ul>
+          <!--              <li v-for="file in files" :key="file.name">-->
+          <!--               -->
+          <!--                <a :href="file.url" :download="file.name">{{ file.name }}</a>-->
+          <!--              </li>-->
+          <el-form>
+            <el-row v-for="file in files" :key="file.name" style="margin-bottom: 4px">
+              <el-col :span="12">
+                {{ file.name }}
+              </el-col>
+              <el-col :span="12">
+                <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>
+              </el-col>
+            </el-row>
+          </el-form>
+          <!--              <li v-for="file in files" :key="file.name">-->
+          <!--                -->
+          <!--                  -->
+          <!--                  <p>{{ file.name }}</p>-->
+          <!--                  &lt;!&ndash;                <a :href="file.url" :download="file.name">{{ file.name }}</a>&ndash;&gt;-->
+          <!--                  <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>-->
+          <!--              -->
+          <!--              </li>-->
+        </ul>
+        <!--            <span slot="footer" class="dialog-footer">-->
+        <!--              <el-button @click="closeModal">关 闭</el-button>-->
+        <!--            </span>-->
+      </el-dialog>
+    </div>
   </div>
+
+
 </template>
 
 <script>
@@ -313,6 +370,14 @@ import AddOrUpdate from './taskmanagementplan-add-or-update'
 export default {
   data() {
     return {
+      queryParamsFinished: {
+        planId: '',
+        planName: ''
+      },
+      queryParamsUnfinished: {
+        planId: '',
+        planName: ''
+      },
       dataForm: {
         key: ''
       },
@@ -338,13 +403,19 @@ export default {
       //员工列表
       options: [],
       indicatorOptions: [],
+
+      // 附件弹窗组件
+      filesDialogVisible: false,
+      // 附件列表
+      files: [],
+
     }
   },
   components: {
     AddOrUpdate
   },
   activated() {
-    this.getDataList()
+    this.getDataQueryList()
     this.getFinishedPlanList()
   },
   async created() {
@@ -395,16 +466,39 @@ export default {
         this.dataListLoading = false
       })
     },
+    // 获取数据列表
+    getDataQueryList() {
+      this.dataListLoading = true
+      this.$http({
+        // url: this.$http.adornUrl('/taskmanagement/plan/list'),
+        url: this.$http.adornUrl('/taskmanagement/plan/queryUnfinished'),
+        method: 'post',
+        data: this.$http.adornData({
+          page: this.pageIndex,
+          limit: this.pageSize,
+          plan: this.queryParamsUnfinished
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.dataList = data.page.list
+          this.totalPage = data.page.totalCount
+        } else {
+          this.dataList = []
+          this.totalPage = 0
+        }
+        this.dataListLoading = false
+      })
+    },
 
     getFinishedPlanList() {
       this.finishedListLoading = true
       this.$http({
         url: this.$http.adornUrl('/taskmanagement/plan/finished'),
-        method: 'get',
-        params: this.$http.adornParams({
-          'page': this.finishedPageIndex,
-          'limit': this.finishedPageSize,
-          'key': this.finishedDataForm.key
+        method: 'post',
+        data: this.$http.adornData({
+          page: this.pageIndex,
+          limit: this.pageSize,
+          plan: this.queryParamsFinished
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
@@ -417,18 +511,39 @@ export default {
         this.finishedListLoading = false
       })
     },
+    // getFinishedPlanList() {
+    //   this.finishedListLoading = true
+    //   this.$http({
+    //     url: this.$http.adornUrl('/taskmanagement/plan/finished'),
+    //     method: 'get',
+    //     params: this.$http.adornParams({
+    //       'page': this.finishedPageIndex,
+    //       'limit': this.finishedPageSize,
+    //       'key': this.finishedDataForm.key
+    //     })
+    //   }).then(({data}) => {
+    //     if (data && data.code === 0) {
+    //       this.finishedPlanList = data.page.list
+    //       this.finishedTotalPage = data.page.totalCount
+    //     } else {
+    //       this.finishedPlanList = []
+    //       this.finishedTotalPage = 0
+    //     }
+    //     this.finishedListLoading = false
+    //   })
+    // },
 
 
     // 每页数
     sizeChangeHandle(val) {
       this.pageSize = val
       this.pageIndex = 1
-      this.getDataList()
+      this.getDataQueryList()
     },
     // 当前页
     currentChangeHandle(val) {
       this.pageIndex = val
-      this.getDataList()
+      this.getDataQueryList()
     },
     // 多选
     selectionChangeHandle(val) {
@@ -490,7 +605,7 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
-                this.getDataList()
+                this.getDataQueryList()
               }
             })
           } else {
@@ -513,7 +628,7 @@ export default {
     },
 
     // 下载附件
-    downloadFile(imageUrl) {
+    downloadFile(url) {
       // 获取当前的 token，假设它存储在 localStorage 中
       const token = this.$cookie.get('token');
       if (token) {
@@ -523,10 +638,28 @@ export default {
       }
 
       // 将 token 作为参数添加到 URL
-      const imageUrlWithToken = `${imageUrl}?token=${token}`;
+      // const imageUrlWithToken = `${url}?token=${token}`;
 
       // 使用window.open方法打开下载链接
-      window.open(imageUrlWithToken);
+      // window.open(imageUrlWithToken);
+
+      // 拼接带有 token 的请求地址
+      const fileUrl = `${this.$http.adornUrl(`/generator/issuetable/${url}`)}?token=${token}`;
+      window.open(fileUrl);
+    },
+
+    viewAttachments(planId) {
+      this.$http({
+        url: this.$http.adornUrl('/taskmanagement/plan/files/' + planId),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          console.log("当前文件附件为" + JSON.stringify(data))
+          this.files = data.files
+          this.filesDialogVisible = true
+        }
+      })
     },
 
     // 获取指标名称
@@ -540,6 +673,64 @@ export default {
       }
       return "-";
     },
+
+    // 清空页码数据
+    clearUnfinishedPage() {
+      this.pageIndex = 1
+      this.queryParamsUnfinished.planId = ''
+      this.queryParamsUnfinished.planName = ''
+      this.getDataQueryList()
+    },
+
+    clearFinishedPage() {
+      this.pageIndex = 1
+      this.queryParamsFinished.planId = ''
+      this.queryParamsFinished.planName = ''
+      this.getFinishedPlanList()
+    },
+
+    exportFile() {
+      this.$http({
+        url: this.$http.adornUrl('/taskmanagement/plan/export'),
+        method: 'get',
+        params: this.$http.adornParams(),
+        responseType: 'blob'
+      }).then(res => {
+        // 创建 Blob 对象
+        const blob = new Blob([res.data], {type: 'application/octet-stream'});
+
+        // 创建一个临时的 URL
+        const url = window.URL.createObjectURL(blob);
+
+        // 创建一个隐藏的 <a> 标签
+        const link = document.createElement('a');
+        link.href = url;
+        // 获取当前时间
+        const currentTime = new Date();
+        // 格式化为中国时间
+        var time = currentTime.toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).replace(/\/|:/g, '-').replace(' ', ' ');
+
+        // 设置下载的文件名
+        link.download = time + '计划导出.xlsx'; // 你可以根据实际情况设置文件名
+
+        // 将 <a> 标签添加到文档中
+        document.body.appendChild(link);
+
+        // 触发点击事件
+        link.click();
+
+        // 移除 <a> 标签
+        document.body.removeChild(link);
+
+        // 释放 URL 对象
+        window.URL.revokeObjectURL(url);
+      })
+    }
+
 
   }
 }

@@ -11,6 +11,12 @@ import java.util.stream.Collectors;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.read.listener.PageReadListener;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.renren.common.utils.Query;
+import io.renren.modules.indicator.entity.IndicatorDataDictionaryEntity;
+import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
 import io.renren.modules.publicmanagement.dao.InstrumentLedgerDao;
 import io.renren.modules.qcManagement.dao.QcSubjectRegistrationDao;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
@@ -52,6 +58,64 @@ public class InstrumentLedgerController  {
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = instrumentLedgerService.queryPage(params);
         return R.ok().put("page", page);
+    }
+//System.out.println("params:" + params);
+//    String key = (String) params.get("key");
+//    QueryWrapper<InstrumentLedgerEntity> queryWrapper = new QueryWrapper<>();
+//
+//        if (key != null && !key.isEmpty()) {
+//        try {
+//            // 将 key 字符串解析为 Map
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            Map<String, String> keyMap = objectMapper.readValue(key, Map.class);
+//
+//            // 遍历 Map 并添加查询条件
+//            for (Map.Entry<String, String> entry : keyMap.entrySet()) {
+//                String field = entry.getKey();
+//                String value = entry.getValue();
+//
+//                if (value != null && !value.isEmpty()) {
+//                    switch (field) {
+//                        case "companyId":
+//                            queryWrapper.like("company_id", value);
+//                            break;
+//                        case "level":
+//                            queryWrapper.like("level", value);
+//                            break;
+//                        case "calibrationCycle":
+//                            queryWrapper.like("calibration_cycle", value);
+//                            break;
+//                        case "calibrationStatus":
+//                            queryWrapper.like("calibration_status", value);
+//                            break;
+//                        case "assessmentDepartment":
+//                            queryWrapper.like("assessment_department", value);
+//                            break;
+//                        // 可以根据需要添加更多的字段
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            // 这里可以处理异常，比如返回错误信息给前端
+//        }
+//    }
+//    IPage<IndicatorDataDictionaryEntity> page = this.page(
+//            new Query<IndicatorDataDictionaryEntity>().getPage(params),
+//            queryWrapper
+//    );
+//
+//    PageUtils pages = new PageUtils(page);
+//
+//
+//        return R.ok().put("page", pages);
+    @GetMapping("/Fuzzy_queries")
+    public R Fuzzy_queries(@RequestParam Map<String, Object> params) {
+
+        PageUtils page = instrumentLedgerService.queryPage(params);
+
+        return R.ok().put("page", page);
+
     }
 
     @PostMapping ("/message")

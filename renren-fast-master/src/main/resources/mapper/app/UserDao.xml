@@ -4,4 +4,7 @@
 <mapper namespace="io.renren.modules.app.dao.UserDao">
 
 
+    <select id="getUsernameById" resultType="java.lang.String">
+        select username from sys_user where user_id = #{id}
+    </select>
 </mapper>

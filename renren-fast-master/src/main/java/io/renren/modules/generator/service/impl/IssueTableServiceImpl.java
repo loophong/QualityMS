@@ -102,6 +102,78 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         return "0001"; // 如果理论上没有找到最大问题，返回默认值
     }
 
+    /**
+     * 获取按年份和月份统计的问题数
+     * @param year 年份
+     * @return 按月份统计的问题数
+     */
+    @Override
+    public Map<String, Integer> getMonthlyCountByYear(int year) {
+        // 使用 QueryWrapper 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("MONTH(creation_time) AS month", "COUNT(*) AS count")
+                .eq("YEAR(creation_time)", year) // 筛选出指定年份的数据
+                .groupBy("MONTH(creation_time)") // 按月分组
+                .orderByAsc("month"); // 按月份排序
+
+        // 执行查询，获取每月的问题数量
+        List<Map<String, Object>> result = issueTableDao.selectMaps(queryWrapper);
+
+        // 将查询结果转换为 Map<String, Integer> 格式，月份作为 key，数量作为 value
+        Map<String, Integer> monthlyStats = new HashMap<>();
+
+        // 初始化 Map，确保所有月份都有数据
+        for (int i = 1; i <= 12; i++) {
+            monthlyStats.put(String.valueOf(i), 0);  // 初始化为 0
+        }
+
+        // 遍历查询结果，将统计值填充到 Map 中
+        for (Map<String, Object> stat : result) {
+            String month = stat.get("month").toString(); // 获取月份
+            Integer count = Integer.parseInt(stat.get("count").toString()); // 获取数量
+            monthlyStats.put(month, count);
+        }
+
+        return monthlyStats;
+    }
+
+    /**
+     * 获取按月份统计的重复问题总数（按年份）
+     * @param year 年份
+     * @return 返回统计数据
+     */
+    @Override
+    public Map<String, Integer> getmonthlyDuplicateStats(int year) {
+        // 使用 QueryWrapper 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("MONTH(creation_time) AS month", "COUNT(*) AS count")
+                .eq("YEAR(creation_time)", year) // 筛选出指定年份的数据
+                .eq("over_due", "true") // 筛选 out over_due 为 "true" 的记录重复问题
+                .groupBy("MONTH(creation_time)") // 按月分组
+                .orderByAsc("month"); // 按月份排序
+
+        // 执行查询，获取每月的问题数量
+        List<Map<String, Object>> result = issueTableDao.selectMaps(queryWrapper);
+
+        // 将查询结果转换为 Map<String, Integer> 格式，月份作为 key，数量作为 value
+        Map<String, Integer> monthlyStats = new HashMap<>();
+
+        // 初始化 Map，确保所有月份都有数据
+        for (int i = 1; i <= 12; i++) {
+            monthlyStats.put(String.valueOf(i), 0);  // 初始化为 0
+        }
+
+        // 遍历查询结果，将统计值填充到 Map 中
+        for (Map<String, Object> stat : result) {
+            String month = stat.get("month").toString(); // 获取月份
+            Integer count = Integer.parseInt(stat.get("count").toString()); // 获取数量
+            monthlyStats.put(month, count);
+        }
+
+        return monthlyStats;
+    }
+
+
 
 
     @Autowired
@@ -195,7 +267,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
     @Override
     public List<IssueTableEntity> listAll() {
-        System.out.println("///" + list());
+//        System.out.println("///" + list());
         return this.list();
     }
 
@@ -566,29 +638,7 @@ public R closeRelatedTasks(Long issueId, Integer closeRelated) {
         }
     }
 
-//    @Override
-//    public Map<String, Integer> getCurrentMonthVerificationConclusionStatistics() {
-//        Map<String, Integer> statistics = new HashMap<>();
-//
-//        // 定义可能的验证结论状态
-//        List<String> verificationConclusions = Arrays.asList("暂缓", "结项");
-//
-//        // 获取当前月份起止日期
-//        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
-//        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
-//        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
-////        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-//
-//        // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
-//        statistics.put("持续", countIssuesByCreationCondition(currentMonthStart, nextMonthFirstDayString));
-//
-//        // 对其他验证结论进行统计
-//        for (String conclusion : verificationConclusions) {
-//            statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion, currentMonthStart, nextMonthFirstDayString));
-//        }
-//
-//        return statistics;
-//    }
+
 
     @Override
     public Map<String, Integer> getCurrentMonthVerificationConclusionStatistics() {
@@ -604,8 +654,56 @@ public R closeRelatedTasks(Long issueId, Integer closeRelated) {
         for (String conclusion : verificationConclusions) {
             statistics.put(conclusion, countIssuesByVerificationConclusion(conclusion));
         }
+        statistics.put("关闭", countIssuesByState());
 
         return statistics;
+    }
+
+    @Override
+    public Map<String, Integer> getCurrentMonthStatistics() {
+        Map<String, Integer> statistics = new HashMap<>();
+
+        // 定义可能的验证结论状态
+        List<String> verificationConclusions = Arrays.asList("暂缓", "结项");
+
+        // 获取当前月份起止日期
+        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
+        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
+//        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+
+        // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
+        statistics.put("持续", countIssuesByCreation(currentMonthStart, nextMonthFirstDayString));
+
+        // 对其他验证结论进行统计
+        for (String conclusion : verificationConclusions) {
+            statistics.put(conclusion, countIssuesByVerification(conclusion, currentMonthStart, nextMonthFirstDayString));
+        }
+        statistics.put("关闭", countIssuesBycruState(currentMonthStart, nextMonthFirstDayString));
+
+        return statistics;
+    }
+
+    @Override
+    public Map<String, Integer> getcurrentMonthInProgressCategoryStats() {
+        Map<String, Integer> categoryStatistics = new HashMap<>();
+
+        // 获取当前月份的起止日期
+        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
+        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
+
+        // 获取当前月份所有问题的 issue_category_id
+        List<String> issueCategoryIds = getIssueCategoryIds(currentMonthStart, nextMonthFirstDayString);
+
+        // 使用 issueCategoryIds 统计每个问题类型的数量
+        for (String categoryId : issueCategoryIds) {
+            Integer count = categoryStatistics.getOrDefault(categoryId, 0); // 获取当前类别的数量，默认值为 0
+            count++; // 每次遇到相同类型的 ID，就计数加 1
+            categoryStatistics.put(categoryId, count); // 更新数量
+        }
+
+        return categoryStatistics;
     }
 
 
@@ -952,16 +1050,45 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
     }
 
     @Override
-    public boolean checkReplicateIssue(Integer issueId, String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
-                // 构建查询条件
+//    public boolean checkReplicateIssue(Integer issueId, String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
+//                // 构建查询条件
+//        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+//
+//            queryWrapper.eq("Systematic_classification",systematicClassification )
+//                    .eq("First_Faulty_parts", firstFaultyParts)
+//                    .eq("Second_Faulty_parts", secondFaultyParts)
+//                    .eq("fault_type", faultType)
+//                    .eq("fault_model",faultModel );
+//
+//        // 查询符合条件的记录
+//        List<IssueTableEntity> issues = this.list(queryWrapper);
+//
+//        System.out.println("issues: " + issues);
+//
+//        // 判断是否存在重复记录
+//        boolean isDuplicate = !issues.isEmpty();
+//
+//        // 更新 overdue 属性为 true
+//        for (IssueTableEntity issue : issues) {
+//            issue.setOverDue("true");
+//            this.updateById(issue);
+//        }
+//
+//        return isDuplicate; // 返回是否存在重复记录
+//    }
+    public boolean checkReplicateIssue(Integer issueId, String systematicClassification, String firstFaultyParts,
+                                       String secondFaultyParts, String faultType, String faultModel) {
+        // 构建查询条件
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
 
-            queryWrapper.eq("Systematic_classification",systematicClassification )
-                    .eq("fault_type", faultType)
-                    .eq("First_Faulty_parts", firstFaultyParts)
-                    .eq("Second_Faulty_parts", secondFaultyParts)
-                    .eq("fault_model",faultModel );
-
+        // 根据传入的参数动态构建查询条件，避免查询条件为空时误查询
+        queryWrapper.eq(systematicClassification != null, "Systematic_classification", systematicClassification)
+                .eq(firstFaultyParts != null, "First_Faulty_parts", firstFaultyParts)
+                .eq(secondFaultyParts != null, "Second_Faulty_parts", secondFaultyParts)
+                .eq(faultType != null, "fault_type", faultType)
+                .eq(faultModel != null, "fault_model", faultModel)
+                // 排除state为"关闭"的记录
+                .ne("state", "关闭");  // 添加该条件，跳过state为"关闭"的记录;
 
 
         // 查询符合条件的记录
@@ -970,10 +1097,10 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
         // 判断是否存在重复记录
         boolean isDuplicate = !issues.isEmpty();
 
-        // 更新 overdue 属性为 true
-        for (IssueTableEntity issue : issues) {
-            issue.setOverDue("true");
-            this.updateById(issue);
+        if (isDuplicate) {
+            // 使用批量更新避免循环调用 updateById
+            issues.forEach(issue -> issue.setOverDue("true"));
+            this.updateBatchById(issues); // 假设你有批量更新的方法
         }
 
         return isDuplicate; // 返回是否存在重复记录
@@ -982,6 +1109,21 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
 
 
 
+
+    // 获取当前月份内所有问题的 issue_category_id
+    private List<String> getIssueCategoryIds(String currentMonthStart, String nextMonthFirstDayString) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("creation_time", currentMonthStart)
+                .lt("creation_time", nextMonthFirstDayString);
+
+        // 查询当月所有问题，获取 issue_category_id 字段
+        List<IssueTableEntity> issueList = this.list(queryWrapper);
+
+        // 提取 issue_category_id 并返回
+        return issueList.stream()
+                .map(IssueTableEntity::getIssueCategoryId) // 获取每个记录的 issue_category_id
+                .collect(Collectors.toList());
+    }
 
     private Integer countAllIssues() {
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
@@ -993,18 +1135,18 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
 
 
     // 统计“创建”的条件
-//    private Integer countIssuesByCreationCondition(String startDate, String endDate) {
-//        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.and(wrapper ->
-//                        wrapper.isNull("verification_conclusion")
-//                                .or().eq("verification_conclusion", "")
-//                                .or().like("verification_conclusion", "持续")
-//                )
-//                .ge("creation_time", startDate)
-//                .le("creation_time", endDate);
-//
-//        return this.count(queryWrapper);
-//    }
+    private Integer countIssuesByCreation(String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.and(wrapper ->
+                        wrapper.isNull("verification_conclusion")
+                                .or().eq("verification_conclusion", "")
+                                .or().like("verification_conclusion", "持续")
+                )
+                .ge("creation_time", startDate)
+                .le("creation_time", endDate);
+
+        return this.count(queryWrapper);
+    }
     private Integer countIssuesByCreationCondition() {
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.and(wrapper ->
@@ -1017,20 +1159,36 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
     }
 
 
-    // 根据 verification_conclusion 统计数量，处理包含多个状态的组合
-//    private Integer countIssuesByVerificationConclusion(String conclusion, String startDate, String endDate) {
-//        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
-//
-//        // 使用 FIND_IN_SET() 函数判断字段中是否包含该状态
-//        queryWrapper.ge("creation_time", startDate)
-//                .le("creation_time", endDate)
-//                .like("verification_conclusion", conclusion); // 使用 LIKE 查询
-//
-//        return this.count(queryWrapper);
-//    }
+    // 根据 verification_conclusion 统计数量，处理包含多个状态的组合（当月）
+    private Integer countIssuesByVerification(String conclusion, String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 使用 FIND_IN_SET() 函数判断字段中是否包含该状态
+        queryWrapper.ge("creation_time", startDate)
+                .le("creation_time", endDate)
+                .like("verification_conclusion", conclusion); // 使用 LIKE 查询
+
+        return this.count(queryWrapper);
+    }
+
+    private Integer countIssuesBycruState(String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("creation_time", startDate)
+                    .le("creation_time", endDate)
+                    .eq("state", "关闭"); // 使用 LIKE 查询
+
+        return this.count(queryWrapper);
+    }
     private Integer countIssuesByVerificationConclusion(String conclusion) {
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("verification_conclusion", conclusion); // 使用 LIKE 查询
+
+        return this.count(queryWrapper);
+    }
+
+    private Integer countIssuesByState() {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("state", "关闭"); // 使用 LIKE 查询
 
         return this.count(queryWrapper);
     }

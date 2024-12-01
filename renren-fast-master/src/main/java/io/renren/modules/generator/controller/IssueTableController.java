@@ -207,7 +207,7 @@ public class IssueTableController {
 
         // 调用服务层方法检查是否有重复的车号和问题类别
         boolean isDuplicate = issueTableService.checkReplicateIssue(issueId,systematicClassification,firstFaultyParts,secondFaultyParts,faultType,faultModel);
-//        System.out.println("结束检查车号和问题类别是否重复"+isDuplicate);
+        System.out.println("结束检查车号和问题类别是否重复"+isDuplicate);
         if (isDuplicate) {
             return R.ok("相同问题已发生");
         }
@@ -296,7 +296,7 @@ public class IssueTableController {
         return R.ok().put("useID", useID);
     }
     /**
-     * 获取问题统计
+     * 获取问题统计（总数）
      */
     @RequestMapping("/currentMonth")
     @RequiresPermissions("generator:issuetable:list") // 权限控制
@@ -307,13 +307,76 @@ public class IssueTableController {
 
         return R.ok().put("stats", stats);
     }
+    /**
+     * 获取问题统计（当月统计不同状态）
+     */
+    @RequestMapping("/truecurrentMonth")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getCurrentMonthStatistics() {
+        Map<String, Integer> stats = issueTableService.getCurrentMonthStatistics();
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取问题统计（当月统计不同类型）
+     */
+    @RequestMapping("/currentMonthInProgressCategoryStats")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getcurrentMonthInProgressCategoryStats() {
+        Map<String, Integer> stats = issueTableService.getcurrentMonthInProgressCategoryStats();
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取按月份统计的总数（按年份）
+     * @param year 年份
+     * @return 返回统计数据
+     */
+    @RequestMapping("/monthlyStats")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getMonthlyCount(@RequestParam("year") int year) {
+        // 获取按月统计的结果
+        Map<String, Integer> stats = issueTableService.getMonthlyCountByYear(year);
+
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        // 返回响应
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取按月份统计的重复问题总数（按年份）
+     * @param year 年份
+     * @return 返回统计数据
+     */
+    @RequestMapping("/monthlyDuplicateStats")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getmonthlyDuplicateStats(@RequestParam("year") int year) {
+        // 获取按月统计的结果
+        Map<String, Integer> stats = issueTableService.getmonthlyDuplicateStats(year);
+
+        // 计算重复问题的总数
+        int total = stats.values().stream().mapToInt(Integer::intValue).sum();
+        // 打印返回给前端的数据
+        System.out.println("返回前端的统计数据: " + total);
+
+        // 返回响应
+        return R.ok().put("stats", stats).put("total", total);
+    }
 
 
     /**
-     * 当月问题完成率
+     * 问题完成率
      */
 //    @Value("${file.upload-dir}")
-    // 获取当月问题完成率
+    // 获取问题完成率
     @RequestMapping("/completionRate")
     @RequiresPermissions("generator:issuetable:list")
     public R getCompletionRate() {
@@ -323,7 +386,7 @@ public class IssueTableController {
     }
 
     /**
-     * 获取当月问题总数
+     * 获取问题总数
      */
     @RequestMapping("/totalIssue")
     @RequiresPermissions("generator:issuetable:list") // 权限控制

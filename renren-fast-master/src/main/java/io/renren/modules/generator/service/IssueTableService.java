@@ -41,6 +41,8 @@ public interface IssueTableService extends IService<IssueTableEntity> {
      */
     Map<String, Integer> getCurrentMonthVerificationConclusionStatistics();
 
+    Map<String, Integer> getCurrentMonthStatistics();
+
     IssueTableEntity getByissueNumber(String issueNumber);
 
     Map<String, Integer> getTaskDetails(String issueNumber);
@@ -63,5 +65,11 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
 
     String newIssueNumber();
+
+    Map<String, Integer> getMonthlyCountByYear(int year); // 月度统计
+
+    Map<String, Integer> getmonthlyDuplicateStats(int year);
+
+    Map<String, Integer> getcurrentMonthInProgressCategoryStats();  // 当前月进行中类别统计
 }
 

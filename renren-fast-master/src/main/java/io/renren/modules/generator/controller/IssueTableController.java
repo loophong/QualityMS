@@ -62,6 +62,16 @@ public class IssueTableController {
         PageUtils page =  issueTableService.queryPageFinishedList(params);
         return R.ok().put("page", page);
     }
+    /*public R finishedList(@RequestParam Map<String, Object> params, @RequestParam(required = false) String issueDescription) {
+        // 如果存在问题描述参数，调用模糊查询方法  修改
+        PageUtils page;
+        if (issueDescription != null && !issueDescription.isEmpty()) {
+            page = issueTableService.queryPageByDescription(params, issueDescription);
+        } else {
+            page = issueTableService.queryPageFinishedList(params);
+        }
+        return R.ok().put("page", page);
+    }*/
     /**
      * 上传图片
      */

@@ -15,6 +15,7 @@ import io.renren.modules.generator.dao.IssueTableDao;
 import io.renren.modules.generator.entity.IssueMaskTableEntity;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
+import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
@@ -40,6 +41,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service("issueTableService")
 public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTableEntity> implements IssueTableService {
+
+
+
     private final String uploadDir;
     @Autowired
     private IssueTableDao issueTableDao;
@@ -65,15 +69,70 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
         long p = Long.parseLong((String) params.get("page"));
         long l = Long.parseLong((String) params.get("limit"));
-        Page<IssueTableEntity> page = new Page<IssueTableEntity>(p,l);
+        Page<IssueTableEntity> page = new Page<>(p, l);
+        String creationTime = (String) params.get("creationTime");
+        String issueDescription = (String) params.get("issueDescription");
+        try {
+            // 执行分页查询
+            List<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(creationTime,issueDescription);
+            page.setRecords(result);
+            page.setTotal(result.size());
 
-        Page<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(page);
-        log.info("result"+result);
-        return new PageUtils(page);
+            log.info("result" + page);
+            return new PageUtils(page);
+        } catch (Exception e) {
+            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+            page.setTotal(0);
+            return new PageUtils(page);
+        }
     }
+
+//    @Override
+//    public PageUtils queryPageFinishedList(Map<String, Object> params) {
+//        log.info("param" + params.get("page") + "------" + params.get("limit"));
+//
+//        long p = Long.parseLong((String) params.get("page"));
+//        long l = Long.parseLong((String) params.get("limit"));
+//        Page<QcknowledgebaseEntity> page = new Page<>(p, l);
+//
+//        // 提取模糊查询参数
+//        String topicName = (String) params.get("topicName");
+//        String keywords = (String) params.get("keywords");
+//        String startDate = (String) params.get("startDate");
+//        String endDate = (String) params.get("endDate");
+//
+//        try {
+//            // 执行分页查询
+//            List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,startDate,endDate);
+//            page.setRecords(result);
+//            page.setTotal(result.size());
+//
+//            log.info("result" + page);
+//            return new PageUtils(page);
+//        } catch (Exception e) {
+//            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+//            page.setTotal(0);
+//            return new PageUtils(page);
+//        }
+//    }
 
     @Autowired
     private IssueMaskTableDao issueMaskTableDao; // 新增的 DAO
+
+
+
+    @Override
+    public PageUtils queryPageByDescription(Map<String, Object> params, String description) {//修改
+        // 获取分页参数
+        long p = Long.parseLong((String) params.get("page"));
+        long l = Long.parseLong((String) params.get("limit"));
+        Page<IssueTableEntity> page = new Page<>(p, l);
+
+        // 调用 DAO 层方法进行分页查询，传递问题描述  问题描述
+        Page<IssueTableEntity> result = issueTableDao.selectFinishedSubjectListByDescription(page, description);
+
+        return new PageUtils(result);
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {

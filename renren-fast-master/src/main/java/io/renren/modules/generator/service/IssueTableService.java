@@ -19,7 +19,7 @@ import java.util.Map;
  * @date 2024-07-22 11:15:58
  */
 public interface IssueTableService extends IService<IssueTableEntity> {
-
+    PageUtils queryPageByDescription(Map<String, Object> params, String description);//问题描述 模糊查询 修改
     PageUtils queryPage(Map<String, Object> params);
     PageUtils queryPagecreator(Map<String, Object> params);
     PageUtils QueryPage(Map<String, Object> params);

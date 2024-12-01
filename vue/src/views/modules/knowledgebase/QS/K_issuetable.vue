@@ -1,7 +1,23 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="问题类别" prop="issueCategoryId">
+    <el-form :inline="true" :model="myQueryParam" @keyup.enter.native="getDataList()">
+      
+      <!-- 查询输入框 -->  
+      <el-form-item>
+        <el-input v-model="myQueryParam.issueDescription" placeholder="问题描述" clearable></el-input>
+      </el-form-item>
+      <!-- <el-form-item>
+        <el-input v-model="myQueryParam.creationTime" placeholder="创建时间" clearable></el-input>
+      </el-form-item> -->
+      <el-form-item label="问题发生时间" prop="creationTime"></el-form-item>
+      <el-date-picker 
+          v-model="myQueryParam.creationTime"
+          type="date"
+          placeholder="选择创建时间"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
+      <!-- <el-form-item label="问题类别" prop="issueCategoryId">
         <el-select v-model="queryParams.issueCategoryId" filterable placeholder="请选择问题类别">
           <el-option
             v-for="item in issueCategoryOptions"
@@ -30,9 +46,9 @@
             :value="department.value">
           </el-option>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
-        <el-button @click="getQueryList()">查询</el-button>
+        <el-button @click="getDataList()">查询</el-button>
       </el-form-item>
       <el-form-item>
         <el-button @click="downloadTemplate()">下载模板</el-button>
@@ -386,6 +402,10 @@
           key: ''
         },
         dataList: [],
+        myQueryParam: {
+            creationTime: '',
+            issueDescription: '',
+          },
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -407,6 +427,7 @@
         fullCause: '',    // 用于存储完整描述
         fullstatus: '',
         dialogVisible2: false,
+        dialogVisible3: false,
         fullRetStates:'',
       }
 
@@ -422,6 +443,8 @@
       this.fetchData()
     },
     methods: {
+
+      
       getImageUrl(fileflag) {
         const token = this.$cookie.get('token'); // 获取当前的 token
         if (!token) {
@@ -620,7 +643,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'issueDescription': this.myQueryParam.issueDescription,
+            'creationTime': this.myQueryParam.creationTime,
           })
         }).then(({data}) => {
           if (data && data.code === 0) {

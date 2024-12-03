@@ -62,6 +62,10 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -308,6 +312,7 @@ export default {
           conplanText: this.textBy || "未命名",
           conplanSeries: JSON.stringify(filteredData),
           conplanAxis: JSON.stringify(tmp),
+          conplanIssue: this.conplanIssue,
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
           conplanUrl: JSON.stringify(img.src),

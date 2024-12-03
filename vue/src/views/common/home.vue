@@ -55,7 +55,7 @@
           <div class="panel-footer"></div>
         </div>
         <div class="panel issue">
-          <h2 @click="openNewPage">问题统计  完成率：{{ completionRate }}</h2>
+          <h2 @click="openNewPage">问题统计 完成率：{{ completionRate }}</h2>
           <div id="issueChart" ref="issueChart"></div>
           <div class="panel-footer"></div>
         </div>
@@ -90,11 +90,11 @@
           <div class="picture" ref="onTimePieChart" style="width: 98%; height: 90%;"></div>
           <div class="panel-footer"></div>
         </div>
-        <div class="panel QC">
+        <div class="panel QC" @click="toStatistics">
           <br>
           <qc-chart></qc-chart>
         </div>
-        <div class="panel QC">
+        <div class="panel QC" @click="toStatistics">
           <br>
           <qc-pie-chart id="qc-pie-chart" ref="qcPieChart"></qc-pie-chart>
         </div>
@@ -591,7 +591,12 @@ export default {
 
       chart.setOption(option);
     },
-
+    // ----------------QC--------------------
+    toStatistics() {
+      this.$router.push({
+        name: 'statistics',
+      })
+    },
   }
 };
 </script>

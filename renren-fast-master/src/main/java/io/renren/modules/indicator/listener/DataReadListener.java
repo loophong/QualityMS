@@ -76,6 +76,7 @@ public class DataReadListener extends AnalysisEventListener<IndicatorIndicatorSu
                 }
                 entity.setManagementDepartment(existingEntity.getManagementDepartment());
                 entity.setIndicatorValue(existingEntity.getIndicatorPlannedValue());
+                entity.setIndicatorClassification(existingEntity.getIndicatorClassification());
 
                 // 解析指标公式并计算指标值
                 BigDecimal calculatedValue = calculateIndicatorValue(existingEntity.getIndicatorDefinition(), dataList);

@@ -1,334 +1,381 @@
+<!--<template>-->
+<!--  <div>-->
+<!--    <div style="display: flex;">-->
+<!--      <div id="barChart1" ref="barChart1" style="width: 50%; height: 300px;"></div>-->
+<!--      <div id="barChart2" ref="barChart2" style="width: 50%; height: 300px;"></div>-->
+<!--      <div id="barChart3" ref="barChart3" style="width: 50%; height: 300px;"></div>-->
+<!--      <div id="barChart4" ref="barChart4" style="width: 50%; height: 300px;"></div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</template>-->
 <template>
-  <div id="index">
-    <header>
-      <h1>盘锦企管系统</h1>
-      <div class="showTime">{{ currentTime }}</div>
-    </header>
-    <section class="mainbox">
-      <div class="column">
-<!--        <div class="panel indicator1">-->
-<!--          <h2>部门指标统计</h2>-->
-<!--          <div id="indicatorChart1" ref="indicatorChart1"></div>-->
-<!--          <div class="panel-footer"></div>-->
-<!--        </div>-->
-<!--        <div class="panel indicator2">-->
-<!--          <h2>分级指标统计</h2>-->
-<!--          <div id="indicatorChart2" ref="indicatorChart2"></div>-->
-<!--          <div class="panel-footer"></div>-->
-<!--        </div>-->
-        <div class="panel issue center-panel">
-          <h2>问题统计 完成率：{{ completionRate }}</h2>
-          <div id="issueChart" ref="issueChart"></div>
-          <div class="panel-footer"></div>
+  <div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px;">
+      <!-- Bar Chart 1 -->
+      <div style="flex: 0 0 48%; height: 300px;" id="barChart1" ref="barChart1"></div>
+
+      <!-- Bar Chart 2 (with Year Selector) -->
+      <div style="flex: 0 0 48%; height: 300px;">
+        <div style="margin-bottom: 10px; text-align: center;">
+          <!-- 年份选择器 -->
+          <el-select v-model="selectedYear" placeholder="选择年份" @change="onYearChange" style="width: 150px; margin: 0 auto;">
+            <el-option
+              v-for="year in yearOptions"
+              :key="year"
+              :label="year"
+              :value="year"
+            ></el-option>
+          </el-select>
         </div>
-
+        <div id="barChart2" ref="barChart2" style="height: 250px;"></div>
       </div>
-<!--      <div class="column">-->
-<!--        <div class="no">-->
-<!--          <div class="no-bd">-->
-<!--            <ul>-->
-<!--              <li>指标总数</li>-->
-<!--              <li>计划总数</li>-->
-<!--              <li>问题总数</li>-->
-<!--            </ul>-->
-<!--          </div>-->
-<!--          <div class="no-hd">-->
-<!--            <ul>-->
-<!--              <li>{{ indicatorCounts }}</li>-->
-<!--              <li>{{ planCounts }}</li>-->
-<!--              <li>{{ totalIssue }}</li>-->
-<!--            </ul>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="map">-->
-<!--          <div class="map1"></div>-->
-<!--          <div class="map2"></div>-->
-<!--          <div class="map3"></div>-->
-<!--          <div class="chart"></div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="column">-->
-<!--        <div class="panel task">-->
-<!--          <h2>计划完成情况</h2>-->
-<!--          <div class="picture" ref="onTimePieChart" style="width: 98%; height: 90%;"></div>-->
-<!--          <div class="panel-footer"></div>-->
-<!--        </div>-->
-<!--        <div class="panel QC">-->
-<!--          <br>-->
-<!--          <qc-chart></qc-chart>-->
-<!--        </div>-->
-<!--        <div class="panel QC">-->
-<!--          <br>-->
-<!--          <qc-pie-chart id="qc-pie-chart" ref="qcPieChart"></qc-pie-chart>-->
-<!--        </div>-->
-<!--      </div>-->
-    </section>
 
+      <!-- Bar Chart 3 -->
+      <div style="flex: 0 0 48%; height: 300px;">
+        <div style="margin-bottom: 10px; text-align: center;">
+          <!-- 年份选择器 -->
+          <el-select v-model="selectedYearChart3" placeholder="选择年份" @change="onYearChangeChart3" style="width: 150px; margin: 0 auto;">
+            <el-option
+              v-for="year in yearOptions"
+              :key="year"
+              :label="year"
+              :value="year"
+            ></el-option>
+          </el-select>
+        </div>
+        <div id="barChart3" ref="barChart3" style="height: 250px;"></div>
+      </div>
+
+      <!-- Bar Chart 4 -->
+      <div style="flex: 0 0 48%; height: 300px;" id="barChart4" ref="barChart4"></div>
+    </div>
   </div>
 </template>
 
 <script>
-import VChart from 'vue-echarts';
-import 'echarts';
-import qcChart from "../QCmanagement/qcChart/qcChart.vue";
-import qcPieChart from "../QCmanagement/qcChart/qcPieChart.vue";
-import * as echarts from "echarts";
+import * as echarts from 'echarts';
 
 export default {
-  components: {
-    qcPieChart, qcChart,
-    VChart
-  },
-  activated () {
-    this.getIssueStats(); // 获取问题统计数据
-    this.gettotalIssue();
-    // this.fetchData()
-  },
   data() {
     return {
-//----------------问题模块-----------------
-      issueStats: {}, // 存储当月问题统计数据
-      issueCategories: ["暂缓", "持续", "结项"], // 问题分类
-      totalIssue: '',
-      completionRateData: { completed: 0, notCompleted: 0 },// 新增的完成率数据
-      completionRate: 0, // 完成率
-      // issueCategories: ["创建", "暂停", "未完成", "已完成", "结项"], // 问题分类
+      //图一
+      issueStats: { 暂缓: 0, 持续: 0, 结项: 0, 关闭: 0, 创建: 0 }, // 初始状态
+      //图二
+      selectedYear: new Date().getFullYear(), // 默认当前年份
+      yearOptions: [], // 存储动态生成的年份列表 // 可选择的年份列表
+      monthlyData: [], // 每个月的问题数
+      months: [], // 月份数组（1 到 12）
+      monthlyGrowth: null, // 月同比增长问题数
+      //图三
+      selectedYearChart3: new Date().getFullYear(),  // 当前选择的年份（Bar Chart 3）
+      monthlyDuplicateData: [], // 存储月度重复问题数的数据（Bar Chart 3）
+      duplicateIssueTotal: 0, // 重复问题总数
+      // 图四
+      issueCategoryStats: {}, // 当前月进行中问题的类别数据
+
     };
   },
-  async mounted() {
-    // console.log('组件已经挂载');
-    this.updateTime(); // 初始化时立即调用一次以显示当前时间
-    this.t = setInterval(this.updateTime, 1000); // 每秒更新一次
-    // this.getIndicatorCounts()
-    // this.renderChart()
-    this.getIssueStats(); // 获取问题统计数据
-    this.gettotalIssue();
-    this.getIndicatorCounts();
+  mounted() {
+    // 初始化图表
+    this.initCharts();
+    // 获取数据
+    this.getIssueStats();
 
-    this.getCompletionRate(); // 新增调用完成率数据的方法
+    this.getMonthlyIssueStats(this.selectedYear); // 默认加载当前年份的数据
+    this.generateYearOptions();  // 动态生成年份列表
 
-    await this.getTaskCounts();
-    await this.getPlanCounts();
-    this.initOnTimePieChart();
-    this.initEarlyCompletionPieChart();
+    this.getMonthlyDuplicateStats(this.selectedYearChart3);  // 获取初始数据（Bar Chart 3）
 
-
+    this.getInProgressIssueCategoryStats();  // 获取当前月进行中问题的类别数据（Bar Chart 4）
   },
   methods: {
-  // 查询问题数量
-  getIssueStats() {
-    this.$http({
-      url: this.$http.adornUrl('/generator/issuetable/currentMonth'),
-      method: 'get',
-      params: this.$http.adornParams({})
-    }).then(({ data }) => {
-      if (data && data.code === 0) {
-        this.issueStats = data.stats; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
-        // this.totalIssue = data.stats['暂停'] + data.stats['未完成'] + data.stats['已完成'] + data.stats['结项']
-        console.log('数据转换中......', this.issueStats)
-        this.renderIssueChart(); // 渲染图表
-      } else {
-        this.issueStats = { 暂缓: 0, 持续: 0, 结项: 0 }; // 默认值
-        // this.issueStats = {创建: 0, 持续: 0, 未完成: 0, 已完成: 0, 结项: 0};
-      }
-    });
-  },
-  // 查询问题完成情况
-  getCompletionRate() {
-    this.$http({
-      url: this.$http.adornUrl('/generator/issuetable/completionRate'),
-      method: 'get',
-      params: this.$http.adornParams({})
-    }).then(({ data }) => {
-      if (data) {
-        console.log('返回的data', data);
-        // 获取完成率
-        const completed = data.completionRate.completed;
-        // const notCompleted = data.completionRate.notCompleted;
-        const total = data.completionRate.tolCompleted;
-        const completionRate = total > 0 ? ((completed / total) * 100).toFixed(2) + '%' : '0%';
-
-        // 更新显示的完成率
-        this.completionRate = completionRate;  // 使用 Vue 响应式数据绑定
-      } else {
-        console.error('无效的数据格式');
-      }
-    });
-  },
-  gettotalIssue() {
-    this.$http({
-      url: this.$http.adornUrl('/generator/issuetable/totalIssue'),
-      method: 'get',
-      params: this.$http.adornParams({})
-    }).then(({ data }) => {
-      if (data && data.code === 0) {
-        this.totalIssue = data.totalIssue; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
-        // console.log('数据转换中......', this.issueStats)
-      } else {
-        console.error('无效的数据格式');
-      }
-    });
-  },
-
-  // 渲染问题统计图表
-  renderIssueChart() {
-    // console.log('开始渲染.....')
-    const chart = echarts.init(document.getElementById("issueChart"));
-
-    const option = {
-      title: {
-      },
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'shadow'
+    //图一
+    // 获取当前月份问题状态数据
+    getIssueStats() {
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuetable/truecurrentMonth'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.issueStats = data.stats; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
+          console.log('数据转换中......', this.issueStats);
+          this.renderIssueChart(); // 渲染图表
+        } else {
+          // 默认值
+          this.issueStats = { 暂缓: 0, 持续: 0, 结项: 0,创建: 0 ,关闭: 0};
         }
-      },
-      grid: {
-        left: '0%',
-        top: '10px',
-        right: '0%',
-        bottom: '26px',
-        containLabel: true
-      },
-      xAxis: {
-        type: 'category',
-        data: this.issueCategories, // 问题分类作为X轴
-        axisLabel: {
-          color: "rgba(255,255,255,.6)",
-          fontSize: 12,
+      });
+    },
+    // 初始化图表
+    initCharts() {
+      const chart1 = echarts.init(this.$refs.barChart1);
+
+      const options = {
+        title: {
+          text: '问题当月完成情况'
         },
-        axisLine: {
-          show: false,
-          lineStyle: {
-            color: "rgba(255,255,255,.1)",
-            width: 2,
-          },
+        tooltip: {},
+        xAxis: {
+          type: 'category',
+          data: ['总数', '持续', '结项', '关闭']
         },
-      },
-      yAxis: {
-        type: 'value',
-        axisLabel: {
-          color: "rgba(255,255,255,.6)",
-          fontSize: 12,
+        yAxis: {
+          type: 'value'
         },
-        splitLine: {
-          show: false
+        series: [
+          {
+            data: [0, 0, 0, 0],  // 初始数据为 0
+            type: 'bar'
+          }
+        ]
+      };
+
+      chart1.setOption(options);
+    },
+    // 渲染图表
+    renderIssueChart() {
+      const chart1 = echarts.init(this.$refs.barChart1);
+
+      // 计算 "总数"
+      const totalCount = this.issueStats['暂缓'] + this.issueStats['持续'] + this.issueStats['结项'];
+      console.log('总数', totalCount);
+      const options = {
+        title: {
+          text: '当月问题统计'
+        },
+        tooltip: {},
+        xAxis: {
+          type: 'category',
+          data: ['总数', '持续', '结项', '关闭']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: [
+              totalCount,
+              this.issueStats['持续'],
+              this.issueStats['结项'],
+              this.issueStats['关闭']
+            ],
+            type: 'bar'
+          }
+        ]
+      };
+
+      chart1.setOption(options);
+    },
+
+    //图二
+    // 生成年份选择器的可选年份范围
+    generateYearOptions() {
+      const currentYear = new Date().getFullYear();
+      const startYear = currentYear - 5; // 当前年份之前5年
+      const endYear = currentYear; // 当前年份之后5年
+      this.yearOptions = [];
+
+      for (let year = startYear; year <= endYear; year++) {
+        this.yearOptions.push(year);
+      }
+    },
+    // 年份选择变更时
+    onYearChange() {
+      this.getMonthlyIssueStats(this.selectedYear);
+    },
+
+    // 向后端请求某个年份的月度问题数
+    getMonthlyIssueStats(year) {
+      this.$http({
+        url: this.$http.adornUrl(`/generator/issuetable/monthlyStats`),
+        method: 'get',
+        params: { year },
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.monthlyData = data.stats; // 假设返回的数据格式 { 1: 10, 2: 12, ..., 12: 5 }
+          // 计算月同比增长
+          this.calculateMonthGrowth();
+          this.renderMonthlyChart(); // 渲染图表
+        } else {
+          // 默认值（如果没有数据）
+          this.monthlyData = Array(12).fill(0);
+          this.renderMonthlyChart();
         }
-      },
-      series: [
-        {
-          name: '数量',
-          type: 'bar',
-          data: [
-            // this.issueStats['创建'] || 0,
-            { value: this.issueStats['暂缓'] || 0, itemStyle: { normal: { color: '#2d84ff' } } },
-            { value: this.issueStats['持续'] || 0, itemStyle: { normal: { color: '#ff8a22' } } },
-            { value: this.issueStats['结项'] || 0, itemStyle: { normal: { color: '#f7ff10' } } }
-          ], // 根据获取的数据填充
-          itemStyle: {
-            color: '#409EFF',
-          },
+      });
+    },
+    // 计算月同比增长
+    calculateMonthGrowth() {
+      const currentMonth = new Date().getMonth() + 1; // 当前月
+      const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1; // 上个月
+
+      const currentMonthCount = this.monthlyData[currentMonth] || 0;
+      const previousMonthCount = this.monthlyData[previousMonth] || 0;
+
+      if (previousMonthCount !== 0) {
+        this.monthlyGrowth = ((currentMonthCount - previousMonthCount) / previousMonthCount) * 100;
+      } else {
+        this.monthlyGrowth = 0; // 如果上个月的问题数为0，则同比增长为0
+      }
+    },
+    // 渲染月度问题数的柱状图
+    renderMonthlyChart() {
+      const chart2 = echarts.init(this.$refs.barChart2);
+
+      // 设置月份标签 ["1月", "2月", ..., "12月"]
+      this.months = Array.from({ length: 12 }, (_, i) => `${i + 1}月`);
+
+      // 将 this.monthlyData 的键转为数组，并确保它是从1到12的映射
+      const monthData = this.months.map((month, index) => {
+        const monthNumber = index + 1; // 获取当前月的数字，例如 1, 2, ..., 12
+        return this.monthlyData[monthNumber] || 0; // 获取每个月的问题数，如果没有数据则为 0
+      });
+
+      const options = {
+        title: {
+          text: `月度问题数展示 -  本月同比增长: ${this.monthlyGrowth.toFixed(2)}%`
         },
-      ],
-    };
+        tooltip: {},
+        xAxis: {
+          type: 'category',
+          data: this.months, // 月份数据
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: [
+          {
+            data: monthData, // 使用月度问题数数据
+            type: 'bar',
+          }
+        ]
+      };
 
-    chart.setOption(option);
-  },
+      chart2.setOption(options);
+    },
 
-}
+    // 年份选择变化处理（Bar Chart 3）
+    onYearChangeChart3() {
+      this.getMonthlyDuplicateStats(this.selectedYearChart3);
+    },
+    // 向后端请求某个年份的月度重复问题数
+    getMonthlyDuplicateStats(year) {
+      this.$http({
+        url: this.$http.adornUrl(`/generator/issuetable/monthlyDuplicateStats`), // 假设后端接口为 `/monthlyDuplicateStats`
+        method: 'get',
+        params: { year },
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.monthlyDuplicateData = data.stats;  // 假设返回的数据格式 { 1: 3, 2: 5, ..., 12: 0 }
+          this.duplicateIssueTotal = data.total; // 获取总数
+          this.renderDuplicateChart();  // 渲染图表
+        } else {
+          // 默认值（如果没有数据）
+          this.monthlyDuplicateData = Array(12).fill(0);
+          this.renderDuplicateChart();
+        }
+      });
+    },
+    // 渲染月度重复问题数的柱状图（Bar Chart 3）
+    renderDuplicateChart() {
+      const chart3 = echarts.init(this.$refs.barChart3);
+
+      // 设置月份标签 ["1月", "2月", ..., "12月"]
+      this.months = Array.from({ length: 12 }, (_, i) => `${i + 1}月`);  // ["1月", "2月", ..., "12月"]
+
+      // 将 this.monthlyDuplicateData 的键转为数组，并确保它是从1到12的映射
+      const monthData = this.months.map((month, index) => {
+        const monthNumber = index + 1; // 获取当前月的数字，例如 1, 2, ..., 12
+        return this.monthlyDuplicateData[monthNumber] || 0; // 获取每个月的重复问题数，如果没有数据则为 0
+      });
+
+      // 图表配置
+      const options = {
+        title: {
+          text: `月度重复问题数 - 重复问题总数: ${this.duplicateIssueTotal}`
+        },
+        tooltip: {},
+        xAxis: {
+          type: 'category',
+          data: this.months,  // 月份数据
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: [
+          {
+            data: monthData,  // 使用月度重复问题数数据
+            type: 'bar',  // 图表类型：柱状图
+          }
+        ]
+      };
+
+      // 设置图表的配置项
+      chart3.setOption(options);
+    },
 
 
+    //图四
+    // 获取当前月进行中问题的类别数据
+    getInProgressIssueCategoryStats() {
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuetable/currentMonthInProgressCategoryStats'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({ data }) => {
+        console.log('返回的数据：', data); // 调试输出
+        if (data && data.code === 0) {
+          this.issueCategoryStats = data.stats;  // 确保 data.stats 格式正确
+          console.log('处理后的统计数据：', this.issueCategoryStats); // 调试输出
+          this.renderIssueCategoryChart();  // 渲染图表
+        } else {
+          // 默认值
+          this.issueCategoryStats = {};
+          this.renderIssueCategoryChart();
+        }
+      });
+    },
+
+    // 渲染图四的柱状图
+    renderIssueCategoryChart() {
+      const chart4 = echarts.init(this.$refs.barChart4);
+
+      // 获取问题类别和问题数
+      const categories = Object.keys(this.issueCategoryStats);  // 问题类别
+      const issueCounts = categories.map(category => this.issueCategoryStats[category]);  // 对应问题数
+
+      // 图表配置项
+      const options = {
+        title: {
+          text: '当月问题类别统计'
+        },
+        tooltip: {
+          trigger: 'axis',
+        },
+        xAxis: {
+          type: 'category',
+          data: categories,  // 问题类别
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: [
+          {
+            data: issueCounts,  // 问题数
+            type: 'bar',  // 设置为柱状图
+          }
+        ]
+      };
+
+      chart4.setOption(options);  // 渲染图表
+    },
+
+
+
+
+  }
 };
-
-
 </script>
 
-<style>
-.mod-home {
-  display: flex;
-  flex-wrap: wrap;
-  /* 自动换行 */
-  gap: 20px;
-  /* 每个区域之间的间距 */
-}
-
-
-.box {
-  font-size: 24px;
-  /* 设置字体大小 */
-  flex: 1 1 40%;
-  /* 每个区域占 30% 宽度 */
-  text-align: center;
-  padding: 20px;
-  border-radius: 4px;
-  min-width: 200px;
-  /* 设置最小宽度，防止过小 */
-  height: 400px;
-  /* 设置每个容器的高度为父容器的百分比 */
-}
-
-#panel QC {
-  width: 98%;
-  height: 90%;
-}
-
-#indicatorChart1 {
-  width: 98%;
-  height: 90%;
-}
-
-#indicatorChart2 {
-  width: 98%;
-  height: 90%;
-}
-
-#QC {
-  width: 100%;
-  height: 100%;
-  /* 确保图表容器高度为 100% */
-}
-
-.flex-container {
-  display: flex;
-  justify-content: space-between;
-  /* 在主轴上均匀分布 */
-  width: 100%;
-  height: 100%;
-}
-
-.flex-item {
-  border: 0px solid #ccc;
-  text-align: center;
-  line-height: 96%;
-  height: 96%;
-}
-
-.picture {
-  display: flex;
-}
-
-#issueChart {
-  width: 98%;
-  /* 使其宽度充满父容器 */
-  height: 90%;
-  /* 高度可以设置为100%，需要确保父容器有明确的高度 */
-}
-.center-panel {
-  width: 60%; /* 调整宽度 */
-  margin: 0 auto; /* 居中显示 */
-  padding: 20px; /* 内边距，增加空间感 */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 轻微阴影效果 */
-  border-radius: 8px; /* 圆角 */
-}
-
-.center-panel h2 {
-  text-align: center; /* 标题居中 */
-}
-
-#issueChart {
-  width: 100%;
-  height: 300px; /* 根据需求调整高度 */
-}
-
+<style scoped>
 </style>

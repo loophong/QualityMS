@@ -34,6 +34,9 @@ public interface QcToolsConplanDao extends BaseMapper<QcToolsConplanEntity> {
     @Select("select * from qc_tools_conplan where conplan_subject = #{conplanSubject} ")
     List<QcToolsConplanEntity> getDataByS(Integer conplanSubject);
 
+    @Select("select * from qc_tools_conplan where conplan_issue = #{conplanIssue} ")
+    List<QcToolsConplanEntity> getDataByI(Integer conplanIssue);
+
     //根据Id查询
     @Select("select * from qc_tools_conplan where conplan_id = #{conplanId}")
     List<QcToolsConplanEntity> getDataById(Integer conplanId);

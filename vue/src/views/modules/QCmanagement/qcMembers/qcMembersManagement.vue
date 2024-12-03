@@ -203,8 +203,8 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"
       @refreshCommonList="getGroupList"></add-or-update>
-    <add-group-dialog v-if="AddGroupDialogVisible" ref="AddGroupDialog" @refreshDataList="getDataList"
-      @refreshCommonList="getGroupList"></add-group-dialog>
+    <add-group-dialog v-if="AddGroupDialogVisible" ref="AddGroupDialog" @refreshDataListGroup="getDataList"
+      @refreshCommonListGroup="getGroupList"></add-group-dialog>
   </el-tabs>
 
 </template>
@@ -270,20 +270,7 @@ export default {
         this.groupList = groupList;
       });
       console.log(this.tableData)
-      this.tableData.sort(function (a, b) {
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-        // 比较两个日期对象，降序排列
-        return dateB - dateA;
-      })
-      this.tableData.forEach(e => {
-        e.children.sort(function (a, b) {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          // 比较两个日期对象，降序排列
-          return dateB - dateA;
-        });
-      });
+
       console.log(this.tableData)
       this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
       this.totalPageExamine = this.examineList.length;
@@ -523,7 +510,7 @@ export default {
           const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
           saveAs(
             new Blob([wbout], { type: "application/octet-stream" }),
-            "课题登记表.xlsx"
+            "小组成员表.xlsx"
           );
 
           // 提交数据到Vuex Store
@@ -594,10 +581,25 @@ export default {
             });
             console.log(map)
             this.tableData = Object.values(map);
+            this.tableData.sort(function (a, b) {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              // 比较两个日期对象，降序排列
+              return dateB - dateA;
+            })
+            this.tableData.forEach(e => {
+              e.children.sort(function (a, b) {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                // 比较两个日期对象，降序排列
+                return dateB - dateA;
+              });
+            });
           } else {
             this.tmpList = [];
             this.totalPage = 0;
           }
+          this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
           this.dataListLoading = false;
           resolve(groupList);
         }).catch(error => {

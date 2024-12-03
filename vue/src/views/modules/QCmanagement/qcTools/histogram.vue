@@ -58,6 +58,10 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -274,6 +278,8 @@ export default {
           conplanAxis: JSON.stringify(this.categories),
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanIssue: this.conplanIssue,
+
           conplanUrl: JSON.stringify(img.src),
           conplanUser: this.currentUserName,
         }),

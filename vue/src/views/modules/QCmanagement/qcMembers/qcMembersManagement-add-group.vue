@@ -7,7 +7,7 @@
           <el-form-item v-if="isAdmin" prop="groupName" label="小组名称">
             <el-input v-model="dataForm.groupName" placeholder="请输入小组名称"></el-input>
           </el-form-item>
-          <el-form-item prop="mainName" label="组长姓名">
+          <el-form-item prop="userId" label="组长姓名">
             <!--             <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input>-->
             <!--            <el-select v-model="dataForm.userId" placeholder="请选择角色">-->
             <!--              <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">-->
@@ -161,7 +161,7 @@ export default {
         userId: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
-        name: [
+        mainName: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
         // number: [
@@ -263,11 +263,8 @@ export default {
                 duration: 1500,
                 onClose: () => {
                   this.visible = false;
-                  if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
-                    this.$emit('refreshDataList');
-                  } else {
-                    this.$emit('refreshCommonList');
-                  }
+                  this.$emit('refreshDataListGroup');
+                  this.$emit('refreshCommonListGroup');
                 }
               });
 
@@ -341,11 +338,8 @@ export default {
           duration: 1500,
           onClose: () => {
             this.visible = false;
-            if (this.isAuth('qcManagement:group:admin') || this.isAuth('qcManagement:group:examine')) {
-              this.$emit('refreshDataList');
-            } else {
-              this.$emit('refreshCommonList');
-            }
+            this.$emit('refreshDataListGroup');
+            this.$emit('refreshCommonListGroup');
           }
         });
       }).catch(error => {

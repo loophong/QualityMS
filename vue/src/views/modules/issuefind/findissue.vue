@@ -29,21 +29,21 @@
 <!--            <el-button v-if="isAuth('generator:issuetable:save')" type="primary"-->
 <!--                       @click="openTools()">QC工具</el-button>-->
             <!-- QC工具下拉菜单 -->
-            <el-dropdown v-if="isAuth('generator:issuetable:save')">
-              <el-button type="primary" class="el-dropdown-link">
-                QC工具
-                <i class="el-icon-arrow-down el-icon--right"></i>
-              </el-button>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  v-for="tool in tools"
-                  :key="tool.routeName"
-                  @click.native="navigateTo(tool.routeName)"
-                >
-                  {{ tool.label }}
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
+<!--            <el-dropdown v-if="isAuth('generator:issuetable:save')">-->
+<!--              <el-button type="primary" class="el-dropdown-link">-->
+<!--                QC工具-->
+<!--                <i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
+<!--              </el-button>-->
+<!--              <el-dropdown-menu slot="dropdown">-->
+<!--                <el-dropdown-item-->
+<!--                  v-for="tool in tools"-->
+<!--                  :key="tool.routeName"-->
+<!--                  @click.native="navigateTo(tool.routeName)"-->
+<!--                >-->
+<!--                  {{ tool.label }}-->
+<!--                </el-dropdown-item>-->
+<!--              </el-dropdown-menu>-->
+<!--            </el-dropdown>-->
           </el-form-item>
           <el-form-item>
             <el-upload class="upload-demo" :before-upload="beforeUpload" :show-file-list="false"
@@ -230,12 +230,23 @@
             </el-table-column>
             <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
             </el-table-column>
-                        <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">
-                          <template slot-scope="scope">
-                            <el-button type="text" size="small"
-                                       @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
-                          </template>
-                        </el-table-column>
+            <el-table-column
+              prop="rectificationPhotoDeliverable"
+              header-align="center"
+              align="center"
+              label="整改照片交付物">
+              <template slot-scope="scope">
+                <el-button type="text" @click="showFileList(scope.row.rectificationPhotoDeliverable)">
+                  预览
+                </el-button>
+              </template>
+            </el-table-column>
+<!--                        <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">-->
+<!--                          <template slot-scope="scope">-->
+<!--                            <el-button type="text" size="small"-->
+<!--                                       @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
+<!--                          </template>-->
+<!--                        </el-table-column>-->
 <!--            <el-table-column-->
 <!--              prop="rectificationPhotoDeliverable"-->
 <!--              header-align="center"-->
@@ -402,10 +413,15 @@
             </el-table-column>
             <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
             </el-table-column>
-            <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">
+            <el-table-column
+              prop="rectificationPhotoDeliverable"
+              header-align="center"
+              align="center"
+              label="整改照片交付物">
               <template slot-scope="scope">
-                <el-button type="text" size="small"
-                           @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+                <el-button type="text" @click="showFileList(scope.row.rectificationPhotoDeliverable)">
+                  预览
+                </el-button>
               </template>
             </el-table-column>
 <!--            <el-table-column-->
@@ -426,7 +442,7 @@
             </el-table-column>
             <el-table-column prop="associatedIssueAddition" header-align="center" align="center" label="关联问题">
             </el-table-column>
-            <el-table-column prop="verificationDeadline" header-align="center" align="center" label="整改验证情况">
+            <el-table-column prop="rectificationVerificationStatus" header-align="center" align="center" label="整改验证情况">
               <template slot-scope="scope">
                 <div
                   style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
@@ -441,7 +457,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="验证截止时间">
+            <el-table-column prop="verificationDeadline" header-align="center" align="center" label="验证截止时间">
             </el-table-column>
             <el-table-column prop="verificationConclusion" header-align="center" align="center" label="验证结论">
               <template slot-scope="scope">
@@ -485,6 +501,24 @@
     <el-dialog :visible.sync="imagePreviewVisible" :title="imagePreviewTitle">
       <img :src="imagePreviewUrl" style="width: 100%;">
     </el-dialog>
+    <el-dialog
+      title="附件预览"
+      :visible.sync="fileDialogVisible"
+      width="50%">
+      <el-table :data="fileList" style="width: 100%">
+        <el-table-column prop="name" label="文件名称" align="left"></el-table-column>
+        <el-table-column label="操作" align="center">
+          <template slot-scope="scope">
+            <el-button type="text" @click="previewFile(scope.row.url)">
+              点击预览
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="fileDialogVisible = false">关闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -503,6 +537,8 @@ import AddOrUpdateV from '../RectVerification/issuetable-add-or-update.vue'
 export default {
   data() {
     return {
+      fileDialogVisible: false, // 控制文件预览弹窗显示
+      fileList: [], // 存储当前记录的附件列表
       tools: [
         { label: '系统图', routeName: 'qcTools' },
         { label: '散点图', routeName: 'Scatter' },
@@ -547,6 +583,51 @@ export default {
     this.getDataList()
   },
   methods: {
+    // 显示文件列表弹窗
+    showFileList(annex) {
+      try {
+        if (!annex) {
+          this.$message.warning("没有附件可预览！");
+          return;
+        }
+        // 解析数据库中存储的附件信息
+        const parsedAnnex = JSON.parse(annex);
+        if (Array.isArray(parsedAnnex) && parsedAnnex.length > 0) {
+          this.fileList = parsedAnnex;
+          this.fileDialogVisible = true; // 打开弹窗
+        } else {
+          this.$message.warning("附件数据格式不正确！");
+        }
+      } catch (error) {
+        console.error("附件解析失败:", error);
+        this.$message.error("附件数据解析失败！");
+      }
+    },
+    // 点击预览具体文件
+    previewFile(fileUrl) {
+      const token = this.$cookie.get("token"); // 获取当前的 token
+      if (!fileUrl) {
+        this.$message.warning("文件路径为空，无法预览！");
+        return;
+      }
+      if (!token) {
+        this.$message.error("登录已过期，请重新登录！");
+        return;
+      }
+      // 拼接带有 token 的预览地址
+      const url = `${this.$http.adornUrl(`/generator/issuetable/${fileUrl}`)}?token=${token}`;
+      window.open(url, "_blank");
+    },
+    getUsernameByUserId(auditorId) {
+      for (const category of this.options) {
+        for (const auditor of category.options) {
+          if (auditor.value === auditorId) {
+            return auditor.label;
+          }
+        }
+      }
+      return "-";
+    },
     getImageUrl(fileflag) {
       const token = this.$cookie.get('token'); // 获取当前的 token
       if (!token) {
@@ -724,14 +805,14 @@ export default {
 
           // 排序操作
           this.dataList.sort((a, b) => {
-            // 转换 overDue 为布尔值，'true' 转为 true，其他转为 false
-            const isOverDueA = a.overDue === 'true';
-            const isOverDueB = b.overDue === 'true';
-
-            // 优先按照 overDue 排序，overDue 为 true 的排在前面
-            if (isOverDueA !== isOverDueB) {
-              return isOverDueA ? -1 : 1;
-            }
+            // // 转换 overDue 为布尔值，'true' 转为 true，其他转为 false
+            // const isOverDueA = a.overDue === 'true';
+            // const isOverDueB = b.overDue === 'true';
+            //
+            // // 优先按照 overDue 排序，overDue 为 true 的排在前面
+            // if (isOverDueA !== isOverDueB) {
+            //   return isOverDueA ? -1 : 1;
+            // }
 
             // 如果 overDue 相同，则按创建时间排序
             return new Date(b.creationTime) - new Date(a.creationTime);

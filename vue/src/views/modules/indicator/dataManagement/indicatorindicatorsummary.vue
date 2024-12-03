@@ -147,6 +147,12 @@
         label="考核部门">
       </el-table-column>
       <el-table-column
+        prop="indicatorClassification"
+        header-align="center"
+        align="center"
+        label="指标分级">
+      </el-table-column>
+      <el-table-column
         prop="finishedFlag"
         header-align="center"
         align="center"
@@ -508,63 +514,70 @@
       },
 
       // 导出
-      exportAll(){
+      exportAll() {
         this.$http({
           url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list01'),
           method: 'get',
           params: this.$http.adornParams({
             'key': this.queryParams
           })
-        }).then(({data}) => {
+        }).then(({ data }) => {
           if (data) {
-            this.dataList01 = data
+            this.dataList01 = data;
+            console.log("this.dataList01====>", this.dataList01);
+
+            // 开始导出逻辑
+            const loadingInstance = Loading.service({
+              lock: true,
+              text: "正在导出，请稍后...",
+              spinner: "el-icon-loading",
+              background: "rgba(0, 0, 0, 0.7)",
+            });
+
+            const promises = this.dataList01.map((tableRow, index) => {
+              return {
+                序号: index + 1,
+                指标名称: tableRow.indicatorName,
+                年月: tableRow.yearMonth,
+                指标目标值: tableRow.indicatorValue,
+                指标完成值: tableRow.indicatorActualValue,
+                管理部门: tableRow.managementDepartment,
+                考核部门: tableRow.assessmentDepartment,
+                指标分级: tableRow.indicatorClassification,
+                完成情况: tableRow.finishedFlag === 1 ? '达标' : tableRow.finishedFlag === 0 ? '未达标' : '',
+                指标填报时间: tableRow.indicatorCreatTime,
+              };
+            });
+
+            Promise.all(promises)
+              .then((data) => {
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+                const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+                saveAs(
+                  new Blob([wbout], { type: "application/octet-stream" }),
+                  "指标月度数据总台账.xlsx"
+                );
+
+              })
+              .finally(() => {
+                loadingInstance.close();
+              })
+              .catch((error) => {
+                console.error("导出失败:", error);
+                loadingInstance.close();
+              });
           } else {
-            this.dataList01 = []
+            this.dataList01 = [];
+            console.log("没有数据");
           }
-        })
-        const loadingInstance = Loading.service({
-          lock: true,
-          text: "正在导出，请稍后...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)",
+        }).catch((error) => {
+          console.error("请求失败:", error);
         });
+      }
 
-        const promises = this.dataList01.map((tableRow, index) => {
-            return {
-              序号: index + 1,
-              指标名称: tableRow.indicatorName,
-              年月: tableRow.yearMonth,
-              指标值: tableRow.indicatorValue,
-              管理部门: tableRow.managementDepartment,
-              考核部门: tableRow.assessmentDepartment,
-              指标填报时间: tableRow.indicatorCreatTime,
-            };
-        });
-        Promise.all(promises)
-          .then((data) => {
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "项目列表");
-
-            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-            saveAs(
-              new Blob([wbout], { type: "application/octet-stream" }),
-              "指标月度数据总台账.xlsx"
-            );
-
-            // // 提交数据到Vuex Store
-            // this.updateExportedData(data);
-
-
-          })
-          .finally(() => {
-            loadingInstance.close();
-          })
-          .catch((error) => {
-            console.error("导出失败:", error);
-            loadingInstance.close();
-          });
-      },
     }
   }
 </script>

@@ -279,6 +279,7 @@
             this.dataForm.indicatorValue = data.page.list[0].indicatorPlannedValue
             this.dataForm.assessmentDepartment = data.page.list[0].assessmentDepartment
             this.dataForm.managementDepartment = data.page.list[0].managementDepartment
+            this.dataForm.indicatorClassification = data.page.list[0].indicatorClassification
             console.log("this.dataForm=====>",this.dataForm);
             if(data.page.list[0].indicatorBoundFlag === 1) {
               if(this.dataForm.indicatorValue <= this.dataForm.indicatorActualValue)

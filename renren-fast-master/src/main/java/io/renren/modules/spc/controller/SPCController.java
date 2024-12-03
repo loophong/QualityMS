@@ -8,8 +8,10 @@ import java.util.*;
 
 import com.aliyun.oss.ServiceException;
 import io.renren.modules.spc.entity.SpcPchartEntity;
+import io.renren.modules.spc.entity.SpcPtdEntity;
 import io.renren.modules.spc.entity.SpcXrchartEntity;
 import io.renren.modules.spc.service.SpcPchartService;
+import io.renren.modules.spc.service.SpcPtdService;
 import io.renren.modules.spc.service.SpcXrchartService;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.*;
@@ -42,8 +44,10 @@ public class SPCController {
     @Resource
     private SpcPchartService spcPchartService;
 
+    @Resource
+    private SpcPtdService spcPtdService;
+
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-//    @RequiresPermissions("SPC:spc:list")
     public ResponseEntity<?> list(@RequestParam("file") MultipartFile excelFile){
 
         System.out.println("------------import-------import------------");
@@ -70,6 +74,29 @@ public class SPCController {
             //旧版本代码
             List<List<Double>> date = parseExcel(excelFile);
             return ResponseEntity.ok(date);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("excel上传失败");
+        }
+    }
+
+    @RequestMapping(value = "/PTD", method = RequestMethod.POST)
+    public ResponseEntity<?> listPTD(@RequestParam("file") MultipartFile excelFile){
+
+        System.out.println("------------test-------test------------");
+        try {
+
+            /**
+             * 导入PTD图表数据
+             *
+             * */
+            List<SpcPtdEntity> PtdDataList = parseExcel2Ptd(excelFile);
+            System.out.println(PtdDataList);
+            spcPtdService.importData(PtdDataList);
+
+            return ResponseEntity.ok("Success");
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity
@@ -250,6 +277,35 @@ public class SPCController {
         return dataList;
     }
 
+    public List<SpcPtdEntity> parseExcel2Ptd(MultipartFile file)throws IOException{
+        List<SpcPtdEntity> dataList = new ArrayList<>();
+
+        ZipSecureFile.setMinInflateRatio(0);
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> rowIterator = sheet.rowIterator();
+
+        // Skip header row
+        if (rowIterator.hasNext()) {
+            rowIterator.next();
+        }
+
+        while (rowIterator.hasNext()){
+            Row row = rowIterator.next();
+
+            if(getNumericCellValue(row.getCell(0)) == 0.0 && getNumericCellValue(row.getCell(1)) == 0.0 && getCellValueAsInt(row.getCell(3)) == 0){
+                continue;
+            }
+            SpcPtdEntity spcPtdEntity = new SpcPtdEntity();
+            spcPtdEntity.setWorkTime(getNumericCellValue(row.getCell(0)));
+            spcPtdEntity.setAcceptanceRegion(getNumericCellValue(row.getCell(1)));
+            spcPtdEntity.setFrequency(getCellValueAsInt(row.getCell(3)));
+            spcPtdEntity.setDataImportTime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            dataList.add(spcPtdEntity);
+        }
+
+        return dataList;
+    }
 
     public static List<List<Double>> parseExcel(MultipartFile file) throws IOException {
         List<List<Double>> dataList = new ArrayList<>();
@@ -491,7 +547,6 @@ public class SPCController {
             return 0;
         }
     }
-
 
     // 将单元格内容转换为double类型值
     private static double getNumericCellValue(Cell cell) {

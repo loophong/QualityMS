@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.spc.dao.SpcPtdDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.spc.entity.SpcPtdEntity" id="spcPtdMap">
+        <result property="id" column="id"/>
+        <result property="acceptanceRegion" column="acceptance_region"/>
+        <result property="workTime" column="work_time"/>
+        <result property="ptdValue" column="PTD_value"/>
+        <result property="frequency" column="frequency"/>
+        <result property="craetTime" column="craet_time"/>
+        <result property="createPeople" column="create_people"/>
+        <result property="deletFlag" column="delet_flag"/>
+        <result property="spare" column="spare"/>
+        <result property="dataImportTime" column="data_import_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 根据月份删除数据 -->
+    <delete id="deleteDataByMonth" parameterType="java.util.Date">
+        DELETE FROM spc_PTD
+        WHERE MONTH(data_import_time) = MONTH(#{datatime})
+        AND YEAR(data_import_time) = YEAR(#{datatime})
+    </delete>
+
+    <!-- 批量插入数据 -->
+    <insert id="batchInsertSpcPtdcharts" parameterType="java.util.List">
+        INSERT INTO spc_PTD (
+        id, acceptance_region, work_time, PTD_value, frequency,
+        craet_time, create_people, delet_flag, spare, data_import_time,
+        update_time
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.acceptanceRegion}, #{item.workTime}, #{item.ptdValue}, #{item.frequency},
+            #{item.craetTime}, #{item.createPeople}, #{item.deletFlag}, #{item.spare}, #{item.dataImportTime},
+            #{item.updateTime})
+        </foreach>
+    </insert>
+
+    <!-- 查询当月数据 -->
+    <select id="getSpcPtdEntityByMonth" parameterType="java.util.Date" resultMap="spcPtdMap">
+        SELECT *
+        FROM spc_PTD
+        WHERE MONTH(data_import_time) = MONTH(#{datatime})
+        AND YEAR(data_import_time) = YEAR(#{datatime});
+    </select>
+
+</mapper>

@@ -226,4 +226,42 @@ public class SpcPchartEntity implements Serializable {
 			case 31: setDate31(value); break;
 		}
 	}
+
+	// 对 sampling_SpcPchartEntity 的示例方法
+	public Integer getDate(int index) {
+		switch (index) {
+			case 1: return getDate1();
+			case 2: return getDate2();
+			case 3: return getDate3();
+			case 4: return getDate4();
+			case 5: return getDate5();
+			case 6: return getDate6();
+			case 7: return getDate7();
+			case 8: return getDate8();
+			case 9: return getDate9();
+			case 10: return getDate10();
+			case 11: return getDate11();
+			case 12: return getDate12();
+			case 13: return getDate13();
+			case 14: return getDate14();
+			case 15: return getDate15();
+			case 16: return getDate16();
+			case 17: return getDate17();
+			case 18: return getDate18();
+			case 19: return getDate19();
+			case 20: return getDate20();
+			case 21: return getDate21();
+			case 22: return getDate22();
+			case 23: return getDate23();
+			case 24: return getDate24();
+			case 25: return getDate25();
+			case 26: return getDate26();
+			case 27: return getDate27();
+			case 28: return getDate28();
+			case 29: return getDate29();
+			case 30: return getDate30();
+			case 31: return getDate31();
+			default: throw new IllegalArgumentException("Index must be between 1 and 31"); // 可以抛出异常用于无效索引
+		}
+	}
 }

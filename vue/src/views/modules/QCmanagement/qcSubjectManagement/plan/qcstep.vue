@@ -407,12 +407,17 @@ export default {
         }
         return bytes.buffer;
       }
-      // const _this = this
-      JSZipUtils.getBinaryContent('/static/test.docx', function (error, content) {
-        // 抛出异常
-        if (error) {
-          throw error
+
+      try {
+        // 使用 fetch 获取 DOCX 模板文件
+        const response = await fetch('/static/test.docx');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
+        const content = await response.arrayBuffer();
+        console.log(response)
+        console.log(content)
+
         expressions.filters.size = function (input, width, height) {
           return {
             data: input,
@@ -476,7 +481,9 @@ export default {
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         })
         saveAs(out, form.tableTitle + '.docx')
-      })
+      } catch (error) {
+        console.log('err', { error: error })
+      }
     },
 
     // 删除

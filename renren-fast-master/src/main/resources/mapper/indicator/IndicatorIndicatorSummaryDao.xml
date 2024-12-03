@@ -30,5 +30,32 @@
         <result property="finishedFlag" column="finished_flag"/>
     </resultMap>
 
+    <select id="queryChart1List" resultType="io.renren.modules.indicator.entity.IndicatorChart1Entity">
+        SELECT
+            `year_month` AS yearMonth,
+            SUM(CASE WHEN finished_flag = 1 THEN 1 ELSE 0 END) AS finishedCounts,
+            SUM(CASE WHEN finished_flag = 0 THEN 1 ELSE 0 END) AS unfinishedCounts
+        FROM
+            indicator_indicator_summary
+        GROUP BY `year_month`
+    </select>
+
+    <select id="queryChart2List" resultType="io.renren.modules.indicator.entity.IndicatorChart2Entity">
+        SELECT
+            `year_month` AS yearMonth,
+            indicator_classification AS indicatorClassification,
+            SUM(CASE WHEN finished_flag = 1 THEN 1 ELSE 0 END) AS finishedCounts,
+            SUM(CASE WHEN finished_flag = 0 THEN 1 ELSE 0 END) AS unfinishedCounts
+        FROM
+            indicator_indicator_summary
+        where
+            `year_month` = (
+                SELECT MAX(`year_month`) FROM indicator_indicator_summary
+                )
+        and
+            indicator_classification = "A"
+        GROUP BY `year_month`
+    </select>
+
 
 </mapper>

@@ -4,6 +4,8 @@ import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.modules.indicator.entity.IndicatorChart1Entity;
+import io.renren.modules.indicator.entity.IndicatorChart2Entity;
 import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
 import io.renren.modules.indicator.listener.DataReadListener;
 
@@ -29,5 +31,8 @@ public interface IndicatorIndicatorSummaryService extends IService<IndicatorIndi
 
     public R readProductionExcelToDB(String fileName, InputStream inputStream, InputStream inputStream2, Date yearMonth);
 
+    public List<IndicatorChart1Entity> queryChart1List(IndicatorChart1Entity indicatorChart1Entity);
+
+    public List<IndicatorChart2Entity> queryChart2List(IndicatorChart2Entity indicatorChart2Entity);
 }
 

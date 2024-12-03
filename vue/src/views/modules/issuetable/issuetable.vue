@@ -38,6 +38,9 @@
       <el-form-item>
         <el-button @click="downloadTemplate()">下载模板</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button @click="exportAll()">导出</el-button>
+      </el-form-item>
     </el-form>
     <el-dialog :visible.sync="taskDetailVisible" title="问题详情">
       <div>
@@ -458,6 +461,8 @@
 <script>
   import AddOrUpdate from '../issuefind/issuetable-add-or-update.vue'
   import AddOrUpdateD from "./issuetable-add-or-update.vue";
+  import {Loading} from "element-ui";
+  import * as XLSX from "xlsx";
 
 
   // import {isAuth} from "../../../utils";
@@ -520,6 +525,7 @@
         dialogVisible1: false, // 控制对话框显示
         fullCause: '',    // 用于存储完整描述
         fullstatus: '',
+        dataList01: [], //列表数据(不分页)
         dialogVisible2: false,
         dialogVisible3: false,
         fullRetStates:'',
@@ -1062,6 +1068,83 @@
           this.$message.error('下载模板失败，请重试！');
           console.error(error);
         });
+      },
+      // 导出
+      exportAll(){
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/issuesAll'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'key': this.queryParams
+          })
+        }).then(({data}) => {
+          if (data) {
+            this.dataList01 = data
+          } else {
+            this.dataList01 = []
+          }
+        })
+        const loadingInstance = Loading.service({
+          lock: true,
+          text: "正在导出，请稍后...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
+
+        const promises = this.dataList01.map((tableRow, index) => {
+          return {
+            序号: index + 1,
+            问题编号: tableRow.issueNumber,
+            检查科室: tableRow.inspectionDepartment,
+            检查日期: tableRow.inspectionDate,
+            问题类别: tableRow.issueCategoryId,
+            系统分类: tableRow.systematicClassification,
+            故障类别: tableRow.faultType,
+            故障件一级: tableRow.firstFaultyParts,
+            故障件二级: tableRow.secondFaultyParts,
+            故障模式: tableRow.faultModel,
+            车型: tableRow.vehicleTypeId,
+            车号: tableRow.vehicleNumberId,
+            初步分析: tableRow.peliminaryAnalysis,
+            问题描述: tableRow.issueDescription,
+            整改要求: tableRow.rectificationRequirement,
+            要求完成时间: tableRow.requiredCompletionTime,
+            责任科室: tableRow.responsibleDepartment,
+            整改情况: tableRow.rectificationStatus,
+            实际完成时间: tableRow.actualCompletionTime,
+            整改责任人: tableRow.rectificationResponsiblePerson,
+            关联问题: tableRow.associatedIssueAddition,
+            整改验证情况: tableRow.rectificationVerificationStatus,
+            验证截止时间: tableRow.verificationDeadline,
+            验证结论: tableRow.verificationConclusion,
+            验证人: tableRow.verifier,
+
+          };
+        });
+        Promise.all(promises)
+          .then((data) => {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "问题列表");
+
+            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+            saveAs(
+              new Blob([wbout], { type: "application/octet-stream" }),
+              "问题月度数据总台账.xlsx"
+            );
+
+            // // 提交数据到Vuex Store
+            // this.updateExportedData(data);
+
+
+          })
+          .finally(() => {
+            loadingInstance.close();
+          })
+          .catch((error) => {
+            console.error("导出失败:", error);
+            loadingInstance.close();
+          });
       },
     }
   }

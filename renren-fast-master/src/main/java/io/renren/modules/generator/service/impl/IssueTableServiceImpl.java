@@ -102,6 +102,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         return "0001"; // 如果理论上没有找到最大问题，返回默认值
     }
 
+
     /**
      * 获取按年份和月份统计的问题数
      * @param year 年份

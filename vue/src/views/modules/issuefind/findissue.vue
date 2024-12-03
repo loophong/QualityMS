@@ -442,7 +442,7 @@
             </el-table-column>
             <el-table-column prop="associatedIssueAddition" header-align="center" align="center" label="关联问题">
             </el-table-column>
-            <el-table-column prop="verificationDeadline" header-align="center" align="center" label="整改验证情况">
+            <el-table-column prop="rectificationVerificationStatus" header-align="center" align="center" label="整改验证情况">
               <template slot-scope="scope">
                 <div
                   style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
@@ -457,7 +457,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="验证截止时间">
+            <el-table-column prop="verificationDeadline" header-align="center" align="center" label="验证截止时间">
             </el-table-column>
             <el-table-column prop="verificationConclusion" header-align="center" align="center" label="验证结论">
               <template slot-scope="scope">
@@ -805,14 +805,14 @@ export default {
 
           // 排序操作
           this.dataList.sort((a, b) => {
-            // 转换 overDue 为布尔值，'true' 转为 true，其他转为 false
-            const isOverDueA = a.overDue === 'true';
-            const isOverDueB = b.overDue === 'true';
-
-            // 优先按照 overDue 排序，overDue 为 true 的排在前面
-            if (isOverDueA !== isOverDueB) {
-              return isOverDueA ? -1 : 1;
-            }
+            // // 转换 overDue 为布尔值，'true' 转为 true，其他转为 false
+            // const isOverDueA = a.overDue === 'true';
+            // const isOverDueB = b.overDue === 'true';
+            //
+            // // 优先按照 overDue 排序，overDue 为 true 的排在前面
+            // if (isOverDueA !== isOverDueB) {
+            //   return isOverDueA ? -1 : 1;
+            // }
 
             // 如果 overDue 相同，则按创建时间排序
             return new Date(b.creationTime) - new Date(a.creationTime);

@@ -66,6 +66,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
     String newIssueNumber();
 
+
     Map<String, Integer> getMonthlyCountByYear(int year); // 月度统计
 
     Map<String, Integer> getmonthlyDuplicateStats(int year);

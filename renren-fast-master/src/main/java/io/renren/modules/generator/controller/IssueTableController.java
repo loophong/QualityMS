@@ -295,6 +295,7 @@ public class IssueTableController {
         System.out.println("获取的新编号为：" + useID);
         return R.ok().put("useID", useID);
     }
+
     /**
      * 获取问题统计（总数）
      */
@@ -402,14 +403,30 @@ public class IssueTableController {
     @RequestMapping("/issuesid")
     @RequiresPermissions("generator:issuetable:list")
     public R list(){
-        System.out.println("=====获取问题列表----开始");
+//        System.out.println("=====获取问题列表----开始");
         List<IssueTableEntity> issues = issueTableService.listAll();
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", 0);
-        response.put("issueTable", issues);
-        System.out.println(response);
-        System.out.println("=====获取问题列表----结束");
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("code", 0);
+//        response.put("issueTable", issues);
+//        System.out.println(response);
+//        System.out.println("=====获取问题列表----结束");
         return R.ok().put("issues", issues);
+    }
+
+    /**
+     * 获取所有问题列表
+     */
+    @RequestMapping("/issuesAll")
+    @RequiresPermissions("generator:issuetable:list")
+    public List<IssueTableEntity> listAll(){
+//        System.out.println("=====获取问题列表----开始");
+        List<IssueTableEntity> list = issueTableService.listAll();
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("code", 0);
+//        response.put("issueTable", issues);
+//        System.out.println(response);
+//        System.out.println("=====获取问题列表----结束");
+        return list;
     }
 
     /**

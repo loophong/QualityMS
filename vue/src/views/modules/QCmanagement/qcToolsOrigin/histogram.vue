@@ -1,11 +1,17 @@
 <template>
   <div>
     <span>
-      <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+      <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
       <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
+    </span>
+    <span>
+      <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+        <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
     </span>
     <div class="container">
       <div ref="chart" style="width: 900px; height: 500px;"></div>
@@ -21,7 +27,7 @@
         <el-button @click="removeData">删除数据</el-button>
         <el-button @click="modifyData">修改数据</el-button>
         <el-button @click="restoreData">恢复数据</el-button>
-        <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
+        <el-button type="success" @click="dialogFormVisible = true" v-if="!valueConPlan">保存为模版</el-button>
       </div>
     </div>
     <el-dialog title="模版名" :visible.sync="dialogFormVisible">
@@ -41,6 +47,7 @@ export default {
   name: 'SimpleHistogram',
   data() {
     return {
+      optionsConPlan: [],//实例选择
       myChart: null,
       categories: ['0', '5', '10', '15', '20', '25'],
       data: [5, 10, 25, 30, 20, 10],
@@ -48,11 +55,13 @@ export default {
       newValue: '',
       inputName: '',
       value: '',
+      valueConPlan: '',
       name: '',//当前模版名
       dialogFormVisible: false,
       totalFrequency: 0,
       weightedMean: 0,
       resultList: [],
+      resultConPlanList: [],
       standardDeviation: 0,
       options: [],//下拉框选择
       history: [], // 记录历史状态
@@ -61,13 +70,48 @@ export default {
   },
   mounted() {
     this.getTemplateData()
+    this.getConPlanData()
     this.drawChart();
     this.updateStatistics(); // 计算初始统计数据
     this.updateChart(); // 更新图表以显示初始数据
   },
   methods: {
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "直方图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
+
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
+      // }
+    },
     //处理下拉框选择变化
     handleSelectChange() {
+      this.valueConPlan = ''
       console.log(this.resultList)
       this.resultList.forEach(item => {
         if (item.templateId == this.value) {
@@ -78,6 +122,17 @@ export default {
       })
       this.updateChart()
 
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
+          this.data = item.templateSeries
+          this.categories = item.templateAxis
+          this.name = item.templateName
+        }
+      })
+      this.updateChart()
     },
     async getTemplateData() {
       await this.$http({

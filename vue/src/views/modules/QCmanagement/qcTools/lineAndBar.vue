@@ -1,40 +1,31 @@
 <template>
   <div>
     <span>
-      <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+      <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
       <!-- <el-button type="danger" @click="handleDelete">删除当前模版</el-button>s -->
     </span>
-
+    <span>
+      <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+        <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+    </span>
     <div id="main" ref="main"></div>
     <span>
       <label for="xAxisDataBy">横坐标:</label>
-      <el-input
-        v-model="xAxisDataBy"
-        placeholder="请输入内容"
-        style="width: 30%"
-      ></el-input>
+      <el-input v-model="xAxisDataBy" placeholder="请输入内容" style="width: 30%"></el-input>
       <label for="seriesDataBy">折线数:</label>
-      <el-input
-        v-model="seriesDataBy"
-        placeholder="请输入内容"
-        style="width: 30%"
-      ></el-input>
+      <el-input v-model="seriesDataBy" placeholder="请输入内容" style="width: 30%"></el-input>
     </span>
     <br />
     <br />
     <span>
       <label for="textBy">图标题:</label>
-      <el-input
-        v-model="textBy"
-        placeholder="请输入内容"
-        style="width: 15%"
-      ></el-input>
-      <el-button type="primary" @click="initChart(tmpResultList)"
-        >更新图表</el-button
-      >
+      <el-input v-model="textBy" placeholder="请输入内容" style="width: 15%"></el-input>
+      <el-button type="primary" @click="initChart(tmpResultList)">更新图表</el-button>
       <!-- 保存为模板 change to 暂存当前数据  -->
       <el-button type="success" @click="dialogFormVisible = true">保存当前数据</el-button>
       <!-- <el-button type="success" @click="handleUp">保存当前数据</el-button> -->
@@ -48,7 +39,7 @@
       </div>
     </el-dialog>
 
-  <!-- <qc-plan-new ref="qcPlanNew"> </qc-plan-new>  -->
+    <!-- <qc-plan-new ref="qcPlanNew"> </qc-plan-new>  -->
 
 
   </div>
@@ -74,10 +65,16 @@ export default {
       type: Number,
       required: true,
     },
+    conplanIssue: {
+      type: Number,
+      required: true,
+    },
   },
 
   data() {
     return {
+      valueConPlan: "",
+      optionsConPlan: [],
       loading: false,
       dialogFormVisible: false,
       inputName: "",
@@ -100,11 +97,14 @@ export default {
       tmpSeriesList: [],
       tmpAxisList: [],
       tmpAxisList: [],
+      currentUserName: '',
     };
   },
   computed: {},
   mounted() {
     this.getTemplateData();
+    this.getConPlanData();
+    this.getUserName();
     this.myChart = echarts.init(this.$refs.main);
     //initChart()为更新echarts图表，使用数据填充图表
     this.initChart(this.tmpResultList);
@@ -112,6 +112,7 @@ export default {
   methods: {
     //处理下拉框选择变化
     handleSelectChange() {
+      this.valueConPlan = ''
       let tmpList = {};
       this.resultList.forEach((item) => {
         if (item.templateId == this.value) {
@@ -120,6 +121,33 @@ export default {
         }
       });
       this.initChart(tmpList);
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      console.log(this.valueConPlan)
+      let tmpList = {}
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
+          tmpList = item
+          this.name = item.templateName
+        }
+      })
+      console.log(tmpList)
+      this.initChart(tmpList)
+    },
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
     },
     async getTemplateData() {
       await this.$http({
@@ -164,6 +192,39 @@ export default {
       // }
 
 
+    },
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "折柱图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
+
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
+      // }
     },
     handleUp() {
       console.log(this.updatedSeries);
@@ -227,6 +288,17 @@ export default {
         data: series.data,
       }));
       console.log(filteredData);
+
+      let img = new Image()
+      img.src = this.myChart.getDataURL(
+        {
+          type: 'png',
+          // pixelRatio: 1,
+          // backgroundColor: '#fff',
+          excludeComponents: ['toolbox']
+        }
+      )
+      console.log(img.src)
       this.$http({
         url: this.$http.adornUrl(`/qcTools/conplan/save`),
         method: "post",
@@ -239,6 +311,10 @@ export default {
           conplanAxis: JSON.stringify(tmp),
           conplanSubject: this.conplanSubject,
           conplanProcess: this.conplanProcess,
+          conplanIssue: this.conplanIssue,
+
+          conplanUrl: JSON.stringify(img.src),
+          conplanUser: this.currentUserName,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -251,7 +327,7 @@ export default {
               this.visible = false;
             },
           });
-          
+
         } else {
           this.$message.error(data.msg);
         }
@@ -597,6 +673,7 @@ export default {
           // }
         ],
         series: seriesData,
+        animation: false,
       };
       this.option && this.myChart.setOption(this.option);
       // console.log(this.option)

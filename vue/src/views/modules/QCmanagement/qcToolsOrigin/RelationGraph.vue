@@ -2,15 +2,21 @@
   <div>
     <div>
       <span>
-        <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+        <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
         <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
       </span>
+      <span>
+        <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+          <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+      </span>
     </div>
     <br>
-    <div id="chart" ref="chart">
+    <div>
       <el-button @click="addNode">增加节点</el-button>
       <el-button @click="removeNode">删除节点</el-button>
       <el-button @click="modifyNode">修改节点</el-button>
@@ -18,8 +24,10 @@
       <el-button @click="removeLink">删除链接</el-button>
       <el-button @click="modifyLink">修改链接</el-button>
       <el-button type="warning" @click="downloadAsImage">保存图片</el-button>
-      <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
+      <el-button type="success" @click="dialogFormVisible = true" v-if="!valueConPlan">保存为模版</el-button>
+      <div id="chart" ref="chart">
 
+      </div>
       <el-dialog title="模版名" :visible.sync="dialogFormVisible">
         <el-input v-model="inputName" placeholder="请输入模版名" style="width:50%"></el-input>
         <div slot="footer" class="dialog-footer">
@@ -39,6 +47,7 @@ export default {
   name: 'RelationGraph',
   data() {
     return {
+      optionsConPlan: [],//实例选择
       nodes: [
         { id: 'A', x: 100, y: 100, size: 1, label: 'A' },
         { id: 'B', x: 300, y: 100, size: 1, label: 'B' },
@@ -56,6 +65,9 @@ export default {
       dialogFormVisible: false,
       selectedLink: null,
       value: '',
+      valueConPlan: '',
+      resultConPlanList: [],
+      resultList: [],
       inputName: '',
       name: '',
       options: [], // 模版列表
@@ -63,10 +75,44 @@ export default {
   },
   mounted() {
     this.getTemplateData()
+    this.getConPlanData()
     this.initSvg();
     this.renderGraph();
   },
   methods: {
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "关联图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
+
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
+      // }
+    },
     handleUp() {
       console.log(this.nodes)
       console.log('inputName:' + this.inputName)
@@ -135,9 +181,20 @@ export default {
     },
     //处理下拉框选项变化
     handleSelectChange() {
+      this.valueConPlan = ''
       this.resultList.forEach(item => {
         if (item.templateId == this.value) {
-          console.log(item.templateSeries)
+          this.nodes = item.templateSeries
+          this.links = item.templateAxis
+          this.name = item.templateName
+        }
+      })
+      this.renderGraph()
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
           this.nodes = item.templateSeries
           this.links = item.templateAxis
           this.name = item.templateName

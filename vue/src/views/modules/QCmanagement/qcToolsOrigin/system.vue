@@ -2,11 +2,17 @@
   <div>
     <div>
       <span>
-        <el-select v-model="value" @change="handleSelectChange" placeholder="请选择模版">
+        <el-select v-model="value" filterable @change="handleSelectChange" placeholder="请选择模版">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
         <el-button type="danger" @click="handleDelete">删除当前模版</el-button>
+      </span>
+      <span>
+        <el-select v-model="valueConPlan" filterable @change="handleSelectChangeConPlan" placeholder="请选择实例">
+          <el-option v-for="item in optionsConPlan" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
       </span>
     </div>
     <div>
@@ -18,7 +24,7 @@
         <button @click="deleteNode(selectedNode.id)">删除</button>
       </div>
 
-      <el-button type="success" @click="dialogFormVisible = true">保存为模版</el-button>
+      <el-button type="success" @click="dialogFormVisible = true" v-if="!valueConPlan">保存为模版</el-button>
       <el-button type="warning" @click="downloadScreenshot">下载截图</el-button>
     </div>
     <el-dialog title="模版名" :visible.sync="dialogFormVisible">
@@ -38,6 +44,7 @@ import { saveAs } from 'file-saver';
 export default {
   data() {
     return {
+      optionsConPlan: [],//实例选择
       treeData: {
         id: '0',
         label: "直拉钢丝亮丝不良",
@@ -89,7 +96,10 @@ export default {
         ]
       },
       options: [],
+      resultList: [],
+      resultConPlanList: [],
       value: '',
+      valueConPlan: '',
       name: '',
       inputName: '',
       showMenu: false,
@@ -103,11 +113,46 @@ export default {
   },
 
   created() {
+
     this.toggleExpand(this.treeData, true);
     this.getTemplateData();
+    this.getConPlanData()
   },
 
   methods: {
+    async getConPlanData() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcTools/conplan/TList"),
+        method: "get",
+        params: this.$http.adornParams({
+          conplanType: "系统图",
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.resultConPlanList = data.resultList.map((row) => ({
+            templateId: row.conplanId,
+            templateName: row.conplanName,
+            templateType: row.conplanType,
+            templateText: row.conplanText,
+            templateSeries: JSON.parse(row.conplanSeries),
+            templateAxis: JSON.parse(row.conplanAxis),
+          }));
+          this.optionsConPlan = data.resultList.map((item) => ({
+            value: item.conplanId,
+            label: item.conplanName,
+          }));
+          console.log(this.resultConPlanList);
+
+          console.log('---------------------');
+
+          console.log(this.optionsConPlan);
+        } else {
+          this.options = [];
+        }
+      });
+
+      // }
+    },
     handleUp() {
       console.log(this.treeData)
       console.log(this.inputName)
@@ -214,10 +259,19 @@ export default {
 
     },
     handleSelectChange(value) {
+      this.valueConPlan = ''
       console.log(this.treeData)
       this.resultList.forEach(item => {
         if (item.templateId == this.value) {
-          console.log(item.templateSeries)
+          this.treeData = item.templateSeries
+          this.name = item.templateName
+        }
+      })
+    },
+    handleSelectChangeConPlan() {
+      this.value = ''
+      this.resultConPlanList.forEach(item => {
+        if (item.templateId == this.valueConPlan) {
           this.treeData = item.templateSeries
           this.name = item.templateName
         }
@@ -325,9 +379,9 @@ export default {
       const element = document.querySelector('.org-tree-container'); // 获取需要截图的元素
       html2canvas(element).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
-        console.log(imgData)
+        // console.log(imgData)
         const blob = this.dataURLtoBlob(imgData);
-        console.log(blob)
+        // console.log(blob)
         saveAs(blob, 'tree-screenshot.png');
       });
     },

@@ -41,6 +41,9 @@
       <el-col :span="1.5">
         <el-button v-if="isAuth('indicator:indicatordictionary:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button  type="primary" @click="exportAll()">导出</el-button>
+      </el-col>
     </el-row>
 
     <el-table
@@ -122,18 +125,18 @@
         align="center"
         label="上级指标">
       </el-table-column>
-      <el-table-column
-        prop="planId"
-        header-align="center"
-        align="center"
-        label="关联计划">
-      </el-table-column>
-      <el-table-column
-        prop="taskId"
-        header-align="center"
-        align="center"
-        label="关联任务">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="planId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="关联计划">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="taskId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="关联任务">-->
+<!--      </el-table-column>-->
 <!--      <el-table-column-->
 <!--        prop="indicatorValueLowerBound"-->
 <!--        header-align="center"-->
@@ -189,6 +192,8 @@
   import AddOrUpdate from './indicatordictionary-add-or-update'
   import KeyControl from './keyindicator-add'
   import AddPlan from "../../taskmanagement/plan/plan-add-page";
+  import * as XLSX from "xlsx";
+  import {Loading} from "element-ui";
   export default {
     data () {
       return {
@@ -441,42 +446,54 @@
           })
         })
       },
-      // async handle123() {
-      //   this.$http({
-      //     url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
-      //     method: 'get',
-      //     params: this.$http.adornParams({
-      //       'page': this.pageIndex,
-      //       'limit': 10000,
-      //       'key': this.queryParams
-      //     })
-      //   }).then(({data}) => {
-      //     if (data && data.code === 0) {
-      //       this.indicatorSummaryList = data.page.list
-      //       console.log("this.indicatorSummaryList====>",this.indicatorSummaryList)
-      //     } else {
-      //       this.indicatorSummaryList = []
-      //     }
-      //   })
-      // },
-      // getRowStyle(row, rowIndex) {
-      //   console.log("1111111111====>",this.indicatorSummaryList)
-      //   console.log("2222222====>",this.indicatorDictionaryList)
-      //   const summaryItems = this.indicatorSummaryList.filter(
-      //     item => item.indicatorName === row.indicatorName
-      //   );
-      //   console.log("summaryItems====>",summaryItems)
-      //
-      //   for (const summaryItem of summaryItems) {
-      //     if (summaryItem.indicatorValue < row.lowerBound || summaryItem.indicatorValue > row.upperBound) {
-      //       console.log(`Row ${row.indicatorName} is out of bounds`);
-      //       return { backgroundColor: 'red' };
-      //     }
-      //   }
-      //
-      //   console.log(`Row ${row.indicatorName} is within bounds`);
-      //   return {};
-      // }
+      // 导出
+      exportAll(){
+        const loadingInstance = Loading.service({
+          lock: true,
+          text: "正在导出，请稍后...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
+
+        const promises = this.indicatorDictionaryList.map((tableRow, index) => {
+          return {
+            序号: index + 1,
+            指标名称: tableRow.indicatorName,
+            管理部门: tableRow.managementDepartment,
+            考核部门: tableRow.assessmentDepartment,
+            指标公式定义: tableRow.indicatorDefinition,
+            指标分级: tableRow.indicatorClassification,
+            指标目标值: tableRow.indicatorPlannedValue,
+            指标权重: tableRow.weight ? `${tableRow.weight}%` : '',
+            上级指标: tableRow.indicatorParentNode,
+            指标创建时间: tableRow.indicatorCreatTime,
+          };
+        });
+        Promise.all(promises)
+          .then((data) => {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+            saveAs(
+              new Blob([wbout], { type: "application/octet-stream" }),
+              "指标总表.xlsx"
+            );
+
+            // // 提交数据到Vuex Store
+            // this.updateExportedData(data);
+
+
+          })
+          .finally(() => {
+            loadingInstance.close();
+          })
+          .catch((error) => {
+            console.error("导出失败:", error);
+            loadingInstance.close();
+          });
+      },
 
     }
   }

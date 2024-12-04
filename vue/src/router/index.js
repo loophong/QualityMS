@@ -124,6 +124,12 @@ const mainRoutes = {
       meta: { title: '课题登记', isDynamic: true, isTab: false }
     },
     {
+      path: '/statistics',
+      component: _import('modules/QCmanagement/qcChart/statistics'),
+      name: 'statistics',
+      meta: { title: '点检统计', isDynamic: true, isTab: false }
+    },
+    {
       path: '/qcTools',
       component: _import('modules/QCmanagement/qcTools/system'),
       name: 'qcTools',
@@ -191,6 +197,12 @@ const mainRoutes = {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/creatorissuemask'),
       name: 'issue-issuemask',
+      meta: { title: '任务详情', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/issue-issuemask',
+      component: _import('modules/issuemask/issueAllmask'),
+      name: 'issue-issueAllmask',
       meta: { title: '任务详情', isDynamic: true, isTab: false }
     },
     {

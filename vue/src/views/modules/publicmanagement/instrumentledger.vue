@@ -15,7 +15,7 @@
          <el-button v-if="isAuth('publicmanagement:instrumentledger:Fuzzy_queries')" type="primary" @click="Fuzzy_queries()">查询</el-button>
 
         <!-- <el-button v-if="isAuth('publicmanagement:instrumentledger:list')" type="primary" @click="getDataList()"></el-button> -->
-        <el-button v-if="isAuth('publicmanagement:instrumentledger:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <!-- <el-button v-if="isAuth('publicmanagement:instrumentledger:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button> -->
         <el-button v-if="isAuth('publicmanagement:instrumentledger:delete')"  type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
          <!--Excel 参数导入 -->
       <el-button

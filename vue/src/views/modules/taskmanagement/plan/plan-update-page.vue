@@ -519,6 +519,8 @@ export default {
     // 移除文件
     handleRemove(file, planFileList) {
       console.log("移除的文件为: " + JSON.stringify(file));
+      console.log("当前文件列表为: " + JSON.stringify(planFileList))
+      this.planFileList = planFileList
     },
 
     init(routerPlanId) {
@@ -556,7 +558,7 @@ export default {
               this.dataForm.planLagDays = data.plan.planLagDays
               this.dataForm.planLagReasons = data.plan.planLagReasons
               this.dataForm.planAssociatedIndicatorsId = data.plan.planAssociatedIndicatorsId
-              this.dataForm.planFile = data.plan.planFile
+              // this.dataForm.planFile = data.plan.planFile
               this.tasks = data.tasks
               this.planFileList = data.files
             }
@@ -668,6 +670,7 @@ export default {
               taskIsOnTime: this.dataForm.taskIsOnTime !== '' ? this.dataForm.taskIsOnTime : 0,
               taskParentNode: this.dataForm.planId
             }));
+            console.log("提交前文件列表为"+this.planFileList);
 
             // 提交数据
             this.$http({

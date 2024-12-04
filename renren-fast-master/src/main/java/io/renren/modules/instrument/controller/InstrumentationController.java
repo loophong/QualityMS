@@ -3,13 +3,10 @@ package io.renren.modules.instrument.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import io.renren.modules.instrument.service.InstrumentTestMethodService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.instrument.entity.InstrumentationEntity;
 import io.renren.modules.instrument.service.InstrumentationService;
@@ -30,7 +27,8 @@ import io.renren.common.utils.R;
 public class InstrumentationController {
     @Autowired
     private InstrumentationService instrumentationService;
-
+    @Autowired
+    private InstrumentTestMethodService instrumentTestMethodService;
     /**
      * 列表
      */
@@ -41,7 +39,29 @@ public class InstrumentationController {
 
         return R.ok().put("page", page);
     }
+    /**
+     * 信息
+     */
+    @RequestMapping("/linkedMethod/{id}")
+    @RequiresPermissions("generator:instrumentation:info")
+    public R linkedMethod(@PathVariable("id") Integer id){
+        InstrumentationEntity instrumentation = instrumentationService.getById(id);
+        System.out.println("看关联的检验方法"+instrumentation);
+         String toolName = instrumentation.getToolName();
+//        instrumentTestMethodService.get
+        return R.ok().put("instrumentation", instrumentation);
+    }
+    /*
+    * 模糊查询
+    * */
+    @GetMapping("/Fuzzy_queries")
+    public R Fuzzy_queries(@RequestParam Map<String, Object> params) {
 
+        PageUtils page = instrumentationService.queryPage(params);
+
+        return R.ok().put("page", page);
+
+    }
 
     /**
      * 信息

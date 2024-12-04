@@ -20,7 +20,11 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
 
     PageUtils creatorqueryPage(Map<String, Object> params);
 
+    PageUtils managerqueryPage(Map<String, Object> params);
+
     PageUtils AuditqueryPage(Map<String, Object> params);
+
+    String newIssuemaskNumber(String issueNumber);
 
     List<IssueMaskTableEntity> listAll(String issueNumber);
 

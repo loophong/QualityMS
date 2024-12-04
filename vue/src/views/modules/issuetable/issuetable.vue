@@ -38,6 +38,9 @@
       <el-form-item>
         <el-button @click="downloadTemplate()">下载模板</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button @click="exportAll()">导出</el-button>
+      </el-form-item>
     </el-form>
     <el-dialog :visible.sync="taskDetailVisible" title="问题详情">
       <div>
@@ -209,9 +212,20 @@
         align="center"
         label="整改照片交付物">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>
+          <el-button type="text" @click="showFileList(scope.row.rectificationPhotoDeliverable)">
+            预览
+          </el-button>
         </template>
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="rectificationPhotoDeliverable"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="整改照片交付物">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
 <!--      <el-table-column-->
 <!--        prop="rectificationPhotoDeliverable"-->
 <!--        header-align="center"-->
@@ -367,7 +381,9 @@
 <!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.issueId)">修改</el-button>-->
           <el-button type="text" size="small" @click="showTaskDetails(scope.row.issueNumber, scope.row.issueId)">完成情况</el-button>
           <el-button type="text" size="small" @click="reuseTask(scope.row.issueId)">问题重写</el-button>
-          <el-button type="text" size="small" @click="closeRelatedTasks(scope.row.issueId)">问题关闭</el-button>
+          <el-button type="text" size="small" @click="openCloseDialog(scope.row.issueId)">
+            问题关闭
+          </el-button>
           <el-button type="text" size="small" @click="showAssociatedIssues(scope.row.associatedRectificationRecords)">关联问题</el-button>
         </template>
       </el-table-column>
@@ -392,6 +408,41 @@
       <el-button @click="dialogVisible3 = false">关闭</el-button>
     </span>
     </el-dialog>
+    <el-dialog
+      title="附件预览"
+      :visible.sync="fileDialogVisible"
+      width="50%">
+      <el-table :data="fileList" style="width: 100%">
+        <el-table-column prop="name" label="文件名称" align="left"></el-table-column>
+        <el-table-column label="操作" align="center">
+          <template slot-scope="scope">
+            <el-button type="text" @click="previewFile(scope.row.url)">
+              点击预览
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="fileDialogVisible = false">关闭</el-button>
+      </div>
+    </el-dialog>
+    <!-- 弹窗 -->
+    <el-dialog
+      title="关闭问题"
+      :visible.sync="showCloseDialog"
+      width="400px"
+      @close="cancelCloseDialog"
+    >
+      <p>是否关闭此问题以及关联问题？</p>
+      <el-radio-group v-model="selectedOption" style="margin-top: 10px;">
+        <el-radio :label="1">关闭关联问题</el-radio>
+        <el-radio :label="0">不关闭关联问题</el-radio>
+      </el-radio-group>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelCloseDialog">取消</el-button>
+        <el-button type="primary" @click="closeRelatedTasks">确定</el-button>
+      </span>
+    </el-dialog>
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -410,12 +461,21 @@
 <script>
   import AddOrUpdate from '../issuefind/issuetable-add-or-update.vue'
   import AddOrUpdateD from "./issuetable-add-or-update.vue";
+  import {Loading} from "element-ui";
+  import * as XLSX from "xlsx";
 
 
   // import {isAuth} from "../../../utils";
   export default {
     data () {
       return {
+        //关闭问题
+        showCloseDialog: false, // 控制弹窗的显示
+        selectedOption: 0, // 默认选项，0：不关闭关联问题，1：关闭关联问题
+        currentIssueId: null, // 当前操作的问题ID
+        //文件预览
+        fileDialogVisible: false, // 控制文件预览弹窗显示
+        fileList: [], // 存储当前记录的附件列表
         //查询参数
         options:[],
         queryParams:{
@@ -465,6 +525,7 @@
         dialogVisible1: false, // 控制对话框显示
         fullCause: '',    // 用于存储完整描述
         fullstatus: '',
+        dataList01: [], //列表数据(不分页)
         dialogVisible2: false,
         dialogVisible3: false,
         fullRetStates:'',
@@ -492,6 +553,41 @@
       // this.fetchData()
     },
     methods: {
+      // 显示文件列表弹窗
+      showFileList(annex) {
+        try {
+          if (!annex) {
+            this.$message.warning("没有附件可预览！");
+            return;
+          }
+          // 解析数据库中存储的附件信息
+          const parsedAnnex = JSON.parse(annex);
+          if (Array.isArray(parsedAnnex) && parsedAnnex.length > 0) {
+            this.fileList = parsedAnnex;
+            this.fileDialogVisible = true; // 打开弹窗
+          } else {
+            this.$message.warning("附件数据格式不正确！");
+          }
+        } catch (error) {
+          console.error("附件解析失败:", error);
+          this.$message.error("附件数据解析失败！");
+        }
+      },
+      // 点击预览具体文件
+      previewFile(fileUrl) {
+        const token = this.$cookie.get("token"); // 获取当前的 token
+        if (!fileUrl) {
+          this.$message.warning("文件路径为空，无法预览！");
+          return;
+        }
+        if (!token) {
+          this.$message.error("登录已过期，请重新登录！");
+          return;
+        }
+        // 拼接带有 token 的预览地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileUrl}`)}?token=${token}`;
+        window.open(url, "_blank");
+      },
       getUsernameByUserId(auditorId) {
         for (const category of this.options) {
           for (const auditor of category.options) {
@@ -522,7 +618,7 @@
         // console.log('打开任务列表', this.tempParams.issueNumber)
         this.taskDetailVisible = false;
         this.$router.push({
-          name: 'issue-issuemask',
+          name: 'issue-issueAllmask',
           params: {
             issueId: this.tempParams.issueId,
             issueNumber: this.tempParams.issueNumber
@@ -635,39 +731,47 @@
       //   return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
       // },
       // 关闭相关任务
-      closeRelatedTasks(id) {
-        // 提示用户确认
-        this.$confirm(`是否删除此问题并删除关联问题？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          // 用户确认后执行删除请求
-          this.$http({
-            url: this.$http.adornUrl(`/generator/issuetable/closeRelatedTasks/${id}`), // 修改为正确的URL
-            method: 'post'
-            // 此处不需要 data，因为我们在方法定义中直接使用了@PathVariable来接收ID
-          }).then(({data}) => {
+      // 打开弹窗
+      openCloseDialog(issueId) {
+        this.currentIssueId = issueId; // 记录当前问题ID
+        this.showCloseDialog = true; // 显示弹窗
+      },
+      // 提交关闭问题请求
+      closeRelatedTasks() {
+        this.$http({
+          url: this.$http.adornUrl(
+            `/generator/issuetable/closeRelatedTasks/${this.currentIssueId}/${this.selectedOption}`
+          ),
+          method: 'post',
+        })
+          .then(({ data }) => {
             if (data && data.code === 0) {
-              // 删除成功的提示
+              // 关闭成功提示
               this.$message({
                 message: '任务已成功关闭',
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  // 删除成功后刷新数据列表
+                  // 刷新列表
                   this.getDataList();
-                }
+                },
               });
             } else {
-              // 删除失败的提示
+              // 失败提示
               this.$message.error(data.msg);
             }
+          })
+          .catch(() => {
+            this.$message.error('操作失败，请稍后重试');
+          })
+          .finally(() => {
+            this.showCloseDialog = false; // 关闭弹窗
           });
-        }).catch(() => {
-          // 用户点击了取消，不执行任何操作
-          this.$message.info('操作已取消');
-        });
+      },
+      // 取消操作
+      cancelCloseDialog() {
+        this.showCloseDialog = false; // 隐藏弹窗
+        // this.$message.info('操作已取消');
       },
 
       // fetchData () {
@@ -964,6 +1068,83 @@
           this.$message.error('下载模板失败，请重试！');
           console.error(error);
         });
+      },
+      // 导出
+      exportAll(){
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/issuesAll'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'key': this.queryParams
+          })
+        }).then(({data}) => {
+          if (data) {
+            this.dataList01 = data
+          } else {
+            this.dataList01 = []
+          }
+        })
+        const loadingInstance = Loading.service({
+          lock: true,
+          text: "正在导出，请稍后...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
+
+        const promises = this.dataList01.map((tableRow, index) => {
+          return {
+            序号: index + 1,
+            问题编号: tableRow.issueNumber,
+            检查科室: tableRow.inspectionDepartment,
+            检查日期: tableRow.inspectionDate,
+            问题类别: tableRow.issueCategoryId,
+            系统分类: tableRow.systematicClassification,
+            故障类别: tableRow.faultType,
+            故障件一级: tableRow.firstFaultyParts,
+            故障件二级: tableRow.secondFaultyParts,
+            故障模式: tableRow.faultModel,
+            车型: tableRow.vehicleTypeId,
+            车号: tableRow.vehicleNumberId,
+            初步分析: tableRow.peliminaryAnalysis,
+            问题描述: tableRow.issueDescription,
+            整改要求: tableRow.rectificationRequirement,
+            要求完成时间: tableRow.requiredCompletionTime,
+            责任科室: tableRow.responsibleDepartment,
+            整改情况: tableRow.rectificationStatus,
+            实际完成时间: tableRow.actualCompletionTime,
+            整改责任人: tableRow.rectificationResponsiblePerson,
+            关联问题: tableRow.associatedIssueAddition,
+            整改验证情况: tableRow.rectificationVerificationStatus,
+            验证截止时间: tableRow.verificationDeadline,
+            验证结论: tableRow.verificationConclusion,
+            验证人: tableRow.verifier,
+
+          };
+        });
+        Promise.all(promises)
+          .then((data) => {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "问题列表");
+
+            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+            saveAs(
+              new Blob([wbout], { type: "application/octet-stream" }),
+              "问题月度数据总台账.xlsx"
+            );
+
+            // // 提交数据到Vuex Store
+            // this.updateExportedData(data);
+
+
+          })
+          .finally(() => {
+            loadingInstance.close();
+          })
+          .catch((error) => {
+            console.error("导出失败:", error);
+            loadingInstance.close();
+          });
       },
     }
   }

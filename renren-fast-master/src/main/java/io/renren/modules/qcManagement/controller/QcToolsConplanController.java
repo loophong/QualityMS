@@ -60,6 +60,30 @@ public class QcToolsConplanController {
     }
 
     /**
+     * 根据S获取相应的列表
+     * @param conplanIssue
+     * @return
+     */
+    @RequestMapping("/IList")
+    public R templateListI(@RequestParam Integer conplanIssue) {
+        List<QcToolsConplanEntity> resultList = qcToolsConplanDao.getDataByI(conplanIssue);
+        System.out.println("save === save ====");
+        return R.ok().put("resultList", resultList);
+    }
+
+    /**
+     * 根据T获取相应的列表
+     * @param conplanType
+     * @return
+     */
+    @RequestMapping("/TList")
+    public R templateListS(@RequestParam String conplanType) {
+        List<QcToolsConplanEntity> resultList = qcToolsConplanDao.getDataByT(conplanType);
+        System.out.println("save === save ====");
+        return R.ok().put("resultList", resultList);
+    }
+
+    /**
      * 根据Id获取对应的数据
      * @param conplanId
      * @return

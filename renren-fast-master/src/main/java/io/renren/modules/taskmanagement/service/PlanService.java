@@ -6,6 +6,7 @@ import io.renren.modules.taskmanagement.dto.PlanDTO;
 import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.PlanEntity;
 import io.renren.modules.taskmanagement.entity.PlanStatisticsLabelDto;
+import io.renren.modules.taskmanagement.vo.PlanExportVO;
 
 import java.util.List;
 import java.util.Map;
@@ -44,5 +45,7 @@ public interface PlanService extends IService<PlanEntity> {
     PageUtils queryPageByParams(PlanQueryParamDTO planQueryParamDTO);
 
     PageUtils queryPageFinishedPlan(PlanQueryParamDTO planQueryParamDTO);
+
+    List<PlanExportVO> export();
 }
 

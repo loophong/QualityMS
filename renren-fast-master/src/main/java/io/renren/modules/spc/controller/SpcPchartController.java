@@ -87,4 +87,24 @@ public class SpcPchartController {
         return R.ok();
     }
 
+    @RequestMapping("/chart/p")
+    public R getPChart(){
+        return R.ok().put("p-chart_Info", spcPchartService.getPChart());
+    }
+
+    @RequestMapping("/chart/np")
+    public R getNPChart(){
+        return R.ok().put("np-chart_Info", spcPchartService.getNPChart());
+    }
+
+    @RequestMapping("/chart/u")
+    public R getUChart(){
+        return R.ok().put("u-chart_Info", spcPchartService.getUChart());
+    }
+
+    @RequestMapping("/chart/c")
+    public R getCChart(){
+        return R.ok().put("c-chart_Info", spcPchartService.getCChart());
+    }
+
 }

@@ -34,7 +34,7 @@
       <!-- <el-button type="success" @click="dialogFormVisible = true"
         >更新当前数据</el-button
       > -->
-      <el-button type="success" @click="handleUp">更新当前数据</el-button>
+      <el-button type="success" @click="handleUp" v-if="admitEdit">更新当前数据</el-button>
     </span>
 
     <el-dialog title="自定义图名" :visible.sync="dialogFormVisible" append-to-body>
@@ -88,14 +88,32 @@ export default {
       },
       tmpSeriesList: [],
       tmpAxisList: [],
+      currentUserName: '',
+      admitEdit: false,
     };
   },
   computed: {},
   mounted() {
+    this.getUserName();
     this.getTemplateData();
     this.myChart = echarts.init(this.$refs.main);
   },
   methods: {
+    async getUserName() {
+      await this.$http({
+        url: this.$http.adornUrl("/qcSubject/registration/user"),
+        method: "get",
+        params: this.$http.adornParams({
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.currentUserName = data.userName;
+        } else {
+        }
+
+      });
+    },
+
     async getTemplateData() {
       await this.$http({
         url: this.$http.adornUrl("/qcTools/conplan/GetById"),
@@ -105,6 +123,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
+          if (data.resultList.length != 0) {
+            if (data.resultList[0].conplanUser == this.currentUserName) {
+              this.admitEdit = true;
+            }
+          }
           this.resultList = data.resultList.map((row) => ({
             templateId: row.conplanId,
             templateName: row.conplanName,

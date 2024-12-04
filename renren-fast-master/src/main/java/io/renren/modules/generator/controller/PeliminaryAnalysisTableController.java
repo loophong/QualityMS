@@ -1,5 +1,6 @@
 package io.renren.modules.generator.controller;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -8,17 +9,13 @@ import java.util.Map;
 import io.renren.modules.generator.entity.DepartmentTableEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.generator.entity.PeliminaryAnalysisTableEntity;
 import io.renren.modules.generator.service.PeliminaryAnalysisTableService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
-
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -33,7 +30,17 @@ import io.renren.common.utils.R;
 public class PeliminaryAnalysisTableController {
     @Autowired
     private PeliminaryAnalysisTableService peliminaryAnalysisTableService;
+    /**
+     * Excel上传
+     */
+    @PostMapping("/uploadExcel")
+    @RequiresPermissions("generator:issuetable:update")
+    public R uploadExcel(@RequestParam("file") MultipartFile file) {
+            // 上传文件
+            System.out.println("接收到的文件名: " + file.getOriginalFilename());
+            return peliminaryAnalysisTableService.uploadExcelFile(file);
 
+    }
     /**
      * 获取所有初步分析列表
      */
@@ -51,7 +58,7 @@ public class PeliminaryAnalysisTableController {
     }
 
     /**
-     * 列表 ok,我要下班了！！
+     * 列表
      */
     @RequestMapping("/list")
     @RequiresPermissions("generator:peliminaryanalysistable:list")

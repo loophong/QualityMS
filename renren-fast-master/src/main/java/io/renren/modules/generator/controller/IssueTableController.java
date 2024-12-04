@@ -150,44 +150,6 @@ public class IssueTableController {
 //        return R.ok();
     }
 
-//    @PostMapping("/minioimage")
-//    @RequiresPermissions("generator:issuetable:update")
-//    public R uploadImageMinio(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-//        try {
-//            // 检查存储桶是否存在
-//            String bucketName = "your-bucket-name";  // 替换为你的存储桶名称
-//            boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-//
-//            if (!isBucketExists) {
-//                // 如果存储桶不存在，可以选择创建一个新的存储桶
-//                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-//            }
-//
-//            // 生成唯一的文件名
-//            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-//
-//            // 上传文件到 MinIO
-//            minioClient.putObject(PutObjectArgs.builder()
-//                    .bucket(bucketName)  // 设置存储桶名称
-//                    .object(fileName)    // 设置上传的对象名称
-//                    .stream(file.getInputStream(), file.getSize(), -1) // 文件流
-//                    .contentType(file.getContentType()) // 文件类型
-//                    .build());
-//
-//            // 构造文件的访问链接
-//            String fileUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
-//                            .bucket(bucketName)
-//                            .object(fileName)
-//                            .build()
-//                    );
-//            System.out.println("获得图片的路径为;" +fileUrl);
-//            // 返回成功响应
-//            return R.ok().put("fileUrl", fileUrl);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return R.error("文件上传失败: " + e.getMessage());
-//        }
-//    }
 
     /**
      * 检查车号和问题类别是否重复
@@ -254,8 +216,8 @@ public class IssueTableController {
 
 
         // 调用服务层方法检查是否有重复的车号和问题类别
-        boolean isDuplicate = issueTableService.checkReplicateIssue(issueId, issueCategoryIds,systematicClassification,firstFaultyParts,secondFaultyParts,faultType,faultModel);
-//        System.out.println("结束检查车号和问题类别是否重复"+isDuplicate);
+        boolean isDuplicate = issueTableService.checkReplicateIssue(issueId,systematicClassification,firstFaultyParts,secondFaultyParts,faultType,faultModel);
+        System.out.println("结束检查车号和问题类别是否重复"+isDuplicate);
         if (isDuplicate) {
             return R.ok("相同问题已发生");
         }
@@ -324,15 +286,28 @@ public class IssueTableController {
     /**
      * 关闭相关任务
      */
-    // 关闭相关任务
-    @RequestMapping("/closeRelatedTasks/{issueId}")
+    @RequestMapping("/closeRelatedTasks/{issueId}/{closeRelated}")
     @RequiresPermissions("generator:issuetable:delete")
-    public R closeRelatedTasks(@PathVariable("issueId") Long issueId) {
-        return issueTableService.closeRelatedTasks(issueId); // 直接调用服务层方法
+    public R closeRelatedTasks(
+            @PathVariable("issueId") Long issueId,
+            @PathVariable("closeRelated") Integer closeRelated) {
+        // 调用服务层方法，并传递新参数
+        return issueTableService.closeRelatedTasks(issueId, closeRelated);
     }
 
     /**
-     * 获取问题统计
+     * 问题编号
+     */
+    @RequestMapping("/newIssueNumber")
+    @RequiresPermissions("generator:issuetable:save")
+    public R newIssueNumber() {
+        String useID = issueTableService.newIssueNumber(); // 直接调用服务层方法
+        System.out.println("获取的新编号为：" + useID);
+        return R.ok().put("useID", useID);
+    }
+
+    /**
+     * 获取问题统计（总数）
      */
     @RequestMapping("/currentMonth")
     @RequiresPermissions("generator:issuetable:list") // 权限控制
@@ -343,13 +318,76 @@ public class IssueTableController {
 
         return R.ok().put("stats", stats);
     }
+    /**
+     * 获取问题统计（当月统计不同状态）
+     */
+    @RequestMapping("/truecurrentMonth")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getCurrentMonthStatistics() {
+        Map<String, Integer> stats = issueTableService.getCurrentMonthStatistics();
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取问题统计（当月统计不同类型）
+     */
+    @RequestMapping("/currentMonthInProgressCategoryStats")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getcurrentMonthInProgressCategoryStats() {
+        Map<String, Integer> stats = issueTableService.getcurrentMonthInProgressCategoryStats();
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取按月份统计的总数（按年份）
+     * @param year 年份
+     * @return 返回统计数据
+     */
+    @RequestMapping("/monthlyStats")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getMonthlyCount(@RequestParam("year") int year) {
+        // 获取按月统计的结果
+        Map<String, Integer> stats = issueTableService.getMonthlyCountByYear(year);
+
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        // 返回响应
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取按月份统计的重复问题总数（按年份）
+     * @param year 年份
+     * @return 返回统计数据
+     */
+    @RequestMapping("/monthlyDuplicateStats")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getmonthlyDuplicateStats(@RequestParam("year") int year) {
+        // 获取按月统计的结果
+        Map<String, Integer> stats = issueTableService.getmonthlyDuplicateStats(year);
+
+        // 计算重复问题的总数
+        int total = stats.values().stream().mapToInt(Integer::intValue).sum();
+        // 打印返回给前端的数据
+        System.out.println("返回前端的统计数据: " + total);
+
+        // 返回响应
+        return R.ok().put("stats", stats).put("total", total);
+    }
 
 
     /**
-     * 当月问题完成率
+     * 问题完成率
      */
 //    @Value("${file.upload-dir}")
-    // 获取当月问题完成率
+    // 获取问题完成率
     @RequestMapping("/completionRate")
     @RequiresPermissions("generator:issuetable:list")
     public R getCompletionRate() {
@@ -359,7 +397,7 @@ public class IssueTableController {
     }
 
     /**
-     * 获取当月问题总数
+     * 获取问题总数
      */
     @RequestMapping("/totalIssue")
     @RequiresPermissions("generator:issuetable:list") // 权限控制
@@ -375,14 +413,30 @@ public class IssueTableController {
     @RequestMapping("/issuesid")
     @RequiresPermissions("generator:issuetable:list")
     public R list(){
-        System.out.println("=====获取问题列表----开始");
+//        System.out.println("=====获取问题列表----开始");
         List<IssueTableEntity> issues = issueTableService.listAll();
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", 0);
-        response.put("issueTable", issues);
-        System.out.println(response);
-        System.out.println("=====获取问题列表----结束");
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("code", 0);
+//        response.put("issueTable", issues);
+//        System.out.println(response);
+//        System.out.println("=====获取问题列表----结束");
         return R.ok().put("issues", issues);
+    }
+
+    /**
+     * 获取所有问题列表
+     */
+    @RequestMapping("/issuesAll")
+    @RequiresPermissions("generator:issuetable:list")
+    public List<IssueTableEntity> listAll(){
+//        System.out.println("=====获取问题列表----开始");
+        List<IssueTableEntity> list = issueTableService.listAll();
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("code", 0);
+//        response.put("issueTable", issues);
+//        System.out.println(response);
+//        System.out.println("=====获取问题列表----结束");
+        return list;
     }
 
     /**

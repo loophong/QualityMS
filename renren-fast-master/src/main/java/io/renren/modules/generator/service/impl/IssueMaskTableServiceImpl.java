@@ -8,10 +8,12 @@ import io.renren.common.utils.Query;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.generator.dao.IssueMaskTableDao;
 import io.renren.modules.generator.entity.IssueMaskTableEntity;
+import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueMaskTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,6 +52,19 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     }
 
     @Override
+    public PageUtils managerqueryPage(Map<String, Object> params) {
+        String issueNumber = (String) params.get("issueNumber");
+
+        QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<IssueMaskTableEntity>()
+                .eq("issue_number", issueNumber);
+        IPage<IssueMaskTableEntity> page = this.page(
+                new Query<IssueMaskTableEntity>().getPage(params),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
     public PageUtils AuditqueryPage(Map<String, Object> params) {
         SysUserEntity role = ShiroUtils.getUserEntity();
         String rolename = role.getUsername();
@@ -61,6 +76,39 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
                         .eq("state", "审核中") // 筛选state为“审核中”的数据
         );
         return new PageUtils(page);
+    }
+
+    @Override
+    public String newIssuemaskNumber(String issueNumber) {
+        //查询相同问题编号的问题
+        List<IssueMaskTableEntity> list1 = this.list(
+                new QueryWrapper<IssueMaskTableEntity>()
+                       .eq("issue_number", issueNumber)
+        );
+
+        // 如果数据库为空，返回默认值 "0001"
+        if (list1.isEmpty()) {
+            return "0001";
+        }
+        //如果查询到相同问题编号的问题，则获取最大的maskNumber，并加1
+        // 找到 ID 最大的问题
+        IssueMaskTableEntity maxIssue = list1.stream()
+                .max(Comparator.comparingLong(IssueMaskTableEntity::getIssuemaskId)) // 根据 ID 获取最大值
+                .orElse(null); // 如果没有记录，返回 null
+        // 处理问题编号，取后四位并加1
+        if (maxIssue != null) {
+            // 获取最大问题的编号
+            String currentIssueNumber = maxIssue.getIssueNumber(); // 假设有一个方法 getIssueNumber()
+
+            // 处理问题编号，取后四位并加1
+            String lastFourDigits = currentIssueNumber.substring(currentIssueNumber.length() - 4);
+            int newNumber = Integer.parseInt(lastFourDigits) + 1;
+
+            // 返回格式化的编号（例如补零）
+            return String.format("%04d", newNumber); // 修改这里返回字符串
+        }
+
+        return "0001";
     }
 
 

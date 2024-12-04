@@ -4,16 +4,17 @@
       <el-tab-pane label="当前计划">
 
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataQueryList()">
-          <el-form-item label="计划编号" >
+          <el-form-item label="计划编号">
             <el-input v-model="queryParamsUnfinished.planId" placeholder="参数名"></el-input>
           </el-form-item>
-          <el-form-item label="计划名" >
+          <el-form-item label="计划名">
             <el-input v-model="queryParamsUnfinished.planName" placeholder="计划名"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button @click="getDataQueryList()">查询</el-button>
             <el-button @click="clearUnfinishedPage()">重置</el-button>
             <el-button v-if="isAuth('taskmanagement:plan:save')" type="primary" @click="addPlanPage()">新增</el-button>
+            <el-button @click="exportFile()">导出</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -157,20 +158,20 @@
 
       <el-tab-pane label="已完成计划">
 
-<!--        <el-form :inline="true" :model="finishedDataForm" @keyup.enter.native="getFinishedPlanList()">-->
-<!--          <el-form-item>-->
-<!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-<!--          </el-form-item>-->
-<!--          <el-form-item>-->
-<!--            <el-button @click="getFinishedPlanList()">查询</el-button>-->
-<!--          </el-form-item>-->
-<!--        </el-form>-->
+        <!--        <el-form :inline="true" :model="finishedDataForm" @keyup.enter.native="getFinishedPlanList()">-->
+        <!--          <el-form-item>-->
+        <!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+        <!--          </el-form-item>-->
+        <!--          <el-form-item>-->
+        <!--            <el-button @click="getFinishedPlanList()">查询</el-button>-->
+        <!--          </el-form-item>-->
+        <!--        </el-form>-->
 
         <el-form :inline="true" @keyup.enter.native="getFinishedPlanList()">
-          <el-form-item label="计划编号" >
-            <el-input v-model="queryParamsFinished.planId" placeholder="参数名" ></el-input>
+          <el-form-item label="计划编号">
+            <el-input v-model="queryParamsFinished.planId" placeholder="参数名"></el-input>
           </el-form-item>
-          <el-form-item label="计划名" >
+          <el-form-item label="计划名">
             <el-input v-model="queryParamsFinished.planName" placeholder="计划名"></el-input>
           </el-form-item>
           <el-form-item>
@@ -199,14 +200,14 @@
           </el-table-column>
           <el-table-column prop="planActualCompletionDate" header-align="center" align="center" label="实际完成日期"
                            width="110">
-<!--            <template slot-scope="scope">-->
-<!--              <span v-if="scope.row.planActualCompletionDate === null" style="color: gray;">-</span>-->
-<!--            </template>-->
+            <!--            <template slot-scope="scope">-->
+            <!--              <span v-if="scope.row.planActualCompletionDate === null" style="color: gray;">-</span>-->
+            <!--            </template>-->
           </el-table-column>
           <el-table-column prop="planActualDays" header-align="center" align="center" label="实际天数">
-<!--            <template slot-scope="scope">-->
-<!--              <span v-if="scope.row.planActualDays === null" style="color: gray;">-</span>-->
-<!--            </template>-->
+            <!--            <template slot-scope="scope">-->
+            <!--              <span v-if="scope.row.planActualDays === null" style="color: gray;">-</span>-->
+            <!--            </template>-->
           </el-table-column>
           <el-table-column prop="planTasksAssignment" header-align="center" align="center" label="任务派发">
           </el-table-column>
@@ -302,9 +303,9 @@
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <!--     如果planFile不为null,显示下载附件按钮     -->
-<!--              <el-button v-if="scope.row.planFile !== null" type="text" size="small"-->
-<!--                         @click="downloadFile(scope.row.planFile)">下载附件-->
-<!--              </el-button>-->
+              <!--              <el-button v-if="scope.row.planFile !== null" type="text" size="small"-->
+              <!--                         @click="downloadFile(scope.row.planFile)">下载附件-->
+              <!--              </el-button>-->
               <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
               <el-button type="text" size="small" @click="updatePlanPage(scope.row.planId)">修改</el-button>
@@ -327,36 +328,36 @@
 
 
     <div>
-<!--       弹窗组件-->
-          <el-dialog :visible.sync="filesDialogVisible" title="附件列表">
-            <ul>
-<!--              <li v-for="file in files" :key="file.name">-->
-<!--               -->
-<!--                <a :href="file.url" :download="file.name">{{ file.name }}</a>-->
-<!--              </li>-->
-              <el-form>
-                <el-row v-for="file in files" :key="file.name" style="margin-bottom: 4px">
-                  <el-col :span="12">
-                    {{ file.name }}
-                  </el-col>
-                  <el-col :span="12">
-                    <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>
-                  </el-col>
-                </el-row>
-              </el-form>
-<!--              <li v-for="file in files" :key="file.name">-->
-<!--                -->
-<!--                  -->
-<!--                  <p>{{ file.name }}</p>-->
-<!--                  &lt;!&ndash;                <a :href="file.url" :download="file.name">{{ file.name }}</a>&ndash;&gt;-->
-<!--                  <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>-->
-<!--              -->
-<!--              </li>-->
-            </ul>
-<!--            <span slot="footer" class="dialog-footer">-->
-<!--              <el-button @click="closeModal">关 闭</el-button>-->
-<!--            </span>-->
-          </el-dialog>
+      <!--       弹窗组件-->
+      <el-dialog :visible.sync="filesDialogVisible" title="附件列表">
+        <ul>
+          <!--              <li v-for="file in files" :key="file.name">-->
+          <!--               -->
+          <!--                <a :href="file.url" :download="file.name">{{ file.name }}</a>-->
+          <!--              </li>-->
+          <el-form>
+            <el-row v-for="file in files" :key="file.name" style="margin-bottom: 4px">
+              <el-col :span="12">
+                {{ file.name }}
+              </el-col>
+              <el-col :span="12">
+                <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>
+              </el-col>
+            </el-row>
+          </el-form>
+          <!--              <li v-for="file in files" :key="file.name">-->
+          <!--                -->
+          <!--                  -->
+          <!--                  <p>{{ file.name }}</p>-->
+          <!--                  &lt;!&ndash;                <a :href="file.url" :download="file.name">{{ file.name }}</a>&ndash;&gt;-->
+          <!--                  <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>-->
+          <!--              -->
+          <!--              </li>-->
+        </ul>
+        <!--            <span slot="footer" class="dialog-footer">-->
+        <!--              <el-button @click="closeModal">关 闭</el-button>-->
+        <!--            </span>-->
+      </el-dialog>
     </div>
   </div>
 
@@ -674,21 +675,61 @@ export default {
     },
 
     // 清空页码数据
-    clearUnfinishedPage(){
+    clearUnfinishedPage() {
       this.pageIndex = 1
       this.queryParamsUnfinished.planId = ''
       this.queryParamsUnfinished.planName = ''
       this.getDataQueryList()
     },
 
-    clearFinishedPage(){
+    clearFinishedPage() {
       this.pageIndex = 1
       this.queryParamsFinished.planId = ''
       this.queryParamsFinished.planName = ''
       this.getFinishedPlanList()
     },
 
+    exportFile() {
+      this.$http({
+        url: this.$http.adornUrl('/taskmanagement/plan/export'),
+        method: 'get',
+        params: this.$http.adornParams(),
+        responseType: 'blob'
+      }).then(res => {
+        // 创建 Blob 对象
+        const blob = new Blob([res.data], {type: 'application/octet-stream'});
 
+        // 创建一个临时的 URL
+        const url = window.URL.createObjectURL(blob);
+
+        // 创建一个隐藏的 <a> 标签
+        const link = document.createElement('a');
+        link.href = url;
+        // 获取当前时间
+        const currentTime = new Date();
+        // 格式化为中国时间
+        var time = currentTime.toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).replace(/\/|:/g, '-').replace(' ', ' ');
+
+        // 设置下载的文件名
+        link.download = time + '计划导出.xlsx'; // 你可以根据实际情况设置文件名
+
+        // 将 <a> 标签添加到文档中
+        document.body.appendChild(link);
+
+        // 触发点击事件
+        link.click();
+
+        // 移除 <a> 标签
+        document.body.removeChild(link);
+
+        // 释放 URL 对象
+        window.URL.revokeObjectURL(url);
+      })
+    }
 
 
   }

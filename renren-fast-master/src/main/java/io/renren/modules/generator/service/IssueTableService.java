@@ -32,7 +32,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
     String getuserinfo();
 
-    R closeRelatedTasks(Long issueId);
+    R closeRelatedTasks(Long issueId, Integer closeRelated);
 
     R uploadExcelFile(MultipartFile file) throws IOException;
 
@@ -40,6 +40,8 @@ public interface IssueTableService extends IService<IssueTableEntity> {
      * 统计当月各类问题数量
      */
     Map<String, Integer> getCurrentMonthVerificationConclusionStatistics();
+
+    Map<String, Integer> getCurrentMonthStatistics();
 
     IssueTableEntity getByissueNumber(String issueNumber);
 
@@ -57,8 +59,18 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
     IssueTableEntity getByassociate(String associatedRectificationRecords);
 
-    boolean checkReplicateIssue(Integer issueId, String issueCategoryIds,String systematicClassification,String firstFaultyParts,String secondFaultyParts,String faultType,String faultModel);
+    boolean checkReplicateIssue(Integer issueId, String systematicClassification,String firstFaultyParts,String secondFaultyParts,String faultType,String faultModel);
 
     PageUtils queryPageFinishedList(Map<String, Object> params);
+
+
+    String newIssueNumber();
+
+
+    Map<String, Integer> getMonthlyCountByYear(int year); // 月度统计
+
+    Map<String, Integer> getmonthlyDuplicateStats(int year);
+
+    Map<String, Integer> getcurrentMonthInProgressCategoryStats();  // 当前月进行中类别统计
 }
 

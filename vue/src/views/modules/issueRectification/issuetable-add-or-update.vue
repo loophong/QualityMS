@@ -173,6 +173,7 @@
         num: 0,
         successNum: 0,
         fileList: [],
+        masknumber: 0,
         dataForm: {
           userinfo: '',
           vehicles: [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }],
@@ -295,22 +296,63 @@
         this.fileList = []; // 清空文件列表
         this.$emit('refreshDataList'); // 可选：触发数据刷新
       },
-      generateSerialNumber() {
+      // generateSerialNumber() {
+      //   const now = new Date();
+      //   const year = now.getFullYear();
+      //   const month = String(now.getMonth() + 1).padStart(2, '0');
+      //   const day = String(now.getDate()).padStart(2, '0');
+      //   const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+      //   console.log('执行随机+++++')
+      //   return `ZL-TA-${year}${month}${day}-${random}`;
+      // },
+      //问题任务编号
+      async generateSerialNumber(issuenumber) {
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
-        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        console.log('执行随机+++++')
-        return `ZL-TA-${year}${month}${day}${random}`;
+        console.log('Successfully fetched new issue number:', issuenumber);
+        try {
+          // 向后端发送请求，获取新的随机数（四字符字符串）
+          const response = await this.$http({
+            url: this.$http.adornUrl(`/generator/issuemasktable/newIssueNumber`),
+            method: 'get',
+            params: { issuenumber }, // 使用 params 传递参数
+          });
+          console.log('Successfully fetched new issue number:', response.data.useID);
+          this.masknumber = response.data.useID;
+          // 返回问题编号，确保 random 是从后端返回的字符串
+          const random = response.data.useID;
+          return `ZL-IS-${year}${month}${day}-${random}`;
+        } catch (error) {
+          console.error('Failed to fetch new issue number:', error);
+          throw new Error('Failed to generate serial number');
+        }
       },
+      generateSerialNumber1() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+
+        // 将 masknumber 转换为整数加 1
+        const newNumber = parseInt(this.masknumber, 10) + 1;
+
+        // 将加 1 后的结果格式化为四位字符
+        this.masknumber = newNumber.toString().padStart(4, '0');
+
+        console.log('Successfully fetched issue number:', this.masknumber);
+
+        return `ZL-IS-${year}${month}${day}-${this.masknumber}`;
+      },
+
       cancel1 () {
         // 重置 subtasks 数组，只保留一个初始组合
         this.dataForm.subtasks = [{ name: '', assignee: '', key: Date.now() }]
         this.visible1 = false // 关闭对话框或重置其他状态
       },
       addSubtask () {
-        const serialNumber = this.generateSerialNumber();
+        const serialNumber = this.generateSerialNumber1();
         console.log('Successfully setnumber:', serialNumber)
         this.dataForm.subtasks.push({
           name: '',
@@ -323,6 +365,7 @@
       },
       removeSubtask (subtask) {
         let index = this.dataForm.subtasks.indexOf(subtask)
+        this.masknumber = this.masknumber - 1;
         if (index !== -1) {
           this.dataForm.subtasks.splice(index, 1)
         }
@@ -699,7 +742,7 @@
         this.dataForm.issueId = id || 0
         this.visible1 = true
         // 为第一个子任务生成序列号
-        this.dataForm.subtasks = [{ name: '', assignee: '', parentTask: '', serialNumber: this.generateSerialNumber(), key: Date.now() }];
+        this.dataForm.subtasks = [{ name: '', assignee: '', parentTask: '', serialNumber: this.generateSerialNumber(issueNumber), key: Date.now() }];
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.issueId) {

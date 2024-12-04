@@ -162,7 +162,8 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     @Override
     public PageUtils queryPageFilter(Map<String, Object> params) {
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
-
+        queryWrapper.lambda()
+                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
             try {
@@ -193,8 +194,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 e.printStackTrace();
             }
         }
-        queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
+
 
         IPage<QcSubjectRegistrationEntity> page = this.page(
                 new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
@@ -206,7 +206,11 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     public PageUtils queryPageAbout(Map<String, Object> params) {
 
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
-
+        String valueTwo = ShiroUtils.getUserEntity().getUsername();
+        queryWrapper.lambda()
+                .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
+                .or()
+                .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo);
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
             try {
@@ -234,11 +238,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 e.printStackTrace();
             }
         }
-        String valueTwo = ShiroUtils.getUserEntity().getUsername();
-        queryWrapper.lambda()
-                .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
-                .or()
-                .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo);
+
 
         IPage<QcSubjectRegistrationEntity> page = this.page(
                 new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
@@ -251,7 +251,13 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     public PageUtils queryPageAboutFilter(Map<String, Object> params) {
 
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
-
+        queryWrapper.lambda()
+                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
+        String valueTwo = ShiroUtils.getUserEntity().getUsername();
+        queryWrapper.lambda()
+                .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
+                .or()
+                .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo);
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
             try {
@@ -279,13 +285,9 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 e.printStackTrace();
             }
         }
-        queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
-        String valueTwo = ShiroUtils.getUserEntity().getUsername();
-        queryWrapper.lambda()
-                .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
-                .or()
-                .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo);
+
+
+
 
         IPage<QcSubjectRegistrationEntity> page = this.page(
                 new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
@@ -308,7 +310,8 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     public PageUtils queryPageLead(Map<String, Object> params) {
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
         String valueOne = ShiroUtils.getUserEntity().getUsername();
-
+        queryWrapper.lambda()
+                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
             try {
@@ -335,8 +338,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 e.printStackTrace();
             }
         }
-        queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
+
 
         IPage<QcSubjectRegistrationEntity> page = this.page(
                 new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
@@ -349,6 +351,10 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     public PageUtils queryPageLeadFilter(Map<String, Object> params) {
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
         String valueOne = ShiroUtils.getUserEntity().getUsername();
+        queryWrapper.lambda()
+                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
+        queryWrapper.lambda()
+                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
 
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
@@ -376,10 +382,6 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 e.printStackTrace();
             }
         }
-        queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
-        queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
 
         IPage<QcSubjectRegistrationEntity> page = this.page(
                 new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),

@@ -4,6 +4,8 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.common.utils.R;
+import io.renren.modules.indicator.entity.IndicatorChart1Entity;
+import io.renren.modules.indicator.entity.IndicatorChart2Entity;
 import io.renren.modules.indicator.entity.IndicatorDataReadEntity;
 import io.renren.modules.indicator.listener.DataReadListener;
 import io.renren.modules.indicator.listener.DataReadListener2;
@@ -37,6 +39,8 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
     private IndicatorIndicatorSummaryService indicatorIndicatorSummaryService;
     @Autowired
     private IndicatorDictionaryService indicatorDictionaryService;
+    @Autowired
+    private IndicatorIndicatorSummaryDao indicatorIndicatorSummaryDao;
 
 
     @Override
@@ -93,12 +97,13 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
             }
         }
 
-        queryWrapper.orderByDesc("`year_month`");
+        queryWrapper.orderByDesc("`year_month`").orderByDesc("indicator_id");
 
         IPage<IndicatorIndicatorSummaryEntity> page = this.page(
                 new Query<IndicatorIndicatorSummaryEntity>().getPage(params),
                 queryWrapper
         );
+
 
         return new PageUtils(page);
     }
@@ -212,6 +217,16 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
                 // 忽略关闭时发生的异常
             }
         }
+    }
+
+    @Override
+    public List<IndicatorChart1Entity> queryChart1List(IndicatorChart1Entity indicatorChart1Entity) {
+        return indicatorIndicatorSummaryDao.queryChart1List(indicatorChart1Entity);
+    }
+
+    @Override
+    public List<IndicatorChart2Entity> queryChart2List(IndicatorChart2Entity indicatorChart2Entity) {
+        return indicatorIndicatorSummaryDao.queryChart2List(indicatorChart2Entity);
     }
 
 }

@@ -239,9 +239,7 @@
         }
       }
     },
-    methods: {
-      
-
+    
         computed: {  
       flagText() {  
         switch (this.dataForm.flag) {  
@@ -255,7 +253,10 @@
             return '';  
         }  
       }  
-    },  
+    }, 
+    methods: {
+      
+ 
       init (id) {
         this.dataForm.id = id || 0
         this.visible = true

@@ -1,6 +1,6 @@
 <template>
   <div style="display: flex;">
-    <div id="barChart" ref="barChart" style="width: 100%; height: 225px;"></div>
+    <div id="barChart" ref="barChart" style="width: 100%; height: 225px;  margin-top: -10px;"></div>
   </div>
 </template>
 

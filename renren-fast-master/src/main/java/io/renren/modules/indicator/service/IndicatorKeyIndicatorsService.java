@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.indicator.entity.IndicatorKeyIndicatorsEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,5 +21,8 @@ public interface IndicatorKeyIndicatorsService extends IService<IndicatorKeyIndi
 //    PageUtils queryPageFinishedList(Map<String, Object> params);
 
     PageUtils queryPage1(Map<String, Object> params);
+
+
+    List<IndicatorKeyIndicatorsEntity> queryList(Map<String, Object> params);
 }
 

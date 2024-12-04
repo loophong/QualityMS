@@ -1,9 +1,11 @@
 package io.renren.modules.indicator.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +43,13 @@ public class IndicatorKeyIndicatorsController {
         PageUtils page = indicatorKeyIndicatorsService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+    @RequestMapping("/list01")
+    @RequiresPermissions("indicator:indicatorkeyindicators:list")
+    public List<IndicatorKeyIndicatorsEntity> list01(@RequestParam Map<String, Object> params){
+        List<IndicatorKeyIndicatorsEntity> list = indicatorKeyIndicatorsService.queryList(params);
+
+        return list;
     }
    /*
    * 指标知识库

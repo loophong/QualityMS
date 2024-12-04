@@ -79,8 +79,19 @@
 <!--          <el-button type="primary">上传附件</el-button>-->
 <!--        </el-upload>-->
         <el-form-item label="上传附件">
-          <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
-                     :on-change="handleFileChange" :auto-upload="false">
+<!--          <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"-->
+<!--                     :on-change="handleFileChange"-->
+<!--                     :on-remove="handleFileRemove"-->
+<!--                     :auto-upload="false">-->
+<!--            <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>-->
+<!--          </el-upload>-->
+          <el-upload
+            ref="file"
+            class="upload-btn-group"
+            :file-list="fileList"
+            :action="uploadUrl"
+            :on-change="handleFileChange"
+            :auto-upload="false">
             <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
           </el-upload>
           <el-button class="upload-preview-btn" type="primary" size="middle"
@@ -92,31 +103,6 @@
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
     </el-dialog>
-
-    <!-- 派发弹窗 -->
-<!--    <el-dialog-->
-<!--      title="派发"-->
-<!--      :close-on-click-modal="false"-->
-<!--      :visible.sync="visible1">-->
-<!--      <el-form :model="dataForm" :rules="dataRule" ref="dispatchForm" @keyup.enter.native="datanewSubmit()" label-width="80px">-->
-<!--        <el-form-item label="接收人" prop="recipients">-->
-<!--          <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">-->
-<!--            <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
-<!--              <el-option v-for="item in group.options" :key="item.value" :label="item.label"-->
-<!--                         :value="item.label">-->
-<!--              </el-option>-->
-<!--            </el-option-group>-->
-<!--          </el-select>-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="派发时间" prop="dispatchTime">-->
-<!--          <el-date-picker v-model="dataForm.creationTime" type="datetime" placeholder="选择派发时间"></el-date-picker>-->
-<!--        </el-form-item>-->
-<!--      </el-form>-->
-<!--      <span slot="footer" class="dialog-footer">-->
-<!--        <el-button @click="visible1 = false">取消</el-button>-->
-<!--        <el-button type="primary" @click="datanewSubmit()">确定</el-button>-->
-<!--      </span>-->
-<!--    </el-dialog>-->
     <el-dialog
       :title="!dataForm.issuemaskId ? '新增' : '派发'"
       :close-on-click-modal="false"
@@ -144,14 +130,15 @@
     </el-dialog>
     <el-dialog title="附件预览" :visible.sync="uploadAllListVisible">
       <div style="color: orange">
-        注：若原先存在文件，则点击备注下方的确定后，将会用新上传文件替换原文件
+<!--        注：若原先存在文件，则点击备注下方的确定后，将会用新上传文件替换原文件-->
       </div>
       <br />
       <el-table :data="uploadAllList" border style="width: 100%">
         <el-table-column prop="name" label="文件名"> </el-table-column>
         <el-table-column prop="url" label="预览">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.url" @click="previewDoc(scope.row.url)">点击预览</el-button>
+            <el-button v-if="scope.row.url" @click="previewDoc(scope.row.url)">预览</el-button>
+            <el-button v-if="scope.row.name" @click="previewDocRemove(scope.row.name)" type="warning">移除</el-button>
             <span v-else>--</span>
           </template>
         </el-table-column>
@@ -194,27 +181,6 @@
           options: ''
         },
         dataRule: {
-          // serialNumber: [
-          //   { required: true, message: '序号不能为空', trigger: 'blur' }
-          // ],
-          // issueNumber: [
-          //   { required: true, message: '问题编号(所属问题)不能为空', trigger: 'blur' }
-          // ],
-          // reviewers: [
-          //   { required: true, message: '审核人不能为空', trigger: 'blur' }
-          // ],
-          // recipients: [
-          //   { required: true, message: '接收人不能为空', trigger: 'blur' }
-          // ],
-          // maskcontent: [
-          //   { required: true, message: '任务内容不能为空', trigger: 'blur' }
-          // ],
-          // creator: [
-          //   { required: true, message: '任务发起人不能为空', trigger: 'blur' }
-          // ],
-          // creationTime: [
-          //   { required: true, message: '发起时间不能为空', trigger: 'blur' }
-          // ]
         },
         options: ''
       }
@@ -285,32 +251,6 @@
         this.uploadNameList.push(file.raw.name);
         this.uploadFile(file.raw); // 调用上传方法
       },
-      // uploadFile(file) {
-      //   const formData = new FormData();
-      //   formData.append('file', file); // 将文件添加到 FormData
-      //
-      //   this.$http({
-      //     url: this.$http.adornUrl('/generator/issuetable/upload'), // 替换为实际上传接口
-      //     method: 'post',
-      //     data: formData,
-      //     headers: {
-      //       'Content-Type': 'multipart/form-data' // 指定为文件上传
-      //     }
-      //   }).then(({ data }) => {
-      //     if (data && data.code === 0) {
-      //       // 保存后端返回的url到变量中
-      //       this.dataForm.annex = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
-      //       // console.log('获得的文件地址 ：' ,data.uploadurl)
-      //       this.$message.success('文件上传成功');
-      //       // 处理成功后的逻辑，例如更新状态
-      //     } else {
-      //       this.$message.error(data.msg);
-      //     }
-      //   }).catch(error => {
-      //     this.$message.error('上传失败');
-      //     console.error(error);
-      //   });
-      // },
       uploadFile(file) {
         const formData = new FormData();
         let file2 = file;
@@ -339,6 +279,7 @@
               // console.log('上传文件列表 ：', fileTmp)
               this.uploadAllList.push(fileTmp);
               console.log("上传文件列表 ：", this.uploadAllList);
+              console.log("上传文件列表2 ：", this.tmpAllList);
               // console.log('上传文件名字列表 ：', this.uploadNameList)
               // this.form.stepFile = data.uploadurl
               // this.$message.success('文件上传成功');
@@ -365,6 +306,13 @@
           `/generator/issuetable/${fileflag}`
         )}?token=${token}`;
         window.open(url);
+      },
+      previewDocRemove(name) {
+        console.log("删除的名字 ", name);
+        console.log("上传文件列表 ：", this.uploadAllList);
+        this.uploadAllList = this.uploadAllList.filter((item) => item.name !== name);
+        this.tmpAllList = this.tmpAllList.filter((item) => item.name !== name);
+        console.log("上传文件列表after ：", this.uploadAllList);
       },
       handleFileChange1(file) {
         // 存储待上传的文件
@@ -497,23 +445,6 @@
         }
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            // this.$http({
-            //   url: this.$http.adornUrl(`/generator/issuemasktable/${!this.dataForm.issuemaskId ? 'save' : 'update'}`),
-            //   method: 'post',
-            //   data: this.$http.adornData({
-            //     'issuemaskId': this.dataForm.issuemaskId || undefined,
-            //     'serialNumber': this.dataForm.serialNumber,
-            //     'issueNumber': this.dataForm.issueNumber,
-            //     'reviewers': this.dataForm.reviewers,
-            //     'reviewerOpinion': this.dataForm.reviewerOpinion,
-            //     'recipients': this.dataForm.recipients,
-            //     'maskcontent': this.dataForm.maskcontent,
-            //     'handlingscenarios': this.dataForm.handlingscenarios,
-            //     'annex': this.dataForm.annex,
-            //     'creator': this.dataForm.creator,
-            //     'creationTime': this.dataForm.creationTime,
-            //     'state': this.dataForm.state
-            //   })
             const requestData = this.$http.adornData({
               'issuemaskId': this.dataForm.issuemaskId || undefined,
               'serialNumber': this.dataForm.serialNumber,

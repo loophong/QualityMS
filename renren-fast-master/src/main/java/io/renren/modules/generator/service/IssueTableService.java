@@ -72,5 +72,8 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     Map<String, Integer> getmonthlyDuplicateStats(int year);
 
     Map<String, Integer> getcurrentMonthInProgressCategoryStats();  // 当前月进行中类别统计
+
+
+    List<IssueTableEntity> listAll01(Map<String, Object> params);
 }
 

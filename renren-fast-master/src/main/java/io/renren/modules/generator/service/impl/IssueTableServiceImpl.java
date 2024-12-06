@@ -330,6 +330,24 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 //        System.out.println("///" + list());
         return this.list();
     }
+    @Override
+    public List<IssueTableEntity> listAll01(Map<String, Object> params) {
+        log.info("param: page=" + params.get("page") + ", limit=" + params.get("limit"));
+
+        String creationTime = (String) params.get("creationTime");
+        String issueDescription = (String) params.get("issueDescription");
+
+        try {
+            // 执行查询
+            List<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(creationTime, issueDescription);
+
+            log.info("Query result size: " + result.size());
+            return result;
+        } catch (Exception e) {
+            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+            return new ArrayList<>(); // 返回空列表以避免调用方出错
+        }
+    }
 
     @Override
     public String saveUploadedFile(MultipartFile file) throws IOException {
@@ -1110,8 +1128,8 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
     }
 
     @Override
-    public boolean checkReplicateIssue(Integer issueId, String issueCategoryIds, String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
-                // 构建查询条件
+    public boolean checkReplicateIssue(Integer issueId,  String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
+                // 构建查询条
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
 
         // 根据传入的参数动态构建查询条件，避免查询条件为空时误查询

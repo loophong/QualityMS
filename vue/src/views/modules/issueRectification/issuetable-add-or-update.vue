@@ -311,7 +311,7 @@
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
-        console.log('Successfully fetched new issue number:', issuenumber);
+        // console.log('Successfully fetched new issue number:', issuenumber);
         try {
           // 向后端发送请求，获取新的随机数（四字符字符串）
           const response = await this.$http({
@@ -319,7 +319,7 @@
             method: 'get',
             params: { issuenumber }, // 使用 params 传递参数
           });
-          console.log('Successfully fetched new issue number:', response.data.useID);
+          // console.log('Successfully fetched new issue number:', response.data.useID);
           this.masknumber = response.data.useID;
           // 返回问题编号，确保 random 是从后端返回的字符串
           const random = response.data.useID;
@@ -438,7 +438,6 @@
       // },
       submitForm(formName) {
         this.fetchuserinform();
-        console.log('Successfully fetched user info4:', this.dataForm.creator);
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.dataForm.subtasks.forEach(subtask => {
@@ -737,12 +736,23 @@
           }
         })
       },
-      init1 (id,issueNumber) {
+      async init1 (id,issueNumber) {
         this.fetchTasksByIssueNumber(issueNumber)
         this.dataForm.issueId = id || 0
         this.visible1 = true
+        console.log("开始获取任务序号++++++++")
         // 为第一个子任务生成序列号
-        this.dataForm.subtasks = [{ name: '', assignee: '', parentTask: '', serialNumber: this.generateSerialNumber(issueNumber), key: Date.now() }];
+        // this.dataForm.subtasks = [{ name: '', assignee: '', parentTask: '', serialNumber: this.generateSerialNumber(issueNumber), key: Date.now() }];
+        this.dataForm.subtasks = [
+          {
+            name: '',
+            assignee: '',
+            parentTask: '',
+            serialNumber: await this.generateSerialNumber(issueNumber), // 使用 await 等待结果
+            key: Date.now(),
+          },
+        ];
+        console.log('Successfully fetched 序号:', this.dataForm.subtasks);
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.issueId) {

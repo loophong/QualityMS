@@ -91,15 +91,26 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
             return "0001";
         }
         //如果查询到相同问题编号的问题，则获取最大的maskNumber，并加1
-        // 找到 ID 最大的问题
+//        // 找到 ID 最大的问题
+//        IssueMaskTableEntity maxIssue = list1.stream()
+//                .max(Comparator.comparingLong(IssueMaskTableEntity::getIssuemaskId)) // 根据 ID 获取最大值
+//                .orElse(null); // 如果没有记录，返回 null
+        // 如果查询到相同问题编号的问题，找到后四位数字最大的记录
         IssueMaskTableEntity maxIssue = list1.stream()
-                .max(Comparator.comparingLong(IssueMaskTableEntity::getIssuemaskId)) // 根据 ID 获取最大值
-                .orElse(null); // 如果没有记录，返回 null
+                .max(Comparator.comparingInt(issue -> {
+                    String serialNumber = issue.getSerialNumber();
+                    if (serialNumber != null && serialNumber.length() >= 4) {
+                        // 提取后四位数字并转为整数
+                        return Integer.parseInt(serialNumber.substring(serialNumber.length() - 4));
+                    }
+                    return 0; // 如果后四位无效，返回 0 作为默认值
+                }))
+                .orElse(null);
         // 处理问题编号，取后四位并加1
         if (maxIssue != null) {
             // 获取最大问题的编号
-            String currentIssueNumber = maxIssue.getIssueNumber(); // 假设有一个方法 getIssueNumber()
-
+            String currentIssueNumber = maxIssue.getSerialNumber(); // 假设有一个方法 getIssueNumber()
+            System.out.println("当前最大问题编号为：" + currentIssueNumber);
             // 处理问题编号，取后四位并加1
             String lastFourDigits = currentIssueNumber.substring(currentIssueNumber.length() - 4);
             int newNumber = Integer.parseInt(lastFourDigits) + 1;

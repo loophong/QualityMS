@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.modules.generator.dao.IssueTableDao;
 import io.renren.modules.indicator.entity.IndicatorDictionaryEntity;
+import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -139,5 +140,15 @@ public class IndicatorKeyIndicatorsServiceImpl extends ServiceImpl<IndicatorKeyI
         );
 
         return new PageUtils(page);
+    }
+    public List<IndicatorKeyIndicatorsEntity> queryList(Map<String, Object> params) {
+        QueryWrapper<IndicatorKeyIndicatorsEntity> queryWrapper = new QueryWrapper<>();
+        System.out.println("params:" + params);
+
+        // 只保留这一条查询语句
+        queryWrapper.lambda().eq(IndicatorKeyIndicatorsEntity::getStorageFlag, 1);
+
+        // 返回查询结果列表
+        return list(queryWrapper);
     }
 }

@@ -9,10 +9,12 @@ import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.entity.IssueUtils;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.generator.service.MinioService;
+import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import org.apache.http.HttpStatus;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,6 +64,16 @@ public class IssueTableController {
         PageUtils page =  issueTableService.queryPageFinishedList(params);
         return R.ok().put("page", page);
     }
+    /*public R finishedList(@RequestParam Map<String, Object> params, @RequestParam(required = false) String issueDescription) {
+        // 如果存在问题描述参数，调用模糊查询方法  修改
+        PageUtils page;
+        if (issueDescription != null && !issueDescription.isEmpty()) {
+            page = issueTableService.queryPageByDescription(params, issueDescription);
+        } else {
+            page = issueTableService.queryPageFinishedList(params);
+        }
+        return R.ok().put("page", page);
+    }*/
     /**
      * 上传图片
      */
@@ -428,6 +440,22 @@ public class IssueTableController {
 //        System.out.println("=====获取问题列表----结束");
         return list;
     }
+    /**
+     * 获取所有问题列表   知识库模块
+     */
+    @RequestMapping("/issuesAllExport")
+    @RequiresPermissions("generator:issuetable:list")
+    public List<IssueTableEntity> listAll01(@RequestParam Map<String, Object> params){
+//        System.out.println("=====获取问题列表----开始");
+       List<IssueTableEntity> list = issueTableService.listAll01(params);
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("code", 0);
+//        response.put("issueTable", issues);
+//        System.out.println(response);
+//        System.out.println("=====获取问题列表----结束");
+       return list;
+    }
+
 
     /**
      * 获取用户信息

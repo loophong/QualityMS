@@ -46,7 +46,7 @@
       </el-form-item>
      <el-row :gutter="10" class="mb8">
        <el-col :span="1.5">
-        <el-button  type="primary" @click="exportAll()">导出</el-button>
+        <el-button v-if="isAuth('qcSubject:registration:list')"  type="primary" @click="exportAll()">导出</el-button>
       </el-col>
       </el-row>
     </el-form>
@@ -311,9 +311,9 @@ export default {
       return new Date(time).toLocaleString();
     },
     // 获取数据列表
-    getDataList() {
+    async getDataList() {
       this.dataListLoading = true
-      this.$http({
+      await this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/finishedList'),
         method: 'get',
         params: this.$http.adornParams({
@@ -391,8 +391,8 @@ export default {
       })
     },
     //导出excel
-    exportAll(){
-        this.$http({
+    async exportAll(){
+        await this.$http({
           url: this.$http.adornUrl('/qcSubject/registration/finishedList01'),
           method: 'get',
           params: this.$http.adornParams({

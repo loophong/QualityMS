@@ -1,7 +1,23 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="问题类别" prop="issueCategoryId">
+    <el-form :inline="true" :model="myQueryParam" @keyup.enter.native="getDataList()">
+      
+      <!-- 查询输入框 -->  
+      <el-form-item>
+        <el-input v-model="myQueryParam.issueDescription" placeholder="问题描述" clearable></el-input>
+      </el-form-item>
+      <!-- <el-form-item>
+        <el-input v-model="myQueryParam.creationTime" placeholder="创建时间" clearable></el-input>
+      </el-form-item> -->
+      <el-form-item label="问题发生时间" prop="creationTime"></el-form-item>
+      <el-date-picker 
+          v-model="myQueryParam.creationTime"
+          type="date"
+          placeholder="选择创建时间"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
+      <!-- <el-form-item label="问题类别" prop="issueCategoryId">
         <el-select v-model="queryParams.issueCategoryId" filterable placeholder="请选择问题类别">
           <el-option
             v-for="item in issueCategoryOptions"
@@ -30,12 +46,15 @@
             :value="department.value">
           </el-option>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
-        <el-button @click="getQueryList()">查询</el-button>
+        <el-button @click="getDataList()">查询</el-button>
       </el-form-item>
       <el-form-item>
         <el-button @click="downloadTemplate()">下载模板</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="exportAll()">导出</el-button>        
       </el-form-item>
     </el-form>
     <el-dialog :visible.sync="taskDetailVisible" title="问题详情">
@@ -357,7 +376,9 @@
 <script>
   import AddOrUpdate from './K_issuetable-add-or-update.vue'
   import AddOrUpdateD from "./KT_issuetable-add-or-update.vue";
-
+  import {Loading} from "element-ui";
+  import * as XLSX from "xlsx";
+  import { saveAs } from "file-saver";
 
   // import {isAuth} from "../../../utils";
   export default {
@@ -386,6 +407,10 @@
           key: ''
         },
         dataList: [],
+        myQueryParam: {
+            creationTime: '',
+            issueDescription: '',
+          },
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -407,6 +432,7 @@
         fullCause: '',    // 用于存储完整描述
         fullstatus: '',
         dialogVisible2: false,
+        dialogVisible3: false,
         fullRetStates:'',
       }
 
@@ -422,6 +448,8 @@
       this.fetchData()
     },
     methods: {
+
+      
       getImageUrl(fileflag) {
         const token = this.$cookie.get('token'); // 获取当前的 token
         if (!token) {
@@ -620,7 +648,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'issueDescription': this.myQueryParam.issueDescription,
+            'creationTime': this.myQueryParam.creationTime,
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -823,8 +852,77 @@
           console.error(error);
         });
       },
+      //导出
+      exportAll(){
+        const loadingInstance = this.$loading({
+        lock: true,
+        text: "正在导出，请稍后...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuetable/issuesAllExport'),
+        method: 'get',
+        params: this.$http.adornParams(this.queryParams),
+      }).then(({data}) => {
+        if (data && data.length > 0) {
+          const processedData = data.map((tableRow, index) => ({
+            序号: index + 1,
+            问题编号: tableRow.issueNumber,
+            检查科室: tableRow.inspectionDepartment,
+            检查日期: tableRow.inspectionDate,
+            问题类别: tableRow.issueCategoryId,
+            系统分类: tableRow.systematicClassification,
+            故障类别: tableRow.faultType,
+            故障件一级: tableRow.firstFaultyParts,
+            故障件二级: tableRow.secondFaultyParts,
+            故障模式: tableRow.faultModel,
+            车型: tableRow.vehicleTypeId,
+            车号: tableRow.vehicleNumberId,
+            初步分析: tableRow.peliminaryAnalysis,
+            问题描述: tableRow.issueDescription,
+            整改要求: tableRow.rectificationRequirement,
+            要求完成时间: tableRow.requiredCompletionTime,
+            责任科室: tableRow.responsibleDepartment,
+            整改情况: tableRow.rectificationStatus,
+            实际完成时间: tableRow.actualCompletionTime,
+            整改责任人: tableRow.rectificationResponsiblePerson,
+            关联问题: tableRow.associatedIssueAddition,
+            整改验证情况: tableRow.rectificationVerificationStatus,
+            验证截止时间: tableRow.verificationDeadline,
+            验证结论: tableRow.verificationConclusion,
+            验证人: tableRow.verifier,
+
+          }));
+            const ws = XLSX.utils.json_to_sheet(processedData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "问题列表");
+
+            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+            saveAs(
+              new Blob([wbout], { type: "application/octet-stream" }),
+              "已结项问题月度数据总台账.xlsx"
+            )}else {
+          this.$message.error("没有可导出的数据！");
+        }
+
+            // // 提交数据到Vuex Store
+            // this.updateExportedData(data);
+
+
+          })
+          .finally(() => {
+            loadingInstance.close();
+          })
+          .catch((error) => {
+            console.error("导出失败:", error);
+            loadingInstance.close();
+          });
+      },
     }
   }
+  
 </script>
 
 <style scoped>

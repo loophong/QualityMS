@@ -32,7 +32,8 @@ public class EmployeeService  {
         Map<String, List<DeptOption>> groupedData = new LinkedHashMap<>();
 
         for (UserDeptInfoDTO employee : employees) {
-            String departmentName = employee.getDeptName();
+            String departmentName = employee.getDept();
+//            String departmentName = employee.getDeptName();
             groupedData.putIfAbsent(departmentName, new ArrayList<>());
             groupedData.get(departmentName).add(new DeptOption(employee.getUserId(), employee.getUserName()));
         }

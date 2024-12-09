@@ -187,15 +187,15 @@
 <!--    <el-form-item label="验证人" prop="verifier">-->
 <!--      <el-input v-model="dataForm.verifier" placeholder="验证人"></el-input>-->
 <!--    </el-form-item>-->
-      <el-form-item label="验证人" prop="verifier">
-        <el-select v-model="dataForm.verifier" filterable placeholder="请选择验证人">
-          <el-option-group v-for="group in options" :key="group.label" :label="group.label">
-            <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                       :value="item.label">
-            </el-option>
-          </el-option-group>
-        </el-select>
-      </el-form-item>
+<!--      <el-form-item label="验证人" prop="verifier">-->
+<!--        <el-select v-model="dataForm.verifier" filterable placeholder="请选择验证人">-->
+<!--          <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
+<!--            <el-option v-for="item in group.options" :key="item.value" :label="item.label"-->
+<!--                       :value="item.label">-->
+<!--            </el-option>-->
+<!--          </el-option-group>-->
+<!--        </el-select>-->
+<!--      </el-form-item>-->
 <!--      <el-form-item label="审核人" prop="reviewers">-->
 <!--        <el-input v-model="dataForm.reviewers" placeholder="审核人"></el-input>-->
 <!--      </el-form-item>-->

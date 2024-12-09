@@ -95,8 +95,8 @@
     <select id="getSpcXrchartEntityByMonth" parameterType="java.util.Date" resultMap="spcXrchartMap">
         SELECT *
         FROM spc_XRchart
-        WHERE MONTH(datatime) = MONTH(CURRENT_DATE())
-        AND YEAR(datatime) = YEAR(CURRENT_DATE());
+        WHERE MONTH(datatime) = MONTH(#{datatime})
+        AND YEAR(datatime) = YEAR(#{datatime});
     </select>
 
 

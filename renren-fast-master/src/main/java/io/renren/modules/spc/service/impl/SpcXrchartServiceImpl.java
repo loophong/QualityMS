@@ -136,10 +136,6 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
             S_LCL.add(S_limit.get(2));
         }
 
-        System.out.println(S_limit.get(0));
-        System.out.println(S_limit.get(1));
-        System.out.println(S_limit.get(2));
-
         //组装数据
         result.add(average);
         result.add(Xbar_UCL);
@@ -163,7 +159,6 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         //计算中位数Me
         List<Double> Me = getMe(datalist);
         result.add(Me);
-        System.out.println("---Me---" + Me);
 
         //Me三限
         List<Double> Me_Limit = getMe_R_Me_Limit(datalist);
@@ -180,14 +175,9 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         result.add(Me_CL);
         result.add(Me_LCL);
 
-        System.out.println("---Me_UCL---" + Me_UCL);
-        System.out.println("---Me_CL---" + Me_CL);
-        System.out.println("---Me_LCL---" + Me_LCL);
-
         //计算极差R
         List<Double> R = getR(datalist);
         result.add(R);
-        System.out.println("---R---" + R);
 
         //R三限
         List<Double> R_Limit = getMe_R_R_Limit(datalist);
@@ -202,10 +192,6 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         result.add(R_UCL);
         result.add(R_CL);
         result.add(R_LCL);
-
-        System.out.println("---R_UCL---" + R_UCL);
-        System.out.println("---R_CL---" + R_CL);
-        System.out.println("---R_LCL---" + R_LCL);
 
         return result;
     }
@@ -240,8 +226,6 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         List<Double> MR = getMR(datalist);
         result.add(MR);
 
-        System.out.println("------MR---------" + MR);
-
         //R三限
         List<Double> MR_Limit = getI_MR_MR_Limit(datalist);
         List<Double> MR_UCL = new ArrayList<>();
@@ -261,8 +245,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
 
     //策略步骤1：获取数据步骤
     public List<SpcXrchartEntity> getData(){
-        List<SpcXrchartEntity> datalist = spcXrchartDao.getSpcXrchartEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        return datalist;
+        return spcXrchartDao.getSpcXrchartEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
     }
 
     //策略步骤2：根据需要生成的图表类型，使用不同方法计算
@@ -270,7 +253,6 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     public List<Double> getSum(List<SpcXrchartEntity> datalist){
         //计算求和
         List<Double> sumList = new ArrayList<>();
-
         for (int i = 1; i <= 31; i++) {
             BigDecimal sum = BigDecimal.ZERO;
             if(datalist.get(0).getData(i) == null){
@@ -429,13 +411,11 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
                 }
             }
             if (!values.isEmpty()){
-                System.out.println("values = "+values);
                 BigDecimal sum = new BigDecimal(0);
                 for (int i = 1; i < values.size(); i++) {
                     BigDecimal range = BigDecimal.valueOf(Math.abs(values.get(i) - values.get(i - 1)));
                     sum = sum.add(range);
                 }
-                System.out.println("sum = " + sum.doubleValue());
                 result.add(sum.divide(BigDecimal.valueOf(values.size()-1)).setScale(2, RoundingMode.HALF_UP).doubleValue());
             }
 

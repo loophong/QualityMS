@@ -24,6 +24,8 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
 
     PageUtils AuditqueryPage(Map<String, Object> params);
 
+    String newIssuemaskNumber(String issueNumber);
+
     List<IssueMaskTableEntity> listAll(String issueNumber);
 
     String listRecords(String issueNumber);

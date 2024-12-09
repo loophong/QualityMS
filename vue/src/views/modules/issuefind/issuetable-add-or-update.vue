@@ -366,7 +366,7 @@
       </span>
     </el-dialog>
     <el-dialog
-      :title="'任务发起'"
+      :title="''"
       :close-on-click-modal="false"
       :visible.sync="visibleT">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
@@ -1250,7 +1250,7 @@ export default {
           url: this.$http.adornUrl(`/generator/issuetable/newIssueNumber`),
           method: 'get',
         });
-        console.log('Successfully fetched new issue number:', response.data.useID);
+        // console.log('Successfully fetched new issue number:', response.data.useID);
 
         // 返回问题编号，确保 random 是从后端返回的字符串
         const random = response.data.useID;
@@ -1260,7 +1260,6 @@ export default {
         throw new Error('Failed to generate serial number');
       }
     },
-
 
     // 处理图片预览
     handlePictureCardPreview(file) {
@@ -1281,7 +1280,7 @@ export default {
       this.visibleT = false // 关闭对话框或重置其他状态
     },
     addSubtask () {
-      const serialNumber = this.generateSerialNumber();
+      const serialNumber = this.generateSerialNumber1();
       // console.log('Successfully setnumber:', serialNumber)
       this.dataForm.subtasks.push({
         name: '',

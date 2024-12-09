@@ -19,5 +19,13 @@ public interface SpcPchartService extends IService<SpcPchartEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     void importData(List<SpcPchartEntity> datalist);
+
+    List<List<Double>> getPChart();
+
+    List<List<Double>> getNPChart();
+
+    List<List<Double>> getUChart();
+
+    List<List<Double>> getCChart();
 }
 

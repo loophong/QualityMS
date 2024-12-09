@@ -378,7 +378,6 @@ export default {
         this.flag = 1;
       }
     },
-    //TODO: 课题组长和课题顾问的下拉框
     // handleFormEdit() {
     //   this.groupMemberList.filter(item => {
     //     if (item.groupName === this.dataForm.groupName) {

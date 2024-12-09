@@ -32,8 +32,8 @@
           </el-table-column>
           <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="120">
           </el-table-column>
-          <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
-          </el-table-column>
+          <!-- <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
+          </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="140">
           </el-table-column>
           <el-table-column prop="department" header-align="center" align="center" label="单位" width="140">
@@ -73,7 +73,7 @@
             <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
-            <el-button type="warning" @click="exportAll()">小组导出</el-button>
+            <el-button type="warning" @click="exportAll('mine')">小组导出</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="dataList" stripe border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -94,8 +94,8 @@
           </el-table-column>
           <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="120">
           </el-table-column>
-          <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
-          </el-table-column>
+          <!-- <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
+          </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="140">
           </el-table-column>
           <el-table-column prop="department" header-align="center" align="center" label="单位" width="140">
@@ -156,8 +156,8 @@
           </el-table-column>
           <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="160">
           </el-table-column>
-          <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
-          </el-table-column>
+          <!-- <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
+          </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="160">
           </el-table-column>
           <el-table-column prop="department" header-align="center" align="center" label="单位" width="160">
@@ -254,6 +254,7 @@ export default {
       roleIdList: [],
 
       exportList: [],
+      exportListMine: [],
     }
   },
   components: {
@@ -442,88 +443,174 @@ export default {
       }
     },
     // 导出
-    async exportAll() {
-      await this.$http({
-        url: this.$http.adornUrl(`/qcMembers/qcGroupMember/list`),
-        method: 'get',
-        params: this.$http.adornParams({
-          'page': 1,
-          'limit': 100000,
-        })
-      }).then(({ data }) => {
-        if (data) {
-          this.exportList = data.page.list
-          let seen = []
-          this.exportList.forEach(e => {
-            if (e.examineStatus === '待审核') {
-              seen.push(e)
-              this.exportList = this.exportList.filter(e => e.examineStatus !== '待审核');
-            }
-          });
-          seen.forEach(s => {
-            this.exportList = this.exportList.filter(e => e.parentId != s.qcgmId);
+    async exportAll(c) {
+      if (c == 'mine') {
+        console.log('导出我的小组')
+        await this.$http({
+          url: this.$http.adornUrl(`/qcMembers/qcGroupMember/myList`),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': 1,
+            'limit': 10000,
           })
-          console.log('----------before------------')
-          console.log(this.exportList)
+        }).then(({ data }) => {
+          if (data) {
+            this.exportListMine = data.page.list
+            let seen = []
+            this.exportListMine.forEach(e => {
+              if (e.examineStatus === '待审核') {
+                seen.push(e)
+                this.exportListMine = this.exportListMine.filter(e => e.examineStatus !== '待审核');
+              }
+            });
+            seen.forEach(s => {
+              this.exportListMine = this.exportListMine.filter(e => e.parentId != s.qcgmId);
+            })
+            console.log('----------before------------')
+            console.log(this.exportListMine)
 
-          this.exportList.sort((a, b) => {
-            if (a.groupName === b.groupName) {
-              // 如果groupName相同，则按roleInTopic是否为"组长"排序
-              return a.roleInTopic === "组长" ? -1 : (b.roleInTopic === "组长" ? 1 : 0);
-            }
-            // 如果groupName不同，则按groupName字母顺序排序
-            return a.groupName.localeCompare(b.groupName);
-          });
-          console.log('----------after------------')
-          console.log(this.exportList)
+            this.exportListMine.sort((a, b) => {
+              if (a.groupName === b.groupName) {
+                // 如果groupName相同，则按roleInTopic是否为"组长"排序
+                return a.roleInTopic === "组长" ? -1 : (b.roleInTopic === "组长" ? 1 : 0);
+              }
+              // 如果groupName不同，则按groupName字母顺序排序
+              return a.groupName.localeCompare(b.groupName);
+            });
+            console.log('----------after------------')
+            console.log(this.exportListMine)
 
-        } else {
-          this.exportList = []
-        }
-      })
-      const loadingInstance = Loading.service({
-        lock: true,
-        text: "正在导出，请稍后...",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)",
-      });
-      // console.log(this.exportList)
-      const promises = this.exportList.map((tableRow, index) => {
-        return {
-          序号: index + 1,
-          小组名: tableRow.groupName,
-          组内角色: tableRow.roleInTopic,
-          姓名: tableRow.memberName,
-          员工编号: tableRow.number,
-          单位: tableRow.department,
-          小组类型: tableRow.team,
-          注册号: tableRow.registrationNum,
-          创建小组时间: tableRow.participationDate,
-        };
-      });
-      Promise.all(promises)
-        .then((data) => {
-          const ws = XLSX.utils.json_to_sheet(data);
-          const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, "项目列表");
-
-          const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-          saveAs(
-            new Blob([wbout], { type: "application/octet-stream" }),
-            "小组成员表.xlsx"
-          );
-
-          // 提交数据到Vuex Store
-          // this.updateExportedData(data);
-
+          } else {
+            this.exportListMine = []
+          }
         })
-        .finally(() => {
-          loadingInstance.close();
-        })
-        .catch((error) => {
-          console.error("导出失败:", error);
-          loadingInstance.close();
+        const loadingInstance = Loading.service({
+          lock: true,
+          text: "正在导出，请稍后...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
         });
+        // console.log(this.exportList)
+        const promises = this.exportListMine.map((tableRow, index) => {
+          return {
+            序号: index + 1,
+            小组名: tableRow.groupName,
+            组内角色: tableRow.roleInTopic,
+            姓名: tableRow.memberName,
+            员工编号: tableRow.number,
+            单位: tableRow.department,
+            小组类型: tableRow.team,
+            注册号: tableRow.registrationNum,
+            创建小组时间: tableRow.participationDate,
+          };
+        });
+        Promise.all(promises)
+          .then((data) => {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+            saveAs(
+              new Blob([wbout], { type: "application/octet-stream" }),
+              "小组成员表.xlsx"
+            );
+
+            // 提交数据到Vuex Store
+            // this.updateExportedData(data);
+
+          })
+          .finally(() => {
+            loadingInstance.close();
+          })
+          .catch((error) => {
+            console.error("导出失败:", error);
+            loadingInstance.close();
+          });
+      } else {
+        await this.$http({
+          url: this.$http.adornUrl(`/qcMembers/qcGroupMember/list`),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': 1,
+            'limit': 100000,
+          })
+        }).then(({ data }) => {
+          if (data) {
+            this.exportList = data.page.list
+            let seen = []
+            this.exportList.forEach(e => {
+              if (e.examineStatus === '待审核') {
+                seen.push(e)
+                this.exportList = this.exportList.filter(e => e.examineStatus !== '待审核');
+              }
+            });
+            seen.forEach(s => {
+              this.exportList = this.exportList.filter(e => e.parentId != s.qcgmId);
+            })
+            console.log('----------before------------')
+            console.log(this.exportList)
+
+            this.exportList.sort((a, b) => {
+              if (a.groupName === b.groupName) {
+                // 如果groupName相同，则按roleInTopic是否为"组长"排序
+                return a.roleInTopic === "组长" ? -1 : (b.roleInTopic === "组长" ? 1 : 0);
+              }
+              // 如果groupName不同，则按groupName字母顺序排序
+              return a.groupName.localeCompare(b.groupName);
+            });
+            console.log('----------after------------')
+            console.log(this.exportList)
+
+          } else {
+            this.exportList = []
+          }
+        })
+        const loadingInstance = Loading.service({
+          lock: true,
+          text: "正在导出，请稍后...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
+        // console.log(this.exportList)
+        const promises = this.exportList.map((tableRow, index) => {
+          return {
+            序号: index + 1,
+            小组名: tableRow.groupName,
+            组内角色: tableRow.roleInTopic,
+            姓名: tableRow.memberName,
+            员工编号: tableRow.number,
+            单位: tableRow.department,
+            小组类型: tableRow.team,
+            注册号: tableRow.registrationNum,
+            创建小组时间: tableRow.participationDate,
+          };
+        });
+        Promise.all(promises)
+          .then((data) => {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+            saveAs(
+              new Blob([wbout], { type: "application/octet-stream" }),
+              "小组成员表.xlsx"
+            );
+
+            // 提交数据到Vuex Store
+            // this.updateExportedData(data);
+
+          })
+          .finally(() => {
+            loadingInstance.close();
+          })
+          .catch((error) => {
+            console.error("导出失败:", error);
+            loadingInstance.close();
+          });
+      }
+
     },
     // 获取数据列表
     getDataList() {

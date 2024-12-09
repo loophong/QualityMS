@@ -3256,7 +3256,6 @@ export default {
     // 上传文件
     handleFileChange(file) {
       // 存储待上传的文件
-
       this.uploadingFile = file.raw; // 获取 File 对象
       this.uploadNameList.push(file.raw.name);
       this.uploadFile(file.raw); // 调用上传方法
@@ -3277,8 +3276,8 @@ export default {
           if (data && data.code === 0) {
             // 保存后端返回的url到变量中
             this.dataForm.rectificationPhotoDeliverable = data.uploadurl;
-            // console.log('获得的文件地址 ：', data.uploadurl)
-            // console.log('获得的文件 ：', data)
+            console.log('获得的文件地址 ：', data.uploadurl)
+            console.log('获得的文件 ：', data)
             this.uploadUrlList.push(data.uploadurl);
             let fileTmp = {
               name: file2.name,

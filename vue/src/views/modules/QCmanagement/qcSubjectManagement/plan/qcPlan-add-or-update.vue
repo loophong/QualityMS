@@ -168,6 +168,8 @@ export default {
                 onClose: () => {
                   this.visible = false
                   this.$emit('refreshDataList')
+                  this.$emit('refreshLeadList')
+                  this.$emit('refreshJoinList')
                 }
               })
             } else {

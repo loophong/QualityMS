@@ -14,7 +14,8 @@ import lombok.Data;
 @Data
 public class UserDeptInfoDTO {
 
-        private String deptName;
+//        private String deptName;
+        private String dept;
         private String userId;
         private String userName;
 

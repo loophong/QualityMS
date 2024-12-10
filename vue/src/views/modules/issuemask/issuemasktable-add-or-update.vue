@@ -437,9 +437,34 @@
           }
         })
       },
+      statechange () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuemasktable/statechange'),
+          method: 'post',
+          data: this.$http.adornData({
+            // 'issuemaskId': this.dataForm.issuemaskId,
+            'issueNumber': this.dataForm.issueNumber
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // this.$message({
+            //   message: '操作成功',
+            //   type: 'success',
+            //   duration: 1500,
+            //   onClose: () => {
+            //     this.visible2 = false
+            //     this.$emit('refreshDataList')
+            //   }
+            // })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      },
       // 表单提交
       dataFormSubmit () {
         let tmpListString = [];
+        this.statechange();
         if (this.tmpAllList.length) {
           tmpListString = JSON.stringify(this.tmpAllList);
         }

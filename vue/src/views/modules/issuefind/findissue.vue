@@ -98,6 +98,22 @@
         </el-table-column>
         <el-table-column prop="responsibleDepartment" header-align="center" align="center" label="责任科室">
         </el-table-column>
+<!--        <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
+<!--        </el-table-column>-->
+        <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">
+          <template slot-scope="scope">
+            <div>
+      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待任务下发'" type="warning" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+      </span>
+            </div>
+          </template>
+        </el-table-column>
+
         <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
@@ -253,6 +269,22 @@
           <!--            </el-table-column>-->
           <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
           </el-table-column>
+<!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
+<!--          </el-table-column>-->
+          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">
+            <template slot-scope="scope">
+              <div>
+      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待任务下发'" type="warning" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+      </span>
+              </div>
+            </template>
+          </el-table-column>
+
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small"
@@ -466,6 +498,22 @@
           </el-table-column>
           <el-table-column prop="verifier" header-align="center" align="center" label="验证人">
           </el-table-column>
+<!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
+<!--          </el-table-column>-->
+          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">
+            <template slot-scope="scope">
+              <div>
+      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待任务下发'" type="warning" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+      </span>
+              </div>
+            </template>
+          </el-table-column>
+
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="checkStateAndHandle(scope.row)">验证</el-button>
@@ -665,19 +713,9 @@ export default {
       return verificationConclusion.split(',').map(state => state.trim());
     },
     checkStateAndHandle(row) {
-      if (!row.verificationDeadline) {
-        this.$message.warning("验证时间未到");
-        return;
-      }
 
-      const currentTime = new Date();
-      const verificationDeadline = new Date(row.verificationDeadline);
+      this.addOrUpdateHandlev(row.issueId);
 
-      if (currentTime < verificationDeadline) {
-        this.$message.warning("验证时间未到");
-      } else {
-        this.addOrUpdateHandlev(row.issueId);
-      }
     },
     addOrUpdateHandlev(id) {
       this.addOrUpdateVisibleV = true

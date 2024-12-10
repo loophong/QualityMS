@@ -96,6 +96,22 @@ public class IssueMaskTableController {
     }
 
     /**
+     * 问题状态改变
+     */
+    @RequestMapping("/statechange")
+    @RequiresPermissions("generator:issuemasktable:save")
+    public R statechange(@RequestParam("issuenumber") String issueNumber) {
+        // 输出接收到的参数
+        System.out.println("接收到的问题编号参数为：" + issueNumber);
+
+        // 调用服务层方法，生成新的编号（可根据 issueNumber 调整逻辑）
+        String useID = issueMaskTableService.statechange(issueNumber);
+
+        System.out.println("获取的新编号为：" + useID);
+
+        return R.ok();
+    }
+    /**
      * 问题任务编号
      */
     @RequestMapping("/newIssueNumber")

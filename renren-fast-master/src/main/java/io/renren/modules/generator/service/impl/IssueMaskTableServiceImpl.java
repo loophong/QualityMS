@@ -10,7 +10,9 @@ import io.renren.modules.generator.dao.IssueMaskTableDao;
 import io.renren.modules.generator.entity.IssueMaskTableEntity;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueMaskTableService;
+import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.sys.entity.SysUserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 
 @Service("issueMaskTableService")
 public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, IssueMaskTableEntity> implements IssueMaskTableService {
+
+    @Autowired
+    private IssueTableService issueTableService;
 
     @Override
     public PageUtils recipientsqueryPage(Map<String, Object> params) {
@@ -121,6 +126,43 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
 
         return "0001";
     }
+
+    @Override
+    public String statechange(String issueNumber) {
+        // 查询相同问题编号的任务
+        List<IssueMaskTableEntity> list1 = this.list(
+                new QueryWrapper<IssueMaskTableEntity>()
+                        .eq("issue_number", issueNumber)
+        );
+
+        // 检查是否所有任务的state都为"已完成"
+        boolean allCompleted = list1.stream()
+                .allMatch(task -> "已完成".equals(task.getState())); // 使用 stream 检查是否所有任务的 state 为 "已完成"
+
+        // 如果全部为"已完成"，更新 IssueTable 中的状态
+        if (allCompleted) {
+            // 更新 IssueTable 中的对应记录
+            IssueTableEntity issue = new IssueTableEntity();
+            issue.setLevel("等待验证指定"); // 设置新状态
+
+            // 使用 update 方法更新 IssueTable 中的状态
+            boolean rowsUpdated = issueTableService.update(
+                    issue,
+                    new QueryWrapper<IssueTableEntity>().eq("issue_number", issueNumber)
+            );
+
+            // 如果更新成功，返回相应的信息
+            if (rowsUpdated) {
+                return "状态更新成功";
+            } else {
+                return "状态更新失败";
+            }
+        }
+
+        // 如果没有全部为"已完成"，返回对应的提示
+        return "部分任务尚未完成，状态未更新";
+    }
+
 
 
     @Override

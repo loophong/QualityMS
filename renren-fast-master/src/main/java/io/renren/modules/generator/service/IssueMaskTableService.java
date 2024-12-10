@@ -26,6 +26,8 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
 
     String newIssuemaskNumber(String issueNumber);
 
+    String statechange(String issueNumber);
+
     List<IssueMaskTableEntity> listAll(String issueNumber);
 
     String listRecords(String issueNumber);

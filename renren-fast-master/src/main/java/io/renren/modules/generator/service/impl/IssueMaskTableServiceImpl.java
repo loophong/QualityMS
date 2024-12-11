@@ -34,7 +34,9 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
 //        System.out.println("当前登录人信息"+role);
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
-                new QueryWrapper<IssueMaskTableEntity>().eq("recipients", rolename)
+                new QueryWrapper<IssueMaskTableEntity>()
+                        .eq("recipients", rolename)
+                        .orderByDesc("issuemask_id")          // 按 ID 降序排序
         );
         return new PageUtils(page);
     }
@@ -47,7 +49,9 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
 
         QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<IssueMaskTableEntity>()
                 .eq("creator", rolename)
-                .eq("issue_number", issueNumber);
+                .eq("issue_number", issueNumber)
+                .orderByDesc("issuemask_id")          // 按 ID 降序排序
+                ;
 
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
@@ -61,7 +65,9 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         String issueNumber = (String) params.get("issueNumber");
 
         QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<IssueMaskTableEntity>()
-                .eq("issue_number", issueNumber);
+                .eq("issue_number", issueNumber)
+                .orderByDesc("issuemask_id")          // 按 ID 降序排序
+                ;
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
                 queryWrapper
@@ -79,6 +85,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
                 new QueryWrapper<IssueMaskTableEntity>()
                         .eq("Reviewers", rolename) // 筛选Reviewers为当前登录用户
                         .eq("state", "审核中") // 筛选state为“审核中”的数据
+                        .orderByDesc("issuemask_id")          // 按 ID 降序排序
         );
         return new PageUtils(page);
     }
@@ -135,12 +142,12 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
                         .eq("issue_number", issueNumber)
         );
 
-        // 检查是否所有任务的state都为"已完成"
-        boolean allCompleted = list1.stream()
-                .allMatch(task -> "已完成".equals(task.getState())); // 使用 stream 检查是否所有任务的 state 为 "已完成"
+        // 检查是否所有任务的状态都不为"执行中"
+        boolean allNotInProgress = list1.stream()
+                .noneMatch(task -> "执行中".equals(task.getState())); // 修改为 noneMatch 判断是否没有任务处于“执行中”
 
-        // 如果全部为"已完成"，更新 IssueTable 中的状态
-        if (allCompleted) {
+        // 如果所有任务的状态都不为"执行中"，更新 IssueTable 中的状态
+        if (allNotInProgress) {
             // 更新 IssueTable 中的对应记录
             IssueTableEntity issue = new IssueTableEntity();
             issue.setLevel("等待验证指定"); // 设置新状态
@@ -159,9 +166,11 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
             }
         }
 
-        // 如果没有全部为"已完成"，返回对应的提示
-        return "部分任务尚未完成，状态未更新";
+        // 如果有任务状态为"执行中"，返回对应的提示
+        return "仍有任务处于执行中，状态未更新";
     }
+
+
 
 
 
@@ -213,16 +222,23 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
 
     @Override
     public PageUtils acceptqueryPage(Map<String, Object> params) {
+        // 获取当前用户信息
         SysUserEntity role = ShiroUtils.getUserEntity();
         String rolename = role.getUsername();
-        System.out.println("当前登录人信息"+role);
+        System.out.println("当前登录人信息: " + role);
+
+        // 分页查询，按 ID 降序排序
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
-                new QueryWrapper<IssueMaskTableEntity>().eq("recipients", rolename)
-                        .ne("state", "已派发") // 筛选state不为“已派发”的数据
+                new QueryWrapper<IssueMaskTableEntity>()
+                        .eq("recipients", rolename)  // 筛选 recipients 等于当前用户
+                        .ne("state", "已派发")       // 筛选 state 不等于 "已派发"
+                        .orderByDesc("issuemask_id")          // 按 ID 降序排序
         );
+
         return new PageUtils(page);
     }
+
 
     @Override
     public PageUtils distributequeryPage(Map<String, Object> params) {
@@ -231,8 +247,10 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         System.out.println("当前登录人信息"+role);
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
-                new QueryWrapper<IssueMaskTableEntity>().eq("recipients", rolename)
+                new QueryWrapper<IssueMaskTableEntity>()
+                        .eq("recipients", rolename)
                         .eq("state", "已派发") // 筛选state为“已派发”的数据
+                        .orderByDesc("issuemask_id")          // 按 ID 降序排序
         );
         return new PageUtils(page);
     }

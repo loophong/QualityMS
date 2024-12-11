@@ -1,14 +1,14 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:verificationdurationtable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:verificationdurationtable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-      </el-form-item>
+<!--      <el-form-item>-->
+<!--        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item>-->
+<!--        <el-button @click="getDataList()">查询</el-button>-->
+<!--        <el-button v-if="isAuth('generator:verificationdurationtable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+<!--        <el-button v-if="isAuth('generator:verificationdurationtable:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
+<!--      </el-form-item>-->
     </el-form>
     <el-table
       :data="dataList"
@@ -22,17 +22,17 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
-        prop="examineId"
-        header-align="center"
-        align="center"
-        label="主键">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="examineId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="主键">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="verificationDuration"
         header-align="center"
         align="center"
-        label="验证时长">
+        label="验证时长(天)">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -42,7 +42,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.examineId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.examineId)">删除</el-button>
+<!--          <el-button type="text" size="small" @click="deleteHandle(scope.row.examineId)">删除</el-button>-->
         </template>
       </el-table-column>
     </el-table>

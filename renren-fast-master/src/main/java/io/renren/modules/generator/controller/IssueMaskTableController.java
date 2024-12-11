@@ -100,7 +100,7 @@ public class IssueMaskTableController {
      */
     @RequestMapping("/statechange")
     @RequiresPermissions("generator:issuemasktable:save")
-    public R statechange(@RequestParam("issuenumber") String issueNumber) {
+    public R statechange(@RequestParam("issueNumber") String issueNumber) {
         // 输出接收到的参数
         System.out.println("接收到的问题编号参数为：" + issueNumber);
 

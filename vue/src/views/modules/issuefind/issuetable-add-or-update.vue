@@ -180,13 +180,22 @@
           <el-input v-model="dataForm.rectificationRequirement" placeholder="整改要求"></el-input>
         </el-form-item>
         <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
-          <el-select v-model="selectedResponsiblePersons" filterable multiple placeholder="请选择整改责任人">
+          <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择整改责任人">
             <el-option-group v-for="group in options" :key="group.label" :label="group.label">
-              <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.label">
               </el-option>
             </el-option-group>
           </el-select>
         </el-form-item>
+<!--        <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
+<!--          <el-select v-model="selectedResponsiblePersons" filterable multiple placeholder="请选择整改责任人">-->
+<!--            <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
+<!--              <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">-->
+<!--              </el-option>-->
+<!--            </el-option-group>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
         <!--    <el-form-item label="要求完成时间" prop="requiredCompletionTime">-->
         <!--      <el-input v-model="dataForm.requiredCompletionTime" placeholder="要求完成时间"></el-input>-->
         <!--    </el-form-item>-->
@@ -938,6 +947,7 @@ export default {
   },
   created () {
     this.fetchIssueCategories()
+    this.fetchuserinform()
     this.fetchVehicleTypes()
     this.fetchIssueOptions() // 获取所有问题编号选项
     this.fetchDepartments()
@@ -1637,7 +1647,7 @@ export default {
           // console.log('Successfully fetched user info:', data.userinfo)
           this.dataForm.userinfo = data.userinfo // 将后端返回的 userinfo 赋值给 this.userinfo
           this.dataForm.creator = this.dataForm.userinfo
-          // console.log('Successfully fetched user info:', this.userinfo)
+          console.log('Successfully fetched user info:', this.dataForm.userinfo)
         } else {
           console.error('Failed to fetch vehicle types:', data.msg)
         }
@@ -1881,8 +1891,8 @@ export default {
             this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId);
             this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber);
 
-            console.log("this.dataForm.issueCategoryId", this.dataForm.issueCategoryId);
-            console.log("this.dataForm.vehicleNumbers", this.dataForm.vehicleNumbers);
+            // console.log("this.dataForm.issueCategoryId", this.dataForm.issueCategoryId);
+            // console.log("this.dataForm.vehicleNumbers", this.dataForm.vehicleNumbers);
 
             // 调用检查重复问题的方法
             // await this.checkDuplicateIssue();
@@ -2043,7 +2053,7 @@ export default {
       console.log('数据+++' ,this.dataForm)
     },
     init (id) {
-      this.fetchuserinform() //获取用户名
+      // this.fetchuserinform() //获取用户名
       this.fetchIssueCategories()
       this.fetchVehicleTypes()
       this.fetchIssueOptions() // 获取所有问题编号选项
@@ -2564,12 +2574,12 @@ export default {
               'rectificationStatus': this.dataForm.rectificationStatus,
               // 'actualCompletionTime': this.dataForm.actualCompletionTime,
               'rectificationPhotoDeliverable': this.tmpAllList.length ? tmpListString : this.stepAttachment,
-              'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+              // 'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
               'causeAnalysis': this.dataForm.causeAnalysis,
               // 'verificationDeadline': this.dataForm.verificationDeadline,
               // 'verifier': this.dataForm.verifier,
               'overDue':'false',
-              'level':'等待任务下发',
+              'level':'等待任务下发(处理)',
               'state': '持续',
             })
           }).then(({data}) => {

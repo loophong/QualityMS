@@ -100,12 +100,12 @@
         </el-table-column>
 <!--        <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--        </el-table-column>-->
-        <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">
+        <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
           <template slot-scope="scope">
             <div>
       <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
         <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待任务下发'" type="warning" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
         <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
         <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
         <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
@@ -271,12 +271,12 @@
           </el-table-column>
 <!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--          </el-table-column>-->
-          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">
+          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
             <template slot-scope="scope">
               <div>
       <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
         <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待任务下发'" type="warning" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
         <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
         <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
         <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
@@ -288,16 +288,16 @@
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small"
-                         @click="handleRectificationRecords(scope.row.issueNumber, scope.row.issueId)">整改记录</el-button>
+                         @click="handleRectificationRecords(scope.row.rectificationResponsiblePerson, scope.row.issueId)">整改记录</el-button>
               <!--          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>-->
               <el-button type="text" size="small"
-                         @click="assetOrUpdateHandle(scope.row.issueId, scope.row.issueNumber)">任务发起</el-button>
+                         @click="assetOrUpdateHandle(scope.row.issueId, scope.row.issueNumber, scope.row.level)">任务发起</el-button>
               <el-button type="text" size="small"
                          @click="openflow(scope.row.issueId, scope.row.issueNumber)">任务流程</el-button>
               <el-button type="text" size="small"
                          @click="openNewPage(scope.row.issueId, scope.row.issueNumber)">任务列表</el-button>
               <el-button type="text" size="small"
-                         @click="handleVerificationRecords(scope.row.issueId, scope.row.issueNumber)">验证指定</el-button>
+                         @click="handleVerificationRecords(scope.row.issueId, scope.row.issueNumber, scope.row.rectificationResponsiblePerson, scope.row.level)">验证指定</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -500,16 +500,16 @@
           </el-table-column>
 <!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--          </el-table-column>-->
-          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">
+          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
             <template slot-scope="scope">
               <div>
-      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
-        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待任务下发'" type="warning" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
-      </span>
+                <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+                  <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+                </span>
               </div>
             </template>
           </el-table-column>
@@ -713,8 +713,21 @@ export default {
       return verificationConclusion.split(',').map(state => state.trim());
     },
     checkStateAndHandle(row) {
-
-      this.addOrUpdateHandlev(row.issueId);
+      this.fetchuserinform().then(userinfo => {
+        // 判断是否为验证人
+        if (userinfo === row.verifier) {
+          // 如果一致，执行 addOrUpdateHandleR 方法
+          if (row.level === '等待验证') {
+            this.addOrUpdateHandlev(row.issueId);
+          } else {
+            //如果不一致，弹出提示
+            this.$message.error('未到验证阶段');
+          }
+        } else {
+          // 如果不一致，弹出提示
+          this.$message.error('您不是验证人');
+        }
+      });
 
     },
     addOrUpdateHandlev(id) {
@@ -723,28 +736,45 @@ export default {
         this.$refs.addOrUpdateV.init(id)
       })
     },
-    handleRectificationRecords(issueNumber, issueId) {
-      // this.$http({
-      //   url: this.$http.adornUrl('/generator/issuemasktable/records'),
-      //   method: 'post',
-      //   params: this.$http.adornParams({ issueNumber: issueNumber })
-      // }).then(({ data }) => {
-      //   console.log("返回数据：", data)
-      //   if (data && data.msg === 'success') {
-      //     console.log('整改得到的id为', issueId)
-      //     // 操作成功后触发addOrUpdateHandle
-      //
-      //   } else if (data && data.msg === 'error') {
-      //     this.$message.error('任务未全部完成')
-      //   } else {
-      //     this.$message.error('操作失败')
-      //   }
-      // }).catch(() => {
-      //   this.$message.error('请求失败')
-      // })
-      this.addOrUpdateHandleR(issueId)
+    // handleRectificationRecords(rectificationResponsiblePerson, issueId) {
+    //   this.addOrUpdateHandleR(issueId)
+    // },
+    handleRectificationRecords(rectificationResponsiblePerson, issueId) {
+      // 调用 fetchuserinform 方法获取用户信息
+      this.fetchuserinform().then(userinfo => {
+        // 判断是否为整改责任人
+        if (userinfo === rectificationResponsiblePerson) {
+          // 如果一致，执行 addOrUpdateHandleR 方法
+          this.addOrUpdateHandleR(issueId);
+        } else {
+          // 如果不一致，弹出提示
+          this.$message.error('您不是整改责任人');
+        }
+      });
     },
-    handleVerificationRecords(issueId, issueNumber) {
+    fetchuserinform() {
+      return new Promise((resolve, reject) => {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/useinfo'),
+          method: 'get',
+          params: this.$http.adornParams()
+        })
+          .then(({ data }) => {
+            if (data && data.code === 0) {
+              // 返回用户信息
+              resolve(data.userinfo);
+            } else {
+              console.error('获取用户信息失败:', data.msg);
+              reject(data.msg);
+            }
+          })
+          .catch(error => {
+            console.error('获取用户信息时发生错误:', error);
+            reject(error);
+          });
+      });
+    },
+    handleVerificationRecords(issueId, issueNumber, rectificationResponsiblePerson, level) {
       this.$http({
         url: this.$http.adornUrl('/generator/issuemasktable/records'),
         method: 'post',
@@ -754,8 +784,23 @@ export default {
         if (data && data.msg === 'success') {
           // console.log('整改得到的id为', issueId)
           // 操作成功后触发addOrUpdateHandleVe
-          this.addOrUpdateHandleVe(issueId)
-
+          // this.addOrUpdateHandleVe(issueId)
+          // 调用 fetchuserinform 方法获取用户信息
+          this.fetchuserinform().then(userinfo => {
+            // 判断是否为整改责任人
+            if (userinfo === rectificationResponsiblePerson) {
+              // 如果一致，执行 addOrUpdateHandleR 方法
+              if (level === '等待验证指定') {
+                this.addOrUpdateHandleVe(issueId);
+              } else {
+                //如果不一致，弹出提示
+                this.$message.error('未到验证阶段');
+              }
+            } else {
+              // 如果不一致，弹出提示
+              this.$message.error('您不是整改责任人');
+            }
+          });
         } else if (data && data.msg === 'error') {
           this.$message.error('任务未全部完成')
         } else {
@@ -902,11 +947,17 @@ export default {
       })
     },
     // 任务发起
-    assetOrUpdateHandle(id, issueNumber) {
-      this.addOrUpdateVisibleT = true
-      this.$nextTick(() => {
-        this.$refs.addOrUpdateT.init1(id, issueNumber)
-      })
+    assetOrUpdateHandle(id, issueNumber, level) {
+      if (level === '等待任务下发(处理)') {
+        // 如果一致，执行 addOrUpdateHandleR 方法
+        this.addOrUpdateVisibleT = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdateT.init1(id, issueNumber)
+        })
+      } else {
+        // 如果不一致，弹出提示
+        this.$message.error('未到任务下发阶段');
+      }
     },
     //图片预览
     // previewImage(imageUrl) {

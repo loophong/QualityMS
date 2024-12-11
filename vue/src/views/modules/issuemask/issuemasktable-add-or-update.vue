@@ -438,33 +438,22 @@
         })
       },
       statechange () {
+        // console.log('状态修改', this.dataForm.issueNumber);
         this.$http({
-          url: this.$http.adornUrl('/generator/issuemasktable/statechange'),
-          method: 'post',
-          data: this.$http.adornData({
-            // 'issuemaskId': this.dataForm.issuemaskId,
-            'issueNumber': this.dataForm.issueNumber
-          })
+          url: this.$http.adornUrl(`/generator/issuemasktable/statechange?issueNumber=${this.dataForm.issueNumber}`),
+          method: 'post'
         }).then(({data}) => {
           if (data && data.code === 0) {
-            // this.$message({
-            //   message: '操作成功',
-            //   type: 'success',
-            //   duration: 1500,
-            //   onClose: () => {
-            //     this.visible2 = false
-            //     this.$emit('refreshDataList')
-            //   }
-            // })
+            // 成功处理
           } else {
             this.$message.error(data.msg)
           }
         })
       },
+
       // 表单提交
       dataFormSubmit () {
         let tmpListString = [];
-        this.statechange();
         if (this.tmpAllList.length) {
           tmpListString = JSON.stringify(this.tmpAllList);
         }
@@ -486,7 +475,7 @@
               'state': this.dataForm.state
             });
 
-            console.log('Request Data:', requestData);  // 打印请求数据
+            // console.log('Request Data:', requestData);  // 打印请求数据
             this.$http({
               url: this.$http.adornUrl(`/generator/issuemasktable/${!this.dataForm.issuemaskId ? 'save' : 'update'}`),
               method: 'post',
@@ -506,6 +495,7 @@
               } else {
                 this.$message.error(data.msg)
               }
+              this.statechange();
             })
           }
         })

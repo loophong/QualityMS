@@ -21,5 +21,7 @@ public interface IssueFaultTableService extends IService<IssueFaultTableEntity> 
     PageUtils queryPage(Map<String, Object> params);
 
     R uploadExcelFile(MultipartFile file) throws IOException;
+
+    PageUtils QueryPage(Map<String, Object> params);
 }
 

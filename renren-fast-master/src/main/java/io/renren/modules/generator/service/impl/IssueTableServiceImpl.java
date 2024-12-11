@@ -262,6 +262,9 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 .or().eq("rectification_responsible_person", rolename)
                 .or().eq("verifier", rolename);
 
+        // 按 ID 降序排序
+        queryWrapper.orderByDesc("issue_id");
+
         // 执行分页查询
         IPage<IssueTableEntity> page = this.page(
                 new Query<IssueTableEntity>().getPage(params),

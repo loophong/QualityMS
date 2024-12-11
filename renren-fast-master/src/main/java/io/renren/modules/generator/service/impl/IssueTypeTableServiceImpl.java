@@ -19,13 +19,22 @@ public class IssueTypeTableServiceImpl extends ServiceImpl<IssueTypeTableDao, Is
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        // 构建查询条件
+        QueryWrapper<IssueTypeTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 按 ID 降序排序
+        queryWrapper.orderByDesc("issue_category_id");
+
+        // 分页查询
         IPage<IssueTypeTableEntity> page = this.page(
                 new Query<IssueTypeTableEntity>().getPage(params),
-                new QueryWrapper<IssueTypeTableEntity>()
+                queryWrapper
         );
 
+        // 返回分页数据
         return new PageUtils(page);
     }
+
 
     @Override
     public List<IssueTypeTableEntity> listAll() {

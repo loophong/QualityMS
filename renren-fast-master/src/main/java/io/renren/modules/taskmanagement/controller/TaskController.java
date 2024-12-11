@@ -14,7 +14,9 @@ import io.renren.modules.notice.entity.CreateNoticeParams;
 import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.taskmanagement.dto.TaskQueryParamDTO;
+import io.renren.modules.taskmanagement.dto.TaskSubmitApprovalDTO;
 import io.renren.modules.taskmanagement.entity.*;
+import io.renren.modules.taskmanagement.service.ApprovalFileService;
 import io.renren.modules.taskmanagement.service.ApprovalService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,8 @@ public class TaskController {
     private ApprovalService approvalService;
     @Autowired
     private MessageNotificationService messageService;
+    @Autowired
+    private ApprovalFileService approvalFileService;
 
     /**
      * @description: 任务折线图展示
@@ -184,11 +188,12 @@ public class TaskController {
      * @date: 2024/8/24 18:50
      */
     @Transactional
-    @RequestMapping("/submitApprover")
+    @PostMapping("/submitApprover")
     //    @RequiresPermissions("taskmanagement:task:list")
-    public R executeTask(String taskId, String taskApprovalor) {
+    public R approval(@RequestBody TaskSubmitApprovalDTO taskSubmitApprovalDTO) {
+        log.info("提交审批" + taskSubmitApprovalDTO);
 
-        log.info("当前任务id为：" + taskId);
+        String taskId = taskSubmitApprovalDTO.getTaskId();
         TaskEntity task = taskService.getByTaskId(taskId);
 
         // 审批之前先检查其子任务是否全部完成
@@ -204,44 +209,107 @@ public class TaskController {
 
         if (task.getTaskCurrentState() == TaskStatus.IN_PROGRESS) {
             ApprovalEntity approvalEntity = new ApprovalEntity();
+            approvalEntity.setApprovalContent(taskSubmitApprovalDTO.getApprovalContent());
             approvalEntity.setTaskId(taskId);
             approvalEntity.setTaskName(task.getTaskName());
             approvalEntity.setTaskContent(task.getTaskContent());
             approvalEntity.setTaskAssociatedPlanId(task.getTaskAssociatedPlanId());
-            log.info("当前任务的task信息为：" + task);
-
             approvalEntity.setTaskPrincipal(task.getTaskPrincipal());
-
             log.info("当前任务的AssociatedIndicatorsId为：" + task.getTaskAssociatedIndicatorsId());
             if (task.getTaskAssociatedIndicatorsId() != null && !task.getTaskAssociatedIndicatorsId().equals("")) {
                 approvalEntity.setTaskAssociatedIndicatorsId(task.getTaskAssociatedIndicatorsId());
             }
             //获取当前时间
-
             approvalEntity.setTaskStartDate(task.getTaskStartDate());
             approvalEntity.setTaskSubmissionTime(new Date());
-//            approvalEntity.setTaskStartDate(task.getTaskStartDate());
-            approvalEntity.setApprover(taskApprovalor);
+            approvalEntity.setApprover(taskSubmitApprovalDTO.getApprovalor());
             approvalEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
-
-
-            task.setTaskCurrentState(TaskStatus.APPROVAL_IN_PROGRESS);
-
-            taskService.updateById(task);
             approvalService.save(approvalEntity);
+            // 设置当前任务的状态为审批中
+            task.setTaskCurrentState(TaskStatus.APPROVAL_IN_PROGRESS);
+            taskService.updateById(task);
+
+            // 保存文件信息
+            for (FileEntity file : taskSubmitApprovalDTO.getFiles()) {
+                ApprovalFileEntity fileEntity = new ApprovalFileEntity();
+                fileEntity.setTaskId(taskId);
+                fileEntity.setName(file.getName());
+                fileEntity.setUrl(file.getUrl());
+                fileEntity.setApprovalId(approvalEntity.getApprovalId());
+                approvalFileService.save(fileEntity);
+            }
+
         } else {
             return R.error("当前任务状态不是进行中，不能进行审核");
         }
-//
-//
-//        taskService.updateById(taskEntity);
 
-        // 发送消息
-        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()}, "您有一个任务需要审批，请及时审批！", "任务审批通知"));
-
+////        taskService.updateById(taskEntity);
+//
+//        // 发送消息
+//        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()}, "您有一个任务需要审批，请及时审批！", "任务审批通知"));
+//
         return R.ok();
 
     }
+//    @Transactional
+//    @RequestMapping("/submitApprover")
+//    //    @RequiresPermissions("taskmanagement:task:list")
+//    public R executeTask(String taskId, String taskApprovalor) {
+//
+//        log.info("当前任务id为：" + taskId);
+//        TaskEntity task = taskService.getByTaskId(taskId);
+//
+//        // 审批之前先检查其子任务是否全部完成
+//        // 查询当前任务的子任务
+//        List<TaskEntity> childrenTasks = taskService.list(new QueryWrapper<TaskEntity>().eq("task_parent_node", taskId));
+//        if (childrenTasks.size() > 0) {
+//            for (TaskEntity childrenTask : childrenTasks) {
+//                if (childrenTask.getTaskCurrentState() != TaskStatus.COMPLETED) {
+//                    return R.error("当前任务子任务未全部完成，不能进行审批");
+//                }
+//            }
+//        }
+//
+//        if (task.getTaskCurrentState() == TaskStatus.IN_PROGRESS) {
+//            ApprovalEntity approvalEntity = new ApprovalEntity();
+//            approvalEntity.setTaskId(taskId);
+//            approvalEntity.setTaskName(task.getTaskName());
+//            approvalEntity.setTaskContent(task.getTaskContent());
+//            approvalEntity.setTaskAssociatedPlanId(task.getTaskAssociatedPlanId());
+//            log.info("当前任务的task信息为：" + task);
+//
+//            approvalEntity.setTaskPrincipal(task.getTaskPrincipal());
+//
+//            log.info("当前任务的AssociatedIndicatorsId为：" + task.getTaskAssociatedIndicatorsId());
+//            if (task.getTaskAssociatedIndicatorsId() != null && !task.getTaskAssociatedIndicatorsId().equals("")) {
+//                approvalEntity.setTaskAssociatedIndicatorsId(task.getTaskAssociatedIndicatorsId());
+//            }
+//            //获取当前时间
+//
+//            approvalEntity.setTaskStartDate(task.getTaskStartDate());
+//            approvalEntity.setTaskSubmissionTime(new Date());
+////            approvalEntity.setTaskStartDate(task.getTaskStartDate());
+//            approvalEntity.setApprover(taskApprovalor);
+//            approvalEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
+//
+//
+//            task.setTaskCurrentState(TaskStatus.APPROVAL_IN_PROGRESS);
+//
+//            taskService.updateById(task);
+//            approvalService.save(approvalEntity);
+//        } else {
+//            return R.error("当前任务状态不是进行中，不能进行审核");
+//        }
+////
+////
+////        taskService.updateById(taskEntity);
+//
+//        // 发送消息
+//        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()}, "您有一个任务需要审批，请及时审批！", "任务审批通知"));
+//
+//        return R.ok();
+//
+//    }
 
     /**
      * @description: 测试获取当前登录的用户信息用户信息

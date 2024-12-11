@@ -25,6 +25,10 @@ public class ApprovalEntity implements Serializable {
 	@TableId
 	private Long approvalId;
 	/**
+	 * 审批内容
+	 */
+	private String approvalContent;
+	/**
 	 * 任务ID
 	 */
 	private String taskId;

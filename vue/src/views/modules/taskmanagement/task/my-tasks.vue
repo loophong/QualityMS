@@ -25,9 +25,9 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getUnfinishedTasksList()">查询</el-button>
-<!--            <el-button v-if="isAuth('taskmanagement:task:delete')" type="danger" @click="deleteHandle()"-->
-<!--                       :disabled="dataListSelections.length <= 0">批量删除-->
-<!--            </el-button>-->
+            <!--            <el-button v-if="isAuth('taskmanagement:task:delete')" type="danger" @click="deleteHandle()"-->
+            <!--                       :disabled="dataListSelections.length <= 0">批量删除-->
+            <!--            </el-button>-->
           </el-form-item>
         </el-form>
         <el-table :data="unfinishedTasksList" border v-loading="unfinishedTasksListLoading"
@@ -151,12 +151,12 @@
 
       <el-tab-pane label="审批记录">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getMySubmitApprovalList()">
-<!--          <el-form-item>-->
-<!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-<!--          </el-form-item>-->
-<!--          <el-form-item>-->
-<!--            <el-button @click="getMySubmitApprovalList()">查询</el-button>-->
-<!--          </el-form-item>-->
+          <!--          <el-form-item>-->
+          <!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+          <!--          </el-form-item>-->
+          <!--          <el-form-item>-->
+          <!--            <el-button @click="getMySubmitApprovalList()">查询</el-button>-->
+          <!--          </el-form-item>-->
         </el-form>
         <el-table :data="mySubmitApprovalList" border v-loading="mySubmitApprovalListLoading" style="width: 100%;">
           <el-table-column prop="approvalId" header-align="center" align="center" label="审批编号">
@@ -489,6 +489,18 @@
             </el-option-group>
           </el-select>
         </el-form-item>
+        <el-form-item label="审核内容">
+          <el-input v-model="approvalForm.approvalContent" type="textarea" :rows="4"
+                    placeholder="请输入审核内容"></el-input>
+        </el-form-item>
+        <el-form-item label="上传附件">
+          <el-upload ref="file" :file-list="approvalFiles" :action="uploadUrl"
+                     :on-remove="handleRemove" :before-remove="beforeRemove" :on-change="uploadFile"
+                     :auto-upload="false">
+            <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
+          </el-upload>
+        </el-form-item>
+
       </el-form>
       <!-- </el-form> -->
       <div slot="footer" class="dialog-footer">
@@ -507,10 +519,7 @@ import AddOrUpdate from './task-update'
 export default {
   data() {
     return {
-      approvalForm: {
-        taskApprovalor: '',
-        taskId: ''
-      },
+
       dataForm: {
         key: ''
       },
@@ -571,7 +580,17 @@ export default {
         taskId: '',
         taskName: '',
         taskAssociatedIndicatorsId: ''
-      }
+      },
+
+      // 提交审批
+      approvalForm: {
+        taskId: '',
+        taskApprovalor: '',
+        approvalContent: ''
+      },
+      approvalFiles: [],
+      uploadUrl: '',
+
 
 
     }
@@ -944,10 +963,12 @@ export default {
     submitApprover() {
       this.$http({
         url: this.$http.adornUrl('/taskmanagement/task/submitApprover'),
-        method: 'get',
-        params: this.$http.adornParams({
+        method: 'post',
+        data: this.$http.adornParams({
           'taskId': this.approvalForm.taskId,
-          'taskApprovalor': this.approvalForm.taskApprovalor,
+          'approvalor': this.approvalForm.taskApprovalor,
+          'approvalContent': this.approvalForm.approvalContent,
+          'files': this.approvalFiles
         })
       }).then(({data}) => {
 
@@ -1019,7 +1040,54 @@ export default {
       if (indicatorId) {
         this.currentTaskQuery.taskAssociatedIndicatorsId = indicatorId;
       }
-    }
+    },
+
+    // 上传文件
+    uploadFile(file) {
+
+      console.log("文件" + file.name);
+
+      const formData = new FormData();
+      formData.append('file', file.raw); // 将文件添加到 FormData
+
+      this.$http({
+        // url: this.$http.adornUrl('/test/upload'), // 替换为实际上传接口
+        url: this.$http.adornUrl('/generator/issuetable/upload'), // 替换为实际上传接口
+        method: 'post',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data' // 指定为文件上传
+        }
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          // 保存后端返回的url到变量中
+          // this.dataForm.planFile = data.uploadurl; // 假设你有一个变量uploadedUrl来保存上传的url
+          this.approvalFiles.push({
+            'name': file.name,
+            'url': data.uploadurl
+          });
+          console.log('获得的文件地址 ：', data.uploadurl)
+          this.$message.success('文件上传成功');
+          // 处理成功后的逻辑，例如更新状态
+        } else {
+          this.$message.error(data.msg);
+        }
+      }).catch(error => {
+        this.$message.error('上传失败');
+        console.error(error);
+      });
+    },
+
+    // 移除文件之前提示
+    beforeRemove(file, approvalFiles) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+
+    // 移除文件
+    handleRemove(file, approvalFiles) {
+      this.approvalFiles = approvalFiles
+      console.log("移除的文件为: " + JSON.stringify(file));
+    },
 
   }
 

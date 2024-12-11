@@ -2,15 +2,15 @@ package io.renren.modules.taskmanagement.controller;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import io.renren.common.utils.DateUtils;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.notice.entity.CreateNoticeParams;
 import io.renren.modules.notice.service.MessageNotificationService;
-import io.renren.modules.taskmanagement.entity.ApprovalStatus;
-import io.renren.modules.taskmanagement.entity.TaskEntity;
-import io.renren.modules.taskmanagement.entity.TaskStatus;
+import io.renren.modules.taskmanagement.entity.*;
+import io.renren.modules.taskmanagement.service.ApprovalFileService;
 import io.renren.modules.taskmanagement.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import io.renren.modules.taskmanagement.entity.ApprovalEntity;
 import io.renren.modules.taskmanagement.service.ApprovalService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
@@ -43,6 +42,8 @@ public class ApprovalController {
 
     @Autowired
     private MessageNotificationService messageService;
+    @Autowired
+    private ApprovalFileService approvalFileService;
 
     /**
      * @description: 取消审批
@@ -165,8 +166,12 @@ public class ApprovalController {
     @RequiresPermissions("taskmanagement:approval:info")
     public R info(@PathVariable("approvalId") Long approvalId) {
         ApprovalEntity taskManagementApprovalTable = approvalService.getById(approvalId);
-
-        return R.ok().put("taskManagementApprovalTable", taskManagementApprovalTable);
+        List<ApprovalFileEntity> files = approvalFileService.query().eq("approval_id", approvalId).list();
+        if (files != null){
+            return R.ok().put("taskManagementApprovalTable", taskManagementApprovalTable).put("files", files);
+        }else {
+            return R.ok().put("taskManagementApprovalTable", taskManagementApprovalTable);
+        }
     }
 
     /**

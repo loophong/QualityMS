@@ -613,7 +613,7 @@ export default {
     // const data = await response.json();
 
     this.$http({
-      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      url: this.$http.adornUrl(`/taskmanagement/user/getName`),
       method: 'get',
     }).then(({data}) => {
       console.log(data);

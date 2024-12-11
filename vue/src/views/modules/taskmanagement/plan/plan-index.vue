@@ -421,7 +421,7 @@ export default {
   async created() {
     // 获取分组后的员工数据
     this.$http({
-      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      url: this.$http.adornUrl(`/taskmanagement/user/getName`),
       method: 'get',
     }).then(({data}) => {
       this.options = data;

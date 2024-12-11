@@ -28,4 +28,9 @@ public class UserController {
     public List<DeptDTO> getEmployeesGroupedByDepartment() {
         return userService.getEmployeesGroupedByDepartment();
     }
+
+    @GetMapping("/getName")
+    public List<DeptDTO> getName() {
+        return userService.getName();
+    }
 }

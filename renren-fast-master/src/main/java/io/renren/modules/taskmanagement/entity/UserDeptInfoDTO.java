@@ -18,5 +18,6 @@ public class UserDeptInfoDTO {
         private String dept;
         private String userId;
         private String userName;
+        private String nickname;
 
 }

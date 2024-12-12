@@ -127,12 +127,12 @@
         <el-input v-model="dataFormLists.controlList[index]" placeholder="请输入控制清单"></el-input>
       </el-form-item>
       <el-form-item>
-          <el-button type="primary" @click="addKeyControl">新增一组管控措施</el-button>
-        </el-form-item>
+        <el-button type="primary" @click="addKeyControl">新增一组管控措施</el-button>
+      </el-form-item>
 
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="handleClose()">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
@@ -169,6 +169,7 @@
           controlList: '',
           storageFlag: ''
         },
+        // 新增一组管控措施
         dataFormLists: {
           keyElements: [],
           potentialFailureMode: [],
@@ -364,6 +365,10 @@
             })
           }
         })
+      },
+      handleClose() {
+        this.visible = false;
+        this.dataFormLists = {}
       },
       addKeyControl() {
         this.dataFormLists.keyElements.push('');

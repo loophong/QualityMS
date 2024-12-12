@@ -95,5 +95,13 @@ public class QcGroupMemberEntity implements Serializable {
 	 * 小组审核状态
 	 */
 	private String examineStatus;
+	/**
+	 * 小组科室审核状态
+	 */
+	private String examineDepartment;
+	/**
+	 * 小组管理员审核状态
+	 */
+	private String examineGroup;
 
 }

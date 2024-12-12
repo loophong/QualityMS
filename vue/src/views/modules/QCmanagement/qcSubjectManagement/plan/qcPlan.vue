@@ -35,10 +35,19 @@
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
           </el-table-column>
@@ -123,10 +132,19 @@
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
           </el-table-column>
@@ -211,10 +229,19 @@
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
           </el-table-column>
@@ -287,8 +314,10 @@
 <script>
 import AddOrUpdate from './qcPlan-add-or-update'
 export default {
+  name: 'qcPlanIndex',
   data() {
     return {
+      membersOptions: [],
       activeName: '2',
       dataForm: {
         key: ''
@@ -328,10 +357,29 @@ export default {
   components: {
     AddOrUpdate
   },
-  activated() {
+  async activated() {
     this.getDataList()
     this.getJoinList();
     this.getLeadList();
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.membersOptions = data.map(o => {
+        return {
+          ...o, // 复制原对象属性
+          options: o.options.map(e => {
+            const match = e.label.match(/\(([^)]+)\)/);
+            return {
+              ...e, // 复制原选项属性
+              name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+            };
+          })
+        };
+      });
+      // console.log(this.membersOptions)
+    });
   },
   computed: {
     // filteredDataList() {
@@ -345,6 +393,27 @@ export default {
     // }
   },
   methods: {
+    numberToNameArray(numbers) {
+      if (Array.isArray(numbers)) {
+        let result = numbers.map(number => this.numberToName(number));
+        return `${result}`
+        // return numbers
+      } else {
+        return numbers
+      }
+    },
+    numberToName(number) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.name == number) {
+            result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      return result
+    },
+
     tableRowClassName({ row, rowIndex }) {
       if (rowIndex === 1) {
         return 'warning-row';
@@ -422,7 +491,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.subjectJoinList = data.page.list;
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.subjectJoinList = tmp;
           // this.dataList = resultList
           this.totalPageJoin = data.page.totalCount;
         } else {
@@ -447,7 +520,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.subjectLeadList = data.page.list;
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.subjectLeadList = tmp;
           // this.dataList = resultList
           this.totalPageLead = data.page.totalCount;
         } else {
@@ -558,7 +635,11 @@ export default {
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.dataList = data.page.list
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.dataList = tmp
           this.totalPage = data.page.totalCount
         } else {
           this.dataList = []

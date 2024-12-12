@@ -28,6 +28,11 @@
         <result property="resultType" column="result_type"/>
         <result property="examineId" column="examine_id"/>
         <result property="groupName" column="group_name"/>
+        <result property="firstComment" column="first_comment"/>
+        <result property="secondComment" column="second_comment"/>
+        <result property="topicReviewDepartment" column="topic_review_department"/>
+        <result property="topicReviewGroup" column="topic_review_group"/>
+        <result property="topicDepartment" column="topic_department"/>
     </resultMap>
     <resultMap type="io.renren.modules.qcManagement.entity.QcknowledgebaseEntity" id="qcSubjectRegistrationMap1">
         <result property="qcsrId" column="qcsr_id"/>

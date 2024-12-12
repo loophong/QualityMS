@@ -88,6 +88,7 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/all")
 //    @RequiresPermissions("qcSubject:registration:list")
     public R listAll(@RequestParam Map<String, Object> params){
+
         PageUtils page = qcSubjectRegistrationService.queryPageAll(params);
         return R.ok().put("page", page);
     }

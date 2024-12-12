@@ -27,13 +27,17 @@
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
           </el-table-column>
-          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="单位">
+          </el-table-column>
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
             <template slot-scope="scope">
               <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
               <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
-              <el-tag v-else-if="scope.row.topicReviewStatus === 2">审核中</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 2 && !scope.row.topicReviewDepartment">审核中(科室)</el-tag>
+              <el-tag
+                v-else-if="scope.row.topicReviewStatus === 2 && scope.row.topicReviewDepartment == 1">审核中(管理员)</el-tag>
               <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
-              <el-tag v-else>-</el-tag> <!-- 处理未知状态 -->
+              <el-tag v-else>-</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
@@ -41,10 +45,19 @@
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名称">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要">
           </el-table-column>
@@ -70,6 +83,10 @@
               <span v-else>--</span>
             </template>
           </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见">
+          </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
 
@@ -77,7 +94,8 @@
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
-              <el-button type="text" size="small" v-if="scope.row.topicReviewStatus != 3"
+              <el-button type="text" size="small"
+                :disabled="((scope.row.topicReviewStatus == 3) || (scope.row.topicReviewStatus == 2))"
                 @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
             </template>
           </el-table-column>
@@ -102,7 +120,7 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
-            <el-button v-if="((isAuth('qcSubject:registration:save')) || groupLead)" type="primary"
+            <el-button v-if="(isAuth('qcSubject:registration:save'))" :disabled="!groupLead" type="primary"
               @click="addOrUpdateHandle()">新增</el-button>
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning"
               @click="reuseVisible = true">课题重用</el-button>
@@ -121,11 +139,15 @@
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
           </el-table-column>
-          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="单位">
+          </el-table-column>
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
             <template slot-scope="scope">
               <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
               <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
-              <el-tag v-else-if="scope.row.topicReviewStatus === 2">审核中</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 2 && !scope.row.topicReviewDepartment">审核中(科室)</el-tag>
+              <el-tag
+                v-else-if="scope.row.topicReviewStatus === 2 && scope.row.topicReviewDepartment == 1">审核中(管理员)</el-tag>
               <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
               <el-tag v-else>-</el-tag>
             </template>
@@ -133,10 +155,19 @@
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要" width="150">
           </el-table-column>
@@ -159,7 +190,9 @@
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
           </el-table-column>
-          <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+          <!-- <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+          </el-table-column> -->
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见">
           </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
@@ -168,7 +201,8 @@
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
-              <el-button type="text" size="small" v-if="scope.row.topicReviewStatus != 3"
+              <el-button type="text" size="small"
+                :disabled="((scope.row.topicReviewStatus == 3) || (scope.row.topicReviewStatus == 2))"
                 @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
             </template>
           </el-table-column>
@@ -206,11 +240,15 @@
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
           </el-table-column>
-          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="单位">
+          </el-table-column>
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
             <template slot-scope="scope">
               <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
               <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
-              <el-tag v-else-if="scope.row.topicReviewStatus === 2">审核中</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 2 && !scope.row.topicReviewDepartment">审核中(科室)</el-tag>
+              <el-tag
+                v-else-if="scope.row.topicReviewStatus === 2 && scope.row.topicReviewDepartment == 1">审核中(管理员)</el-tag>
               <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
               <el-tag v-else>-</el-tag>
             </template>
@@ -218,10 +256,19 @@
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要" width="150">
           </el-table-column>
@@ -244,7 +291,9 @@
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
           </el-table-column>
-          <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+          <!-- <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+          </el-table-column> -->
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见">
           </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
@@ -252,7 +301,8 @@
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
-              <el-button type="text" size="small" v-if="scope.row.topicReviewStatus != 3"
+              <el-button type="text" size="small"
+                :disabled="((scope.row.topicReviewStatus == 3) || (scope.row.topicReviewStatus == 2))"
                 @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
             </template>
           </el-table-column>
@@ -341,6 +391,7 @@ export default {
   data() {
     return {
       activeName: '2',
+
       dataForm: {
         key: ''
       },
@@ -411,11 +462,43 @@ export default {
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
     }).then(({ data }) => {
-      this.membersOptions = data;
+      this.membersOptions = data.map(o => {
+        return {
+          ...o, // 复制原对象属性
+          options: o.options.map(e => {
+            const match = e.label.match(/\(([^)]+)\)/);
+            return {
+              ...e, // 复制原选项属性
+              name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+            };
+          })
+        };
+      });
+      // console.log(this.membersOptions)
     });
     this.ifGroupLead();
   },
   methods: {
+    numberToNameArray(numbers) {
+      if (Array.isArray(numbers)) {
+        let result = numbers.map(number => this.numberToName(number));
+        return `${result}`
+        // return numbers
+      } else {
+        return numbers
+      }
+    },
+    numberToName(number) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.name == number) {
+            result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      return result
+    },
     async ifGroupLead() {
       this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/ifGroupLead'),
@@ -458,7 +541,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.subjectJoinList = data.page.list;
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.subjectJoinList = tmp;
           // this.dataList = resultList
           this.totalPageJoin = data.page.totalCount;
         } else {
@@ -482,7 +569,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.subjectLeadList = data.page.list;
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.subjectLeadList = tmp;
           // this.dataList = resultList
           this.totalPageLead = data.page.totalCount;
         } else {
@@ -507,7 +598,12 @@ export default {
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.dataList = data.page.list
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          console.log(tmp)
+          this.dataList = tmp
           this.totalPage = data.page.totalCount
           this.messageList = data.page.list
           this.totalPageReuse = data.page.totalCount
@@ -591,6 +687,8 @@ export default {
             duration: 1500,
             onClose: () => {
               this.getDataList();
+              this.getJoinList();
+              this.getLeadList();
               this.visible = false
             }
           })
@@ -598,7 +696,6 @@ export default {
           this.$message.error(data.msg)
         }
       })
-      this.getDataList();
     },
     //获取成员小组数据
     async getGroupMemberData() {
@@ -918,6 +1015,7 @@ export default {
         return {
           序号: index + 1,
           课题ID: tableRow.qcsrId,
+          单位: tableRow.topicDepartment,
           课题编号: tableRow.topicNumber,
           课题组长: tableRow.topicLeader,
           课题顾问: tableRow.topicConsultant,

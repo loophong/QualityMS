@@ -20,7 +20,9 @@
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="120">
             <template slot-scope="scope">
-              <el-tag v-if="scope.row.examineStatus === '待审核'">{{ scope.row.examineStatus }}</el-tag>
+              <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
+              <el-tag
+                v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
                 }}</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
@@ -31,6 +33,9 @@
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
           <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="120">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.memberName) }}
+            </template>
           </el-table-column>
           <!-- <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column> -->
@@ -84,7 +89,9 @@
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
             <template slot-scope="scope">
-              <el-tag v-if="scope.row.examineStatus === '待审核'">{{ scope.row.examineStatus }}</el-tag>
+              <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
+              <el-tag
+                v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
                 }}</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
@@ -93,6 +100,9 @@
             </template>
           </el-table-column>
           <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="120">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.memberName) }}
+            </template>
           </el-table-column>
           <!-- <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column> -->
@@ -139,12 +149,15 @@
         <!-- <el-form :inline="true" :model="dataForm" >
         </el-form> -->
         <el-table :data="examineList" stripe border v-loading="dataListLoading"
-          @selection-change="selectionChangeHandle" style="width: 100%;" row-key="id">
+          :default-sort="{ prop: 'department', order: 'descending' }" @selection-change="selectionChangeHandle"
+          style="width: 100%;" row-key="id">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
             <template slot-scope="scope">
-              <el-tag v-if="scope.row.examineStatus === '待审核'">{{ scope.row.examineStatus }}</el-tag>
+              <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
+              <el-tag
+                v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
                 }}</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
@@ -155,12 +168,15 @@
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
           <el-table-column prop="memberName" header-align="center" align="center" label="姓名" width="160">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.memberName) }}
+            </template>
           </el-table-column>
           <!-- <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="160">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="160">
+          <el-table-column prop="department" header-align="center" align="center" label="单位" width="160" sortable>
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
@@ -174,7 +190,8 @@
               <!-- <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
                 @click="addMemberHandle(scope.row.id)">新增成员</el-button> -->
               <el-button type="text" size="small" v-if="!scope.row.parentId"
-                @click="handleExamine(scope.row.id, scope.row.registrationNum)">处理审核</el-button>
+                :disabled="!checkIfAdmit(scope.row.department, scope.row.examineStatus, scope.row.examineDepartment)"
+                @click="handleExamine(scope.row.id, scope.row.registrationNum, scope.row.examineDepartment)">处理审核</el-button>
               <!-- <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
                 @click="deleteHandle(scope.row.id)">删除</el-button> -->
             </template>
@@ -185,11 +202,17 @@
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination> -->
         <el-dialog :title="'处理审核'" :close-on-click-modal="false" :visible.sync="dialogFormVisible">
-          <el-form :model="examineFrom">
-            <el-form-item label="审核结果">
-              <el-select v-model="examineFrom.result" placeholder="请选择">
-                <el-option label="通过" value="通过"></el-option>
-                <el-option label="未通过" value="未通过"></el-option>
+          <el-form :model="examineFrom" :rules="examineRules">
+            <el-form-item v-if="already == '1'" label="管理员审核结果" prop="result">
+              <el-select v-model="examineFrom.group" placeholder="请选择">
+                <el-option label="通过" value="1"></el-option>
+                <el-option label="未通过" value="0"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item v-else label="科室审核结果" prop="result">
+              <el-select v-model="examineFrom.department" placeholder="请选择">
+                <el-option label="通过" value="1"></el-option>
+                <el-option label="未通过" value="0"></el-option>
               </el-select>
             </el-form-item>
           </el-form>
@@ -227,6 +250,8 @@ export default {
       },
       registrationNum: '',
       examineFrom: {
+        department: '',
+        group: '',
         result: ''
       },
       dialogFormVisible: false,
@@ -237,10 +262,11 @@ export default {
       originList: [],
       tableData: [],
       pageIndex: 1,
-      pageSize: 100,
+      pageSize: 1000000,
       totalPageGroup: 0,
       totalPageExamine: 0,
       totalPage: 0,
+      already: '',//科室审核是否已通过
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
@@ -255,6 +281,11 @@ export default {
 
       exportList: [],
       exportListMine: [],
+      examineRules: {
+        result: [
+          { required: true, message: '请选择审核结果', trigger: 'blur' }
+        ]
+      }
     }
   },
   components: {
@@ -287,22 +318,26 @@ export default {
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
     }).then(({ data }) => {
-      this.membersOptions = data;
+      this.membersOptions = data.map(o => {
+        return {
+          ...o, // 复制原对象属性
+          options: o.options.map(e => {
+            const match = e.label.match(/\(([^)]+)\)/);
+            return {
+              ...e, // 复制原选项属性
+              name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+            };
+          })
+        };
+      });
+      // console.log(this.membersOptions)
     });
+    // console.log('+++++++++++++')
+    // console.log((this.checkIfAdmit('生产科') || (this.isAuth('qcManagement:group:admin'))))
+    // console.log((this.checkIfAdmit('质量科') || (this.isAuth('qcManagement:group:admin'))))
   },
   computed: {
-    // formattedName() {
-    //     return this.tableData.map(row => {
-    //         const value = row.name.toString();
-    //         for (const optionGroup of this.optionsData) {
-    //             const option = optionGroup.options.find(opt => opt.value === value);
-    //             if (option) {
-    //                 return option.label;
-    //             }
-    //         }
-    //         return '--';
-    //     });
-    // },
+
     isAdmin() {
       if (!this.dataForm.parentId || this.dataForm.parentId == '') {
         return true;
@@ -312,9 +347,49 @@ export default {
     }
   },
   methods: {
-    ad(s) {
-      console.log(s)
+    checkIfAdmit(department, examineStatus, examineDepartment) {
+      console.log(examineStatus + '/////' + examineDepartment);
+
+      if (examineStatus === '待审核' && examineDepartment != '1') {
+        if ((department == '生产科' && this.isAuth('department:product:leader'))) {
+          console.log('返回 true - 生产科领导');
+          return true;
+        } else if ((department == '质量科' && this.isAuth('department:quality:leader'))) {
+          console.log('返回 true - 质量科领导');
+          return true;
+        } else {
+          console.log('返回 false - 非部门领导');
+          return false;
+        }
+      } else if (examineStatus === '待审核' && examineDepartment == '1') {
+        console.log('管理员审核');
+        console.log('isAuth(qcManagement:group:admin): ', this.isAuth('qcManagement:group:admin'));
+
+        if (this.isAuth('qcManagement:group:admin')) {
+          console.log('返回 true - 是管理员');
+          return true;
+        } else {
+          console.log('返回 false - 非管理员');
+          return false;
+        }
+      } else {
+        console.log('返回 false - 其他情况');
+        return false;
+      }
     },
+    numberToName(number) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.name == number) {
+            result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      // console.log(result)
+      return result
+    },
+
     // 获取我的小组数据列表
     async getGroupList() {
       this.dataListLoading = true
@@ -323,9 +398,7 @@ export default {
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
-          'limit': 1000,
-          // 'key': 1,
-          // 'reuseStepId': 5
+          'limit': 1000000,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -383,6 +456,8 @@ export default {
                 admitEdit: item.admitEdit,
                 department: item.department,
                 examineStatus: item.examineStatus,
+                examineDepartment: item.examineDepartment,
+                examineGroup: item.examineGroup,
                 registrationNum: item.registrationNum,
                 children: []
               };
@@ -451,7 +526,7 @@ export default {
           method: 'get',
           params: this.$http.adornParams({
             'page': 1,
-            'limit': 10000,
+            'limit': 10000000,
           })
         }).then(({ data }) => {
           if (data) {
@@ -533,7 +608,7 @@ export default {
           method: 'get',
           params: this.$http.adornParams({
             'page': 1,
-            'limit': 100000,
+            'limit': 10000000,
           })
         }).then(({ data }) => {
           if (data) {
@@ -648,6 +723,8 @@ export default {
                   team: item.team,
                   department: item.department,
                   examineStatus: item.examineStatus,
+                  examineDepartment: item.examineDepartment,
+                  examineGroup: item.examineGroup,
                   registrationNum: item.registrationNum,
                   children: []
                 };
@@ -775,44 +852,55 @@ export default {
     // 新增成员
     addMemberHandle(id, name) {
       this.addOrUpdateVisible = true
+      let tmp = JSON.parse(JSON.stringify(this.membersOptions));
+      tmp.forEach(item => {
+        item.options = item.options.filter(row => !row.label.includes(name));
+      });
       this.$nextTick(() => {
-        let tmp = this.membersOptions
-        tmp.forEach(item => {
-          item.options = item.options.filter(row => row.label !== name);
-        });
         this.$refs.addOrUpdate.membersOptions = tmp
+        this.$refs.addOrUpdate.allMembersOptions = this.membersOptions
         this.$refs.addOrUpdate.isAddMember = true;
         this.$refs.addOrUpdate.init(id)
       })
     },
-    handleExamine(id, num) {
+    handleExamine(id, num, department) {
+      this.already = department
+      console.log(department)
       // this.registrationNum = '';
       if (num) {
         this.registrationNum = num;
       } else {
-        this.registrationNum = '';
+        this.registrationNum = null;
       }
-
       this.dialogFormVisible = true;
       this.examineId = id;
     },
     //提交审核结果
     async examineSubmit() {
-      this.num = '';
-      await this.$http({
-        url: this.$http.adornUrl(`/qcMembers/qcGroupMember/registration`),
-        method: 'get',
-      }).then(({ data }) => {
-        this.num = data.result.registrationNum + 1
-      })
-      if (this.num !== '') {
-        const year = new Date().getFullYear();
-        if (this.num < 10) {
-          this.num = `PJHLQC-${year}-00${this.num}`;
-        } else if (this.num < 100) {
-          this.num = `PJHLQC-${year}-0${this.num}`;
-        } else {
-          this.num = `PJHLQC-${year}-${this.num}`;
+      this.num = null;
+      var result = ''
+      if (this.examineFrom.department == '0' || this.examineFrom.group == '0') {
+        result = '未通过'
+      } else if (this.examineFrom.department == '1' && (this.examineFrom.group == '' || this.examineFrom.group == 'null' || this.examineFrom.group == 'undefined')) {
+        result = '待审核'
+      } else if (this.already == '1' && this.examineFrom.group == '1') {
+        result = '通过'
+        //生成注册号
+        await this.$http({
+          url: this.$http.adornUrl(`/qcMembers/qcGroupMember/registration`),
+          method: 'get',
+        }).then(({ data }) => {
+          this.num = data.result.registrationNum + 1
+        })
+        if (this.num !== '') {
+          const year = new Date().getFullYear();
+          if (this.num < 10) {
+            this.num = `PJHLQC-${year}-00${this.num}`;
+          } else if (this.num < 100) {
+            this.num = `PJHLQC-${year}-0${this.num}`;
+          } else {
+            this.num = `PJHLQC-${year}-${this.num}`;
+          }
         }
       }
       await this.$http({
@@ -820,8 +908,10 @@ export default {
         method: 'post',
         data: this.$http.adornData({
           'qcgmId': this.examineId,
-          'examineStatus': this.examineFrom.result,
-          'registrationNum': this.registrationNum == '' ? this.num : this.registrationNum,
+          'examineGroup': this.examineFrom.group,
+          'examineDepartment': this.examineFrom.group == '0' ? '' : this.examineFrom.department,
+          'examineStatus': result,
+          'registrationNum': (this.registrationNum == '' || this.registrationNum == null) ? this.num : this.registrationNum,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -830,7 +920,10 @@ export default {
             type: 'success',
             duration: 1500,
             onClose: () => {
+              this.examineFrom.department = ''
+              this.examineFrom.group = ''
               this.dialogFormVisible = false;
+              this.getGroupList();
               this.getDataList();
               this.examineList = this.tableData.filter(item => item.examineStatus === '待审核');
               this.totalPageExamine = this.examineList.length;
@@ -845,12 +938,15 @@ export default {
     handleReexamine(id) {
       // this.dataForm.qcsrId = id;
       // this.dataForm.topicReviewStatus = 2;
+      console.log(id)
       this.$http({
         url: this.$http.adornUrl(`/qcMembers/qcGroupMember/update`),
         method: 'post',
         data: this.$http.adornData({
           'qcgmId': id,
-          'examineStatus': '待审核'
+          'examineStatus': '待审核',
+          'examineGroup': undefined,
+          'examineDepartment': null,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -868,6 +964,7 @@ export default {
         }
       })
       this.getGroupList();
+      this.getDataList();
     },
 
     // 删除

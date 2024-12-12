@@ -28,12 +28,12 @@
 
 
           </el-form-item>
-          <el-form-item label="角色">
+          <!-- <el-form-item label="角色">
             <el-select v-model="dataForm.memberRole" placeholder="请选择">
               <el-option v-for="role in roleIdList" :key="role.roleId" :label="role.roleName"
                 :value="role.roleId"></el-option>
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <!-- <el-form-item prop="number" label="员工编号">
             <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
           </el-form-item> -->

@@ -134,5 +134,25 @@ public class QcSubjectRegistrationEntity implements Serializable {
 	 * 小组名称
 	 */
 	private String groupName;
+	/**
+	 * 科室领导初审意见
+	 */
+	private String firstComment;
+	/**
+	 *组内管理员审核意见
+	 */
+	private String secondComment;
+	/**
+	 * 科室领导审核
+	 */
+	private String topicReviewDepartment;
+	/**
+	 * 组内管理员审核
+	 */
+	private String topicReviewGroup;
+	/**
+	 * 单位
+	 */
+	private String topicDepartment;
 
 }

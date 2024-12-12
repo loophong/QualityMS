@@ -848,7 +848,8 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
-                this.renderTree()
+                // this.renderTree()
+                location.reload()
                 this.showDialog1 = false
               }
             })
@@ -889,7 +890,8 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
-                this.renderTree()
+                // this.renderTree()
+                location.reload()
                 this.showDialog2 = false
                 // console.log('++++++++++');
                 // console.log(this.routerParam[0].examineId);
@@ -922,6 +924,7 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
+                location.reload()
                 this.showDialog3 = false
               }
             })
@@ -950,6 +953,7 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
+                location.reload()
                 this.showDialog4 = false
               }
             })
@@ -980,6 +984,7 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
+                  location.reload()
                   this.showDialog5 = false
                 }
               })
@@ -1008,6 +1013,7 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
+                  location.reload()
                   this.showDialog5 = false
                 }
               })
@@ -1036,6 +1042,7 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
+                  location.reload()
                   this.showDialog6 = false
                 }
               })
@@ -1062,6 +1069,7 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
+                  location.reload()
                   this.showDialog6 = false
                 }
               })
@@ -1090,6 +1098,7 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
+                  location.reload()
                   this.showDialog7 = false
                 }
               })
@@ -1127,6 +1136,7 @@ export default {
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
+                  location.reload()
                   this.showDialog7 = false
                 }
               })

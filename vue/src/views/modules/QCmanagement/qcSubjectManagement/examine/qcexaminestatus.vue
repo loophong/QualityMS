@@ -17,9 +17,9 @@
         <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
           style="width: 100%;">
           <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
-      </el-table-column> -->
+        </el-table-column> -->
           <!-- <el-table-column prop="qcExamineId" header-align="center" align="center" label="主键id">
-      </el-table-column> -->
+        </el-table-column> -->
           <el-table-column prop="qcExamineSubject" header-align="center" align="center" label="审核关联课题ID" width="120">
           </el-table-column>
           <el-table-column prop="qcExamineCurrent" header-align="center" align="center" label="当前待审核步骤" width="180">

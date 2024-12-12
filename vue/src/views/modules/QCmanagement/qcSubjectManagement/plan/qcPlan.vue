@@ -88,8 +88,7 @@
           :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
-        <!-- 弹窗, 新增 / 修改 -->
-        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+
       </div>
     </el-tab-pane>
     <el-tab-pane label="我创办的课题" name="2">
@@ -103,8 +102,8 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
-              @click="addOrUpdateHandle()">新增</el-button>
+            <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+              @click="addOrUpdateHandle()">新增</el-button> -->
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
               :disabled="dataListSelections.length != 1">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
@@ -193,8 +192,8 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getJoinList()">查询</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
-              @click="addOrUpdateHandle()">新增</el-button>
+            <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+              @click="addOrUpdateHandle()">新增</el-button> -->
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
               :disabled="dataListSelections.length != 1">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
@@ -269,9 +268,10 @@
 
       </div>
     </el-tab-pane>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"
+      @refreshLeadList="getLeadList()" @refreshJoinList="getJoinList()"></add-or-update>
   </el-tabs>
-
-
 </template>
 
 <style scoped>
@@ -602,6 +602,9 @@ export default {
     },
     // 新增 / 修改
     addOrUpdateHandle(id, status, type) {
+      console.log(id)
+      console.log(status)
+      console.log(type)
       if (type == '创新型') {
         if (status != '8') {
           this.$message({
@@ -616,6 +619,7 @@ export default {
           })
         }
       } else {
+
         if (status != '10') {
           this.$message({
             message: '请先完成课题计划',
@@ -623,6 +627,7 @@ export default {
             duration: 1500
           })
         } else {
+          console.log('创')
           this.addOrUpdateVisible = true
           this.$nextTick(() => {
             this.$refs.addOrUpdate.init(id)
@@ -630,11 +635,6 @@ export default {
         }
       }
       console.log(this.dataListSelections)
-      // console.log(id)
-      // this.addOrUpdateVisible = true
-      // this.$nextTick(() => {
-      //   this.$refs.addOrUpdate.init(id)
-      // })
     },
     // 删除
     deleteHandle(id) {

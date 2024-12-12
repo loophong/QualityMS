@@ -16,9 +16,9 @@
               </el-option-group>
             </el-select>
           </el-form-item>
-          <el-form-item prop="number" label="员工编号">
+          <!-- <el-form-item prop="number" label="员工编号">
             <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item v-if="isAdmin" prop="department" label="单位">
             <el-input v-model="dataForm.department" placeholder="请输入单位"></el-input>
           </el-form-item>
@@ -64,9 +64,9 @@
                   </el-option-group>
                 </el-select>
               </el-form-item>
-              <el-form-item label="员工编号" prop="number">
+              <!-- <el-form-item label="员工编号" prop="number">
                 <el-input v-model="member.number" placeholder="请输入员工编号"></el-input>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="组内角色" prop="roleInTopic">
                 <el-select v-model="member.roleInTopic" placeholder="请选择组内角色">
                   <el-option label="成员" value="成员"></el-option>

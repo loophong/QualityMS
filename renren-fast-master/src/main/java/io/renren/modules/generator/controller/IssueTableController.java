@@ -437,7 +437,7 @@ public class IssueTableController {
     public R listuserinfo(){
         System.out.println("=====获取用户信息----开始");
         String userinfo = issueTableService.getuserinfo();
-        Map<String, Object> response = new HashMap<>();
+//        Map<String, Object> response = new HashMap<>();
 //        response.put("code", 0);
 //        response.put("issueTable", userinfo);
         System.out.println(userinfo);

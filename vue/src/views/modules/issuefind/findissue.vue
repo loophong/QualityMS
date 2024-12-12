@@ -317,6 +317,9 @@
           <!--              </template>-->
           <!--            </el-table-column>-->
           <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.rectificationResponsiblePerson) }}
+            </template>
           </el-table-column>
 <!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--          </el-table-column>-->
@@ -528,6 +531,9 @@
           <!--              </template>-->
           <!--            </el-table-column>-->
           <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.rectificationResponsiblePerson) }}
+            </template>
           </el-table-column>
           <el-table-column prop="associatedIssueAddition" header-align="center" align="center" label="关联问题">
           </el-table-column>
@@ -589,6 +595,9 @@
             </template>
           </el-table-column>
           <el-table-column prop="verifier" header-align="center" align="center" label="验证人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.verifier) }}
+            </template>
           </el-table-column>
 <!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--          </el-table-column>-->
@@ -714,6 +723,7 @@ export default {
       dialogVisible1: false, // 控制对话框显示
       fullCause: '',    // 用于存储完整描述
       dialogVisible2: false,
+      options: '',
       fullRetStates: '',
     }
   },
@@ -722,9 +732,19 @@ export default {
     AddOrUpdateT,
     AddOrUpdateV
   },
+  created() {
+    this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.options = data;
+      // console.log("所有的用户信息" ,data);
+    })
+  },
   activated() {
     this.getDataList()
   },
+
   methods: {
     // 显示文件列表弹窗
     showFileList(annex) {

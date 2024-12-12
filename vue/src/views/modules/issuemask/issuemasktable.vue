@@ -38,6 +38,9 @@
           header-align="center"
           align="center"
           label="审核人">
+          <template slot-scope="scope">
+            {{ getUsernameByUserId(scope.row.reviewers) }}
+          </template>
         </el-table-column>
         <el-table-column
           prop="reviewerOpinion"
@@ -50,6 +53,9 @@
           header-align="center"
           align="center"
           label="接收人">
+          <template slot-scope="scope">
+            {{ getUsernameByUserId(scope.row.recipients) }}
+          </template>
         </el-table-column>
         <el-table-column
           prop="maskcontent"
@@ -91,6 +97,9 @@
           header-align="center"
           align="center"
           label="任务发起人">
+          <template slot-scope="scope">
+            {{ getUsernameByUserId(scope.row.creator) }}
+          </template>
         </el-table-column>
         <el-table-column
           prop="creationTime"
@@ -208,12 +217,22 @@
         dataListSelections: [],
         addOrUpdateVisible: false,
         addOrUpdateVisibleD: false,
+        options: '',
         completeVisible: false
       }
     },
     components: {
       AddOrUpdate,
       AddOrUpdateD,
+    },
+    created() {
+      this.$http({
+        url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+        method: 'get',
+      }).then(({ data }) => {
+        this.options = data;
+        // console.log("所有的用户信息" ,data);
+      })
     },
     activated () {
       this.recigetDataList()
@@ -283,6 +302,16 @@
         // 拼接带有 token 的预览地址
         const url = `${this.$http.adornUrl(`/generator/issuetable/${fileUrl}`)}?token=${token}`;
         window.open(url, "_blank");
+      },
+      getUsernameByUserId(auditorId) {
+        for (const category of this.options) {
+          for (const auditor of category.options) {
+            if (auditor.value === auditorId) {
+              return auditor.label;
+            }
+          }
+        }
+        return "-";
       },
       //文件预览
       previewDoc(fileflag) {

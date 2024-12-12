@@ -30,7 +30,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     @Override
     public PageUtils recipientsqueryPage(Map<String, Object> params) {
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
 //        System.out.println("当前登录人信息"+role);
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
@@ -44,7 +44,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     @Override
     public PageUtils creatorqueryPage(Map<String, Object> params) {
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
         String issueNumber = (String) params.get("issueNumber");
 
         QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<IssueMaskTableEntity>()
@@ -78,7 +78,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     @Override
     public PageUtils AuditqueryPage(Map<String, Object> params) {
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
 //        System.out.println("当前登录人信息"+role);
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
@@ -224,7 +224,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     public PageUtils acceptqueryPage(Map<String, Object> params) {
         // 获取当前用户信息
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
         System.out.println("当前登录人信息: " + role);
 
         // 分页查询，按 ID 降序排序
@@ -243,7 +243,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     @Override
     public PageUtils distributequeryPage(Map<String, Object> params) {
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
         System.out.println("当前登录人信息"+role);
         IPage<IssueMaskTableEntity> page = this.page(
                 new Query<IssueMaskTableEntity>().getPage(params),
@@ -258,7 +258,7 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     @Override
     public PageUtils creatormaskqueryPage(Map<String, Object> params) {
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
         String serialNumber = (String) params.get("serialNumber");
 
         QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<IssueMaskTableEntity>()

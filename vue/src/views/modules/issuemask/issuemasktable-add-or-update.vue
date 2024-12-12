@@ -111,9 +111,9 @@
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
         <el-form-item label="接收人" prop="recipients">
                     <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">
-                      <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+                      <el-option-group v-for="group in options" :key="group.value" :label="group.label">
                         <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                                   :value="item.label">
+                                   :value="item.value">
                         </el-option>
                       </el-option-group>
                     </el-select>
@@ -135,9 +135,9 @@
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
         <el-form-item label="审核人" prop="reviewers">
           <el-select v-model="dataForm.reviewers" filterable placeholder="请选择审核人">
-            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+            <el-option-group v-for="group in options" :key="group.value" :label="group.label">
               <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                         :value="item.label">
+                         :value="item.value">
               </el-option>
             </el-option-group>
           </el-select>
@@ -151,9 +151,9 @@
           :rules="{ required: true, message: '子任务不能为空', trigger: 'blur' }">
           <el-input v-model="subtask.name" placeholder="请输入子任务"></el-input>
           <el-select v-model="subtask.assignee" filterable placeholder="请选择接收人">
-            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+            <el-option-group v-for="group in options" :key="group.value" :label="group.label">
               <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                         :value="item.label">
+                         :value="item.value">
               </el-option>
             </el-option-group>
           </el-select>

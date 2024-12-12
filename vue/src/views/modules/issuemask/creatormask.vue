@@ -45,6 +45,9 @@
         header-align="center"
         align="center"
         label="审核人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.reviewers) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="reviewerOpinion"
@@ -57,6 +60,9 @@
         header-align="center"
         align="center"
         label="接收人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.recipients) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="maskcontent"
@@ -97,6 +103,9 @@
         header-align="center"
         align="center"
         label="任务发起人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.creator) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="creationTime"
@@ -205,11 +214,21 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       dataListSelections: [],
+      options: '',
       addOrUpdateVisible: false
     }
   },
   components: {
     AddOrUpdate
+  },
+  created() {
+    this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.options = data;
+      // console.log("所有的用户信息" ,data);
+    })
   },
   activated () {
     this.creatorDataList()
@@ -299,6 +318,16 @@ export default {
       this.$nextTick(() => {
         this.$refs.assetOrUpdate.init1(id)
       })
+    },
+    getUsernameByUserId(auditorId) {
+      for (const category of this.options) {
+        for (const auditor of category.options) {
+          if (auditor.value === auditorId) {
+            return auditor.label;
+          }
+        }
+      }
+      return "-";
     },
     // 获取数据列表，任务创建人可以看见的数据
     creatorDataList () {

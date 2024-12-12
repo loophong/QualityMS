@@ -181,9 +181,9 @@
         </el-form-item>
         <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
           <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择整改责任人">
-            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+            <el-option-group v-for="group in options" :key="group.value" :label="group.label">
               <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                         :value="item.label">
+                         :value="item.value">
               </el-option>
             </el-option-group>
           </el-select>
@@ -341,9 +341,9 @@
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmitVE()" label-width="150px">
         <el-form-item label="验证人" prop="verifier">
           <el-select v-model="dataForm.verifier" filterable placeholder="请选择验证人">
-            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+            <el-option-group v-for="group in options" :key="group.value" :label="group.label">
               <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                         :value="item.label">
+                         :value="item.value">
               </el-option>
             </el-option-group>
           </el-select>
@@ -961,7 +961,7 @@ export default {
       this.options = data;
 
 
-      // console.log(data);
+      console.log('获取的人员信息', data);
       // if (data && data.code === 0) {
       //   console.log(data);
       // }
@@ -2053,7 +2053,7 @@ export default {
       console.log('数据+++' ,this.dataForm)
     },
     init (id) {
-      // this.fetchuserinform() //获取用户名
+      this.fetchuserinform() //获取用户名
       this.fetchIssueCategories()
       this.fetchVehicleTypes()
       this.fetchIssueOptions() // 获取所有问题编号选项

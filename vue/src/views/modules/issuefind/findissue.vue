@@ -202,35 +202,84 @@
           <!--              align="center"-->
           <!--              label="原因分析">-->
           <!--            </el-table-column>-->
-          <el-table-column prop="causeAnalysis" header-align="center" align="center" label="原因分析">
+<!--          <el-table-column prop="causeAnalysis" header-align="center" align="center" label="原因分析">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div-->
+<!--                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"-->
+<!--                @click="showFullCauseAnalysis(scope.row.causeAnalysis)">-->
+<!--                  <span v-if="scope.row.causeAnalysis.length > 8">-->
+<!--                    {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> &lt;!&ndash; 显示前八个字符，加粗省略号 &ndash;&gt;-->
+<!--                  </span>-->
+<!--                <span v-else>-->
+<!--                    {{ scope.row.causeAnalysis }} &lt;!&ndash; 显示完整描述 &ndash;&gt;-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="causeAnalysis"
+            header-align="center"
+            align="center"
+            label="原因分析">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.causeAnalysis"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
-                  <span v-if="scope.row.causeAnalysis.length > 8">
-                    {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
-                  </span>
+                <span v-if="scope.row.causeAnalysis.length > 8">
+                  {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+               </span>
                 <span v-else>
-                    {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
-                  </span>
+                   {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+                </span>
+              </div>
+              <div v-else>
+                <!-- 如果 causeAnalysis 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
+
           <!--            <el-table-column-->
           <!--              prop="rectificationStatus"-->
           <!--              header-align="center"-->
           <!--              align="center"-->
           <!--              label="整改情况">-->
           <!--            </el-table-column>-->
-          <el-table-column prop="rectificationStatus" header-align="center" align="center" label="整改情况">
+<!--          <el-table-column prop="rectificationStatus" header-align="center" align="center" label="整改情况">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div-->
+<!--                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"-->
+<!--                @click="showFullDescription(scope.row.rectificationStatus)">-->
+<!--                {{ truncateDescription(scope.row.rectificationStatus) }}-->
+<!--                <span v-if="scope.row.rectificationStatus.length > 20">-->
+<!--                    <strong>...</strong> &lt;!&ndash; 将省略号加粗 &ndash;&gt;-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--              <div v-else>-->
+<!--                &lt;!&ndash; 如果 rectificationStatus 为空，显示空白 &ndash;&gt;-->
+<!--                &nbsp;-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="rectificationStatus"
+            header-align="center"
+            align="center"
+            label="整改情况">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.rectificationStatus"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullDescription(scope.row.rectificationStatus)">
                 {{ truncateDescription(scope.row.rectificationStatus) }}
                 <span v-if="scope.row.rectificationStatus.length > 20">
-                    <strong>...</strong> <!-- 将省略号加粗 -->
-                  </span>
+                  <strong>...</strong> <!-- 将省略号加粗 -->
+             </span>
+              </div>
+              <div v-else>
+                <!-- 如果 rectificationStatus 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
@@ -401,17 +450,26 @@
           <!--              align="center"-->
           <!--              label="原因分析">-->
           <!--            </el-table-column>-->
-          <el-table-column prop="causeAnalysis" header-align="center" align="center" label="原因分析">
+          <el-table-column
+            prop="causeAnalysis"
+            header-align="center"
+            align="center"
+            label="原因分析">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.causeAnalysis"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
-                  <span v-if="scope.row.causeAnalysis.length > 8">
-                    {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
-                  </span>
+                <span v-if="scope.row.causeAnalysis.length > 8">
+                  {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+               </span>
                 <span v-else>
-                    {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
-                  </span>
+                   {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+                </span>
+              </div>
+              <div v-else>
+                <!-- 如果 causeAnalysis 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
@@ -421,15 +479,24 @@
           <!--              align="center"-->
           <!--              label="整改情况">-->
           <!--            </el-table-column>-->
-          <el-table-column prop="rectificationStatus" header-align="center" align="center" label="整改情况">
+          <el-table-column
+            prop="rectificationStatus"
+            header-align="center"
+            align="center"
+            label="整改情况">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.rectificationStatus"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullDescription(scope.row.rectificationStatus)">
                 {{ truncateDescription(scope.row.rectificationStatus) }}
                 <span v-if="scope.row.rectificationStatus.length > 20">
-                    <strong>...</strong> <!-- 将省略号加粗 -->
-                  </span>
+                  <strong>...</strong> <!-- 将省略号加粗 -->
+             </span>
+              </div>
+              <div v-else>
+                <!-- 如果 rectificationStatus 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
@@ -464,21 +531,46 @@
           </el-table-column>
           <el-table-column prop="associatedIssueAddition" header-align="center" align="center" label="关联问题">
           </el-table-column>
-          <el-table-column prop="rectificationVerificationStatus" header-align="center" align="center" label="整改验证情况">
+<!--          <el-table-column prop="rectificationVerificationStatus" header-align="center" align="center" label="整改验证情况">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div-->
+<!--                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"-->
+<!--                @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">-->
+<!--                  <span v-if="scope.row.rectificationVerificationStatus.length > 50">-->
+<!--                    {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong>-->
+<!--                    &lt;!&ndash; 显示前八个字符，加粗省略号 &ndash;&gt;-->
+<!--                  </span>-->
+<!--                <span v-else>-->
+<!--                    {{ scope.row.rectificationVerificationStatus }} &lt;!&ndash; 显示完整描述 &ndash;&gt;-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="rectificationVerificationStatus"
+            header-align="center"
+            align="center"
+            label="整改验证情况">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.rectificationVerificationStatus"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">
-                  <span v-if="scope.row.rectificationVerificationStatus.length > 50">
-                    {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong>
-                    <!-- 显示前八个字符，加粗省略号 -->
-                  </span>
+             <span v-if="scope.row.rectificationVerificationStatus.length > 50">
+                  {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong>
+        <!-- 显示前五十个字符，加粗省略号 -->
+               </span>
                 <span v-else>
-                    {{ scope.row.rectificationVerificationStatus }} <!-- 显示完整描述 -->
-                  </span>
+        {{ scope.row.rectificationVerificationStatus }} <!-- 显示完整描述 -->
+              </span>
+              </div>
+              <div v-else>
+                <!-- 如果 rectificationVerificationStatus 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
+
           <el-table-column prop="verificationDeadline" header-align="center" align="center" label="验证截止时间">
           </el-table-column>
           <el-table-column prop="verificationConclusion" header-align="center" align="center" label="验证结论">
@@ -734,6 +826,7 @@ export default {
       this.addOrUpdateVisibleV = true
       this.$nextTick(() => {
         this.$refs.addOrUpdateV.init(id)
+        // this.$refs.addOrUpdateV.
       })
     },
     // handleRectificationRecords(rectificationResponsiblePerson, issueId) {
@@ -1084,12 +1177,12 @@ export default {
     },
     // 新增的完整原因分析显示方法
     showFullCauseAnalysis(causeAnalysis) {
-      this.fullCause = causeAnalysis; // 存储原因分析完整描述
+      this.fullCause = causeAnalysis || ''; // 存储原因分析完整描述
       this.dialogVisible1 = true; // 显示对话框
     },
     // 新增显示整改验证情况的完整方法
     showFullRectificationStatus(rectificationVerificationStatus) {
-      this.fullRetStates = rectificationVerificationStatus; // 存储整改验证情况完整描述
+      this.fullRetStates = rectificationVerificationStatus || ''; // 存储整改验证情况完整描述
       this.dialogVisible2 = true; // 显示对话框
     }
   }

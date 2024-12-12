@@ -253,7 +253,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     public PageUtils queryPagecreator(Map<String, Object> params) {
         // 获取当前用户信息
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
 
         // 构建查询条件
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
@@ -261,6 +261,9 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         queryWrapper.eq("creator", rolename)
                 .or().eq("rectification_responsible_person", rolename)
                 .or().eq("verifier", rolename);
+
+        // 按 ID 降序排序
+        queryWrapper.orderByDesc("issue_id");
 
         // 执行分页查询
         IPage<IssueTableEntity> page = this.page(
@@ -410,7 +413,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     @Override
     public String getuserinfo() {
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
         return rolename;
     }
 

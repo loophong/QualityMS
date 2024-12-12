@@ -56,12 +56,18 @@
         header-align="center"
         align="center"
         label="审核人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.reviewers) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="recipients"
         header-align="center"
         align="center"
         label="接收人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.recipients) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="maskcontent"
@@ -74,6 +80,9 @@
         header-align="center"
         align="center"
         label="任务发起人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.creator) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="creationTime"
@@ -366,7 +375,16 @@ export default {
         this.auditDialogVisible = false; // 关闭弹窗
       });
     },
-
+    getUsernameByUserId(auditorId) {
+      for (const category of this.options) {
+        for (const auditor of category.options) {
+          if (auditor.value === auditorId) {
+            return auditor.label;
+          }
+        }
+      }
+      return "-";
+    },
     sendMessageNotification() {
       const receivers = this.dataListSelections.map(item => item.recipients); // 获取选中任务的接收人
       const senderId = this.getUserIdByUsername(this.dataList[0].creator); // 获取发起人ID

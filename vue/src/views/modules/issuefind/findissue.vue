@@ -98,6 +98,22 @@
         </el-table-column>
         <el-table-column prop="responsibleDepartment" header-align="center" align="center" label="责任科室">
         </el-table-column>
+<!--        <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
+<!--        </el-table-column>-->
+        <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+          <template slot-scope="scope">
+            <div>
+      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+      </span>
+            </div>
+          </template>
+        </el-table-column>
+
         <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
@@ -186,35 +202,84 @@
           <!--              align="center"-->
           <!--              label="原因分析">-->
           <!--            </el-table-column>-->
-          <el-table-column prop="causeAnalysis" header-align="center" align="center" label="原因分析">
+<!--          <el-table-column prop="causeAnalysis" header-align="center" align="center" label="原因分析">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div-->
+<!--                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"-->
+<!--                @click="showFullCauseAnalysis(scope.row.causeAnalysis)">-->
+<!--                  <span v-if="scope.row.causeAnalysis.length > 8">-->
+<!--                    {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> &lt;!&ndash; 显示前八个字符，加粗省略号 &ndash;&gt;-->
+<!--                  </span>-->
+<!--                <span v-else>-->
+<!--                    {{ scope.row.causeAnalysis }} &lt;!&ndash; 显示完整描述 &ndash;&gt;-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="causeAnalysis"
+            header-align="center"
+            align="center"
+            label="原因分析">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.causeAnalysis"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
-                  <span v-if="scope.row.causeAnalysis.length > 8">
-                    {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
-                  </span>
+                <span v-if="scope.row.causeAnalysis.length > 8">
+                  {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+               </span>
                 <span v-else>
-                    {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
-                  </span>
+                   {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+                </span>
+              </div>
+              <div v-else>
+                <!-- 如果 causeAnalysis 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
+
           <!--            <el-table-column-->
           <!--              prop="rectificationStatus"-->
           <!--              header-align="center"-->
           <!--              align="center"-->
           <!--              label="整改情况">-->
           <!--            </el-table-column>-->
-          <el-table-column prop="rectificationStatus" header-align="center" align="center" label="整改情况">
+<!--          <el-table-column prop="rectificationStatus" header-align="center" align="center" label="整改情况">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div-->
+<!--                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"-->
+<!--                @click="showFullDescription(scope.row.rectificationStatus)">-->
+<!--                {{ truncateDescription(scope.row.rectificationStatus) }}-->
+<!--                <span v-if="scope.row.rectificationStatus.length > 20">-->
+<!--                    <strong>...</strong> &lt;!&ndash; 将省略号加粗 &ndash;&gt;-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--              <div v-else>-->
+<!--                &lt;!&ndash; 如果 rectificationStatus 为空，显示空白 &ndash;&gt;-->
+<!--                &nbsp;-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="rectificationStatus"
+            header-align="center"
+            align="center"
+            label="整改情况">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.rectificationStatus"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullDescription(scope.row.rectificationStatus)">
                 {{ truncateDescription(scope.row.rectificationStatus) }}
                 <span v-if="scope.row.rectificationStatus.length > 20">
-                    <strong>...</strong> <!-- 将省略号加粗 -->
-                  </span>
+                  <strong>...</strong> <!-- 将省略号加粗 -->
+             </span>
+              </div>
+              <div v-else>
+                <!-- 如果 rectificationStatus 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
@@ -252,20 +317,39 @@
           <!--              </template>-->
           <!--            </el-table-column>-->
           <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.rectificationResponsiblePerson) }}
+            </template>
           </el-table-column>
+<!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
+<!--          </el-table-column>-->
+          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+            <template slot-scope="scope">
+              <div>
+      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+      </span>
+              </div>
+            </template>
+          </el-table-column>
+
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small"
-                         @click="handleRectificationRecords(scope.row.issueNumber, scope.row.issueId)">整改记录</el-button>
+                         @click="handleRectificationRecords(scope.row.rectificationResponsiblePerson, scope.row.issueId)">整改记录</el-button>
               <!--          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>-->
               <el-button type="text" size="small"
-                         @click="assetOrUpdateHandle(scope.row.issueId, scope.row.issueNumber)">任务发起</el-button>
+                         @click="assetOrUpdateHandle(scope.row.issueId, scope.row.issueNumber, scope.row.level)">任务发起</el-button>
               <el-button type="text" size="small"
                          @click="openflow(scope.row.issueId, scope.row.issueNumber)">任务流程</el-button>
               <el-button type="text" size="small"
                          @click="openNewPage(scope.row.issueId, scope.row.issueNumber)">任务列表</el-button>
               <el-button type="text" size="small"
-                         @click="handleVerificationRecords(scope.row.issueId, scope.row.issueNumber)">验证指定</el-button>
+                         @click="handleVerificationRecords(scope.row.issueId, scope.row.issueNumber, scope.row.rectificationResponsiblePerson, scope.row.level)">验证指定</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -369,17 +453,26 @@
           <!--              align="center"-->
           <!--              label="原因分析">-->
           <!--            </el-table-column>-->
-          <el-table-column prop="causeAnalysis" header-align="center" align="center" label="原因分析">
+          <el-table-column
+            prop="causeAnalysis"
+            header-align="center"
+            align="center"
+            label="原因分析">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.causeAnalysis"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
-                  <span v-if="scope.row.causeAnalysis.length > 8">
-                    {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
-                  </span>
+                <span v-if="scope.row.causeAnalysis.length > 8">
+                  {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+               </span>
                 <span v-else>
-                    {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
-                  </span>
+                   {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+                </span>
+              </div>
+              <div v-else>
+                <!-- 如果 causeAnalysis 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
@@ -389,15 +482,24 @@
           <!--              align="center"-->
           <!--              label="整改情况">-->
           <!--            </el-table-column>-->
-          <el-table-column prop="rectificationStatus" header-align="center" align="center" label="整改情况">
+          <el-table-column
+            prop="rectificationStatus"
+            header-align="center"
+            align="center"
+            label="整改情况">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.rectificationStatus"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullDescription(scope.row.rectificationStatus)">
                 {{ truncateDescription(scope.row.rectificationStatus) }}
                 <span v-if="scope.row.rectificationStatus.length > 20">
-                    <strong>...</strong> <!-- 将省略号加粗 -->
-                  </span>
+                  <strong>...</strong> <!-- 将省略号加粗 -->
+             </span>
+              </div>
+              <div v-else>
+                <!-- 如果 rectificationStatus 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
@@ -429,24 +531,52 @@
           <!--              </template>-->
           <!--            </el-table-column>-->
           <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.rectificationResponsiblePerson) }}
+            </template>
           </el-table-column>
           <el-table-column prop="associatedIssueAddition" header-align="center" align="center" label="关联问题">
           </el-table-column>
-          <el-table-column prop="rectificationVerificationStatus" header-align="center" align="center" label="整改验证情况">
+<!--          <el-table-column prop="rectificationVerificationStatus" header-align="center" align="center" label="整改验证情况">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div-->
+<!--                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"-->
+<!--                @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">-->
+<!--                  <span v-if="scope.row.rectificationVerificationStatus.length > 50">-->
+<!--                    {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong>-->
+<!--                    &lt;!&ndash; 显示前八个字符，加粗省略号 &ndash;&gt;-->
+<!--                  </span>-->
+<!--                <span v-else>-->
+<!--                    {{ scope.row.rectificationVerificationStatus }} &lt;!&ndash; 显示完整描述 &ndash;&gt;-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="rectificationVerificationStatus"
+            header-align="center"
+            align="center"
+            label="整改验证情况">
             <template slot-scope="scope">
               <div
+                v-if="scope.row.rectificationVerificationStatus"
                 style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
                 @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">
-                  <span v-if="scope.row.rectificationVerificationStatus.length > 50">
-                    {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong>
-                    <!-- 显示前八个字符，加粗省略号 -->
-                  </span>
+             <span v-if="scope.row.rectificationVerificationStatus.length > 50">
+                  {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong>
+        <!-- 显示前五十个字符，加粗省略号 -->
+               </span>
                 <span v-else>
-                    {{ scope.row.rectificationVerificationStatus }} <!-- 显示完整描述 -->
-                  </span>
+        {{ scope.row.rectificationVerificationStatus }} <!-- 显示完整描述 -->
+              </span>
+              </div>
+              <div v-else>
+                <!-- 如果 rectificationVerificationStatus 为空，显示空白 -->
+                &nbsp;
               </div>
             </template>
           </el-table-column>
+
           <el-table-column prop="verificationDeadline" header-align="center" align="center" label="验证截止时间">
           </el-table-column>
           <el-table-column prop="verificationConclusion" header-align="center" align="center" label="验证结论">
@@ -465,7 +595,26 @@
             </template>
           </el-table-column>
           <el-table-column prop="verifier" header-align="center" align="center" label="验证人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.verifier) }}
+            </template>
           </el-table-column>
+<!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
+<!--          </el-table-column>-->
+          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+            <template slot-scope="scope">
+              <div>
+                <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+                  <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+                </span>
+              </div>
+            </template>
+          </el-table-column>
+
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="checkStateAndHandle(scope.row)">验证</el-button>
@@ -574,6 +723,7 @@ export default {
       dialogVisible1: false, // 控制对话框显示
       fullCause: '',    // 用于存储完整描述
       dialogVisible2: false,
+      options: '',
       fullRetStates: '',
     }
   },
@@ -582,9 +732,19 @@ export default {
     AddOrUpdateT,
     AddOrUpdateV
   },
+  created() {
+    this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.options = data;
+      // console.log("所有的用户信息" ,data);
+    })
+  },
   activated() {
     this.getDataList()
   },
+
   methods: {
     // 显示文件列表弹窗
     showFileList(annex) {
@@ -665,48 +825,69 @@ export default {
       return verificationConclusion.split(',').map(state => state.trim());
     },
     checkStateAndHandle(row) {
-      if (!row.verificationDeadline) {
-        this.$message.warning("验证时间未到");
-        return;
-      }
+      this.fetchuserinform().then(userinfo => {
+        // 判断是否为验证人
+        if (userinfo === row.verifier) {
+          // 如果一致，执行 addOrUpdateHandleR 方法
+          if (row.level === '等待验证') {
+            this.addOrUpdateHandlev(row.issueId);
+          } else {
+            //如果不一致，弹出提示
+            this.$message.error('未到验证阶段');
+          }
+        } else {
+          // 如果不一致，弹出提示
+          this.$message.error('您不是验证人');
+        }
+      });
 
-      const currentTime = new Date();
-      const verificationDeadline = new Date(row.verificationDeadline);
-
-      if (currentTime < verificationDeadline) {
-        this.$message.warning("验证时间未到");
-      } else {
-        this.addOrUpdateHandlev(row.issueId);
-      }
     },
     addOrUpdateHandlev(id) {
       this.addOrUpdateVisibleV = true
       this.$nextTick(() => {
         this.$refs.addOrUpdateV.init(id)
+        // this.$refs.addOrUpdateV.
       })
     },
-    handleRectificationRecords(issueNumber, issueId) {
-      // this.$http({
-      //   url: this.$http.adornUrl('/generator/issuemasktable/records'),
-      //   method: 'post',
-      //   params: this.$http.adornParams({ issueNumber: issueNumber })
-      // }).then(({ data }) => {
-      //   console.log("返回数据：", data)
-      //   if (data && data.msg === 'success') {
-      //     console.log('整改得到的id为', issueId)
-      //     // 操作成功后触发addOrUpdateHandle
-      //
-      //   } else if (data && data.msg === 'error') {
-      //     this.$message.error('任务未全部完成')
-      //   } else {
-      //     this.$message.error('操作失败')
-      //   }
-      // }).catch(() => {
-      //   this.$message.error('请求失败')
-      // })
-      this.addOrUpdateHandleR(issueId)
+    // handleRectificationRecords(rectificationResponsiblePerson, issueId) {
+    //   this.addOrUpdateHandleR(issueId)
+    // },
+    handleRectificationRecords(rectificationResponsiblePerson, issueId) {
+      // 调用 fetchuserinform 方法获取用户信息
+      this.fetchuserinform().then(userinfo => {
+        // 判断是否为整改责任人
+        if (userinfo === rectificationResponsiblePerson) {
+          // 如果一致，执行 addOrUpdateHandleR 方法
+          this.addOrUpdateHandleR(issueId);
+        } else {
+          // 如果不一致，弹出提示
+          this.$message.error('您不是整改责任人');
+        }
+      });
     },
-    handleVerificationRecords(issueId, issueNumber) {
+    fetchuserinform() {
+      return new Promise((resolve, reject) => {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/useinfo'),
+          method: 'get',
+          params: this.$http.adornParams()
+        })
+          .then(({ data }) => {
+            if (data && data.code === 0) {
+              // 返回用户信息
+              resolve(data.userinfo);
+            } else {
+              console.error('获取用户信息失败:', data.msg);
+              reject(data.msg);
+            }
+          })
+          .catch(error => {
+            console.error('获取用户信息时发生错误:', error);
+            reject(error);
+          });
+      });
+    },
+    handleVerificationRecords(issueId, issueNumber, rectificationResponsiblePerson, level) {
       this.$http({
         url: this.$http.adornUrl('/generator/issuemasktable/records'),
         method: 'post',
@@ -716,8 +897,23 @@ export default {
         if (data && data.msg === 'success') {
           // console.log('整改得到的id为', issueId)
           // 操作成功后触发addOrUpdateHandleVe
-          this.addOrUpdateHandleVe(issueId)
-
+          // this.addOrUpdateHandleVe(issueId)
+          // 调用 fetchuserinform 方法获取用户信息
+          this.fetchuserinform().then(userinfo => {
+            // 判断是否为整改责任人
+            if (userinfo === rectificationResponsiblePerson) {
+              // 如果一致，执行 addOrUpdateHandleR 方法
+              if (level === '等待验证指定') {
+                this.addOrUpdateHandleVe(issueId);
+              } else {
+                //如果不一致，弹出提示
+                this.$message.error('未到验证阶段');
+              }
+            } else {
+              // 如果不一致，弹出提示
+              this.$message.error('您不是整改责任人');
+            }
+          });
         } else if (data && data.msg === 'error') {
           this.$message.error('任务未全部完成')
         } else {
@@ -864,11 +1060,17 @@ export default {
       })
     },
     // 任务发起
-    assetOrUpdateHandle(id, issueNumber) {
-      this.addOrUpdateVisibleT = true
-      this.$nextTick(() => {
-        this.$refs.addOrUpdateT.init1(id, issueNumber)
-      })
+    assetOrUpdateHandle(id, issueNumber, level) {
+      if (level === '等待任务下发(处理)') {
+        // 如果一致，执行 addOrUpdateHandleR 方法
+        this.addOrUpdateVisibleT = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdateT.init1(id, issueNumber)
+        })
+      } else {
+        // 如果不一致，弹出提示
+        this.$message.error('未到任务下发阶段');
+      }
     },
     //图片预览
     // previewImage(imageUrl) {
@@ -995,12 +1197,12 @@ export default {
     },
     // 新增的完整原因分析显示方法
     showFullCauseAnalysis(causeAnalysis) {
-      this.fullCause = causeAnalysis; // 存储原因分析完整描述
+      this.fullCause = causeAnalysis || ''; // 存储原因分析完整描述
       this.dialogVisible1 = true; // 显示对话框
     },
     // 新增显示整改验证情况的完整方法
     showFullRectificationStatus(rectificationVerificationStatus) {
-      this.fullRetStates = rectificationVerificationStatus; // 存储整改验证情况完整描述
+      this.fullRetStates = rectificationVerificationStatus || ''; // 存储整改验证情况完整描述
       this.dialogVisible2 = true; // 显示对话框
     }
   }

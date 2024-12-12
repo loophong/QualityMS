@@ -29,13 +29,22 @@ public class IssueFaultTableServiceImpl extends ServiceImpl<IssueFaultTableDao, 
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        // 构建查询条件
+        QueryWrapper<IssueFaultTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 按 ID 降序排序
+        queryWrapper.orderByAsc("fault_ID");
+
+        // 分页查询
         IPage<IssueFaultTableEntity> page = this.page(
                 new Query<IssueFaultTableEntity>().getPage(params),
-                new QueryWrapper<IssueFaultTableEntity>()
+                queryWrapper
         );
 
+        // 返回分页数据
         return new PageUtils(page);
     }
+
 
     @Override
     public R uploadExcelFile(MultipartFile file) throws IOException {
@@ -121,6 +130,51 @@ public class IssueFaultTableServiceImpl extends ServiceImpl<IssueFaultTableDao, 
         }
     }
 
+    @Override
+    public PageUtils QueryPage(Map<String, Object> params) {
+        // 提取查询参数
+        String selectedSystematic = (String) params.get("selectedSystematic");
+        String selectedFirstFaultyParts = (String) params.get("selectedFirstFaultyParts");
+        String selectedSecondFaultyParts = (String) params.get("selectedSecondFaultyParts");
+        String selectedFaultType = (String) params.get("selectedFaultType");
+        String selectedFaultModel = (String) params.get("selectedFaultModel");
+
+        // 创建查询条件
+        QueryWrapper<IssueFaultTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 如果 selectedSystematic 不为空，则添加模糊查询条件
+        if (selectedSystematic != null && !selectedSystematic.isEmpty()) {
+            queryWrapper.like("Systematic_classification", selectedSystematic);
+        }
+
+        // 如果 selectedFirstFaultyParts 不为空，则添加模糊查询条件
+        if (selectedFirstFaultyParts != null && !selectedFirstFaultyParts.isEmpty()) {
+            queryWrapper.like("First_Faulty_parts", selectedFirstFaultyParts);
+        }
+
+        // 如果 selectedSecondFaultyParts 不为空，则添加模糊查询条件
+        if (selectedSecondFaultyParts != null && !selectedSecondFaultyParts.isEmpty()) {
+            queryWrapper.like("Second_Faulty_parts", selectedSecondFaultyParts);
+        }
+
+        // 如果 selectedFaultType 不为空，则添加模糊查询条件
+        if (selectedFaultType != null && !selectedFaultType.isEmpty()) {
+            queryWrapper.like("fault_type", selectedFaultType);
+        }
+
+        // 如果 selectedFaultModel 不为空，则添加模糊查询条件
+        if (selectedFaultModel != null && !selectedFaultModel.isEmpty()) {
+            queryWrapper.like("fault_model", selectedFaultModel);
+        }
+
+        // 执行分页查询并返回结果
+        IPage<IssueFaultTableEntity> page = this.page(
+                new Query<IssueFaultTableEntity>().getPage(params),
+                queryWrapper
+        );
+
+        return new PageUtils(page);
+    }
 
 
 

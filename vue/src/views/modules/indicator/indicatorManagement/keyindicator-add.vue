@@ -245,6 +245,7 @@ export default {
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
+        console.log("dataFormSubmit=====>",this.dataForm)
         if (valid) {
           // 将数组转换成字符串
           const keyElementsString =this.keyElementsList.join(',');

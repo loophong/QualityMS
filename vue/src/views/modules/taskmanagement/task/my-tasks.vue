@@ -592,7 +592,6 @@ export default {
       uploadUrl: '',
 
 
-
     }
   },
   components: {
@@ -635,8 +634,6 @@ export default {
       console.log(opt);
       this.indicatorOptions = opt;
     })
-
-
   },
 
   methods: {

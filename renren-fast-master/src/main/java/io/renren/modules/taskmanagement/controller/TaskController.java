@@ -8,6 +8,7 @@ import java.util.*;
 import com.alibaba.excel.util.DateUtils;
 import com.aliyun.oss.common.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.notice.entity.CreateNoticeParams;
@@ -50,6 +51,44 @@ public class TaskController {
     private MessageNotificationService messageService;
     @Autowired
     private ApprovalFileService approvalFileService;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    /**
+     * @description: 图中点击任务时，查询任务的全部信息和审批文件
+     * @param: null
+     * @return:
+     * @author: hong
+     * @date: 2024/12/11 17:00
+     */
+    @PostMapping("/taskAllInfo")
+    public R taskAllInfo(@RequestBody String param) throws Exception {
+        log.info("param:" + param);
+        Map<String, Object> jsonMap = objectMapper.readValue(param, Map.class);
+        String taskId = (String) jsonMap.get("taskId");
+        log.info("taskId:" + taskId);
+        TaskEntity task = taskService.query().eq("task_id", taskId).one();
+        // 检查task状态，如果通过则查询审批文件
+        if (task.getTaskCurrentState() != TaskStatus.COMPLETED) {
+            return R.ok().put("task", task).put("fileList", null);
+        }
+
+        // 查询审批编号
+        ApprovalEntity approval = approvalService.query()
+                .eq("task_id", taskId)
+                .eq("approval_status", ApprovalStatus.APPROVED)
+                .orderByDesc("task_submission_time") // 按照 submit_time 降序排序
+                .last("limit 1") // 限制结果为一条记录
+                .one();// 获取一条记录
+        // 检查是否有审批文件
+        List<ApprovalFileEntity> fileList = approvalFileService.list(new QueryWrapper<ApprovalFileEntity>()
+                .eq("approval_id", approval.getApprovalId()));
+        if (fileList.size() > 0) {
+            return R.ok().put("task", task).put("fileList", fileList);
+        } else {
+            return R.ok().put("task", task).put("fileList", null);
+        }
+    }
 
     /**
      * @description: 任务折线图展示
@@ -76,22 +115,22 @@ public class TaskController {
     }
 
 
-    /** 
+    /**
      * @description: 小屏问题，任务进度，与任务关联的指标中，显示指标的已完成和未完成数
-     * @return: io.renren.common.utils.R 
+     * @return: io.renren.common.utils.R
      * @author: hong
      * @date: 2024/11/28 14:49
-     */ 
+     */
     @RequestMapping("/statisticsOnTaskRelatedIndicators")
     public R statisticsOnTaskRelatedIndicators() {
         List<TaskEntity> unfinishedList = taskService.list(
                 new QueryWrapper<TaskEntity>()
-                .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id","")
-                .eq("task_is_completed", 0));
+                        .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id", "")
+                        .eq("task_is_completed", 0));
         List<TaskEntity> finishedList = taskService.list(
                 new QueryWrapper<TaskEntity>()
-                .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id","")
-                .eq("task_is_completed", 1));
+                        .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id", "")
+                        .eq("task_is_completed", 1));
         log.info("未完成的任务数量为：" + unfinishedList);
         log.info("未完成的任务数量为：" + unfinishedList.size());
         log.info("已完成的任务数量为：" + finishedList);
@@ -101,18 +140,18 @@ public class TaskController {
     }
 
 
-    /** 
+    /**
      * @description: 小屏问题，指标任务数
-     * @return: io.renren.common.utils.R 
+     * @return: io.renren.common.utils.R
      * @author: hong
      * @date: 2024/11/28 15:01
-     */ 
+     */
     @RequestMapping("/countTaskRelatedIndicatorsNum")
     public R countTaskRelatedIndicatorsNum() {
         List<TaskEntity> list = taskService.list(
                 new QueryWrapper<TaskEntity>()
-                .isNotNull("task_associated_indicators_id")
-                        .ne("task_associated_indicators_id",""));
+                        .isNotNull("task_associated_indicators_id")
+                        .ne("task_associated_indicators_id", ""));
 
         log.info("指标任务数：" + list);
         log.info("指标任务数：" + list.size());

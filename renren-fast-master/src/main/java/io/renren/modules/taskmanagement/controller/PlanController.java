@@ -10,6 +10,7 @@ import cn.hutool.log.Log;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
 import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
@@ -52,6 +53,8 @@ public class PlanController {
     private FileService fileService;
     @Autowired
     private ApprovalService approvalService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @RequestMapping("/export")
     public void export(HttpServletResponse response){
@@ -63,6 +66,30 @@ public class PlanController {
             throw new RuntimeException(e);
         }
 
+    }
+
+
+    /**
+     * @description: 图中点击计划时，查询计划的全部信息和计划文件
+     * @param: null
+     * @return:
+     * @author: hong
+     * @date: 2024/12/12 15:50
+     */
+    @PostMapping("/planAllInfo")
+    public R planAllInfo(@RequestBody String param) throws Exception {
+        log.info("param:" + param);
+        Map<String, Object> jsonMap = objectMapper.readValue(param, Map.class);
+        String planId = (String) jsonMap.get("paramPlanId");
+        log.info("paramPlanId:" + planId);
+        PlanEntity plan = planService.query().eq("plan_id", planId).one();
+        // 查询plan的文件
+        List<FileEntity> files = fileService.list(new QueryWrapper<FileEntity>().eq("plan_id", planId));
+        if (files != null){
+            return R.ok().put("plan", plan).put("files", files);
+        }else {
+            return R.ok().put("plan", plan).put("files", null);
+        }
     }
 
     /**

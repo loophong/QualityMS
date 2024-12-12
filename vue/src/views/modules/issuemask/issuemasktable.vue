@@ -141,6 +141,9 @@
   <!--          <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>-->
             <el-button v-if="showButtons" type="text" size="small" @click="completeHandle(scope.row.issuemaskId,scope.row)">完成</el-button>
             <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId,scope.row)">派发</el-button>
+            <el-button v-if="showButtons" type="text" size="small" @click="distributeHandle(scope.row)">分发</el-button>
+            <el-button v-if="showButtons" type="text" size="small" @click="SubtasksHandle(scope.row.serialNumber)">子任务列表</el-button>
+
           </template>
         </el-table-column>
       </el-table>
@@ -210,12 +213,42 @@
     },
     components: {
       AddOrUpdate,
-      AddOrUpdateD
+      AddOrUpdateD,
     },
     activated () {
       this.recigetDataList()
     },
     methods: {
+      SubtasksHandle(serialNumber){
+        this.$router.push({
+          name: 'issue-issuenewmask',
+          params: {
+            serialNumber: serialNumber
+          }
+        })
+      },
+      distributeHandle(row){
+        const issueNumber = row.issueNumber;
+        const maskNumber = row.serialNumber;
+        const creator = row.recipients;
+        // const id = row.issuemaskId;
+        // console.log('issueNumber', issueNumber)
+        // console.log('maskNumber', maskNumber)
+        this.addOrUpdateVisible = true
+        if(row.state === '审核中')
+          this.$message.error('任务审核中！')
+        else if (row.state === '已派发')
+          this.$message.error('任务已派发！')
+        else if (row.state === '已完成')
+          this.$message.error('任务已完成！')
+        else if (row.state === '审核未通过')
+          this.$message.error('任务审核未通过！')
+        else {
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.distribute(issueNumber, maskNumber, creator)
+        })
+        }
+      },
       // 显示文件列表弹窗
       showFileList(annex) {
         try {
@@ -312,7 +345,7 @@
           this.$message.error('任务审核未通过！')
         else {
           this.$nextTick(() => {
-            this.$refs.assetOrUpdate.init1(id)
+            this.$refs.assetOrUpdate.init1(id ,row.issueNumber)
           })
         }
       },
@@ -414,10 +447,29 @@
         else if (row.state === '未通过审核')
           this.$message.error('任务审核未通过！')
         else {
-          this.assertOrUpdateVisible = true
-          this.$nextTick(() => {
-            this.$refs.assetOrUpdate.completeHandle(id)
-          });
+          this.$http({
+            url: this.$http.adornUrl('/generator/issuemasktable/serialNumber'),
+            method: 'post',
+            params: this.$http.adornParams({ issueNumber: row.serialNumber, })
+          }).then(({ data }) => {
+            // console.log("返回数据：", data)
+            if (data && data.msg === 'success') {
+              // console.log('整改得到的id为', issueId)
+              // 操作成功后触发addOrUpdateHandleVe
+              // this.addOrUpdateHandleVe(issueId)
+              // 调用 fetchuserinform 方法获取用户信息
+              this.assertOrUpdateVisible = true
+              this.$nextTick(() => {
+                this.$refs.assetOrUpdate.completeHandle(id)
+              });
+            } else if (data && data.msg === 'error') {
+              this.$message.error('任务未全部完成')
+            } else {
+              this.$message.error('操作失败')
+            }
+          }).catch(() => {
+            this.$message.error('请求失败')
+          })
         }
       },
       // 删除

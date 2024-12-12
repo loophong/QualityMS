@@ -255,4 +255,37 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         return new PageUtils(page);
     }
 
+    @Override
+    public PageUtils creatormaskqueryPage(Map<String, Object> params) {
+        SysUserEntity role = ShiroUtils.getUserEntity();
+        String rolename = role.getUsername();
+        String serialNumber = (String) params.get("serialNumber");
+
+        QueryWrapper<IssueMaskTableEntity> queryWrapper = new QueryWrapper<IssueMaskTableEntity>()
+                .eq("creator", rolename)
+                .eq("superior_mask", serialNumber)
+                .orderByDesc("issuemask_id")          // 按 ID 降序排序
+                ;
+
+        IPage<IssueMaskTableEntity> page = this.page(
+                new Query<IssueMaskTableEntity>().getPage(params),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public String listserialNumber(String issueNumber) {
+            List<IssueMaskTableEntity> list1 = this.list();
+            boolean allCompleted = list1.stream()
+                    .filter(issue -> issue.getSuperiorMask().equals(issueNumber))
+                    .allMatch(issue -> "已完成".equals(issue.getState()) || "已派发".equals(issue.getState()) || "未通过审核".equals(issue.getState()) );
+
+            if (allCompleted) {
+                return "success";
+            } else {
+                return "error";
+            }
+    }
+
 }

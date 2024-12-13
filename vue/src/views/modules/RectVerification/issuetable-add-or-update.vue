@@ -581,8 +581,8 @@
               this.dataForm.state = '已完成'
 
             } else {
-              this.dataForm.verificationConclusion = '持续'
-              this.dataForm.level = '持续'
+              this.dataForm.verificationConclusion = '结项'
+              this.dataForm.level = '未通过验证'
               this.dataForm.state = '未完成'
               this.newissue()
             }

@@ -39,7 +39,7 @@
 <template>
   <div id="index">
     <header>
-      <h1>盘锦合力质量管理数字化数据展示</h1>
+      <h1>盘锦数据展示</h1>
       <div class="showTime">{{ currentTime }}</div>
     </header>
     <section class="mainbox">

@@ -73,7 +73,7 @@ public class IndicatorDictionaryServiceImpl extends ServiceImpl<IndicatorDiction
             }
         }
 
-        queryWrapper.orderByDesc("`indicator_creat_time`");
+//        queryWrapper.orderByDesc("`indicator_creat_time`");
 
         IPage<IndicatorDictionaryEntity> page = this.page(
                 new Query<IndicatorDictionaryEntity>().getPage(params),

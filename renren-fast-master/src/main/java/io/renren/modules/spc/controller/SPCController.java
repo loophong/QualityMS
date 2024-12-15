@@ -7,12 +7,8 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import com.aliyun.oss.ServiceException;
-import io.renren.modules.spc.entity.SpcPchartEntity;
-import io.renren.modules.spc.entity.SpcPtdEntity;
-import io.renren.modules.spc.entity.SpcXrchartEntity;
-import io.renren.modules.spc.service.SpcPchartService;
-import io.renren.modules.spc.service.SpcPtdService;
-import io.renren.modules.spc.service.SpcXrchartService;
+import io.renren.modules.spc.entity.*;
+import io.renren.modules.spc.service.*;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -38,6 +34,9 @@ public class SPCController {
     public int  arrayLength = 0;
     public int arraySize = 0;
 
+    public int standards_arrayLength = 0;
+    public int standards_arraySize = 0;
+
     @Resource
     private SpcXrchartService spcXrchartService;
 
@@ -46,6 +45,12 @@ public class SPCController {
 
     @Resource
     private SpcPtdService spcPtdService;
+
+    @Resource
+    private SpcXrchartStandardsService spcXrchartStandardsService;
+
+    @Resource
+    private SpcPchartStandardsService spcPchartStandardsService;
 
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     public ResponseEntity<?> list(@RequestParam("file") MultipartFile excelFile){
@@ -60,7 +65,6 @@ public class SPCController {
             List<SpcXrchartEntity> XRchartDataList = parseExcel2XRchart(excelFile);
             spcXrchartService.importData(XRchartDataList);
 
-
             /**
              * 导入P-chart图表数据
              * 从表中获取一些固定值，当前日期（以上传日期为准）
@@ -70,10 +74,9 @@ public class SPCController {
             System.out.println(PchartDataList);
             spcPchartService.importData(PchartDataList);
 
-
             //旧版本代码
-            List<List<Double>> date = parseExcel(excelFile);
-            return ResponseEntity.ok(date);
+//            List<List<Double>> date = parseExcel(excelFile);
+            return ResponseEntity.ok("Success");
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity
@@ -95,6 +98,36 @@ public class SPCController {
             List<SpcPtdEntity> PtdDataList = parseExcel2Ptd(excelFile);
             System.out.println(PtdDataList);
             spcPtdService.importData(PtdDataList);
+
+            return ResponseEntity.ok("Success");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("excel上传失败");
+        }
+    }
+
+    @RequestMapping(value = "/standards", method = RequestMethod.POST)
+    public ResponseEntity<?> listStandards(@RequestParam("file") MultipartFile excelFile){
+
+        System.out.println("------------standards-------standards------------");
+        try {
+
+            /**
+             * 导入X-R图表数据
+             * 从表中获取一些固定值，包括9个基准值，当前日期（以上传日期为准）
+             * */
+            List<SpcXrchartStandardsEntity> XRchartStandardsDataList = parseExcel2XRchartStandards(excelFile);
+            spcXrchartStandardsService.importData(XRchartStandardsDataList);
+
+            /**
+             * 导入P-chart图表数据
+             * 从表中获取一些固定值，当前日期（以上传日期为准）
+             * */
+
+            List<SpcPchartStandardsEntity> PchartStandardsDataList = parseExcel2PchartStandards(excelFile);
+            spcPchartStandardsService.importData(PchartStandardsDataList);
 
             return ResponseEntity.ok("Success");
         } catch (IOException e) {
@@ -206,6 +239,51 @@ public class SPCController {
         return dataList;
     }
 
+    public List<SpcXrchartStandardsEntity> parseExcel2XRchartStandards(MultipartFile file) throws IOException {
+        List<SpcXrchartStandardsEntity> dataList = new ArrayList<>();
+
+        ZipSecureFile.setMinInflateRatio(0);
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+
+        /*
+        *
+        X-R图
+        * */
+        Sheet sheet = workbook.getSheetAt(0);
+
+        //子组大小
+        standards_arrayLength = getCellValueAsInt(sheet.getRow(3).getCell(12));
+
+        standards_arraySize = getCellValueAsInt(sheet.getRow(5).getCell(12));
+
+        double[][] date = new double[standards_arrayLength][standards_arraySize];
+        int n = 0;
+        for(int i = 8; i < 8 + standards_arrayLength; i++ ){
+            Row row = sheet.getRow(i);
+            int m = 0;
+            for(int j = 2; j < 2 + standards_arraySize; j++){
+                date[n][m] = getNumericCellValue(row.getCell(j));
+                m++;
+            }
+            n++;
+        }
+
+        for (int i = 0; i < date.length; i++){
+            SpcXrchartStandardsEntity spcXrchartStandardsEntity = new SpcXrchartStandardsEntity();
+
+            for (int j = 0; j < Math.min(standards_arraySize, 31); j++) {
+                spcXrchartStandardsEntity.setData(j + 1, (float) date[i][j]);
+            }
+            //存入日期
+            spcXrchartStandardsEntity.setDatatime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+            dataList.add(spcXrchartStandardsEntity);
+        }
+
+        workbook.close();
+        return dataList;
+    }
+
     public List<SpcPchartEntity> parseExcel2Pchart(MultipartFile file) throws IOException{
         List<SpcPchartEntity> dataList = new ArrayList<>();
 
@@ -273,6 +351,80 @@ public class SPCController {
 
         dataList.add(sampling_SpcPchartEntity);
         dataList.add(defects_SpcPchartEntity);
+
+        return dataList;
+    }
+
+    public List<SpcPchartStandardsEntity> parseExcel2PchartStandards(MultipartFile file) throws IOException{
+        List<SpcPchartStandardsEntity> dataList = new ArrayList<>();
+
+        ZipSecureFile.setMinInflateRatio(0);
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+
+        /*
+        *
+        P-chart图
+        * */
+
+        Sheet sheet = workbook.getSheetAt(1);
+
+        int[] sampling_Tests_Number = new int[standards_arraySize];
+        int[] defects_Number = new int[standards_arraySize];
+
+        Row row6 = sheet.getRow(5);   //抽检数一行
+        Row row7 = sheet.getRow(6);   //不良数一行
+
+        System.out.println(standards_arrayLength);
+        System.out.println(standards_arraySize);
+        for (int i = 1; i < 1 + standards_arraySize; i++){
+            sampling_Tests_Number[i-1] = getCellValueAsInt(row6.getCell(i));
+            defects_Number[i-1] = getCellValueAsInt(row7.getCell(i));
+            System.out.println("--" + sampling_Tests_Number[i-1]);
+            System.out.println("--" + defects_Number[i-1]);
+        }
+
+        int sum_sampling_Tests_Number = 0;
+        int sum_defects_Number = 0;
+
+
+
+        //对抽检数进行格式转换
+        SpcPchartStandardsEntity sampling_SpcPchartStandardsEntity = new SpcPchartStandardsEntity();
+
+        //对不良数进行格式转换
+        SpcPchartStandardsEntity defects_SpcPchartStandardsEntity = new SpcPchartStandardsEntity();
+
+        //存入31天的数据，如果不足31天，剩余没有数据则不填
+        for (int i = 0; i < Math.min(standards_arraySize, 31); i++) {
+            // 根据索引设置值
+            sampling_SpcPchartStandardsEntity.setDate(i + 1, sampling_Tests_Number[i]);
+            defects_SpcPchartStandardsEntity.setDate(i + 1, defects_Number[i]);
+
+            //计算总和
+            sum_sampling_Tests_Number += sampling_Tests_Number[i];
+            sum_defects_Number += defects_Number[i];
+        }
+
+
+        System.out.println("========="+sum_sampling_Tests_Number);
+        System.out.println("========="+sum_defects_Number);
+        //存入补充数据,合计、数据日期、数据内容（抽检数/不良数）
+
+        //合计
+        sampling_SpcPchartStandardsEntity.setSum(sum_sampling_Tests_Number);
+        defects_SpcPchartStandardsEntity.setSum(sum_defects_Number);
+
+
+        //数据日期
+        sampling_SpcPchartStandardsEntity.setDatatime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        defects_SpcPchartStandardsEntity.setDatatime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        //数据内容（抽检数/不良数）
+        sampling_SpcPchartStandardsEntity.setDataContent("抽检数");
+        defects_SpcPchartStandardsEntity.setDataContent("不良数");
+
+        dataList.add(sampling_SpcPchartStandardsEntity);
+        dataList.add(defects_SpcPchartStandardsEntity);
 
         return dataList;
     }
@@ -574,6 +726,4 @@ public class SPCController {
         BigDecimal ucl = p.subtract(BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(Math.sqrt(sqrt))));
         return ucl.setScale(4, RoundingMode.HALF_UP);
     }
-
-
 }

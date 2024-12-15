@@ -29,11 +29,20 @@
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
-          <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
-          </el-table-column> -->
+          <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
+          </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要" width="150">
           </el-table-column>
@@ -192,12 +201,12 @@
     </el-tab-pane>
     <el-tab-pane label="课题初审" name="4" v-if="isAuth('qc:first:examine')">
       <div class="mod-config">
-        <el-form :inline="true" :model="dataForm" @keyup.enter.native="getFIR()">
-          <el-form-item>
+        <el-form :inline="true" :model="dataForm">
+          <!-- <el-form-item>
             <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
-            <el-button @click="getFirstList()">查询</el-button>
+            <!-- <el-button @click="getFirstList()">查询</el-button> -->
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
@@ -209,17 +218,28 @@
           style="width: 100%;">
           <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column>
-          <el-table-column prop="qcsrId" header-align="center" align="center" label="id">
+          <el-table-column prop="qcsrId" header-align="center" align="center" label="id" width="60">
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
           </el-table-column>
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="单位">
+          </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
-          <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
-          </el-table-column> -->
+          <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
+          </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="startDate" header-align="center" align="center" label="开始日期">
           </el-table-column>
@@ -243,18 +263,24 @@
             </el-table-column> -->
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
-          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <el-table-column prop="firstComment" header-align="center" align="center" label="科室初审意见">
+          </el-table-column>
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
             <template slot-scope="scope">
-              <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
-              <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
-              <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
-              <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
-              <span v-else>-</span> <!-- 处理未知状态 -->
+              <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 2 && !scope.row.topicReviewDepartment">审核中(科室)</el-tag>
+              <el-tag
+                v-else-if="scope.row.topicReviewStatus === 2 && scope.row.topicReviewDepartment == 1">审核中(管理员)</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
+              <el-tag v-else>-</el-tag>
             </template>
           </el-table-column>
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">处理审核</el-button>
+              <el-button type="text" size="small"
+                :disabled="!checkIfAdmit(scope.row.topicDepartment, scope.row.topicReviewStatus, scope.row.topicReviewDepartment)"
+                @click="addOrUpdateHandle(scope.row.qcsrId)">处理审核</el-button>
               <!-- <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button> -->
             </template>
           </el-table-column>
@@ -324,8 +350,10 @@
 import AddOrUpdate from "../qcSubjectManagement/plan/qcPlan-add-or-update";
 import firstUpdate from "../qcSubjectManagement/examine/examine-add-or-update";
 export default {
+  name: "mine",
   data() {
     return {
+      membersOptions: [], //分组后的员工数据
       activeName: "1",
       dialogMessageVisible: false,
       messageListLoading: false,
@@ -365,7 +393,7 @@ export default {
       return this.firstList.filter(item => item.topicReviewStatus === 2);
     }
   },
-  activated() {
+  async activated() {
     this.getGroupList();
     this.getSubjectList();
     this.getFirstList();
@@ -376,8 +404,77 @@ export default {
     // console.log('+++++++++++++++++++++++++++++++')
     // console.log(this.isAuth('qcExamine:interested:technology'))
     // console.log('+++++++++++++++++++++++++++++++')
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.membersOptions = data.map(o => {
+        return {
+          ...o, // 复制原对象属性
+          options: o.options.map(e => {
+            const match = e.label.match(/\(([^)]+)\)/);
+            return {
+              ...e, // 复制原选项属性
+              name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+            };
+          })
+        };
+      });
+      // console.log(this.membersOptions)
+    });
   },
   methods: {
+    numberToNameArray(numbers) {
+      if (Array.isArray(numbers)) {
+        let result = numbers.map(number => this.numberToName(number));
+        return `${result}`
+      } else {
+        return numbers
+      }
+    },
+    numberToName(number) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.name == number) {
+            result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      return result
+    },
+
+    checkIfAdmit(department, examineStatus, examineDepartment) {
+      console.log(examineStatus + '/////' + examineDepartment);
+
+      if (examineStatus == '2' && examineDepartment != '1') {
+        if ((department == '生产科' && this.isAuth('department:product:leader'))) {
+          console.log('返回 true - 生产科领导');
+          return true;
+        } else if ((department == '质量科' && this.isAuth('department:quality:leader'))) {
+          console.log('返回 true - 质量科领导');
+          return true;
+        } else {
+          console.log('返回 false - 非部门领导');
+          return false;
+        }
+      } else if (examineStatus == '2' && examineDepartment == '1') {
+        console.log('管理员审核');
+        console.log('isAuth(qcManagement:group:admin): ', this.isAuth('qcManagement:group:admin'));
+
+        if (this.isAuth('qcManagement:group:admin')) {
+          console.log('返回 true - 是管理员');
+          return true;
+        } else {
+          console.log('返回 false - 非管理员');
+          return false;
+        }
+      } else {
+        console.log('返回 false - 其他情况');
+        return false;
+      }
+    },
     showNotification(keyword, offsetAdjustment = 65) {
       // 根据传递进来的参数计算新的偏移量
       const newOffset = this.notifyOffset + offsetAdjustment;
@@ -418,7 +515,11 @@ export default {
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.firstList = data.page.list
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.firstList = tmp
           this.totalPage = data.page.totalCount
         } else {
           this.firstList = []
@@ -802,7 +903,7 @@ export default {
                     name: item.name,
                     number: item.number,
                     groupName: item.groupName,
-                    roleInTopic: "管理员",
+                    roleInTopic: "组长",
                     children: [],
                   };
                 }

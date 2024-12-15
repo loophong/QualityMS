@@ -4,6 +4,7 @@ import io.renren.modules.taskmanagement.dao.UserDeptInfoDao;
 import io.renren.modules.taskmanagement.entity.DeptDTO;
 import io.renren.modules.taskmanagement.entity.DeptOption;
 import io.renren.modules.taskmanagement.entity.UserDeptInfoDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import java.util.Map;
  * @Version: 1.0
  */
 
+@Slf4j
 @Service
 public class EmployeeService  {
 
@@ -32,9 +34,14 @@ public class EmployeeService  {
         Map<String, List<DeptOption>> groupedData = new LinkedHashMap<>();
 
         for (UserDeptInfoDTO employee : employees) {
-            String departmentName = employee.getDeptName();
+            String departmentName = employee.getDept();
+//            String departmentName = employee.getDeptName();
             groupedData.putIfAbsent(departmentName, new ArrayList<>());
-            groupedData.get(departmentName).add(new DeptOption(employee.getUserId(), employee.getUserName()));
+            log.info("departmentName: " + departmentName);
+            log.info("employees: " + employees);
+            String label = employee.getNickname() + "(" + employee.getUserName() + ")";
+//            groupedData.get(departmentName).add(new DeptOption(employee.getUserId(), employee.getUserName()));
+            groupedData.get(departmentName).add(new DeptOption(employee.getUserId(), label));
         }
 
         List<DeptDTO> result = new ArrayList<>();
@@ -42,6 +49,28 @@ public class EmployeeService  {
             result.add(new DeptDTO(entry.getKey(), entry.getValue()));
         }
 
+        return result;
+    }
+
+    public List<DeptDTO> getName() {
+        List<UserDeptInfoDTO> employees = userDeptInfoDao.getEmployeesGroupedByDepartment();
+        Map<String, List<DeptOption>> groupedData = new LinkedHashMap<>();
+
+        for (UserDeptInfoDTO employee : employees) {
+            String departmentName = employee.getDept();
+//            String departmentName = employee.getDeptName();
+            groupedData.putIfAbsent(departmentName, new ArrayList<>());
+            log.info("departmentName: " + departmentName);
+            log.info("employees: " + employees);
+            String label = employee.getNickname();
+//            groupedData.get(departmentName).add(new DeptOption(employee.getUserId(), employee.getUserName()));
+            groupedData.get(departmentName).add(new DeptOption(employee.getUserId(), label));
+        }
+
+        List<DeptDTO> result = new ArrayList<>();
+        for (Map.Entry<String, List<DeptOption>> entry : groupedData.entrySet()) {
+            result.add(new DeptDTO(entry.getKey(), entry.getValue()));
+        }
         return result;
     }
 }

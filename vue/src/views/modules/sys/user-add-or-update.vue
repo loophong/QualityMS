@@ -1,20 +1,14 @@
 <template>
-  <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
-    :close-on-click-modal="false"
-    :visible.sync="visible"
-  >
-    <el-form
-      :model="dataForm"
-      :rules="dataRule"
-      ref="dataForm"
-      @keyup.enter.native="dataFormSubmit()"
-      label-width="80px"
-    >
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
+      label-width="80px">
       <el-form-item label="用户名" prop="userName">
         <el-input v-model="dataForm.userName" placeholder="登录帐号"></el-input>
       </el-form-item>
-
+      <!-- 12-10新增 -->
+      <el-form-item label="昵称" prop="nickName">
+        <el-input v-model="dataForm.nickName" placeholder="名称"></el-input>
+      </el-form-item>
       <!-- 进行判断：1、如果为新增：需要改为孙春阳的字典 下拉框 2、如果为修改，则显示dataForm.dept的数据-->
       <!-- 始终使用下拉框，无论是新增还是修改 -->
       <!-- <el-form-item label="所属部门" prop="dept">
@@ -30,37 +24,18 @@
       </el-form-item> -->
 
       <el-form-item label="所属部门" prop="dept">
-          <el-select v-model="dataForm.dept" filterable placeholder="选择部门">
-            <el-option
-              v-for="department in departmentOptions"
-              :key="department.value"
-              :label="department.label"
-              :value="department.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-      <el-form-item
-        label="密码"
-        prop="password"
-        :class="{ 'is-required': !dataForm.id }"
-      >
-        <el-input
-          v-model="dataForm.password"
-          type="password"
-          placeholder="密码"
-        ></el-input>
+        <el-select v-model="dataForm.dept" filterable placeholder="选择部门">
+          <el-option v-for="department in departmentOptions" :key="department.value" :label="department.label"
+            :value="department.value">
+          </el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item
-        label="确认密码"
-        prop="comfirmPassword"
-        :class="{ 'is-required': !dataForm.id }"
-      >
-        <el-input
-          v-model="dataForm.comfirmPassword"
-          type="password"
-          placeholder="确认密码"
-        ></el-input>
+
+      <el-form-item label="密码" prop="password" :class="{ 'is-required': !dataForm.id }">
+        <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
+      </el-form-item>
+      <el-form-item label="确认密码" prop="comfirmPassword" :class="{ 'is-required': !dataForm.id }">
+        <el-input v-model="dataForm.comfirmPassword" type="password" placeholder="确认密码"></el-input>
       </el-form-item>
       <el-form-item label="邮箱" prop="email">
         <el-input v-model="dataForm.email" placeholder="邮箱"></el-input>
@@ -70,12 +45,8 @@
       </el-form-item>
       <el-form-item label="角色" size="mini" prop="roleIdList">
         <el-checkbox-group v-model="dataForm.roleIdList">
-          <el-checkbox
-            v-for="role in roleList"
-            :key="role.roleId"
-            :label="role.roleId"
-            >{{ role.roleName }}</el-checkbox
-          >
+          <el-checkbox v-for="role in roleList" :key="role.roleId" :label="role.roleId">{{ role.roleName
+            }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="状态" size="mini" prop="status">
@@ -139,6 +110,7 @@ export default {
       dataForm: {
         id: 0,
         userName: "",
+        nickName: "",
         password: "",
         comfirmPassword: "",
         salt: "",
@@ -152,14 +124,17 @@ export default {
         userName: [
           { required: true, message: "用户名不能为空", trigger: "blur" },
         ],
+        nickName: [
+          { required: true, message: "用户名不能为空", trigger: "blur" },
+        ],
         password: [{ validator: validatePassword, trigger: "blur" }],
         comfirmPassword: [
           { validator: validateComfirmPassword, trigger: "blur" },
         ],
-        email: [
-          { required: true, message: "邮箱不能为空", trigger: "blur" },
-          { validator: validateEmail, trigger: "blur" },
-        ],
+        // email: [
+        //   { required: true, message: "邮箱不能为空", trigger: "blur" },
+        //   { validator: validateEmail, trigger: "blur" },
+        // ],
         mobile: [
           { required: true, message: "手机号不能为空", trigger: "blur" },
           { validator: validateMobile, trigger: "blur" },
@@ -179,12 +154,12 @@ export default {
   },
   methods: {
     //获取部门信息的接口
-    fetchDepartments () {
+    fetchDepartments() {
       this.$http({
         url: this.$http.adornUrl('/generator/departmenttable/fetchDepartments'),
         method: 'get',
         params: this.$http.adornParams()
-      }).then(({data}) => {
+      }).then(({ data }) => {
         if (data && data.code === 0) {
           console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
           this.departmentOptions = data.departmentTableEntities.map(departmentTableEntities => ({
@@ -227,6 +202,7 @@ export default {
             }).then(({ data }) => {
               if (data && data.code === 0) {
                 this.dataForm.userName = data.user.username;
+                this.dataForm.nickName = data.user.nickname;
                 this.dataForm.salt = data.user.salt;
                 this.dataForm.email = data.user.email;
                 this.dataForm.mobile = data.user.mobile;
@@ -250,6 +226,8 @@ export default {
             data: this.$http.adornData({
               userId: this.dataForm.id || undefined,
               username: this.dataForm.userName,
+              //新增用户昵称
+              nickname: this.dataForm.nickName,
               password: this.dataForm.password,
               salt: this.dataForm.salt,
               email: this.dataForm.email,

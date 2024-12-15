@@ -245,6 +245,9 @@
         header-align="center"
         align="center"
         label="整改责任人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.rectificationResponsiblePerson) }}
+        </template>
       </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="requiredSecondRectificationTime"-->

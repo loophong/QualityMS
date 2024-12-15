@@ -50,5 +50,21 @@
         <result property="formula" column="formula"/>
     </resultMap>
 
-    <select id="selectFinishedSubjectList" resultType="io.renren.modules.generator.entity.IssueTableEntity"> SELECT * FROM issue_table WHERE verification_conclusion='已完成' </select>
+    <select id="selectFinishedSubjectList" resultType="io.renren.modules.generator.entity.IssueTableEntity">
+    SELECT *
+    FROM issue_table
+    <where>
+        <if test="issueDescription != null and issueDescription != ''">
+            AND issue_description LIKE CONCAT('%', #{issueDescription}, '%')
+        </if>
+        <if test="creationTime != null and creationTime != ''">
+            AND DATE(creation_time) = DATE(STR_TO_DATE(#{creationTime}, '%Y-%m-%d %H:%i:%s'))
+        </if>
+        AND verification_conclusion='结项'
+    </where>
+</select>
+    <select id="selectFinishedSubjectListByDescription"
+            resultType="io.renren.modules.generator.entity.IssueTableEntity"></select>
+    <!--    <select id="selectFinishedSubjectListByDescription"-->
+<!--            resultType="io.renren.modules.generator.entity.IssueTableEntity"></select>-->
 </mapper>

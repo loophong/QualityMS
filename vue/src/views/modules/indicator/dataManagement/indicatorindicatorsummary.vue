@@ -184,6 +184,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.indicatorId)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.indicatorId)">删除</el-button>
+          <el-button type="text" size="small" @click="addPlanHandle(scope.row.indicatorName)">新建计划</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -510,6 +511,26 @@
               this.$message.error(data.msg)
             }
           })
+        })
+      },
+      // 新建计划
+      addPlanHandle (name) {
+        //按指标名称查询
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatordictionary/querylist'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'key': {indicatorName: name}
+          })
+        }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$router.push({
+                name: 'plan-add-page',
+                query: {
+                  indicatorId: data.page.list[0].indicatorId
+                }
+              });
+            }
         })
       },
 

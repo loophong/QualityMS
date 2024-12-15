@@ -201,6 +201,12 @@ const mainRoutes = {
     },
     {
       path: '/issue-issuemask',
+      component: _import('modules/issuemask/creatormask'),
+      name: 'issue-issuenewmask',
+      meta: { title: '任务详情', isDynamic: true, isTab: false }
+    },
+    {
+      path: '/issue-issuemask',
       component: _import('modules/issuemask/issueAllmask'),
       name: 'issue-issueAllmask',
       meta: { title: '任务详情', isDynamic: true, isTab: false }

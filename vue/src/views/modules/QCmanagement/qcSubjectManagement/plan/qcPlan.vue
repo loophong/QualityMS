@@ -35,10 +35,19 @@
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
           </el-table-column>
@@ -88,8 +97,7 @@
           :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
-        <!-- 弹窗, 新增 / 修改 -->
-        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+
       </div>
     </el-tab-pane>
     <el-tab-pane label="我创办的课题" name="2">
@@ -103,8 +111,8 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
-              @click="addOrUpdateHandle()">新增</el-button>
+            <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+              @click="addOrUpdateHandle()">新增</el-button> -->
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
               :disabled="dataListSelections.length != 1">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
@@ -124,10 +132,19 @@
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
           </el-table-column>
@@ -193,8 +210,8 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="getJoinList()">查询</el-button>
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
-              @click="addOrUpdateHandle()">新增</el-button>
+            <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
+              @click="addOrUpdateHandle()">新增</el-button> -->
             <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
               :disabled="dataListSelections.length != 1">课题重用</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
@@ -212,10 +229,19 @@
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicLeader) }}
+            </template>
           </el-table-column>
           <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.topicConsultant) }}
+            </template>
           </el-table-column>
           <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+            <template slot-scope="scope">
+              {{ numberToNameArray(scope.row.teamNumberIds) }}
+            </template>
           </el-table-column>
           <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
           </el-table-column>
@@ -269,9 +295,10 @@
 
       </div>
     </el-tab-pane>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"
+      @refreshLeadList="getLeadList()" @refreshJoinList="getJoinList()"></add-or-update>
   </el-tabs>
-
-
 </template>
 
 <style scoped>
@@ -287,8 +314,10 @@
 <script>
 import AddOrUpdate from './qcPlan-add-or-update'
 export default {
+  name: 'qcPlanIndex',
   data() {
     return {
+      membersOptions: [],
       activeName: '2',
       dataForm: {
         key: ''
@@ -328,10 +357,29 @@ export default {
   components: {
     AddOrUpdate
   },
-  activated() {
+  async activated() {
     this.getDataList()
     this.getJoinList();
     this.getLeadList();
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.membersOptions = data.map(o => {
+        return {
+          ...o, // 复制原对象属性
+          options: o.options.map(e => {
+            const match = e.label.match(/\(([^)]+)\)/);
+            return {
+              ...e, // 复制原选项属性
+              name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+            };
+          })
+        };
+      });
+      // console.log(this.membersOptions)
+    });
   },
   computed: {
     // filteredDataList() {
@@ -345,6 +393,27 @@ export default {
     // }
   },
   methods: {
+    numberToNameArray(numbers) {
+      if (Array.isArray(numbers)) {
+        let result = numbers.map(number => this.numberToName(number));
+        return `${result}`
+        // return numbers
+      } else {
+        return numbers
+      }
+    },
+    numberToName(number) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.name == number) {
+            result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      return result
+    },
+
     tableRowClassName({ row, rowIndex }) {
       if (rowIndex === 1) {
         return 'warning-row';
@@ -422,7 +491,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.subjectJoinList = data.page.list;
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.subjectJoinList = tmp;
           // this.dataList = resultList
           this.totalPageJoin = data.page.totalCount;
         } else {
@@ -447,7 +520,11 @@ export default {
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.subjectLeadList = data.page.list;
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.subjectLeadList = tmp;
           // this.dataList = resultList
           this.totalPageLead = data.page.totalCount;
         } else {
@@ -558,7 +635,11 @@ export default {
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.dataList = data.page.list
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.dataList = tmp
           this.totalPage = data.page.totalCount
         } else {
           this.dataList = []
@@ -602,6 +683,9 @@ export default {
     },
     // 新增 / 修改
     addOrUpdateHandle(id, status, type) {
+      console.log(id)
+      console.log(status)
+      console.log(type)
       if (type == '创新型') {
         if (status != '8') {
           this.$message({
@@ -616,6 +700,7 @@ export default {
           })
         }
       } else {
+
         if (status != '10') {
           this.$message({
             message: '请先完成课题计划',
@@ -623,6 +708,7 @@ export default {
             duration: 1500
           })
         } else {
+          console.log('创')
           this.addOrUpdateVisible = true
           this.$nextTick(() => {
             this.$refs.addOrUpdate.init(id)
@@ -630,11 +716,6 @@ export default {
         }
       }
       console.log(this.dataListSelections)
-      // console.log(id)
-      // this.addOrUpdateVisible = true
-      // this.$nextTick(() => {
-      //   this.$refs.addOrUpdate.init(id)
-      // })
     },
     // 删除
     deleteHandle(id) {

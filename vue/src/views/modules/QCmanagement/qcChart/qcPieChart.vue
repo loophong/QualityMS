@@ -75,6 +75,10 @@ export default {
       await this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/all'),
         method: 'get',
+        params: this.$http.adornParams({
+          'page': this.pageIndex,
+          'limit': 10000000,
+        })
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.stageNumData = data.page.list.filter(item => item.topicReviewStatus === 3);
@@ -225,7 +229,7 @@ export default {
 
       option && myChart.setOption(option);
     },
-    //课题获奖情况饼图
+    //课题获奖情况图
     pieChart2() {
       var app = {};
 

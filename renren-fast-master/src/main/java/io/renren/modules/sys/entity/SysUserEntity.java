@@ -96,6 +96,12 @@ public class SysUserEntity implements Serializable {
      */
     private String dept;
 
+	/**
+	 * 2024/12/10 新增
+	 * 昵称
+	 */
+	private String nickname;
+
 
 
 }

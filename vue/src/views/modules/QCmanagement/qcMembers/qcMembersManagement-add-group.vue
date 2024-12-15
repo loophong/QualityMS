@@ -28,15 +28,15 @@
 
 
           </el-form-item>
-          <el-form-item label="角色">
+          <!-- <el-form-item label="角色">
             <el-select v-model="dataForm.memberRole" placeholder="请选择">
               <el-option v-for="role in roleIdList" :key="role.roleId" :label="role.roleName"
                 :value="role.roleId"></el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item prop="number" label="员工编号">
+          </el-form-item> -->
+          <!-- <el-form-item prop="number" label="员工编号">
             <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item v-if="isAdmin" prop="department" label="单位">
             <el-input v-model="dataForm.department" placeholder="请输入单位"></el-input>
           </el-form-item>
@@ -100,7 +100,7 @@
       <el-form-item>
         <br>
 
-        <el-button v-if="!dataForm.qcgmId || isAddMember" type="primary" @click="addMember">新增成员</el-button>
+        <!-- <el-button v-if="!dataForm.qcgmId || isAddMember" type="primary" @click="addMember">新增成员</el-button> -->
       </el-form-item>
     </el-form>
 

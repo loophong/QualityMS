@@ -36,7 +36,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
@@ -56,7 +56,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="选择课题描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="选择课题描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -126,7 +126,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
@@ -146,7 +146,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="现状调查描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="现状调查描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -213,7 +213,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
 
             <el-form-item label="阶段计划活动时间">
@@ -301,7 +301,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
@@ -321,7 +321,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="原因分析描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="原因分析描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -393,7 +393,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
@@ -413,7 +413,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="要因确定描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="要因确定描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -479,7 +479,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
@@ -499,7 +499,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="制定对策描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="制定对策描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -565,7 +565,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
@@ -585,7 +585,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="对策实施描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="对策实施描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -651,7 +651,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
@@ -743,7 +743,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
@@ -763,7 +763,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="巩固措施描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="巩固措施描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -829,7 +829,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.planDate" type="daterange" range-separator="-"
@@ -958,7 +958,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="选择课题描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="选择课题描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -1024,7 +1024,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1044,7 +1044,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="设定目标描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="设定目标描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -1110,7 +1110,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1130,7 +1130,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="可靠性分析描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="可靠性分析描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -1196,7 +1196,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1216,7 +1216,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="原因分析描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="原因分析描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -1282,7 +1282,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1302,7 +1302,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="要因确定描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="要因确定描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -1368,7 +1368,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1388,7 +1388,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="制定对策描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="制定对策描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -1454,7 +1454,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1474,7 +1474,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="对策实施描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="对策实施描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -1540,7 +1540,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1632,7 +1632,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -1652,7 +1652,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="巩固措施描述" prop="stageDescribe">
-              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="巩固措施描述"></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -1718,7 +1718,7 @@
           <el-form>
             <br />
             <el-form-item label="阶段名称" prop="stageName">
-              <el-input v-model="form.stageName" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageName" placeholder="阶段名称"></el-input>
             </el-form-item>
             <el-form-item label="阶段计划活动时间">
               <el-date-picker clearable v-model="form.participationDate" type="date" value-format="yyyy-MM-dd"
@@ -3256,7 +3256,6 @@ export default {
     // 上传文件
     handleFileChange(file) {
       // 存储待上传的文件
-
       this.uploadingFile = file.raw; // 获取 File 对象
       this.uploadNameList.push(file.raw.name);
       this.uploadFile(file.raw); // 调用上传方法
@@ -3277,8 +3276,8 @@ export default {
           if (data && data.code === 0) {
             // 保存后端返回的url到变量中
             this.dataForm.rectificationPhotoDeliverable = data.uploadurl;
-            // console.log('获得的文件地址 ：', data.uploadurl)
-            // console.log('获得的文件 ：', data)
+            console.log('获得的文件地址 ：', data.uploadurl)
+            console.log('获得的文件 ：', data)
             this.uploadUrlList.push(data.uploadurl);
             let fileTmp = {
               name: file2.name,

@@ -104,6 +104,14 @@ const mainRoutes = {
       props: true
     },
 
+    {
+      path: '/plan-approval-page/:plabId',
+      component: _import('modules/taskmanagement/plan-approval/plan-approval-page'),
+      name: 'plan-approval-page',
+      meta: { title: '计划审批页', isDynamic: false, isTab: false },
+      props: true
+    },
+
     //QC
     {
       path: '/qcPlanNew',

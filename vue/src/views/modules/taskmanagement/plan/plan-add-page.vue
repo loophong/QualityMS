@@ -585,7 +585,7 @@ export default {
 
             // 提交数据
             this.$http({
-              url: this.$http.adornUrl(`/taskmanagement/plan/save`),
+              url: this.$http.adornUrl(`/taskmanagement/plan/saveAndApproval`),
               method: 'post',
               data: this.$http.adornData({
                 'plan': plan,

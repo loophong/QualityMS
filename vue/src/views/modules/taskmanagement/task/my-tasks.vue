@@ -84,6 +84,10 @@
                 <el-tag type="danger" disable-transitions>已逾期</el-tag></span>
               <span v-else-if="scope.row.taskCurrentState === 'COMPLETED'">
                 <el-tag type="success" disable-transitions>已完成</el-tag></span>
+              <span v-else-if="scope.row.taskCurrentState === 'CREATED_BUT_NOT_APPROVED'">
+            <el-tag type="success" disable-transitions>初审中</el-tag></span>
+              <span v-else-if="scope.row.taskCurrentState === 'PREAPPROVAL_NOT_PASSED'">
+            <el-tag type="danger" disable-transitions>未通过初审</el-tag></span>
               <span v-else>-</span>
             </template>
           </el-table-column>
@@ -301,6 +305,10 @@
                 <el-tag type="danger" disable-transitions>已逾期</el-tag></span>
               <span v-else-if="scope.row.taskCurrentState === 'COMPLETED'">
                 <el-tag type="success" disable-transitions>已完成</el-tag></span>
+              <span v-else-if="scope.row.taskCurrentState === 'CREATED_BUT_NOT_APPROVED'">
+            <el-tag type="success" disable-transitions>初审中</el-tag></span>
+              <span v-else-if="scope.row.taskCurrentState === 'PREAPPROVAL_NOT_PASSED'">
+            <el-tag type="danger" disable-transitions>未通过初审</el-tag></span>
               <span v-else>-</span> <!-- 处理未知状态 -->
             </template>
           </el-table-column>

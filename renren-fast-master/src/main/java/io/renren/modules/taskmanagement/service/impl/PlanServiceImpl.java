@@ -4,6 +4,7 @@ import cn.hutool.core.util.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.renren.common.utils.DateUtils;
+import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.app.service.UserService;
 import io.renren.modules.indicator.service.IndicatorDictionaryService;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
@@ -12,6 +13,7 @@ import io.renren.modules.taskmanagement.dto.PlanDTO;
 import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.FileService;
+import io.renren.modules.taskmanagement.service.PlanApprovalTableService;
 import io.renren.modules.taskmanagement.service.TaskService;
 import io.renren.modules.taskmanagement.vo.PlanExportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,8 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
     private FileService fileService;
     @Autowired
     private IndicatorDictionaryService indicatorDictionaryService;
+    @Autowired
+    private PlanApprovalTableService planApprovalTableService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -161,6 +165,39 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         return planExportVO;
     }
 
+    @Override
+    public void saveAllPlanInfoAndApproval(PlanDTO planDTO) {
+        // 保存计划信息
+        PlanEntity plan = new PlanEntity();
+        BeanUtils.copyProperties(planDTO.getPlan(), plan);
+        plan.setPlanCurrentState(TaskStatus.CREATED_BUT_NOT_APPROVED);
+        log.info("plan: " + plan);
+        planDao.insert(plan);
+
+        // 新建审批
+        PlanApprovalTableEntity planApprovalTableEntity = new PlanApprovalTableEntity();
+        BeanUtils.copyProperties(plan, planApprovalTableEntity);
+        planApprovalTableEntity.setApprovalStatus(ApprovalStatus.PENDING);
+        planApprovalTableEntity.setPlanPrincipal(plan.getPlanPrincipal());
+        planApprovalTableEntity.setPlanExecutor(plan.getPlanExecutor().toString());
+        planApprovalTableEntity.setPlanAssociatedIndicatorsId(Integer.valueOf(plan.getPlanAssociatedIndicatorsId()));
+        planApprovalTableEntity.setPlanSubmissionTime(new Date());
+        planApprovalTableEntity.setApprover(plan.getPlanAuditor());
+        planApprovalTableEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
+        log.info("planApprovalTableEntity: " + planApprovalTableEntity);
+        planApprovalTableService.save(planApprovalTableEntity);
+
+        // 保存任务信息
+        List<TaskEntity> tasks = planDTO.getTasks();
+        log.info("tasks: " + tasks);
+        taskService.saveBatch(tasks);
+
+        // 保存附件信息
+        List<FileEntity> files = planDTO.getFiles();
+        log.info("files: " + files);
+        fileService.saveBatch(files);
+    }
+
     private void convert(PlanExportVO plan) {
 
         if (plan.getPrincipal() != null) {
@@ -207,7 +244,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
             log.info("indicatorName: " + indicatorName);
         }
 
-        if(plan.getCurrentState() != null){
+        if (plan.getCurrentState() != null) {
             switch (plan.getCurrentState()) {
                 case "COMPLETED":
                     plan.setCurrentState("已完成");

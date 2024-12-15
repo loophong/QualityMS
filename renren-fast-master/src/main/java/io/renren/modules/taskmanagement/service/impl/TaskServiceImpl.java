@@ -106,7 +106,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
         BeanUtils.copyProperties(taskQueryParamDTO.getTask(), task);
         task.setTaskIsCompleted(0L);
         Page<TaskEntity> page = new Page<>(taskQueryParamDTO.getPage(), taskQueryParamDTO.getLimit());
-        Page<TaskEntity> result = taskDao.queryPageByParams(page,task,userId);
+        Page<TaskEntity> result = taskDao.queryPageGetUnfinishedTasks(page,task,userId);
         return new PageUtils(result);
 
 //        PlanEntity plan = new PlanEntity();

@@ -576,8 +576,8 @@
             // }
             // 检查是否通过
             if (this.dataForm.isaccessory === '通过') {
-              this.dataForm.verificationConclusion = '已完成'
-              this.dataForm.level = '已完成'
+              this.dataForm.verificationConclusion = '结项'
+              this.dataForm.level = '结项'
               this.dataForm.state = '已完成'
 
             } else {

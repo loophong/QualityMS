@@ -75,5 +75,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
 
     List<IssueTableEntity> listAll01(Map<String, Object> params);
+
+    Map<String, Integer> gettruecurrentall();
 }
 

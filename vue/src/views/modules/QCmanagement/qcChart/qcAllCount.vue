@@ -9,7 +9,8 @@
       style="width: 40%;">
       <el-table-column prop="qcMemberCount" header-align="center" align="center" label="当前公司职工总数">
       </el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+      <el-table-column fixed="right" v-if="isAuth('qcManagement:qcAllCount:update')" header-align="center"
+        align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcAllId)">修改</el-button>
           <!-- <el-button type="text" size="small" @click="deleteHandle(scope.row.qcAllId)">删除</el-button> -->

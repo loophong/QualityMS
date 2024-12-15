@@ -2,7 +2,9 @@ package io.renren.modules.taskmanagement.entity;
 
 public enum TaskStatus {
     //已创建未审批
-
+    CREATED_BUT_NOT_APPROVED,
+    //初审未通过
+    PREAPPROVAL_NOT_PASSED,
     //未开始
     NOT_STARTED,
     //进行中

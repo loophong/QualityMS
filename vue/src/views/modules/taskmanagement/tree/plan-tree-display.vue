@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!--    div 放到底层-->
+    <!-- div 状态提示条  -->
     <div style=" height: auto; width: auto; ">
       <el-row>
         <el-col style="color: #95a5a6; font-size: 20px; margin-bottom: 5px; width: 200px">● 未开始</el-col>
@@ -8,11 +8,9 @@
         <el-col style="color: #e67e22; font-size: 20px; margin-bottom: 5px; width: 200px">● 审批中</el-col>
         <el-col style="color: #2ecc71; font-size: 20px; margin-bottom: 5px; width: 200px">● 已完成</el-col>
       </el-row>
-
-
     </div>
 
-
+    <!--  任务详情窗口  -->
     <el-dialog title="任务详情" :visible.sync="isTaskVisible" width="50%">
       <el-form label-position="left" label-width="100px">
         <el-row :gutter="18">
@@ -87,6 +85,7 @@
       </el-form>
     </el-dialog>
 
+    <!--  计划详情窗口  -->
     <el-dialog title="计划详情" :visible.sync="isPlanVisible" width="50%">
       <el-form label-position="left" label-width="100px">
         <el-row :gutter="18">
@@ -124,7 +123,8 @@
               <el-input v-model="planInfo.planName" disabled placeholder="计划名"></el-input>
             </el-form-item>
             <el-form-item label="计划完成日期" prop="planScheduleCompletionDate">
-              <el-date-picker v-model="planInfo.planScheduleCompletionDate" disabled type="date" placeholder="选择计划完成日期"
+              <el-date-picker v-model="planInfo.planScheduleCompletionDate" disabled type="date"
+                              placeholder="选择计划完成日期"
                               style="width: 100%;"></el-date-picker>
             </el-form-item>
             <el-form-item label="关联指标" prop="planAssociatedIndicatorsId">
@@ -172,7 +172,6 @@
     </el-dialog>
 
     <div ref="treeChart" style="width: 100%; height: 500px;"></div>
-
 
   </div>
 

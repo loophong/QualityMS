@@ -84,6 +84,10 @@
                 <el-tag type="danger" disable-transitions>已逾期</el-tag></span>
               <span v-else-if="scope.row.taskCurrentState === 'COMPLETED'">
                 <el-tag type="success" disable-transitions>已完成</el-tag></span>
+              <span v-else-if="scope.row.taskCurrentState === 'CREATED_BUT_NOT_APPROVED'">
+            <el-tag type="success" disable-transitions>初审中</el-tag></span>
+              <span v-else-if="scope.row.taskCurrentState === 'PREAPPROVAL_NOT_PASSED'">
+            <el-tag type="danger" disable-transitions>未通过初审</el-tag></span>
               <span v-else>-</span>
             </template>
           </el-table-column>
@@ -301,6 +305,10 @@
                 <el-tag type="danger" disable-transitions>已逾期</el-tag></span>
               <span v-else-if="scope.row.taskCurrentState === 'COMPLETED'">
                 <el-tag type="success" disable-transitions>已完成</el-tag></span>
+              <span v-else-if="scope.row.taskCurrentState === 'CREATED_BUT_NOT_APPROVED'">
+            <el-tag type="success" disable-transitions>初审中</el-tag></span>
+              <span v-else-if="scope.row.taskCurrentState === 'PREAPPROVAL_NOT_PASSED'">
+            <el-tag type="danger" disable-transitions>未通过初审</el-tag></span>
               <span v-else>-</span> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
@@ -611,16 +619,14 @@ export default {
     // const response = await fetch('/taskmanagement/user/getEmployeesGroupedByDepartment'); // 假设这是你的 API 路由
     // const data = await response.json();
 
-    this.$http({
-      url: this.$http.adornUrl(`/taskmanagement/user/getName`),
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
     }).then(({data}) => {
-      console.log(data);
-      console.log(1111);
-
       this.options = data;
-      console.log(this.options);
-    });
+      console.log(data);
+    })
 
 
     this.$http({

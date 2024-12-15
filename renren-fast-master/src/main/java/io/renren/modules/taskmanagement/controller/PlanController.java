@@ -253,6 +253,21 @@ public class PlanController {
         return R.ok();
     }
 
+    /** 
+     * @description: 保存计划，直系任务，文件，并且根据计划的审批人进行送审
+     * @param: planDTO 
+     * @return: io.renren.common.utils.R 
+     * @author: hong
+     * @date: 2024/12/15 13:18
+     */ 
+    @PostMapping("/saveAndApproval")
+    @RequiresPermissions("taskmanagement:plan:save")
+    public R saveAndApproval(@RequestBody PlanDTO planDTO) {
+        log.info("新增计划：" + planDTO);
+        planService.saveAllPlanInfoAndApproval(planDTO);
+        return R.ok();
+    }
+
     /**
      * @description: 更新计划和任务
      * @author: hong

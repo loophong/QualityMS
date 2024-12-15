@@ -113,8 +113,8 @@
             <el-button @click="getLeadList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
-              :disabled="dataListSelections.length != 1">课题重用</el-button>
+            <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
+              :disabled="dataListSelections.length != 1">课题重用</el-button> -->
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
             <!-- <el-badge :value="superScriptNumber" class="item">
               <el-button type="warning" @click="dialogMessageVisible = true">消息详情</el-button>
@@ -212,8 +212,8 @@
             <el-button @click="getJoinList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
-            <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
-              :disabled="dataListSelections.length != 1">课题重用</el-button>
+            <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
+              :disabled="dataListSelections.length != 1">课题重用</el-button> -->
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
 
           </el-form-item>

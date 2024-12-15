@@ -611,16 +611,14 @@ export default {
     // const response = await fetch('/taskmanagement/user/getEmployeesGroupedByDepartment'); // 假设这是你的 API 路由
     // const data = await response.json();
 
-    this.$http({
-      url: this.$http.adornUrl(`/taskmanagement/user/getName`),
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
     }).then(({data}) => {
-      console.log(data);
-      console.log(1111);
-
       this.options = data;
-      console.log(this.options);
-    });
+      console.log(data);
+    })
 
 
     this.$http({

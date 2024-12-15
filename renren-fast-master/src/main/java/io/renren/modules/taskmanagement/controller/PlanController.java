@@ -312,7 +312,7 @@ public class PlanController {
         fileService.remove(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
 
         // 删除所有的审批信息
-        approvalService.remove(new LambdaQueryWrapper<ApprovalEntity>().eq(ApprovalEntity::getTaskAssociatedIndicatorsId, planId));
+        approvalService.remove(new LambdaQueryWrapper<ApprovalEntity>().eq(ApprovalEntity::getTaskAssociatedPlanId, planId));
 
         return R.ok();
     }

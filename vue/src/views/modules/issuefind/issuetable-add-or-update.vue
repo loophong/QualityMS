@@ -16,18 +16,6 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <!--    <el-form-item label="检查日期" prop="inspectionDate">-->
-        <!--      <el-input v-model="dataForm.inspectionDate" placeholder="检查日期"></el-input>-->
-        <!--    </el-form-item>-->
-        <!--      :before-upload="handleFileChange"-->
-        <!--      <el-form-item label="检查日期" prop="inspectionDate">-->
-        <!--        <el-date-picker-->
-        <!--          v-model="dataForm.inspectionDate"-->
-        <!--          type="date"-->
-        <!--          placeholder="选择日期">-->
-        <!--          value-format="yyyy-MM-dd HH:mm:ss">-->
-        <!--        </el-date-picker>-->
-        <!--      </el-form-item>-->
         <el-form-item label="检查日期" prop="inspectionDate">
           <el-date-picker
             v-model="dataForm.inspectionDate"
@@ -191,6 +179,23 @@
         <el-form-item label="整改要求" prop="rectificationRequirement">
           <el-input v-model="dataForm.rectificationRequirement" placeholder="整改要求"></el-input>
         </el-form-item>
+        <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
+          <el-select v-model="dataForm.rectificationResponsiblePerson" filterable placeholder="请选择整改责任人">
+            <el-option-group v-for="group in options" :key="group.value" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.value">
+              </el-option>
+            </el-option-group>
+          </el-select>
+        </el-form-item>
+<!--        <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
+<!--          <el-select v-model="selectedResponsiblePersons" filterable multiple placeholder="请选择整改责任人">-->
+<!--            <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
+<!--              <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">-->
+<!--              </el-option>-->
+<!--            </el-option-group>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
         <!--    <el-form-item label="要求完成时间" prop="requiredCompletionTime">-->
         <!--      <el-input v-model="dataForm.requiredCompletionTime" placeholder="要求完成时间"></el-input>-->
         <!--    </el-form-item>-->
@@ -252,22 +257,14 @@
         <el-form-item label="整改情况" prop="rectificationStatus">
           <el-input v-model="dataForm.rectificationStatus" placeholder="整改情况"></el-input>
         </el-form-item>
-        <el-form-item label="实际完成时间" prop="actualCompletionTime">
-          <el-date-picker
-            v-model="dataForm.actualCompletionTime"
-            type="datetime"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            placeholder="请选择实际完成时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">
-          <el-select v-model="selectedResponsiblePersons" filterable multiple placeholder="请选择整改责任人">
-            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
-              <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
-              </el-option>
-            </el-option-group>
-          </el-select>
-        </el-form-item>
+<!--        <el-form-item label="整改责任人" prop="rectificationResponsiblePerson">-->
+<!--          <el-select v-model="selectedResponsiblePersons" filterable multiple placeholder="请选择整改责任人">-->
+<!--            <el-option-group v-for="group in options" :key="group.label" :label="group.label">-->
+<!--              <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">-->
+<!--              </el-option>-->
+<!--            </el-option-group>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
         <!-- QC工具行 -->
         <el-form-item label="QC工具添加" class="qc-tools">
           <div>
@@ -341,28 +338,54 @@
       :title="'验证指定'"
       :close-on-click-modal="false"
       :visible.sync="visibleVE">
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmitR()" label-width="150px">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmitVE()" label-width="150px">
         <el-form-item label="验证人" prop="verifier">
           <el-select v-model="dataForm.verifier" filterable placeholder="请选择验证人">
-            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+            <el-option-group v-for="group in options" :key="group.value" :label="group.label">
               <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                         :value="item.label">
+                         :value="item.value">
               </el-option>
             </el-option-group>
           </el-select>
         </el-form-item>
+        <el-form-item label="实际完成时间" prop="actualCompletionTime">
+          <el-date-picker
+            v-model="dataForm.actualCompletionTime"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="请选择实际完成时间">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="验证时长 (天)" prop="verificationDuration">
+          <el-input
+            v-model="dataForm.verificationDuration"
+            type="number"
+            min="1"
+            placeholder="请输入验证时长 (天)"
+            @input="calculateVerificationDeadline">
+          </el-input>
+        </el-form-item>
         <el-form-item label="验证截止日期" prop="verificationDeadline">
           <el-date-picker
             v-model="dataForm.verificationDeadline"
-            type="date"
+            type="datetime"
             value-format="yyyy-MM-dd HH:mm:ss"
-            placeholder="请选择日期">
+            placeholder="自动计算的验证截止日期"
+            disabled>
           </el-date-picker>
         </el-form-item>
+<!--        <el-form-item label="验证截止日期" prop="verificationDeadline">-->
+<!--          <el-date-picker-->
+<!--            v-model="dataForm.verificationDeadline"-->
+<!--            type="date"-->
+<!--            value-format="yyyy-MM-dd HH:mm:ss"-->
+<!--            placeholder="请选择日期">-->
+<!--          </el-date-picker>-->
+<!--        </el-form-item>-->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancel()">取消</el-button>
-        <el-button type="primary" @click="dataFormSubmitR()">确定</el-button>
+        <el-button type="primary" @click="dataFormSubmitVE()">确定</el-button>
       </span>
     </el-dialog>
     <el-dialog
@@ -883,6 +906,7 @@ export default {
         rectificationResponsiblePerson: '',
         requiredSecondRectificationTime: '',
         remark: '',
+        verificationDuration: '',
         creator: '',
         creationTime: '',
         lastModifier: '',
@@ -901,6 +925,7 @@ export default {
         formula: '',
         isRelatedIssue: '否',  // 添加此行以初始化
       },
+      commenverificationDuration: '',
       vehicleTypeOptions: [],
       // issueCategoryOptions: [],
       departments: [],
@@ -911,17 +936,24 @@ export default {
       // 数据列表
       conplanDataList: [],
       dataRule: {
+        verificationDuration: [
+          // { required: true, message: '请输入验证时长', trigger: 'blur' },
+          // { type: 'number', min: 1, message: '验证时长必须为正整数', trigger: 'blur' },
+          { validator: this.validateVerificationDuration, trigger: 'blur' }
+        ]
       },
       options: ''
     }
   },
   created () {
     this.fetchIssueCategories()
+    this.fetchuserinform()
     this.fetchVehicleTypes()
     this.fetchIssueOptions() // 获取所有问题编号选项
     this.fetchDepartments()
     this.fetchAnalysis()
     this.fetchFaultOptions()
+    this.fetchverificationDuration()
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
@@ -929,7 +961,7 @@ export default {
       this.options = data;
 
 
-      // console.log(data);
+      console.log('获取的人员信息', data);
       // if (data && data.code === 0) {
       //   console.log(data);
       // }
@@ -939,6 +971,36 @@ export default {
 
   },
   methods: {
+    validateVerificationDuration(rule, value, callback) {
+      const commonDuration = this.commenverificationDuration;
+      if (value && value <= commonDuration) {
+        callback(new Error(`验证时长必须大于 ${commonDuration} 天`));
+      } else {
+        callback();
+      }
+    },
+    calculateVerificationDeadline() {
+      if (this.dataForm.actualCompletionTime && this.dataForm.verificationDuration) {
+        const completionTime = new Date(this.dataForm.actualCompletionTime);
+        const duration = parseInt(this.dataForm.verificationDuration, 10);
+
+        if (!isNaN(duration) && duration > 0) {
+          const deadline = new Date(completionTime.getTime() + duration * 24 * 60 * 60 * 1000);
+          this.dataForm.verificationDeadline = this.formatDate(deadline);
+        } else {
+          this.dataForm.verificationDeadline = '';
+        }
+      }
+    },
+    formatDate(date) {
+      const yyyy = date.getFullYear();
+      const MM = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const HH = String(date.getHours()).padStart(2, '0');
+      const mm = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+      return `${yyyy}-${MM}-${dd} ${HH}:${mm}:${ss}`;
+    },
     //文件预览
     previewDoc(fileflag) {
       const token = this.$cookie.get("token"); // 获取当前的 token
@@ -1333,6 +1395,23 @@ export default {
     //     console.error('There was an error fetching the issue categories!', error)
     //   })
     // },
+    fetchverificationDuration() {
+      this.$http({
+        url: this.$http.adornUrl('/generator/verificationdurationtable/fetchverificationDuration'),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          // 假设后端返回的数据结构中包含一个整型字段 verificationDuration
+          this.commenverificationDuration = data.verificationDuration;
+          console.log('Successfully fetched verification duration:', this.commenverificationDuration);
+        } else {
+          console.error('Failed to fetch verification duration:', data.msg);
+        }
+      }).catch(error => {
+        console.error('There was an error fetching the verification duration!', error);
+      });
+    },
     fetchAnalysis () {
       this.$http({
         url: this.$http.adornUrl('/generator/peliminaryanalysistable/fetchAnalysis'),
@@ -1340,7 +1419,7 @@ export default {
         params: this.$http.adornParams()
       }).then(({data}) => {
         if (data && data.code === 0) {
-          // console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
+          console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
           this.issuepeliminaryAnalysis = data.peliminaryAnalysisTableEntities.map(peliminaryAnalysisTableEntities => ({
             value: peliminaryAnalysisTableEntities.peliminaryAnalysis,
             label: peliminaryAnalysisTableEntities.peliminaryAnalysis
@@ -1568,7 +1647,7 @@ export default {
           // console.log('Successfully fetched user info:', data.userinfo)
           this.dataForm.userinfo = data.userinfo // 将后端返回的 userinfo 赋值给 this.userinfo
           this.dataForm.creator = this.dataForm.userinfo
-          // console.log('Successfully fetched user info:', this.userinfo)
+          console.log('Successfully fetched user info:', this.dataForm.userinfo)
         } else {
           console.error('Failed to fetch vehicle types:', data.msg)
         }
@@ -1812,8 +1891,8 @@ export default {
             this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId);
             this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber);
 
-            console.log("this.dataForm.issueCategoryId", this.dataForm.issueCategoryId);
-            console.log("this.dataForm.vehicleNumbers", this.dataForm.vehicleNumbers);
+            // console.log("this.dataForm.issueCategoryId", this.dataForm.issueCategoryId);
+            // console.log("this.dataForm.vehicleNumbers", this.dataForm.vehicleNumbers);
 
             // 调用检查重复问题的方法
             // await this.checkDuplicateIssue();
@@ -1849,6 +1928,7 @@ export default {
                   secondFaultyParts: this.selectedSecondFaultyParts,
                   faultType: this.selectedFaultType,
                   faultModel: this.selectedFaultModel,
+                  level:'等待整改记录填写',
                   vehicleTypeId: this.dataForm.vehicleTypeIds.join(','),
                   vehicleNumberId: this.dataForm.vehicleNumbers.join(','),
                   associatedIssueAddition: this.dataForm.associatedIssueIds.join(','),
@@ -2492,13 +2572,14 @@ export default {
             data: this.$http.adornData({
               'issueId': this.dataForm.issueId || undefined,
               'rectificationStatus': this.dataForm.rectificationStatus,
-              'actualCompletionTime': this.dataForm.actualCompletionTime,
+              // 'actualCompletionTime': this.dataForm.actualCompletionTime,
               'rectificationPhotoDeliverable': this.tmpAllList.length ? tmpListString : this.stepAttachment,
-              'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+              // 'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
               'causeAnalysis': this.dataForm.causeAnalysis,
-              'verificationDeadline': this.dataForm.verificationDeadline,
-              'verifier': this.dataForm.verifier,
+              // 'verificationDeadline': this.dataForm.verificationDeadline,
+              // 'verifier': this.dataForm.verifier,
               'overDue':'false',
+              'level':'等待任务下发(处理)',
               'state': '持续',
             })
           }).then(({data}) => {
@@ -2530,6 +2611,79 @@ export default {
                   }
                 });
               }
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }
+      })
+      // 重置 vehicles 数组，只保留一个初始组合
+      this.dataForm.vehicles = [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }]
+      this.vehicleNumberOptions = []
+    },
+    // 表单提交
+    dataFormSubmitVE () {
+      let tmpListString = [];
+      if (this.tmpAllList.length) {
+        tmpListString = JSON.stringify(this.tmpAllList);
+      }
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
+          this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
+          // 将选中的责任人ID数组转换为字符串
+          this.dataForm.rectificationResponsiblePerson = this.selectedResponsiblePersons.join(',');
+          // 确保 issueCategoryId 是一个数组
+          if (!Array.isArray(this.dataForm.issueCategoryId)) {
+            this.dataForm.issueCategoryId = [this.dataForm.issueCategoryId]
+          }
+          // 将数组转换为逗号分隔的字符串
+          const issueCategoryIdString = this.dataForm.issueCategoryId.join(',')
+          this.$http({
+            url: this.$http.adornUrl(`/generator/issuetable/${!this.dataForm.issueId ? 'save' : 'update'}`),
+            method: 'post',
+            data: this.$http.adornData({
+              'issueId': this.dataForm.issueId || undefined,
+              // 'rectificationStatus': this.dataForm.rectificationStatus,
+              'actualCompletionTime': this.dataForm.actualCompletionTime,
+              // 'rectificationPhotoDeliverable': this.tmpAllList.length ? tmpListString : this.stepAttachment,
+              // 'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+              // 'causeAnalysis': this.dataForm.causeAnalysis,
+              'verificationDeadline': this.dataForm.verificationDeadline,
+              'verifier': this.dataForm.verifier,
+              // 'overDue':'false',
+              'level':'等待验证',
+              // 'state': '持续',
+            })
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.visibleR = false
+                  this.visibleVE = false
+                  this.$emit('refreshDataList')
+                }
+              })
+              // 检查是否关联相关问题
+              // if (this.dataForm.isRelatedIssue === '是') {
+              //   // 发起新的请求
+              //   this.$http({
+              //     url: this.$http.adornUrl(`/generator/issuetable/connection`),  // 请替换为实际请求的 URL
+              //     method: 'post',
+              //     data: {
+              //       'issueId' : this.dataForm.issueId, // 根据需要传递的参数
+              //       // ...其他所需数据
+              //     }
+              //   }).then(({ data }) => {
+              //     if (data && data.code === 0) {
+              //     } else {
+              //       this.$message.error(data.msg);
+              //     }
+              //   });
+              // }
             } else {
               this.$message.error(data.msg)
             }

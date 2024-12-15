@@ -74,6 +74,16 @@ public class IssueMaskTableController {
         return R.ok().put("page", page);
     }
     /**
+     * 列表，任务发起人可见
+     */
+    @RequestMapping("/creatormasklist")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R creatormasklist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueMaskTableService.creatormaskqueryPage(params);
+
+        return R.ok().put("page", page);
+    }
+    /**
      * 列表，管理人员可见
      */
     @RequestMapping("/managerlist")
@@ -95,6 +105,22 @@ public class IssueMaskTableController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 问题状态改变
+     */
+    @RequestMapping("/statechange")
+    @RequiresPermissions("generator:issuemasktable:save")
+    public R statechange(@RequestParam("issueNumber") String issueNumber) {
+        // 输出接收到的参数
+        System.out.println("接收到的问题编号参数为：" + issueNumber);
+
+        // 调用服务层方法，生成新的编号（可根据 issueNumber 调整逻辑）
+        String useID = issueMaskTableService.statechange(issueNumber);
+
+        System.out.println("获取的新编号为：" + useID);
+
+        return R.ok();
+    }
     /**
      * 问题任务编号
      */
@@ -136,6 +162,17 @@ public class IssueMaskTableController {
         System.out.println("返回的数据为："+fin);
         return R.ok(fin);
     }
+    /**
+     * 任务对应任务是否全部完成
+     */
+    @RequestMapping("/serialNumber")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R serialNumber(@RequestParam String issueNumber){
+//        System.out.println("获取任务编号成功："+issueNumber);
+        String fin = issueMaskTableService.listserialNumber(issueNumber);
+//        System.out.println("返回的数据为："+fin);
+        return R.ok(fin);
+    }
 
     /**
      * 分发问题
@@ -156,7 +193,7 @@ public class IssueMaskTableController {
     @RequiresPermissions("generator:issuemasktable:info")
     public R info(@PathVariable("issuemaskId") Integer issuemaskId){
         IssueMaskTableEntity issueMaskTable = issueMaskTableService.getById(issuemaskId);
-
+        System.out.println("获取到整改信息："+issueMaskTable);
         return R.ok().put("issueMaskTable", issueMaskTable);
     }
 

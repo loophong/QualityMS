@@ -253,7 +253,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     public PageUtils queryPagecreator(Map<String, Object> params) {
         // 获取当前用户信息
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
 
         // 构建查询条件
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
@@ -261,6 +261,9 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         queryWrapper.eq("creator", rolename)
                 .or().eq("rectification_responsible_person", rolename)
                 .or().eq("verifier", rolename);
+
+        // 按 ID 降序排序
+        queryWrapper.orderByDesc("issue_id");
 
         // 执行分页查询
         IPage<IssueTableEntity> page = this.page(
@@ -350,6 +353,34 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     }
 
     @Override
+    public Map<String, Integer> gettruecurrentall() {
+
+        Map<String, Integer> statistics = new HashMap<>();
+
+        // 定义可能的验证结论状态
+        List<String> verificationConclusions = Arrays.asList("问题添加", "问题整改", "问题验证");
+
+        // 获取当前月份起止日期
+//        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
+//        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+//        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
+//        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+
+        // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
+        statistics.put("问题添加", countIssuesBylevel("等待整改记录填写"));
+        int count1 = countIssuesBylevel("等待任务下发(处理)");
+        int count2 = countIssuesBylevel("等待验证指定");
+        statistics.put("问题整改", count1+count2);
+        statistics.put("问题验证", countIssuesBylevel("等待验证"));
+        int count3 = countIssuesBylevel("结项");
+        int count4 = countIssuesBylevel("未通过验证");
+        statistics.put("验证已通过", count3);
+        statistics.put("验证未通过", count4);
+
+        return statistics;
+    }
+
+    @Override
     public String saveUploadedFile(MultipartFile file) throws IOException {
 //        if (uploadPath == null) {
 //            throw new IllegalStateException("Upload path is not configured.");
@@ -410,7 +441,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     @Override
     public String getuserinfo() {
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
         return rolename;
     }
 
@@ -1205,6 +1236,16 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
                         .or().eq("verification_conclusion", "")
                         .or().like("verification_conclusion", "持续")
         );
+
+        return this.count(queryWrapper);
+    }
+
+    // 统计所有问题状态
+    private Integer countIssuesBylevel(String Issuestate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+        queryWrapper.eq("level", Issuestate);
+
 
         return this.count(queryWrapper);
     }

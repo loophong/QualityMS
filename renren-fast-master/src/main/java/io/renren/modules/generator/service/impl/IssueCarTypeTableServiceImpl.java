@@ -27,13 +27,22 @@ public class IssueCarTypeTableServiceImpl extends ServiceImpl<IssueCarTypeTableD
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        // 构建查询条件
+        QueryWrapper<IssueCarTypeTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 按 ID 降序排序
+        queryWrapper.orderByDesc("vehicle_type_id");
+
+        // 分页查询
         IPage<IssueCarTypeTableEntity> page = this.page(
                 new Query<IssueCarTypeTableEntity>().getPage(params),
-                new QueryWrapper<IssueCarTypeTableEntity>()
+                queryWrapper
         );
 
+        // 返回分页数据
         return new PageUtils(page);
     }
+
 
     @Override
     public R uploadExcelFile(MultipartFile file) throws IOException {

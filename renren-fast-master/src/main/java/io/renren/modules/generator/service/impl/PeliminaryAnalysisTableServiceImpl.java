@@ -28,13 +28,22 @@ public class PeliminaryAnalysisTableServiceImpl extends ServiceImpl<PeliminaryAn
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        // 构建查询条件
+        QueryWrapper<PeliminaryAnalysisTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 按 ID 降序排序
+        queryWrapper.orderByDesc("analysis_ID");
+
+        // 分页查询
         IPage<PeliminaryAnalysisTableEntity> page = this.page(
                 new Query<PeliminaryAnalysisTableEntity>().getPage(params),
-                new QueryWrapper<PeliminaryAnalysisTableEntity>()
+                queryWrapper
         );
 
+        // 返回分页数据
         return new PageUtils(page);
     }
+
 
     @Override
     public List<PeliminaryAnalysisTableEntity> listAll() {

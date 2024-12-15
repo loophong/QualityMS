@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.spc.dao.SpcPchartStandardsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.spc.entity.SpcPchartStandardsEntity" id="spcPchartStandardsMap">
+        <result property="spcpId" column="spcP_id"/>
+        <result property="date1" column="date1"/>
+        <result property="date2" column="date2"/>
+        <result property="date3" column="date3"/>
+        <result property="date4" column="date4"/>
+        <result property="date5" column="date5"/>
+        <result property="date6" column="date6"/>
+        <result property="date7" column="date7"/>
+        <result property="date8" column="date8"/>
+        <result property="date9" column="date9"/>
+        <result property="date10" column="date10"/>
+        <result property="date11" column="date11"/>
+        <result property="date12" column="date12"/>
+        <result property="date13" column="date13"/>
+        <result property="date14" column="date14"/>
+        <result property="date15" column="date15"/>
+        <result property="date16" column="date16"/>
+        <result property="date17" column="date17"/>
+        <result property="date18" column="date18"/>
+        <result property="date19" column="date19"/>
+        <result property="date20" column="date20"/>
+        <result property="date21" column="date21"/>
+        <result property="date22" column="date22"/>
+        <result property="date23" column="date23"/>
+        <result property="date24" column="date24"/>
+        <result property="date25" column="date25"/>
+        <result property="date26" column="date26"/>
+        <result property="date27" column="date27"/>
+        <result property="date28" column="date28"/>
+        <result property="date29" column="date29"/>
+        <result property="date30" column="date30"/>
+        <result property="date31" column="date31"/>
+        <result property="sum" column="sum"/>
+        <result property="datatime" column="datatime"/>
+        <result property="dataContent" column="data_content"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="alternateFields1" column="alternate_fields1"/>
+        <result property="alternateFields2" column="alternate_fields2"/>
+        <result property="alternateFields3" column="alternate_fields3"/>
+        <result property="alternateFields4" column="alternate_fields4"/>
+        <result property="deleteFlag" column="delete_flag"/>
+    </resultMap>
+
+    <!-- 根据月份删除数据 -->
+    <delete id="deleteDataByMonth" parameterType="java.util.Date">
+        DELETE FROM spc_Pchart_standards
+        WHERE MONTH(datatime) = MONTH(#{datatime})
+        AND YEAR(datatime) = YEAR(#{datatime})
+    </delete>
+
+    <!-- 批量插入数据 -->
+    <insert id="batchInsertSpcPchartStandards" parameterType="java.util.List">
+        INSERT INTO spc_Pchart_standards (
+        spcP_id, date1, date2, date3, date4, date5, date6, date7,
+        date8, date9, date10, date11, date12, date13, date14, date15,
+        date16, date17, date18, date19, date20, date21, date22, date23,
+        date24, date25, date26, date27, date28, date29, date30, date31,
+        sum,datatime,data_content, create_by, create_time, alternate_fields1,
+        alternate_fields2,alternate_fields3, alternate_fields4, delete_flag
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.spcpId}, #{item.date1}, #{item.date2}, #{item.date3}, #{item.date4},
+            #{item.date5}, #{item.date6}, #{item.date7}, #{item.date8}, #{item.date9},
+            #{item.date10}, #{item.date11}, #{item.date12}, #{item.date13}, #{item.date14},
+            #{item.date15}, #{item.date16}, #{item.date17}, #{item.date18}, #{item.date19},
+            #{item.date20}, #{item.date21}, #{item.date22}, #{item.date23}, #{item.date24},
+            #{item.date25}, #{item.date26}, #{item.date27}, #{item.date28}, #{item.date29},
+            #{item.date30}, #{item.date31}, #{item.sum}, #{item.datatime},
+            #{item.dataContent}, #{item.createBy}, #{item.createTime},
+            #{item.alternateFields1}, #{item.alternateFields2}, #{item.alternateFields3}, #{item.alternateFields4},
+            #{item.deleteFlag})
+        </foreach>
+    </insert>
+
+    <!-- 查询当月数据 -->
+    <select id="getSpcPchartStandardsEntityByMonth" parameterType="java.util.Date" resultMap="spcPchartStandardsMap">
+        SELECT *
+        FROM spc_Pchart_standards
+        WHERE MONTH(datatime) = MONTH(#{datatime})
+        AND YEAR(datatime) = YEAR(#{datatime});
+    </select>
+
+</mapper>

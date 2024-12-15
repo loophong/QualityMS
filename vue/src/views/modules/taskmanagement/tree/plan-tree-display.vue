@@ -72,7 +72,7 @@
                     v-model="taskInfo.taskContent" disabled maxlength="1000">
           </el-input>
         </el-form-item>
-        <el-form-item v-if="taskFiles && taskFiles.length > 0" label="附件">
+        <el-form-item v-if="taskFiles && taskFiles.length > 0" label="审批附件">
           <el-row v-for="file in taskFiles" :key="file.name" style="margin-bottom: 4px">
             <el-col :span="12">
               {{ file.name }}

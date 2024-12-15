@@ -2807,7 +2807,7 @@ export default {
         stageExtra: "",
         stageConsolidate: "",
         stepFile: "",
-        stageAttachment: "",
+        stageAttachment: [],
         stageConsultant: "",
         stageReview: "",
       },
@@ -3435,7 +3435,7 @@ export default {
         stageConsolidate: "",
         stageConsultant: "",
         stageReview: "",
-        stageAttachment: "",
+        stageAttachment: [],
       };
     },
     init(id) {

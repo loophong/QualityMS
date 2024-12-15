@@ -38,7 +38,6 @@ public class QcAllCountController {
     @RequiresPermissions("qcManagement:qcAllCount:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = qcAllCountService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 
@@ -50,7 +49,16 @@ public class QcAllCountController {
     @RequiresPermissions("qcManagement:qcAllCount:info")
     public R info(@PathVariable("qcAllId") Integer qcAllId){
 		QcAllCountEntity qcAllCount = qcAllCountService.getById(qcAllId);
+        return R.ok().put("qcAllCount", qcAllCount);
+    }
 
+    /**
+     * word信息
+     */
+    @RequestMapping("/wordInfo")
+//    @RequiresPermissions("qcManagement:qcAllCount:info")
+    public R wordInfo(){
+        QcAllCountEntity qcAllCount = qcAllCountService.getById(1);
         return R.ok().put("qcAllCount", qcAllCount);
     }
 
@@ -72,6 +80,17 @@ public class QcAllCountController {
     @RequiresPermissions("qcManagement:qcAllCount:update")
     public R update(@RequestBody QcAllCountEntity qcAllCount){
 		qcAllCountService.updateById(qcAllCount);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改
+     */
+    @RequestMapping("/word")
+//    @RequiresPermissions("qcManagement:qcAllCount:update")
+    public R word(@RequestBody QcAllCountEntity qcAllCount){
+        qcAllCountService.updateById(qcAllCount);
 
         return R.ok();
     }

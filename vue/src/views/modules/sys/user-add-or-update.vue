@@ -125,16 +125,16 @@ export default {
           { required: true, message: "用户名不能为空", trigger: "blur" },
         ],
         nickName: [
-          { required: true, message: "用户名不能为空", trigger: "blur" },
+          { required: true, message: "昵称不能为空", trigger: "blur" },
         ],
         password: [{ validator: validatePassword, trigger: "blur" }],
         comfirmPassword: [
           { validator: validateComfirmPassword, trigger: "blur" },
         ],
-        email: [
-          { required: true, message: "邮箱不能为空", trigger: "blur" },
-          { validator: validateEmail, trigger: "blur" },
-        ],
+        // email: [
+        //   { required: true, message: "邮箱不能为空", trigger: "blur" },
+        //   { validator: validateEmail, trigger: "blur" },
+        // ],
         mobile: [
           { required: true, message: "手机号不能为空", trigger: "blur" },
           { validator: validateMobile, trigger: "blur" },

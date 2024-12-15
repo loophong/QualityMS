@@ -39,11 +39,16 @@
           </el-table-column>
           <!-- <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column> -->
-          <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="140">
+          <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="100">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="140">
+          <el-table-column prop="department" header-align="center" align="center" label="单位" width="120">
           </el-table-column>
-          <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
+          <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="100">
+          </el-table-column>
+          <el-table-column prop="position" header-align="center" align="center" label="顾问" width="120">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.position) }}
+            </template>
           </el-table-column>
           <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="160">
           </el-table-column>
@@ -106,11 +111,16 @@
           </el-table-column>
           <!-- <el-table-column prop="number" header-align="center" align="center" label="员工编号" width="160">
           </el-table-column> -->
-          <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="140">
+          <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="100">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="140">
+          <el-table-column prop="department" header-align="center" align="center" label="单位" width="120">
           </el-table-column>
-          <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
+          <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="100">
+          </el-table-column>
+          <el-table-column prop="position" header-align="center" align="center" label="顾问" width="120">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.position) }}
+            </template>
           </el-table-column>
           <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="160">
           </el-table-column>
@@ -179,6 +189,11 @@
           <el-table-column prop="department" header-align="center" align="center" label="单位" width="160" sortable>
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
+          </el-table-column>
+          <el-table-column prop="position" header-align="center" align="center" label="顾问" width="140">
+            <template slot-scope="scope">
+              {{ numberToName(scope.row.position) }}
+            </template>
           </el-table-column>
           <!-- <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
           </el-table-column> -->
@@ -330,7 +345,7 @@ export default {
           })
         };
       });
-      // console.log(this.membersOptions)
+
     });
     // console.log('+++++++++++++')
     // console.log((this.checkIfAdmit('生产科') || (this.isAuth('qcManagement:group:admin'))))
@@ -352,28 +367,33 @@ export default {
 
       if (examineStatus === '待审核' && examineDepartment != '1') {
         if ((department == '生产科' && this.isAuth('department:product:leader'))) {
-          console.log('返回 true - 生产科领导');
           return true;
         } else if ((department == '质量科' && this.isAuth('department:quality:leader'))) {
-          console.log('返回 true - 质量科领导');
+          return true;
+        } else if ((department == '供应科' && this.isAuth('department:supply:leader'))) {
+          return true;
+        } else if ((department == '市场科' && this.isAuth('department:market:leader'))) {
+          return true;
+        } else if ((department == '财务科' && this.isAuth('department:financial:leader'))) {
+          return true;
+        } else if ((department == '技术科' && this.isAuth('department:tech:leader'))) {
+          return true;
+        } else if ((department == '安环设备科' && this.isAuth('department:safety:leader'))) {
+          return true;
+        } else if ((department == '企业管理科' && this.isAuth('department:enterprise:leader'))) {
+          return true;
+        } else if ((department == '党群办公室' && this.isAuth('department:party:leader'))) {
           return true;
         } else {
-          console.log('返回 false - 非部门领导');
           return false;
         }
       } else if (examineStatus === '待审核' && examineDepartment == '1') {
-        console.log('管理员审核');
-        console.log('isAuth(qcManagement:group:admin): ', this.isAuth('qcManagement:group:admin'));
-
         if (this.isAuth('qcManagement:group:admin')) {
-          console.log('返回 true - 是管理员');
           return true;
         } else {
-          console.log('返回 false - 非管理员');
           return false;
         }
       } else {
-        console.log('返回 false - 其他情况');
         return false;
       }
     },
@@ -458,6 +478,7 @@ export default {
                 examineStatus: item.examineStatus,
                 examineDepartment: item.examineDepartment,
                 examineGroup: item.examineGroup,
+                position: item.position,
                 registrationNum: item.registrationNum,
                 children: []
               };
@@ -657,6 +678,7 @@ export default {
             员工编号: tableRow.number,
             单位: tableRow.department,
             小组类型: tableRow.team,
+            顾问: tableRow.position,
             注册号: tableRow.registrationNum,
             创建小组时间: tableRow.participationDate,
           };
@@ -722,6 +744,7 @@ export default {
                   roleInTopic: '组长',
                   team: item.team,
                   department: item.department,
+                  position: item.position,
                   examineStatus: item.examineStatus,
                   examineDepartment: item.examineDepartment,
                   examineGroup: item.examineGroup,

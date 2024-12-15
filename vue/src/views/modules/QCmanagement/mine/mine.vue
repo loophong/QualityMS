@@ -150,7 +150,62 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update> -->
       </div>
     </el-tab-pane>
-    <el-tab-pane label="我的审核" name="3">
+    <el-tab-pane label="我指导的小组" name="3" v-if="isAuth('qc:group:consultant')">
+      <div class="mod-config">
+        <!-- <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()"> -->
+        <!-- <el-form-item>
+        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+      </el-form-item> -->
+        <!-- <el-form-item>
+            <el-button @click="getDataList()">查询</el-button>
+            <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
+              @click="addOrUpdateHandle()">新增小组</el-button>
+            <el-button type="danger" @click="toIssue()">问题添加</el-button>
+          </el-form-item> -->
+        <!-- </el-form> -->
+        <el-table :data="consultantList" stripe border v-loading="dataListLoading"
+          @selection-change="selectionChangeHandle" style="width: 100%" row-key="id">
+          <el-table-column header-align="center" align="center" label="" width="40">
+          </el-table-column>
+          <el-table-column prop="groupName" header-align="center" align="center" label="小组名">
+          </el-table-column>
+          <el-table-column prop="memberName" header-align="center" align="center" label="姓名">
+          </el-table-column>
+          <el-table-column prop="number" header-align="center" align="center" label="员工编号">
+          </el-table-column>
+          <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色">
+          </el-table-column>
+          <el-table-column prop="department" header-align="center" align="center" label="单位">
+          </el-table-column>
+          <el-table-column prop="team" header-align="center" align="center" label="小组类型">
+          </el-table-column>
+          <el-table-column prop="position" header-align="center" align="center" label="顾问">
+          </el-table-column>
+          <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号">
+          </el-table-column>
+          <el-table-column prop="date" header-align="center" align="center" label="加入小组时间">
+          </el-table-column>
+          <!-- <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
+            align="center" label="操作" width="160">
+            <template slot-scope="scope">
+              <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
+                @click="addMemberHandle(scope.row.id)">新增成员</el-button>
+              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:save')"
+                @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:save')"
+                @click="deleteHandle(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column> -->
+        </el-table>
+        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+          :page-sizes="[10, 20, 50, 100, 999]" :page-size="999" :total="totalPageGroup"
+          layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination> -->
+        <!-- 弹窗, 新增 / 修改
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update> -->
+      </div>
+    </el-tab-pane>
+    <el-tab-pane label="我的审核" name="4">
       <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
         </el-table-column>
@@ -199,7 +254,7 @@
         </el-table-column>
       </el-table>
     </el-tab-pane>
-    <el-tab-pane label="课题初审" name="4" v-if="isAuth('qc:first:examine')">
+    <el-tab-pane label="课题初审" name="5" v-if="isAuth('qc:first:examine')">
       <div class="mod-config">
         <el-form :inline="true" :model="dataForm">
           <!-- <el-form-item>
@@ -362,6 +417,7 @@ export default {
       },
       subjectDataList: [], //标签页1，我的课题
       dataList: [], //标签页2，我的小组
+      consultantList: [], //标签页，我指导的小组
       examineList: [], //标签页3，我的审核
       pageIndex: 1,
       pageSize: 10,
@@ -395,6 +451,7 @@ export default {
   },
   async activated() {
     this.getGroupList();
+    this.getConsultantList();
     this.getSubjectList();
     this.getFirstList();
     this.handleTip();
@@ -616,6 +673,105 @@ export default {
           this.totalPageGroup = resultList.length;
         } else {
           this.dataList = [];
+          this.totalPageGroup = 0;
+        }
+
+        this.dataListLoading = false;
+      });
+    },
+    // 获取顾问数据列表
+    async getConsultantList() {
+      this.dataListLoading = true;
+      await this.$http({
+        url: this.$http.adornUrl("/qcMembers/qcGroupMember/myList"),
+        method: "get",
+        params: this.$http.adornParams({
+          page: 1,
+          limit: 1000000,
+          // 'key': 1,
+          // 'reuseStepId': 5
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          const sameList = [];
+          // this.dataList = data.page.list
+          data.page.list.forEach(item => {
+            console.log('-----------------')
+            console.log(item.position)
+            console.log(data.userName)
+            console.log('-----------------')
+            if (item.position == data.userName && item.roleInTopic == "组长") {
+              console.log('存在')
+              sameList.push(item)
+            }
+          });
+          console.log(sameList)
+          const resultList = [];
+          const seen = new Set(); // 用于去重
+
+          sameList.forEach(item => {
+            if (!seen.has(item.qcgmId)) {
+              resultList.push(item);
+              seen.add(item.qcgmId);
+            }
+            if (item.parentId) {
+              data.page.list.forEach(row => {
+                if ((row.parentId == item.parentId || row.qcgmId == item.parentId) && !seen.has(row.qcgmId)) {
+                  resultList.push(row);
+                  seen.add(row.qcgmId);
+                }
+              });
+            } else {
+              data.page.list.forEach(row => {
+                if (row.parentId == item.qcgmId && !seen.has(row.qcgmId)) {
+                  row.management = 1 //标识当前角色为组长，可以移交组长
+                  resultList.push(row);
+                  seen.add(row.qcgmId);
+                }
+              });
+            }
+          });
+          console.log(resultList);
+          // 分组
+          this.consultantList = []; // 清空 
+          const map = {};
+          resultList.forEach((item) => {
+            if (item.parentId === null) {
+              map[item.qcgmId] = {
+                id: item.qcgmId,
+                date: item.participationDate,
+                memberName: item.memberName,
+                number: item.number,
+                groupName: item.groupName,
+                roleInTopic: "组长",
+                team: item.team,
+                position: item.position,
+                department: item.department,
+                registrationNum: item.registrationNum,
+                children: [],
+              };
+            }
+          });
+          resultList.forEach((item) => {
+            if (item.parentId !== null && map[item.parentId]) {
+              map[item.parentId].children.push({
+                id: item.qcgmId,
+                date: item.participationDate,
+                memberName: item.memberName,
+                number: item.number,
+                department: item.department,
+                roleInTopic: item.roleInTopic,
+                parentId: item.parentId,
+              });
+            }
+          });
+          console.log(map);
+          this.consultantList = Object.values(map);
+          // this.dataList = resultList
+          console.log(this.consultantList);
+          this.totalPageGroup = resultList.length;
+        } else {
+          this.consultantList = [];
           this.totalPageGroup = 0;
         }
 
@@ -884,7 +1040,7 @@ export default {
           method: "get",
           params: this.$http.adornParams({
             page: 1,
-            limit: 10000,
+            limit: 1000000,
             key: "",
           }),
         })
@@ -937,6 +1093,7 @@ export default {
           });
       });
     },
+
     toIssue() {
       this.$router.push({
         name: "otherToIssue",

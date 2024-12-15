@@ -277,7 +277,19 @@
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
           </el-table-column>
-          <el-table-column prop="topicDepartment" header-align="center" align="center" label="单位">
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室">
+          </el-table-column>
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
+              <el-tag
+                v-else-if="scope.row.topicReviewStatus === 2 && scope.row.topicReviewDepartment != 1">审核中(科室)</el-tag>
+              <el-tag
+                v-else-if="scope.row.topicReviewStatus === 2 && scope.row.topicReviewDepartment == 1">审核中(管理员)</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
+              <el-tag v-else>-</el-tag>
+            </template>
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
@@ -320,17 +332,7 @@
           </el-table-column>
           <el-table-column prop="firstComment" header-align="center" align="center" label="科室初审意见">
           </el-table-column>
-          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
-            <template slot-scope="scope">
-              <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
-              <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
-              <el-tag v-else-if="scope.row.topicReviewStatus === 2 && !scope.row.topicReviewDepartment">审核中(科室)</el-tag>
-              <el-tag
-                v-else-if="scope.row.topicReviewStatus === 2 && scope.row.topicReviewDepartment == 1">审核中(管理员)</el-tag>
-              <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
-              <el-tag v-else>-</el-tag>
-            </template>
-          </el-table-column>
+
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small"
@@ -446,6 +448,8 @@ export default {
   computed: {
     filteredDataList() {
       this.totalPage = this.firstList.filter(item => item.topicReviewStatus === 2).length
+      // console.log('***************')
+      // console.log(this.firstList.filter(item => item.topicReviewStatus === 2))
       return this.firstList.filter(item => item.topicReviewStatus === 2);
     }
   },
@@ -566,9 +570,9 @@ export default {
         url: this.$http.adornUrl('/qcSubject/registration/list'),
         method: 'get',
         params: this.$http.adornParams({
-          'page': this.pageIndex,
-          'limit': this.pageSize,
-          'key': this.dataForm.key
+          'page': 1,
+          'limit': 10000000,
+          // 'key': this.dataForm.key
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -576,6 +580,7 @@ export default {
           tmp.forEach(item => {
             item.teamNumberIds = JSON.parse(item.teamNumberIds)
           });
+          console.log(tmp)
           this.firstList = tmp
           this.totalPage = data.page.totalCount
         } else {

@@ -309,7 +309,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         List<Double> averageList = new ArrayList<>();
         for (Double value : sum){
             BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
-            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number)); // 除以5
+            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number),3,RoundingMode.HALF_UP); // 除以5
             averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
         }
 
@@ -324,7 +324,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         List<Double> averageList = new ArrayList<>();
         for (Double value : sum){
             BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
-            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number)); // 除以5
+            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number),3,RoundingMode.HALF_UP);
             averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
         }
 
@@ -535,7 +535,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         List<Double> averageList = new ArrayList<>();
         for (Double value : sum){
             BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
-            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number)); // 除以5
+            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number),3,RoundingMode.HALF_UP);
             averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
         }
 
@@ -550,7 +550,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         List<Double> averageList = new ArrayList<>();
         for (Double value : sum){
             BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
-            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number)); // 除以5
+            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number),3,RoundingMode.HALF_UP);
             averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
         }
 

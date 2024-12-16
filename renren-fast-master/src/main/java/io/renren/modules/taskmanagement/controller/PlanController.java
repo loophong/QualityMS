@@ -20,6 +20,7 @@ import io.renren.modules.taskmanagement.service.TaskService;
 import io.renren.modules.taskmanagement.vo.PlanExportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -68,6 +69,19 @@ public class PlanController {
 
     }
 
+    /** 
+     * @description: 分页查询
+     * @param: planQueryParamDTO 
+     * @return: io.renren.common.utils.R 
+     * @author: hong
+     * @date: 2024/12/16 16:58
+     */ 
+    @PostMapping("/queryPageByParams")
+    public R queryPageByParams(@RequestBody PlanQueryParamDTO planQueryParamDTO) {
+        log.info("查询条件：" + planQueryParamDTO);
+        PageUtils page = planService.queryPageByPlanParams(planQueryParamDTO);
+        return R.ok().put("page", page);
+    }
 
     /**
      * @description: 图中点击计划时，查询计划的全部信息和计划文件
@@ -268,6 +282,13 @@ public class PlanController {
         return R.ok();
     }
 
+    @RequestMapping("/reApproval")
+    @RequiresPermissions("taskmanagement:plan:update")
+    public R reApproval(@RequestBody PlanDTO planDTO) {
+        planService.reApproval(planDTO);
+        return R.ok();
+    }
+
     /**
      * @description: 更新计划和任务
      * @author: hong
@@ -303,6 +324,8 @@ public class PlanController {
         planService.updateAllPlanInfo(planDTO);
         return R.ok();
     }
+
+
 
     /**
      * @description: 删除计划时删除其全部子任务

@@ -31,6 +31,7 @@ import io.renren.common.utils.Query;
 
 import io.renren.modules.taskmanagement.dao.PlanDao;
 import io.renren.modules.taskmanagement.service.PlanService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service("planService")
@@ -170,7 +171,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         // 保存计划信息
         PlanEntity plan = new PlanEntity();
         BeanUtils.copyProperties(planDTO.getPlan(), plan);
-        plan.setPlanCurrentState(TaskStatus.CREATED_BUT_NOT_APPROVED);
+        plan.setPlanCurrentState(TaskStatus.PREAPPROVAL_IN_PROGRESS);
         log.info("plan: " + plan);
         planDao.insert(plan);
 
@@ -196,6 +197,64 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         List<FileEntity> files = planDTO.getFiles();
         log.info("files: " + files);
         fileService.saveBatch(files);
+    }
+
+    @Transactional
+    @Override
+    public void reApproval(PlanDTO planDTO) {
+        // 更新计划信息
+        PlanEntity plan = new PlanEntity();
+        log.info("plan: " + plan);
+        BeanUtils.copyProperties(planDTO.getPlan(), plan);
+        plan.setPlanCurrentState(TaskStatus.PREAPPROVAL_IN_PROGRESS);
+        planDao.updateById(plan);
+
+        // 更新任务信息
+        List<TaskEntity> tasks = planDTO.getTasks();
+        log.info("tasks: " + tasks);
+        taskService.remove(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, plan.getPlanId()));
+        for (TaskEntity task : tasks) {
+            task.setTaskCurrentState(TaskStatus.PREAPPROVAL_IN_PROGRESS);
+        }
+        taskService.saveBatch(tasks);
+
+        // 更新附件信息
+        List<FileEntity> files = planDTO.getFiles();
+        log.info("files: " + files);
+        fileService.remove(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, plan.getPlanId()));
+        fileService.saveBatch(files);
+
+        // 新建审批
+        PlanApprovalTableEntity planApprovalTableEntity = new PlanApprovalTableEntity();
+        BeanUtils.copyProperties(plan, planApprovalTableEntity);
+        planApprovalTableEntity.setApprovalStatus(ApprovalStatus.PENDING);
+        planApprovalTableEntity.setPlanPrincipal(plan.getPlanPrincipal());
+        planApprovalTableEntity.setPlanExecutor(plan.getPlanExecutor().toString());
+        planApprovalTableEntity.setPlanAssociatedIndicatorsId(Integer.valueOf(plan.getPlanAssociatedIndicatorsId()));
+        planApprovalTableEntity.setPlanSubmissionTime(new Date());
+        planApprovalTableEntity.setApprover(plan.getPlanAuditor());
+        planApprovalTableEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
+        log.info("planApprovalTableEntity: " + planApprovalTableEntity);
+        planApprovalTableService.save(planApprovalTableEntity);
+    }
+
+    @Override
+    public PageUtils queryPageByPlanParams(PlanQueryParamDTO planQueryParamDTO) {
+
+
+        PlanEntity plan = planQueryParamDTO.getPlan();
+        Page<PlanEntity> page = new Page<>(planQueryParamDTO.getPage(), planQueryParamDTO.getLimit());
+
+        IPage<PlanEntity> planList = planDao.selectPage(
+                page,
+                new LambdaQueryWrapper<PlanEntity>()
+                        .eq(plan.getPlanId() != null,PlanEntity::getPlanId, plan.getPlanId())
+                        .eq(plan.getPlanName() != null,PlanEntity::getPlanName, plan.getPlanName())
+                        .eq(plan.getPlanAssociatedIndicatorsId() != null,PlanEntity::getPlanAssociatedIndicatorsId, plan.getPlanAssociatedIndicatorsId())
+                        .orderByDesc(PlanEntity::getPlanStartDate)
+        );
+
+        return new PageUtils(planList);
     }
 
     private void convert(PlanExportVO plan) {
@@ -329,6 +388,11 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         List<TaskEntity> tasks = planDTO.getTasks();
         log.info("tasks: " + tasks);
         taskService.remove(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, plan.getPlanId()));
+        for (TaskEntity task : tasks) {
+            if(task.getTaskCurrentState() == null){
+                task.setTaskCurrentState(TaskStatus.NOT_STARTED);
+            }
+        }
         taskService.saveBatch(tasks);
 
         // 更新附件信息

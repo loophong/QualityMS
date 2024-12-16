@@ -204,13 +204,13 @@
           <el-table-column prop="approvalStatus" label="审批状态" header-align="center" align="center">
             <template slot-scope="scope">
               <span v-if="scope.row.approvalStatus === 'PENDING'">
-                <el-tag type="info" disable-transitions>待审批</el-tag></span>
+                <el-tag disable-transitions>待审批</el-tag></span>
               <span v-else-if="scope.row.approvalStatus === 'APPROVED'">
                 <el-tag type="success" disable-transitions>已通过</el-tag></span>
               <span v-else-if="scope.row.approvalStatus === 'REJECTED'">
                 <el-tag type="danger" disable-transitions>已拒绝</el-tag></span>
               <span v-else-if="scope.row.approvalStatus === 'CANCEL'">
-                <el-tag type="danger" disable-transitions>已取消</el-tag></span>
+                <el-tag type="info" disable-transitions>已取消</el-tag></span>
               <span v-else>-</span> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
@@ -621,7 +621,7 @@ export default {
 
     // 获取分组后的员工数据
     await this.$http({
-      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      url: this.$http.adornUrl(`/taskmanagement/user/getName`),
       method: 'get',
     }).then(({data}) => {
       this.options = data;

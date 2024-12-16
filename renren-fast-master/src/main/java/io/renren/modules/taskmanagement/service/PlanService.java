@@ -49,5 +49,9 @@ public interface PlanService extends IService<PlanEntity> {
     List<PlanExportVO> export();
 
     void saveAllPlanInfoAndApproval(PlanDTO planDTO);
+
+    void reApproval(PlanDTO planDTO);
+
+    PageUtils queryPageByPlanParams(PlanQueryParamDTO planQueryParamDTO);
 }
 

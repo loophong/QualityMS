@@ -104,7 +104,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -192,7 +194,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -280,7 +284,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -366,13 +372,9 @@
                 @click="uploadAllListVisible = true">附件预览</el-button>
             </el-form-item>
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
-            </el-form-item>
-            <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
-            </el-form-item>
-            <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -459,7 +461,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -545,7 +549,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -631,7 +637,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -723,7 +731,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -809,7 +819,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -895,7 +907,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1004,7 +1018,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1090,7 +1106,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1176,7 +1194,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1262,7 +1282,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1348,7 +1370,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1434,7 +1458,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1520,7 +1546,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1612,7 +1640,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1698,7 +1728,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1784,7 +1816,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1891,7 +1925,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -1977,7 +2013,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -2065,7 +2103,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -2152,7 +2192,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -2239,7 +2281,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -2332,7 +2376,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -2419,7 +2465,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -2506,7 +2554,9 @@
             </el-form-item>
 
             <el-form-item label="顾问意见">
-              <el-input type="textarea" autosize v-model="form.stageConsultant"></el-input>
+              <el-input type="textarea"
+                :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
+                autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
               <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
@@ -2757,7 +2807,7 @@ export default {
         stageExtra: "",
         stageConsolidate: "",
         stepFile: "",
-        stepAttachment: "",
+        stageAttachment: [],
         stageConsultant: "",
         stageReview: "",
       },
@@ -2773,7 +2823,7 @@ export default {
       routerParam: {
         qcsrId: "",
         topicName: "",
-        teamNumberIds: "",
+        teamNumberIds: [],
         topicLeader: "",
         topicType: "",
       },
@@ -2800,7 +2850,7 @@ export default {
       },
 
       selectedItem: null, // 用于存储当前选中的 item 数据
-
+      membersOptions: [],
       currentUserName: "", // 当前登录用户
     };
   },
@@ -2811,6 +2861,10 @@ export default {
     this.getDictWorkFlowList();
     this.getPlanStepDataList();
     this.getUserName();
+    console.log('------------+++')
+    console.log(!((this.currentUserName == this.routerParam.topicConsultant) && (this.isAuth('qc:group:consultant'))))
+    console.log((this.currentUserName == this.routerParam.topicConsultant))
+    console.log(this.isAuth('qc:group:consultant'))
   },
   computed: {
     lastDisabled1() {
@@ -2856,6 +2910,7 @@ export default {
 
       });
     },
+
 
     // 监听关闭事件
     handleDialogClose() {
@@ -3002,7 +3057,7 @@ export default {
       this.getTemplateData();
     },
 
-    initRouterParam() {
+    async initRouterParam() {
       const res = this.$route.query.data ? JSON.parse(this.$route.query.data) : {
         qcsrId: "",
         topicName: "",
@@ -3022,11 +3077,43 @@ export default {
       this.conplanProcess = this.active1;
       //==================2024.11.11新增调整================================
 
-      const tmp = this.routerParam.teamNumberIds.split(",");
-      this.participantOptions = tmp.map((id) => ({
-        value: id.trim(),
-        label: id.trim(),
-      }));
+
+      // 获取分组后的员工数据
+      await this.$http({
+        url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+        method: 'get',
+      }).then(({ data }) => {
+        this.membersOptions = data.map(o => {
+          return {
+            ...o, // 复制原对象属性
+            options: o.options.map(e => {
+              const match = e.label.match(/\(([^)]+)\)/);
+              return {
+                ...e, // 复制原选项属性
+                name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              };
+            })
+          };
+        });
+        // console.log(this.membersOptions)
+      });
+      const tmp = this.routerParam.teamNumberIds;
+      if (tmp != '' && tmp != null && tmp != 'undefined') {
+        console.log(tmp)
+        this.participantOptions = tmp.map((id) => ({
+          value: id.trim(),
+          label: id.trim(),
+        }));
+      }
+      this.membersOptions.forEach(a => {
+        a.options.forEach(b => {
+          this.participantOptions.forEach(c => {
+            if (b.name === c.label) {
+              c.label = b.label
+            }
+          })
+        })
+      })
       this.value = this.routerParam.topicType;
     },
     chart(id) {
@@ -3090,7 +3177,7 @@ export default {
           if (item.stageAttachment) {
             const tmp = JSON.parse(item.stageAttachment);
             this.uploadAllList = tmp;
-            this.form.stepAttachment = item.stageAttachment;
+            this.form.stageAttachment = JSON.parse(item.stageAttachment);
           }
           if (item.stageConsultant) {
             this.form.stageConsultant = item.stageConsultant;
@@ -3199,7 +3286,6 @@ export default {
         this.active1++;
         this.tmp = '';
         this.conplanProcess = this.active1;
-        console.log("this.this.active1 ===xht==>" + this.active1);
       }
       this.findMatchingItem(this.active1);
     },
@@ -3258,7 +3344,7 @@ export default {
       // 存储待上传的文件
       this.uploadingFile = file.raw; // 获取 File 对象
       this.uploadNameList.push(file.raw.name);
-      this.uploadFile(file.raw); // 调用上传方法
+      this.uploadFile(file.raw); // 调用上传方法s
     },
     uploadFile(file) {
       const formData = new FormData();
@@ -3271,31 +3357,42 @@ export default {
         headers: {
           "Content-Type": "multipart/form-data", // 指定为文件上传
         },
-      })
-        .then(({ data }) => {
-          if (data && data.code === 0) {
-            // 保存后端返回的url到变量中
-            this.dataForm.rectificationPhotoDeliverable = data.uploadurl;
-            console.log('获得的文件地址 ：', data.uploadurl)
-            console.log('获得的文件 ：', data)
-            this.uploadUrlList.push(data.uploadurl);
-            let fileTmp = {
-              name: file2.name,
-              url: data.uploadurl,
-            };
-            // this.uploadAllList = []
-            this.tmpAllList.push(fileTmp);
-            // console.log('上传文件列表 ：', fileTmp)
-            this.uploadAllList.push(fileTmp);
-            console.log("上传文件列表 ：", this.uploadAllList);
-            // console.log('上传文件名字列表 ：', this.uploadNameList)
-            // this.form.stepFile = data.uploadurl
-            // this.$message.success('文件上传成功');
-            // 处理成功后的逻辑，例如更新状态
-          } else {
-            this.$message.error(data.msg);
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          // console.log(file.name);
+          if (file.name == "wordForExport.docx") {
+            this.$http({
+              url: this.$http.adornUrl("/qcManagement/qcAllCount/word"),
+              method: 'post',
+              data: this.$http.adornData({
+                'qcAllId': 1,
+                'qcTemplateWord': data.uploadurl,
+              })
+            })
           }
-        })
+          // 保存后端返回的url到变量中
+          this.dataForm.rectificationPhotoDeliverable = data.uploadurl;
+          console.log('获得的文件地址 ：', data.uploadurl)
+          console.log('获得的文件 ：', data)
+          this.uploadUrlList.push(data.uploadurl);
+          let fileTmp = {
+            name: file2.name,
+            url: data.uploadurl,
+          };
+          // this.uploadAllList = []
+          this.tmpAllList.push(fileTmp);
+          this.form.stageAttachment.push(fileTmp);
+          // console.log('上传文件列表 ：', fileTmp)
+          this.uploadAllList.push(fileTmp);
+          console.log("上传文件列表 ：", this.uploadAllList);
+          // console.log('上传文件名字列表 ：', this.uploadNameList)
+          // this.form.stepFile = data.uploadurl
+          // this.$message.success('文件上传成功');
+          // 处理成功后的逻辑，例如更新状态
+        } else {
+          this.$message.error(data.msg);
+        }
+      })
         .catch((error) => {
           this.$message.error("上传失败");
           console.error(error);
@@ -3317,10 +3414,11 @@ export default {
     },
     previewDocRemove(name) {
       console.log("删除的名字 ", name);
-      console.log("上传文件列表 ：", this.uploadAllList);
-      this.uploadAllList = this.uploadAllList.filter((item) => item.name !== name);
-      this.tmpAllList = this.tmpAllList.filter((item) => item.name !== name);
-      console.log("上传文件列表after ：", this.uploadAllList);
+      console.log("上传文件列表 ：", this.form.stageAttachment);
+      this.uploadAllList = this.uploadAllList.filter((item) => item.name != name);
+      this.tmpAllList = this.tmpAllList.filter((item) => item.name != name);
+      this.form.stageAttachment = this.form.stageAttachment.filter((item) => item.name != name);
+      console.log("上传文件列表after ：", this.form.stageAttachment);
     },
 
     initForm() {
@@ -3337,6 +3435,7 @@ export default {
         stageConsolidate: "",
         stageConsultant: "",
         stageReview: "",
+        stageAttachment: [],
       };
     },
     init(id) {
@@ -3368,6 +3467,7 @@ export default {
               this.dataForm.stageConsolidate = data.qcStep.stageConsolidate;
               this.dataForm.stageConsultant = data.qcStep.stageConsultant;
               this.dataForm.stageReview = data.qcStep.stageReview;
+              this.dataForm.stageAttachment = JSON.parse(data.qcStep.stageAttachment);
 
             }
           });
@@ -3385,9 +3485,7 @@ export default {
       }
       const tmpStagePeople = JSON.stringify(this.form.stagePeople);
       this.$http({
-        url: this.$http.adornUrl(
-          `/qcPlan/step/${!this.form.stepId ? "save" : "update"}`
-        ),
+        url: this.$http.adornUrl(`/qcPlan/step/${!this.form.stepId ? "save" : "update"}`),
         method: "post",
         data: this.$http.adornData({
           stepId: this.form.stepId || undefined,
@@ -3407,7 +3505,9 @@ export default {
           stageConsultant: this.form.stageConsultant || "",
           stageConsolidate: this.form.stageConsolidate || "",
           stageReview: this.form.stageReview || "",
-          stageAttachment: this.uploadAllList.length ? tmpListString : this.form.stepAttachment,
+          // stageAttachment: tmpListString,
+          // stageAttachment: this.uploadAllList.length ? tmpListString : this.form.stepAttachment,
+          stageAttachment: JSON.stringify(this.form.stageAttachment),
         }),
       })
         .then(({ data }) => {

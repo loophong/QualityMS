@@ -5,10 +5,17 @@
       <el-form-item label="课题名称" prop="topicName">
         <el-input v-model="dataForm.topicName" placeholder="课题名称"></el-input>
       </el-form-item>
-      <el-form-item label="课题单位" prop="topicDepartment">
-        <el-select v-model="dataForm.topicDepartment" placeholder="请选择单位">
+      <el-form-item label="课题科室" prop="topicDepartment">
+        <el-select v-model="dataForm.topicDepartment" placeholder="请选择科室">
           <el-option label="生产科" value="生产科"></el-option>
+          <el-option label="供应科" value="供应科"></el-option>
+          <el-option label="市场科" value="市场科"></el-option>
+          <el-option label="技术科" value="技术科"></el-option>
           <el-option label="质量科" value="质量科"></el-option>
+          <el-option label="财务科" value="财务科"></el-option>
+          <el-option label="安环设备科" value="安环设备科"></el-option>
+          <el-option label="企业管理科" value="企业管理科"></el-option>
+          <el-option label="党群办公室" value="党群办公室"></el-option>
         </el-select>
       </el-form-item>
       <!-- <el-form-item label="课题编号" prop="topicNumber">
@@ -27,7 +34,7 @@
         <el-input v-model="dataForm.topicConsultant" placeholder="课题顾问"></el-input>
       </el-form-item> -->
       <el-form-item label="课题顾问" prop="topicConsultant">
-        <el-select v-model="dataForm.topicConsultant" filterable placeholder="请选择课题顾问">
+        <el-select v-model="dataForm.topicConsultant" :disabled="true" filterable placeholder="请选择课题顾问">
           <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
             <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
             </el-option>
@@ -207,12 +214,15 @@ export default {
         });
 
         if (matchedItem) {
+          console.log(matchedItem)
+          //更新组长
           this.dataForm.topicLeader = matchedItem.name
-          // 更新顾问选项
-          this.consultantOptions = matchedItem.children.filter(member => member.roleInTopic === '顾问').map(member => ({
-            value: member.name,
-            label: member.name
-          }));
+          // 更新顾问
+          this.dataForm.topicConsultant = matchedItem.position
+          // this.consultantOptions = matchedItem.children.filter(member => member.roleInTopic === '顾问').map(member => ({
+          //   value: member.name,
+          //   label: member.name
+          // }));
 
           // 更新成员选项
           this.membersSelect = matchedItem.children.filter(member => member.roleInTopic === '成员').map(member => ({
@@ -244,7 +254,17 @@ export default {
       }
 
     },
-
+    numberToName(number) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.name == number) {
+            result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      return result
+    },
     init(id) {
 
       this.dataForm.qcsrId = id || 0
@@ -453,8 +473,8 @@ export default {
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                if (!this.dataForm.qcsrId && data.exist) {
-                  this.$message.error('课题名称已存在!')
+                if (data.exist) {
+                  this.$message.warning('课题名称已存在!')
                   return
                 } else {
                   this.$http({

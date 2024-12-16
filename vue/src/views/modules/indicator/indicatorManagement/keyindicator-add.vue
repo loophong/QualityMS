@@ -9,8 +9,8 @@
           v-model="dataForm.indicatorName"
           placeholder="请选择指标名称"
           filterable
-          :disabled="!!dataForm.indicatorId"
           @change="onIndicatorNameChange"> <!-- 当 indicatorId 存在时禁用选择 -->
+<!--          :disabled="!!dataForm.indicatorId" -->
           <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
             {{ field.indicatorName }}
           </el-option>

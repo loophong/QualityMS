@@ -62,6 +62,31 @@
             </if>
         </where>
     </select>
+
+
+    <select id="queryPageGetUnfinishedTasks" resultType="io.renren.modules.taskmanagement.entity.TaskEntity">
+        SELECT * FROM task_management_task
+        <where>
+            <if test="task.taskId != null and task.taskId != ''">
+                AND task_id like concat('%',#{task.taskId},'%')
+            </if>
+            <if test="task.taskName != null and task.taskName != ''">
+                AND task_name like concat('%',#{task.taskName},'%')
+            </if>
+            <if test="task.taskIsCompleted != null ">
+                AND task_is_completed = #{task.taskIsCompleted}
+            </if>
+            <if test="task.taskAssociatedIndicatorsId != null and task.taskAssociatedIndicatorsId != ''">
+                AND task_associated_indicators_id = #{task.taskAssociatedIndicatorsId}
+            </if>
+            <if test="userId != null">
+                AND ( task_executor like concat('%','"',#{userId},'"','%') or task_principal = #{userId} )
+            </if>
+            and task_current_state IN("NOT_STARTED","IN_PROGRESS","OVERDUE","APPROVAL_IN_PROGRESS")
+        </where>
+    </select>
+
+
     <select id="selectTaskByPlanId" resultType="io.renren.modules.taskmanagement.vo.PlanExportVO">
         SELECT task_id                       as taskId,
                task_name                     as name,

@@ -28,7 +28,9 @@ public class QcAllCountEntity implements Serializable {
 	 * 职工总数
 	 */
 	private Integer qcMemberCount;
-
-
+	/**
+	 * 模板文件
+	 */
+	private String qcTemplateWord;
 
 }

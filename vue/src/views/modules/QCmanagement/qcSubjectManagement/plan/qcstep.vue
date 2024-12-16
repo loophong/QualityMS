@@ -154,7 +154,7 @@ export default {
           this.dataList.forEach(item => {
             item.stagePeople = JSON.parse(item.stagePeople)
           })
-
+          this.dataList.sort((a, b) => a.stepProcess - b.stepProcess);
         } else {
           this.dataList = []
           this.totalPage = 0

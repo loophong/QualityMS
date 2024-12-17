@@ -7,7 +7,7 @@
     <resultMap type="io.renren.modules.qcManagement.entity.QcAllCountEntity" id="qcAllCountMap">
         <result property="qcAllId" column="qc_all_id"/>
         <result property="qcMemberCount" column="qc_member_count"/>
+        <result property="qcTemplateWord" column="qc_template_word"/>
     </resultMap>
-
 
 </mapper>

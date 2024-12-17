@@ -25,6 +25,7 @@ public interface TaskDao extends BaseMapper<TaskEntity> {
 
     List<TaskLineChartDTO> taskLineDisplay(String planId);
 
+    Page<TaskEntity> queryPageGetUnfinishedTasks(Page<TaskEntity> page, TaskEntity task, Long userId);
     Page<TaskEntity> queryPageByParams(Page<TaskEntity> page, TaskEntity task, Long userId);
 
     List<PlanExportVO> selectTaskByPlanId(String planId);

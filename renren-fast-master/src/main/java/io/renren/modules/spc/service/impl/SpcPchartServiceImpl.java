@@ -1,5 +1,7 @@
 package io.renren.modules.spc.service.impl;
 
+import io.renren.modules.spc.dao.SpcPchartStandardsDao;
+import io.renren.modules.spc.entity.SpcPchartStandardsEntity;
 import io.renren.modules.spc.entity.SpcXrchartEntity;
 import io.swagger.models.auth.In;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,9 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
     @Resource
     private SpcPchartDao spcPchartDao;
 
+    @Resource
+    private SpcPchartStandardsDao spcPchartStandardsDao;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SpcPchartEntity> page = this.page(
@@ -54,9 +59,16 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
 
         //获取数据
         List<SpcPchartEntity> datalist = getData();
+        List<SpcPchartStandardsEntity> datalist_standards = getStandardsData();
+
+        //转换标准数据和普通数据的类型
+        List<SpcPchartEntity> datalist_standards_convert = new ArrayList<>();
+        for(SpcPchartStandardsEntity entity : datalist_standards){
+            datalist_standards_convert.add(convert2SpcPchartEntity(entity));
+        }
 
         List<Double> P = getP(datalist);
-        List<List<Double>> Limit = getP_Limit(datalist);
+        List<List<Double>> Limit = getP_Limit(datalist_standards_convert);
 
         result.add(P);
         result.add(Limit.get(0));
@@ -71,11 +83,18 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
 
         //获取数据
         List<SpcPchartEntity> datalist = getData();
+        List<SpcPchartStandardsEntity> datalist_standards = getStandardsData();
+
+        //转换标准数据和普通数据的类型
+        List<SpcPchartEntity> datalist_standards_convert = new ArrayList<>();
+        for(SpcPchartStandardsEntity entity : datalist_standards){
+            datalist_standards_convert.add(convert2SpcPchartEntity(entity));
+        }
 
         //计算np
         List<Double> np = getNP(datalist);
 
-        List<List<Double>> Limit = getNP_Limit(datalist);
+        List<List<Double>> Limit = getNP_Limit(datalist_standards_convert);
 
         result.add(np);
         result.add(Limit.get(0));
@@ -90,11 +109,18 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
 
         //获取数据
         List<SpcPchartEntity> datalist = getData();
+        List<SpcPchartStandardsEntity> datalist_standards = getStandardsData();
+
+        //转换标准数据和普通数据的类型
+        List<SpcPchartEntity> datalist_standards_convert = new ArrayList<>();
+        for(SpcPchartStandardsEntity entity : datalist_standards){
+            datalist_standards_convert.add(convert2SpcPchartEntity(entity));
+        }
 
         //计算np
         List<Double> u = getU(datalist);
 
-        List<List<Double>> Limit = getU_Limit(datalist);
+        List<List<Double>> Limit = getU_Limit(datalist_standards_convert);
 
         result.add(u);
         result.add(Limit.get(0));
@@ -110,11 +136,18 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
 
         //获取数据
         List<SpcPchartEntity> datalist = getData();
+        List<SpcPchartStandardsEntity> datalist_standards = getStandardsData();
+
+        //转换标准数据和普通数据的类型
+        List<SpcPchartEntity> datalist_standards_convert = new ArrayList<>();
+        for(SpcPchartStandardsEntity entity : datalist_standards){
+            datalist_standards_convert.add(convert2SpcPchartEntity(entity));
+        }
 
         //计算np
         List<Double> c = getC(datalist);
 
-        List<List<Double>> Limit = getC_Limit(datalist);
+        List<List<Double>> Limit = getC_Limit(datalist_standards_convert);
 
         result.add(c);
         result.add(Limit.get(0));
@@ -126,9 +159,14 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
 
     //策略步骤1：获取数据步骤
     public List<SpcPchartEntity> getData(){
-        List<SpcPchartEntity> datalist = spcPchartDao.getSpcPchartEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        return datalist;
+        return spcPchartDao.getSpcPchartEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
     }
+
+    //获取标准数据
+    public List<SpcPchartStandardsEntity> getStandardsData(){
+        return spcPchartStandardsDao.getSpcPchartStandardsEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+
     //处理数据，分辨抽检数
     public List<Integer> getSampling_Tests_Number(List<SpcPchartEntity> datalist){
 
@@ -474,6 +512,72 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
         return sum;
     }
 
+    public SpcPchartEntity convert2SpcPchartEntity(SpcPchartStandardsEntity standardsEntity) {
+        if (standardsEntity == null) {
+            return null; // 如果传入的对象为 null，返回 null
+        }
 
+        SpcPchartEntity pchartEntity = new SpcPchartEntity();
+
+        // 复制主键
+        pchartEntity.setSpcpId(standardsEntity.getSpcpId());
+
+        // 复制当月各天数据
+        pchartEntity.setDate1(standardsEntity.getDate1());
+        pchartEntity.setDate2(standardsEntity.getDate2());
+        pchartEntity.setDate3(standardsEntity.getDate3());
+        pchartEntity.setDate4(standardsEntity.getDate4());
+        pchartEntity.setDate5(standardsEntity.getDate5());
+        pchartEntity.setDate6(standardsEntity.getDate6());
+        pchartEntity.setDate7(standardsEntity.getDate7());
+        pchartEntity.setDate8(standardsEntity.getDate8());
+        pchartEntity.setDate9(standardsEntity.getDate9());
+        pchartEntity.setDate10(standardsEntity.getDate10());
+        pchartEntity.setDate11(standardsEntity.getDate11());
+        pchartEntity.setDate12(standardsEntity.getDate12());
+        pchartEntity.setDate13(standardsEntity.getDate13());
+        pchartEntity.setDate14(standardsEntity.getDate14());
+        pchartEntity.setDate15(standardsEntity.getDate15());
+        pchartEntity.setDate16(standardsEntity.getDate16());
+        pchartEntity.setDate17(standardsEntity.getDate17());
+        pchartEntity.setDate18(standardsEntity.getDate18());
+        pchartEntity.setDate19(standardsEntity.getDate19());
+        pchartEntity.setDate20(standardsEntity.getDate20());
+        pchartEntity.setDate21(standardsEntity.getDate21());
+        pchartEntity.setDate22(standardsEntity.getDate22());
+        pchartEntity.setDate23(standardsEntity.getDate23());
+        pchartEntity.setDate24(standardsEntity.getDate24());
+        pchartEntity.setDate25(standardsEntity.getDate25());
+        pchartEntity.setDate26(standardsEntity.getDate26());
+        pchartEntity.setDate27(standardsEntity.getDate27());
+        pchartEntity.setDate28(standardsEntity.getDate28());
+        pchartEntity.setDate29(standardsEntity.getDate29());
+        pchartEntity.setDate30(standardsEntity.getDate30());
+        pchartEntity.setDate31(standardsEntity.getDate31());
+
+        // 复制合计
+        pchartEntity.setSum(standardsEntity.getSum());
+
+        // 复制数据日期
+        pchartEntity.setDatatime(standardsEntity.getDatatime());
+
+        // 复制数据内容
+        pchartEntity.setDataContent(standardsEntity.getDataContent());
+
+        // 复制创建人和创建时间
+        pchartEntity.setCreateBy(standardsEntity.getCreateBy());
+        pchartEntity.setCreateTime(standardsEntity.getCreateTime());
+
+        // 复制备用字段
+        pchartEntity.setAlternateFields1(standardsEntity.getAlternateFields1());
+        pchartEntity.setAlternateFields2(standardsEntity.getAlternateFields2());
+        pchartEntity.setAlternateFields3(standardsEntity.getAlternateFields3());
+        pchartEntity.setAlternateFields4(standardsEntity.getAlternateFields4());
+
+        // 复制逻辑删除标志
+        pchartEntity.setDeleteFlag(standardsEntity.getDeleteFlag());
+
+        return pchartEntity;
+    }
 
 }

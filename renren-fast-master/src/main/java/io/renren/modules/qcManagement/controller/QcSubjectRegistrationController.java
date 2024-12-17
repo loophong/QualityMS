@@ -141,6 +141,17 @@ public class QcSubjectRegistrationController {
     }
 
     /**
+     * 关于我的列表
+     */
+    @RequestMapping("/aboutMeList")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R aboutMeList(@RequestParam Map<String, Object> params){
+        log.info("关于我："+(String) params.get("key"));
+        PageUtils page = qcSubjectRegistrationService.queryPageAboutAndLead(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
      * 我参与的列表,通过审核
      */
     @RequestMapping("/myListFilter")

@@ -27,7 +27,7 @@
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称">
           </el-table-column>
-          <el-table-column prop="topicDepartment" header-align="center" align="center" label="单位">
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室">
           </el-table-column>
           <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
             <template slot-scope="scope">
@@ -139,7 +139,7 @@
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
           </el-table-column>
-          <el-table-column prop="topicDepartment" header-align="center" align="center" label="单位">
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室">
           </el-table-column>
           <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
             <template slot-scope="scope">
@@ -185,10 +185,18 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-              }}</span>
+                }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
+            <template slot-scope="scope">
+              <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
+              <span v-else>--</span> <!-- 处理未知状态 -->
+            </template>
           </el-table-column>
           <!-- <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
           </el-table-column> -->
@@ -199,10 +207,12 @@
 
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
-              <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
+              <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)"
+                :disabled="!groupLead">修改</el-button>
+              <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)"
+                :disabled="!groupLead">删除</el-button>
               <el-button type="text" size="small"
-                :disabled="((scope.row.topicReviewStatus == 3) || (scope.row.topicReviewStatus == 2))"
+                :disabled="((scope.row.topicReviewStatus == 3) || (scope.row.topicReviewStatus == 2)) || !groupLead"
                 @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
             </template>
           </el-table-column>
@@ -240,7 +250,7 @@
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
           </el-table-column>
-          <el-table-column prop="topicDepartment" header-align="center" align="center" label="单位">
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室">
           </el-table-column>
           <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
             <template slot-scope="scope">
@@ -286,7 +296,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-              }}</span>
+                }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -297,7 +307,7 @@
           </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
-          <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <!-- <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)">删除</el-button>
@@ -305,7 +315,7 @@
                 :disabled="((scope.row.topicReviewStatus == 3) || (scope.row.topicReviewStatus == 2))"
                 @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
             </template>
-          </el-table-column>
+          </el-table-column> -->
         </el-table>
         <el-pagination @size-change="sizeChangeHandleJoin" @current-change="currentChangeHandleJoin"
           :current-page="pageIndexJoin" :page-sizes="[10, 20, 50, 100]" :page-size="pageSizeJoin" :total="totalPageJoin"
@@ -447,7 +457,7 @@ export default {
     AddOrUpdate
   },
   async activated() {
-    this.getDataList()
+    this.getDataList();
     this.getJoinList();
     this.getLeadList();
     this.getUserName();
@@ -474,7 +484,6 @@ export default {
           })
         };
       });
-      // console.log(this.membersOptions)
     });
     this.ifGroupLead();
   },
@@ -729,6 +738,7 @@ export default {
                   groupName: item.groupName,
                   roleInTopic: '组长',
                   examineStatus: item.examineStatus,
+                  position: item.position,
                   children: []
                 };
               }
@@ -1015,7 +1025,7 @@ export default {
         return {
           序号: index + 1,
           课题ID: tableRow.qcsrId,
-          单位: tableRow.topicDepartment,
+          科室: tableRow.topicDepartment,
           课题编号: tableRow.topicNumber,
           课题组长: tableRow.topicLeader,
           课题顾问: tableRow.topicConsultant,

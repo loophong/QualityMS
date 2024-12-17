@@ -1,6 +1,6 @@
 <template>
   <div>
-    <qc-all-count @allCount="handleEvent"></qc-all-count>
+    <qc-all-count v-if="isAuth('qcManagement:qcAllCount:info')" @allCount="handleEvent"></qc-all-count>
     <div style="display: flex;">
       <div id="barChart" ref="barChart" style="width: 50%; height: 300px;"></div>
       <div id="pieChart" ref="pieChart" style="width: 50%; height: 300px;"></div>

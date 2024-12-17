@@ -1,6 +1,8 @@
 package io.renren.modules.spc.service.impl;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+
+import io.renren.modules.spc.dao.SpcXrchartStandardsDao;
+import io.renren.modules.spc.entity.SpcXrchartStandardsEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,9 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     @Resource
     private SpcXrchartDao spcXrchartDao;
 
+    @Resource
+    private SpcXrchartStandardsDao spcXrchartStandardsDao;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SpcXrchartEntity> page = this.page(
@@ -56,14 +61,15 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     public List<List<Double>> getXbar_RChart(){
 
         List<List<Double>> result = new ArrayList<>();
-        List<SpcXrchartEntity> datalist = getData();
 
+        List<SpcXrchartEntity> datalist = getData();
+        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
 
         List<Double> average = getAverage(datalist);
         List<Double> R = getR(datalist);
 
         //存入X图的三限
-        List<Double> Xbar_Limit = getXbar_R_Xbar_Limit(datalist);
+        List<Double> Xbar_Limit = getXbar_R_Xbar_Limit(datalist_standards);
 
         List<Double> Xbar_UCL = new ArrayList<>();
         List<Double> Xbar_CL = new ArrayList<>();
@@ -75,7 +81,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         }
 
         //存入R图的三限
-        List<Double> R_Limit = getXbar_R_R_Limit(datalist);
+        List<Double> R_Limit = getXbar_R_R_Limit(datalist_standards);
 
         List<Double> R_UCL = new ArrayList<>();
         List<Double> R_CL = new ArrayList<>();
@@ -101,7 +107,9 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     @Override
     public List<List<Double>> getXbar_SChart(){
         List<List<Double>> result = new ArrayList<>();
+
         List<SpcXrchartEntity> datalist = getData();
+        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
 
         //计算均值
         List<Double> average = getAverage(datalist);
@@ -110,9 +118,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         List<Double> S = getS(datalist);
 
         //计算均值Xbar的三限
-        List<Double> Xbar_limit = getXbar_S_Xbar_Limit(datalist);
-
-
+        List<Double> Xbar_limit = getXbar_S_Xbar_Limit(datalist_standards);
 
 
         List<Double> Xbar_UCL = new ArrayList<>();
@@ -125,7 +131,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         }
 
         //计算标准差S的三限
-        List<Double> S_limit = getXbar_S_S_Limit(datalist);
+        List<Double> S_limit = getXbar_S_S_Limit(datalist_standards);
 
         List<Double> S_UCL = new ArrayList<>();
         List<Double> S_CL = new ArrayList<>();
@@ -154,14 +160,16 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     @Override
     public List<List<Double>> getMe_RChart(){
         List<List<Double>> result = new ArrayList<>();
+
         List<SpcXrchartEntity> datalist = getData();
+        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
 
         //计算中位数Me
         List<Double> Me = getMe(datalist);
         result.add(Me);
 
         //Me三限
-        List<Double> Me_Limit = getMe_R_Me_Limit(datalist);
+        List<Double> Me_Limit = getMe_R_Me_Limit(datalist_standards);
 
         List<Double> Me_UCL = new ArrayList<>();
         List<Double> Me_CL = new ArrayList<>();
@@ -180,7 +188,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         result.add(R);
 
         //R三限
-        List<Double> R_Limit = getMe_R_R_Limit(datalist);
+        List<Double> R_Limit = getMe_R_R_Limit(datalist_standards);
         List<Double> R_UCL = new ArrayList<>();
         List<Double> R_CL = new ArrayList<>();
         List<Double> R_LCL = new ArrayList<>();
@@ -201,13 +209,14 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         List<List<Double>> result = new ArrayList<>();
 
         List<SpcXrchartEntity> datalist = getData();
+        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
 
         //计算单值I
         List<Double> I = getI(datalist);
         result.add(I);
 
         //Me三限
-        List<Double> I_Limit = getI_MR_I_Limit(datalist);
+        List<Double> I_Limit = getI_MR_I_Limit(datalist_standards);
 
         List<Double> I_UCL = new ArrayList<>();
         List<Double> I_CL = new ArrayList<>();
@@ -227,7 +236,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         result.add(MR);
 
         //R三限
-        List<Double> MR_Limit = getI_MR_MR_Limit(datalist);
+        List<Double> MR_Limit = getI_MR_MR_Limit(datalist_standards);
         List<Double> MR_UCL = new ArrayList<>();
         List<Double> MR_CL = new ArrayList<>();
         List<Double> MR_LCL = new ArrayList<>();
@@ -246,6 +255,11 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     //策略步骤1：获取数据步骤
     public List<SpcXrchartEntity> getData(){
         return spcXrchartDao.getSpcXrchartEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+
+    //获取标准数据
+    public List<SpcXrchartStandardsEntity> getStandardsData(){
+        return spcXrchartStandardsDao.getSpcXrchartStandardsEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
     }
 
     //策略步骤2：根据需要生成的图表类型，使用不同方法计算
@@ -268,6 +282,25 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         return sumList;
     }
 
+    //标准数据求和
+    public List<Double> getStandardsSum(List<SpcXrchartStandardsEntity> datalist){
+        //计算求和
+        List<Double> sumList = new ArrayList<>();
+        for (int i = 1; i <= 31; i++) {
+            BigDecimal sum = BigDecimal.ZERO;
+            if(datalist.get(0).getData(i) == null){
+                break;
+            }
+            for (SpcXrchartStandardsEntity spcXrchartStandardsEntity : datalist) {
+                Float value = spcXrchartStandardsEntity.getData(i);
+                sum = sum.add(new BigDecimal(value.toString())); // 确保精度
+            }
+            sumList.add(sum.doubleValue()); // 将结果添加到列表中
+        }
+        return sumList;
+    }
+
+
     //数据均值Xbar
     public List<Double> getAverage(List<SpcXrchartEntity> datalist){
         List<Double> sum = getSum(datalist);
@@ -276,7 +309,22 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         List<Double> averageList = new ArrayList<>();
         for (Double value : sum){
             BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
-            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number)); // 除以5
+            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number),3,RoundingMode.HALF_UP); // 除以5
+            averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
+        }
+
+        return averageList;
+    }
+
+    //标准数据均值Xbar
+    public List<Double> getStandardsAverage(List<SpcXrchartStandardsEntity> datalist){
+        List<Double> sum = getStandardsSum(datalist);
+        int number = datalist.size();
+
+        List<Double> averageList = new ArrayList<>();
+        for (Double value : sum){
+            BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
+            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number),3,RoundingMode.HALF_UP);
             averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
         }
 
@@ -285,6 +333,37 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
 
     //数据R值(极差R为最大值与最小值之差)
     public List<Double> getR(List<SpcXrchartEntity> datalist) {
+        List<Double> result = new ArrayList<>();
+
+        for (int col = 1; col <= 31; col++) {
+            // 初始化最大值和最小值
+            Float firstValue = datalist.get(0).getData(col);
+            if (firstValue != null) {
+                BigDecimal max = new BigDecimal(firstValue.toString());
+                BigDecimal min = new BigDecimal(firstValue.toString());
+
+                for (int row = 1; row < datalist.size(); row++) { // 遍历该列的每一行
+                    Float currentValue = datalist.get(row).getData(col);
+                    if (currentValue != null) {
+                        BigDecimal current = new BigDecimal(currentValue.toString());
+                        if (current.compareTo(max) > 0) {
+                            max = current; // 更新最大值
+                        }
+                        if (current.compareTo(min) < 0) {
+                            min = current; // 更新最小值
+                        }
+                    }
+                }
+                BigDecimal difference = max.subtract(min); // 计算最大值与最小值的差
+                result.add(difference.doubleValue()); // 将差值转换为Double并添加到列表R中
+            }
+        }
+
+        return result;
+    }
+
+    //标准数据R值
+    public List<Double> getStandardsR(List<SpcXrchartStandardsEntity> datalist){
         List<Double> result = new ArrayList<>();
 
         for (int col = 1; col <= 31; col++) {
@@ -346,6 +425,38 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         return result;
     }
 
+    //标准数据标准差S
+    public List<Double> getStandardsS(List<SpcXrchartStandardsEntity> datalist){
+        List<Double> result = new ArrayList<>();
+
+        List<Double> average = getStandardsAverage(datalist);
+
+        for (int i = 1; i <= average.size(); i++) {
+            List<Double> values = new ArrayList<>();
+
+            // 收集每个 SpcXrchartEntity 对象对应 index 的值
+            for (SpcXrchartStandardsEntity entity : datalist) {
+                Float value = entity.getData(i);
+                if (value != null) {
+                    values.add(value.doubleValue()); // 直接使用 doubleValue()
+                }
+            }
+
+            double averageValue = average.get(i - 1);
+            // 计算方差
+            double variance = values.size() > 1 ? values.stream()
+                    .mapToDouble(value -> Math.pow(value - averageValue, 2))
+                    .sum() / (values.size() - 1) : 0.0;
+
+            double stdDev = Math.sqrt(variance);
+            // 将标准差结果保留2位小数
+            BigDecimal roundedStdDev = new BigDecimal(stdDev).setScale(2, RoundingMode.HALF_UP);
+            result.add(roundedStdDev.doubleValue());
+        }
+
+        return result;
+    }
+
     //数据中位数Me
     public List<Double> getMe(List<SpcXrchartEntity> datalist){
         List<Double> result = new ArrayList<>();
@@ -381,6 +492,41 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         return result;
     }
 
+    //标准数据中位数Me
+    public List<Double> getStandardsMe(List<SpcXrchartStandardsEntity> datalist){
+        List<Double> result = new ArrayList<>();
+
+        for (int col = 1; col <= 31; col++) {
+            List<Double> values = new ArrayList<>();
+
+            // 收集每个 SpcXrchartEntity 对象对应 index 的值
+            for (SpcXrchartStandardsEntity entity : datalist) {
+                Float value = entity.getData(col);
+                if (value != null) {
+                    values.add(value.doubleValue()); // 直接使用 doubleValue()
+                }
+            }
+
+            if (!values.isEmpty()) {
+                // 排序
+                Collections.sort(values);
+                int size = values.size();
+
+                // 判断列表长度是奇数还是偶数
+                if (size % 2 == 1) {
+                    // 奇数，返回中间的值
+                    result.add(round(values.get(size / 2)));
+                } else {
+                    // 偶数，返回中间两个值的平均
+                    double median = (values.get(size / 2 - 1) + values.get(size / 2)) / 2;
+                    result.add(round(median));
+                }
+            }
+        }
+
+        return result;
+    }
+
     //数据单值I (计算方法和求均值Xbar相同)
     public List<Double> getI(List<SpcXrchartEntity> datalist){
         List<Double> sum = getSum(datalist);
@@ -389,7 +535,22 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         List<Double> averageList = new ArrayList<>();
         for (Double value : sum){
             BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
-            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number)); // 除以5
+            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number),3,RoundingMode.HALF_UP);
+            averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
+        }
+
+        return averageList;
+    }
+
+    //标准数据单值I
+    public List<Double> getStandardsI(List<SpcXrchartStandardsEntity> datalist){
+        List<Double> sum = getStandardsSum(datalist);
+        int number = datalist.size();
+
+        List<Double> averageList = new ArrayList<>();
+        for (Double value : sum){
+            BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
+            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(number),3,RoundingMode.HALF_UP);
             averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
         }
 
@@ -424,16 +585,44 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         return result;
     }
 
+    //标准数据移动极差MR
+    public List<Double> getStandardsMR(List<SpcXrchartStandardsEntity> datalist){
+        List<Double> result = new ArrayList<>();
+
+        for (int col = 1; col <= 31; col++) {
+            List<Double> values = new ArrayList<>();
+
+            // 收集每个 SpcXrchartEntity 对象对应 index 的值
+            for (SpcXrchartStandardsEntity entity : datalist) {
+                Float value = entity.getData(col);
+                if (value != null) {
+                    values.add(value.doubleValue()); // 直接使用 doubleValue()
+                }
+            }
+            if (!values.isEmpty()){
+                BigDecimal sum = new BigDecimal(0);
+                for (int i = 1; i < values.size(); i++) {
+                    BigDecimal range = BigDecimal.valueOf(Math.abs(values.get(i) - values.get(i - 1)));
+                    sum = sum.add(range);
+                }
+                result.add(sum.divide(BigDecimal.valueOf(values.size()-1)).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            }
+
+        }
+
+        return result;
+    }
+
     //Xbar-R图 均值Xbar上限UCL、中心限CL、下限LCL
-    public List<Double> getXbar_R_Xbar_Limit(List<SpcXrchartEntity> datalist){
+    public List<Double> getXbar_R_Xbar_Limit(List<SpcXrchartStandardsEntity> datalist){
 
         //输出Xbar-R图 均值Xbar的上限、中心限、下限
         List<Double> result = new ArrayList<>();
 
         //计算Xbar的均值、极差R的均值
 
-        List<Double> average = getAverage(datalist);
-        List<Double> R = getR(datalist);
+        List<Double> average = getStandardsAverage(datalist);
+        List<Double> R = getStandardsR(datalist);
 
         double average_bar = calculateAverage(average);
         double R_bar = calculateAverage(R);
@@ -465,30 +654,15 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
             result.add(0.0);
         }
 
-//        //todo 可能需要修改计算ucl的方法
-//        Float UCL = datalist.get(0).getUpperLimitX();
-//        BigDecimal ucl = new BigDecimal(UCL.toString());
-//        result.add(ucl.doubleValue());
-//
-//        //todo 可能需要修改计算cl的方法
-//        Float CL = datalist.get(0).getCenterLimitX();
-//        BigDecimal cl = new BigDecimal(CL.toString());
-//        result.add(cl.doubleValue());
-//
-//        //todo 可能需要修改计算lcl的方法
-//        Float LCL = datalist.get(0).getLowerLimitX();
-//        BigDecimal lcl = new BigDecimal(LCL.toString());
-//        result.add(lcl.doubleValue());
-
         return result;
     }
 
     //Xbar-R图 极差R上限UCL、中心限CL、下限LCL
-    public List<Double> getXbar_R_R_Limit(List<SpcXrchartEntity> datalist){
+    public List<Double> getXbar_R_R_Limit(List<SpcXrchartStandardsEntity> datalist){
         List<Double> result = new ArrayList<>();
 
         //计算极差R的均值
-        List<Double> R = getR(datalist);
+        List<Double> R = getStandardsR(datalist);
 
         double R_bar = calculateAverage(R);
 
@@ -525,13 +699,13 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     }
 
     //Xbar-S图 均值Xbar上限UCL、中心限CL、下限LCL
-    public List<Double> getXbar_S_Xbar_Limit(List<SpcXrchartEntity> datalist){
+    public List<Double> getXbar_S_Xbar_Limit(List<SpcXrchartStandardsEntity> datalist){
         List<Double> result = new ArrayList<>();
 
         //计算Xbar的均值、标准差S的均值
 
-        List<Double> average = getAverage(datalist);
-        List<Double> S = getS(datalist);
+        List<Double> average = getStandardsAverage(datalist);
+        List<Double> S = getStandardsS(datalist);
 
         double average_bar = calculateAverage(average);
         double S_bar = calculateAverage(S);
@@ -567,11 +741,11 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     }
 
     //Xbar-S图 标准差S上限UCL、中心限CL、下限LCL
-    public List<Double> getXbar_S_S_Limit(List<SpcXrchartEntity> datalist){
+    public List<Double> getXbar_S_S_Limit(List<SpcXrchartStandardsEntity> datalist){
         List<Double> result = new ArrayList<>();
 
         //计算Xbar的均值、标准差S的均值
-        List<Double> S = getS(datalist);
+        List<Double> S = getStandardsS(datalist);
 
         double S_bar = calculateAverage(S);
 
@@ -608,11 +782,11 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     }
 
     //Me-R图 中位数Me上限UCL、中心限CL、下限LCL
-    public List<Double> getMe_R_Me_Limit(List<SpcXrchartEntity> datalist){
+    public List<Double> getMe_R_Me_Limit(List<SpcXrchartStandardsEntity> datalist){
         List<Double> result = new ArrayList<>();
 
-        List<Double> Me = getMe(datalist);
-        List<Double> R = getR(datalist);
+        List<Double> Me = getStandardsMe(datalist);
+        List<Double> R = getStandardsR(datalist);
 
         //计算Me均值、R均值
         double Me_bar = calculateAverage(Me);
@@ -653,11 +827,11 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     }
 
     //Me-R图 极差R上限UCL、中心限CL、下限LCL
-    public List<Double> getMe_R_R_Limit(List<SpcXrchartEntity> datalist){
+    public List<Double> getMe_R_R_Limit(List<SpcXrchartStandardsEntity> datalist){
         List<Double> result = new ArrayList<>();
 
         //计算Me均值、R均值
-        List<Double> R = getR(datalist);
+        List<Double> R = getStandardsR(datalist);
 
         double R_bar = calculateAverage(R);
 
@@ -694,11 +868,11 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     }
 
     //I-MR图 单值I上限UCL、中心限CL、下限LCL
-    public List<Double> getI_MR_I_Limit(List<SpcXrchartEntity> datalist){
+    public List<Double> getI_MR_I_Limit(List<SpcXrchartStandardsEntity> datalist){
         List<Double> result = new ArrayList<>();
 
-        List<Double> I = getI(datalist);
-        List<Double> MR = getMR(datalist);
+        List<Double> I = getStandardsI(datalist);
+        List<Double> MR = getStandardsMR(datalist);
 
         //计算I均值、MR均值
         double I_bar = calculateAverage(I);
@@ -737,11 +911,11 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     }
 
     //I-MR图 移动极差MR上限UCL、中心限CL、下限LCL
-    public List<Double> getI_MR_MR_Limit(List<SpcXrchartEntity> datalist){
+    public List<Double> getI_MR_MR_Limit(List<SpcXrchartStandardsEntity> datalist){
         List<Double> result = new ArrayList<>();
 
         //计算Me均值、R均值
-        List<Double> MR = getMR(datalist);
+        List<Double> MR = getStandardsMR(datalist);
 
         double MR_bar = calculateAverage(MR);
 

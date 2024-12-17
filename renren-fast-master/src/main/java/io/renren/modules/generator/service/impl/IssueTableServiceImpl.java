@@ -241,13 +241,21 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 按 creation_time 降序排序
+        queryWrapper.orderByDesc("creation_time");
+
+        // 执行分页查询
         IPage<IssueTableEntity> page = this.page(
                 new Query<IssueTableEntity>().getPage(params),
-                new QueryWrapper<IssueTableEntity>()
+                queryWrapper
         );
 
         return new PageUtils(page);
     }
+
 
     @Override
     public PageUtils queryPagecreator(Map<String, Object> params) {
@@ -263,7 +271,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
                 .or().eq("verifier", rolename);
 
         // 按 ID 降序排序
-        queryWrapper.orderByDesc("issue_id");
+        queryWrapper.orderByDesc("creation_time");
 
         // 执行分页查询
         IPage<IssueTableEntity> page = this.page(

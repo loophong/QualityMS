@@ -167,9 +167,9 @@ public class IssueMaskTableController {
      */
     @RequestMapping("/serialNumber")
     @RequiresPermissions("generator:issuemasktable:list")
-    public R serialNumber(@RequestParam String issueNumber){
+    public R serialNumber(@RequestParam String issueNumber , @RequestParam String serialNumber){
 //        System.out.println("获取任务编号成功："+issueNumber);
-        String fin = issueMaskTableService.listserialNumber(issueNumber);
+        String fin = issueMaskTableService.listserialNumber(issueNumber ,serialNumber);
 //        System.out.println("返回的数据为："+fin);
         return R.ok(fin);
     }

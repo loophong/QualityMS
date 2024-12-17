@@ -903,7 +903,7 @@ export default {
             // 判断是否为整改责任人
             if (userinfo === rectificationResponsiblePerson) {
               // 如果一致，执行 addOrUpdateHandleR 方法
-              if (level === '等待验证指定') {
+              if (level === '等待验证指定' || level === '等待验证') {
                 this.addOrUpdateHandleVe(issueId);
               } else {
                 //如果不一致，弹出提示

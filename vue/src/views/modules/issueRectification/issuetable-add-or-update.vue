@@ -186,6 +186,7 @@
           issueId: 0,
           serialNumber: '',
           issueNumber: '',
+          issuecreator: '',
           inspectionDepartment: '',
           inspectionDate: '',
           issueCategoryId: '',
@@ -456,6 +457,8 @@
                   'recipients': subtask.assignee,
                   'maskcontent': subtask.name,
                   'creator': this.dataForm.creator,
+                  'issuecreator': this.dataForm.issuecreator,
+                  'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
                   'creationTime': this.dataForm.creationTime,
                   'requiredCompletionTime': this.dataForm.requiredCompletionTime,
                   'superiorMask': subtask.parentTask,
@@ -776,6 +779,7 @@
                 this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
                 this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
                 this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+                this.dataForm.issuecreator = data.issueTable.creator
                 this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
                 this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
                 this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime

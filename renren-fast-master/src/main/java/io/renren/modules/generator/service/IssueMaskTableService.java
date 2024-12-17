@@ -40,6 +40,6 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
 
     PageUtils creatormaskqueryPage(Map<String, Object> params);
 
-    String listserialNumber(String issueNumber);
+    String listserialNumber(String issueNumber ,String serialNumber);
 }
 

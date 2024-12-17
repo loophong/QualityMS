@@ -116,7 +116,7 @@
           state: '',
           formula: '',
           isRelatedIssue: '否',  // 添加此行以初始化
-          isaccessory: '否',  // 添加此行以初始化
+          isaccessory: '',  // 添加此行以初始化
         },
         verificationOptions: [
           {label: '未完成', value: '未完成'},
@@ -138,7 +138,9 @@
           {value: '企管科', label: '企管科'}
           // 其他科室选项
         ],
-        dataRule: {},
+        dataRule: {  isaccessory: [
+            { required: true, message: '请选择验证结论', trigger: 'blur' }
+          ]},
         options: ''
       }
     },
@@ -581,7 +583,7 @@
               this.dataForm.state = '已完成'
 
             } else {
-              this.dataForm.verificationConclusion = '结项'
+              this.dataForm.verificationConclusion = '持续'
               this.dataForm.level = '未通过验证'
               this.dataForm.state = '未完成'
               this.newissue()

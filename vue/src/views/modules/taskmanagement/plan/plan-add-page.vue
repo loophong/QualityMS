@@ -585,7 +585,7 @@ export default {
 
             // 提交数据
             this.$http({
-              url: this.$http.adornUrl(`/taskmanagement/plan/save`),
+              url: this.$http.adornUrl(`/taskmanagement/plan/saveAndApproval`),
               method: 'post',
               data: this.$http.adornData({
                 'plan': plan,
@@ -599,10 +599,10 @@ export default {
                   type: 'success',
                   duration: 1500
                 });
-                // this.$router.push({
-                //   name: 'plan-list'
-                // });
-                this.$router.back();
+                this.$router.push({
+                  name: 'plan-list'
+                });
+                // this.$router.go(-1)
               } else {
                 this.$message.error(data.msg);
               }

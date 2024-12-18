@@ -25,36 +25,38 @@
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
+
       <el-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50">
       </el-table-column>
-      <!--      <el-table-column-->
-      <!--        prop="issueCategoryId"-->
-      <!--        header-align="center"-->
-      <!--        align="center"-->
-      <!--        label="问题类别ID">-->
-      <!--      </el-table-column>-->
-            <el-table-column
-              prop="issueGrade"
-              header-align="center"
-              align="center"
-              label="问题等级">
-            </el-table-column>
+
+      <el-table-column
+        prop="issueGrade"
+        header-align="center"
+        align="center"
+        label="问题等级"
+        fixed>
+      </el-table-column>
+
       <el-table-column
         prop="concreteIssueCategory"
         header-align="center"
         align="center"
-        label="具体问题类别">
+        label="具体问题类别"
+        fixed>
       </el-table-column>
-            <el-table-column
-              prop="gradeIllustrate"
-              header-align="center"
-              align="center"
-              label="等级说明">
-            </el-table-column>
+
+      <el-table-column
+        prop="gradeIllustrate"
+        header-align="center"
+        align="center"
+        label="等级说明"
+        fixed>
+      </el-table-column>
+
       <el-table-column
         fixed="right"
         header-align="center"
@@ -66,7 +68,9 @@
           <el-button type="text" size="small" @click="deleteHandle(scope.row.issueCategoryId)">删除</el-button>
         </template>
       </el-table-column>
+
     </el-table>
+
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"

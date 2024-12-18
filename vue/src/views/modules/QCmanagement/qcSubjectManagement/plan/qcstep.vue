@@ -97,6 +97,7 @@ export default {
         tableTitle: "过程表",
         topicName: '',
       },
+      wordDataUrl: '',
     }
   },
   components: {
@@ -112,7 +113,18 @@ export default {
     //合并两个数组
     this.options = this.options.concat(this.options2)
     console.log(this.options)
+    await this.$http({
+      url: this.$http.adornUrl(`/qcManagement/qcAllCount/wordInfo`),
+      method: 'get',
+      params: this.$http.adornParams()
+    }).then(({ data }) => {
+      if (data && data.code === 0) {
+        this.wordDataUrl = data.qcAllCount.qcTemplateWord
+      }
+    })
+    console.log(this.wordDataUrl)
   },
+
   mounted() {
 
   },
@@ -134,7 +146,7 @@ export default {
         method: 'get',
         params: this.$http.adornParams({
           'page': 1,
-          'limit': 1000,
+          'limit': 100000,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -142,7 +154,7 @@ export default {
           this.dataList.forEach(item => {
             item.stagePeople = JSON.parse(item.stagePeople)
           })
-
+          this.dataList.sort((a, b) => a.stepProcess - b.stepProcess);
         } else {
           this.dataList = []
           this.totalPage = 0
@@ -157,7 +169,7 @@ export default {
         method: "get",
         params: this.$http.adornParams({
           'page': 1,
-          'limit': 1000,
+          'limit': 100000,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -181,7 +193,7 @@ export default {
         method: "get",
         params: this.$http.adornParams({
           'page': 1,
-          'limit': 1000,
+          'limit': 100000,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -205,7 +217,7 @@ export default {
         method: "get",
         params: this.$http.adornParams({
           'page': 1,
-          'limit': 1000,
+          'limit': 100000,
         }),
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -405,12 +417,26 @@ export default {
           const ascii = binaryString.charCodeAt(i);
           bytes[i] = ascii;
         }
+        console.log(bytes.buffer)
         return bytes.buffer;
       }
-
       try {
         // 使用 fetch 获取 DOCX 模板文件
-        const response = await fetch('/static/test.docx');
+
+        //文件预览
+        // function previewDoc(fileflag) {
+        const token = this.$cookie.get("token"); // 获取当前的 token
+        if (!token) {
+          console.error("Token not found!");
+          return;
+        }
+        // 拼接带有 token 的请求地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${this.wordDataUrl}`)}?token=${token}`;
+        // window.open(url);
+        console.log("打开的地址 ", url);
+        // }
+        const response = await fetch(url);
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -469,7 +495,7 @@ export default {
             properties: error.properties
 
           }
-          console.log('err', { error: e })
+          console.log('replace', { error: e })
           // 当使用json记录时，此处抛出错误信息
           throw error
 
@@ -480,12 +506,66 @@ export default {
           mimeType:
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         })
-        saveAs(out, form.tableTitle + '.docx')
+        saveAs(out, this.name + '.docx')
+        // const formData = new FormData();
+        // formData.append('file', new Blob([out],
+        //   { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), `${this.name}.docx`);
+        // console.log(formData)
+        // this.uploadFile(formData)
+
       } catch (error) {
-        console.log('err', { error: error })
+        console.log('big', { error: error })
       }
     },
-
+    // // 上传文件
+    // handleFileChange(file) {
+    //   // 存储待上传的文件
+    //   this.uploadingFile = file.raw; // 获取 File 对象
+    //   this.uploadNameList.push(file.raw.name);
+    //   this.uploadFile(file.raw); // 调用上传方法
+    // },
+    // uploadFile(formData) {
+    //   // const formData = new FormData();
+    //   // let file2 = file;
+    //   // formData.append("file", file); // 将文件添加到 FormData
+    //   this.$http({
+    //     url: this.$http.adornUrl("/generator/issuetable/upload"), // 替换为实际上传接口
+    //     method: "post",
+    //     data: formData,
+    //     headers: {
+    //       "Content-Type": "multipart/form-data", // 指定为文件上传
+    //     },
+    //   })
+    //     .then(({ data }) => {
+    //       if (data && data.code === 0) {
+    //         // 保存后端返回的url到变量中
+    //         // this.dataForm.rectificationPhotoDeliverable = data.uploadurl;
+    //         console.log('获得的文件地址 ：', data.uploadurl)
+    //         console.log('获得的文件 ：', data)
+    //         this.previewDoc(data.uploadurl)
+    //       } else {
+    //         this.$message.error(data.msg);
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       this.$message.error("上传失败");
+    //       console.error(error);
+    //     });
+    // },
+    // //文件预览
+    // previewDoc(fileflag) {
+    //   const token = this.$cookie.get("token"); // 获取当前的 token
+    //   if (!token) {
+    //     console.error("Token not found!");
+    //     return;
+    //   }
+    //   console.log("获取的地址 ", fileflag);
+    //   // 拼接带有 token 的请求地址
+    //   const url = `${this.$http.adornUrl(
+    //     `/generator/issuetable/${fileflag}`
+    //   )}?token=${token}`;
+    //   window.open(url);
+    // },
     // 删除
     deleteHandle(id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {

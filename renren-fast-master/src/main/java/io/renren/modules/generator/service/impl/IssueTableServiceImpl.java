@@ -15,6 +15,7 @@ import io.renren.modules.generator.dao.IssueTableDao;
 import io.renren.modules.generator.entity.IssueMaskTableEntity;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
+import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
@@ -40,6 +41,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service("issueTableService")
 public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTableEntity> implements IssueTableService {
+
+
+
     private final String uploadDir;
     @Autowired
     private IssueTableDao issueTableDao;
@@ -65,12 +69,52 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 
         long p = Long.parseLong((String) params.get("page"));
         long l = Long.parseLong((String) params.get("limit"));
-        Page<IssueTableEntity> page = new Page<IssueTableEntity>(p,l);
+        Page<IssueTableEntity> page = new Page<>(p, l);
+        String creationTime = (String) params.get("creationTime");
+        String issueDescription = (String) params.get("issueDescription");
+        try {
+            // 执行分页查询
+            List<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(creationTime,issueDescription);
+            page.setRecords(result);
+            page.setTotal(result.size());
 
-        Page<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(page);
-        log.info("result"+result);
-        return new PageUtils(page);
+            log.info("result" + page);
+            return new PageUtils(page);
+        } catch (Exception e) {
+            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+            page.setTotal(0);
+            return new PageUtils(page);
+        }
     }
+
+//    @Override
+//    public PageUtils queryPageFinishedList(Map<String, Object> params) {
+//        log.info("param" + params.get("page") + "------" + params.get("limit"));
+//
+//        long p = Long.parseLong((String) params.get("page"));
+//        long l = Long.parseLong((String) params.get("limit"));
+//        Page<QcknowledgebaseEntity> page = new Page<>(p, l);
+//
+//        // 提取模糊查询参数
+//        String topicName = (String) params.get("topicName");
+//        String keywords = (String) params.get("keywords");
+//        String startDate = (String) params.get("startDate");
+//        String endDate = (String) params.get("endDate");
+//
+//        try {
+//            // 执行分页查询
+//            List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,startDate,endDate);
+//            page.setRecords(result);
+//            page.setTotal(result.size());
+//
+//            log.info("result" + page);
+//            return new PageUtils(page);
+//        } catch (Exception e) {
+//            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+//            page.setTotal(0);
+//            return new PageUtils(page);
+//        }
+//    }
 
     @Override
     public String newIssueNumber() {
@@ -180,21 +224,44 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     @Autowired
     private IssueMaskTableDao issueMaskTableDao; // 新增的 DAO
 
+
+
+    @Override
+    public PageUtils queryPageByDescription(Map<String, Object> params, String description) {//修改
+        // 获取分页参数
+        long p = Long.parseLong((String) params.get("page"));
+        long l = Long.parseLong((String) params.get("limit"));
+        Page<IssueTableEntity> page = new Page<>(p, l);
+
+        // 调用 DAO 层方法进行分页查询，传递问题描述  问题描述
+        Page<IssueTableEntity> result = issueTableDao.selectFinishedSubjectListByDescription(page, description);
+
+        return new PageUtils(result);
+    }
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 按 creation_time 降序排序
+        queryWrapper.orderByDesc("creation_time");
+
+        // 执行分页查询
         IPage<IssueTableEntity> page = this.page(
                 new Query<IssueTableEntity>().getPage(params),
-                new QueryWrapper<IssueTableEntity>()
+                queryWrapper
         );
 
         return new PageUtils(page);
     }
 
+
     @Override
     public PageUtils queryPagecreator(Map<String, Object> params) {
         // 获取当前用户信息
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
 
         // 构建查询条件
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
@@ -202,6 +269,9 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         queryWrapper.eq("creator", rolename)
                 .or().eq("rectification_responsible_person", rolename)
                 .or().eq("verifier", rolename);
+
+        // 按 ID 降序排序
+        queryWrapper.orderByDesc("creation_time");
 
         // 执行分页查询
         IPage<IssueTableEntity> page = this.page(
@@ -271,6 +341,52 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 //        System.out.println("///" + list());
         return this.list();
     }
+    @Override
+    public List<IssueTableEntity> listAll01(Map<String, Object> params) {
+        log.info("param: page=" + params.get("page") + ", limit=" + params.get("limit"));
+
+        String creationTime = (String) params.get("creationTime");
+        String issueDescription = (String) params.get("issueDescription");
+
+        try {
+            // 执行查询
+            List<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(creationTime, issueDescription);
+
+            log.info("Query result size: " + result.size());
+            return result;
+        } catch (Exception e) {
+            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+            return new ArrayList<>(); // 返回空列表以避免调用方出错
+        }
+    }
+
+    @Override
+    public Map<String, Integer> gettruecurrentall() {
+
+        Map<String, Integer> statistics = new HashMap<>();
+
+        // 定义可能的验证结论状态
+        List<String> verificationConclusions = Arrays.asList("问题添加", "问题整改", "问题验证");
+
+        // 获取当前月份起止日期
+//        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
+//        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+//        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
+//        String currentMonthEnd = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+
+        // 统计“创建”的数量（即 verification_conclusion 是 NULL 或空字符串的记录）
+        statistics.put("问题添加", countIssuesBylevel("等待整改记录填写"));
+        int count1 = countIssuesBylevel("等待任务下发(处理)");
+        int count2 = countIssuesBylevel("等待验证指定");
+        statistics.put("问题整改", count1+count2);
+        statistics.put("问题验证", countIssuesBylevel("等待验证"));
+        int count3 = countIssuesBylevel("结项");
+        int count4 = countIssuesBylevel("未通过验证");
+        statistics.put("验证已通过", count3);
+        statistics.put("验证未通过", count4);
+
+        return statistics;
+    }
 
     @Override
     public String saveUploadedFile(MultipartFile file) throws IOException {
@@ -333,7 +449,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
     @Override
     public String getuserinfo() {
         SysUserEntity role = ShiroUtils.getUserEntity();
-        String rolename = role.getUsername();
+        String rolename = String.valueOf(role.getUserId());
         return rolename;
     }
 
@@ -1051,35 +1167,8 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
     }
 
     @Override
-//    public boolean checkReplicateIssue(Integer issueId, String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
-//                // 构建查询条件
-//        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
-//
-//            queryWrapper.eq("Systematic_classification",systematicClassification )
-//                    .eq("First_Faulty_parts", firstFaultyParts)
-//                    .eq("Second_Faulty_parts", secondFaultyParts)
-//                    .eq("fault_type", faultType)
-//                    .eq("fault_model",faultModel );
-//
-//        // 查询符合条件的记录
-//        List<IssueTableEntity> issues = this.list(queryWrapper);
-//
-//        System.out.println("issues: " + issues);
-//
-//        // 判断是否存在重复记录
-//        boolean isDuplicate = !issues.isEmpty();
-//
-//        // 更新 overdue 属性为 true
-//        for (IssueTableEntity issue : issues) {
-//            issue.setOverDue("true");
-//            this.updateById(issue);
-//        }
-//
-//        return isDuplicate; // 返回是否存在重复记录
-//    }
-    public boolean checkReplicateIssue(Integer issueId, String systematicClassification, String firstFaultyParts,
-                                       String secondFaultyParts, String faultType, String faultModel) {
-        // 构建查询条件
+    public boolean checkReplicateIssue(Integer issueId,  String systematicClassification, String firstFaultyParts, String secondFaultyParts, String faultType, String faultModel) {
+                // 构建查询条
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
 
         // 根据传入的参数动态构建查询条件，避免查询条件为空时误查询
@@ -1155,6 +1244,16 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
                         .or().eq("verification_conclusion", "")
                         .or().like("verification_conclusion", "持续")
         );
+
+        return this.count(queryWrapper);
+    }
+
+    // 统计所有问题状态
+    private Integer countIssuesBylevel(String Issuestate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+        queryWrapper.eq("level", Issuestate);
+
 
         return this.count(queryWrapper);
     }

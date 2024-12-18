@@ -61,6 +61,14 @@ public class IssueMaskTableEntity implements Serializable {
 	 */
 	private String creator;
 	/**
+	 * 整改责任人
+	 */
+	private String rectificationResponsiblePerson;
+	/**
+	 * 任务创建人
+	 */
+	private String issuecreator;
+	/**
 	 * 发起时间
 	 */
 	private Date creationTime;

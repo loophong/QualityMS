@@ -165,9 +165,9 @@ export default {
         managementDepartment: [
           { required: true, message: '管理部门不能为空', trigger: 'blur' }
         ],
-        indicatorDefinition: [
-          { required: true, message: '指标定义不能为空', trigger: 'blur' }
-        ],
+        // indicatorDefinition: [
+        //   { required: true, message: '指标定义不能为空', trigger: 'blur' }
+        // ],
         indicatorClassification: [
           { required: true, message: '指标分级不能为空', trigger: 'blur' }
         ],

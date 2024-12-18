@@ -88,6 +88,7 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/all")
 //    @RequiresPermissions("qcSubject:registration:list")
     public R listAll(@RequestParam Map<String, Object> params){
+
         PageUtils page = qcSubjectRegistrationService.queryPageAll(params);
         return R.ok().put("page", page);
     }
@@ -136,6 +137,17 @@ public class QcSubjectRegistrationController {
     public R myList(@RequestParam Map<String, Object> params){
         log.info("我参与："+(String) params.get("key"));
         PageUtils page = qcSubjectRegistrationService.queryPageAbout(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 关于我的列表
+     */
+    @RequestMapping("/aboutMeList")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R aboutMeList(@RequestParam Map<String, Object> params){
+        log.info("关于我："+(String) params.get("key"));
+        PageUtils page = qcSubjectRegistrationService.queryPageAboutAndLead(params);
         return R.ok().put("page", page);
     }
 

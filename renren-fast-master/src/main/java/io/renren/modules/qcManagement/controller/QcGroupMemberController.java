@@ -185,21 +185,21 @@ public class QcGroupMemberController {
             qcGroupMemberService.save(qcGroupMember);
             // 修改当前用户权限
             // 获取用户所属的角色列表
-            List<Long> roleIdList = sysUserRoleService.queryRoleIdList(qcGroupMember.getUserId());
-            log.info("修改前用户角色权限列表：" + roleIdList);
+//            List<Long> roleIdList = sysUserRoleService.queryRoleIdList(qcGroupMember.getUserId());
+//            log.info("修改前用户角色权限列表：" + roleIdList);
             // 判断当前传入的权限是否在权限列表中，如果不存在则添加
-            boolean flag = false;
-            for (Long aLong : roleIdList) {
-                if (aLong == qcGroupMember.getMemberRole()) {
-                    flag = true;
-                    log.info("当前用户已拥有该权限，无需添加");
-                }
-            }
-            if (!flag) {
-                roleIdList.add(qcGroupMember.getMemberRole());
-                log.info("修改后用户角色权限列表：" + roleIdList);
-                sysUserRoleService.saveOrUpdate(qcGroupMember.getUserId(), roleIdList);
-            }
+//            boolean flag = false;
+//            for (Long aLong : roleIdList) {
+//                if (aLong == qcGroupMember.getMemberRole()) {
+//                    flag = true;
+//                    log.info("当前用户已拥有该权限，无需添加");
+//                }
+//            }
+//            if (!flag) {
+//                roleIdList.add(qcGroupMember.getMemberRole());
+//                log.info("修改后用户角色权限列表：" + roleIdList);
+//                sysUserRoleService.saveOrUpdate(qcGroupMember.getUserId(), roleIdList);
+//            }
         }
         return R.ok().put("id", qcGroupMember.getQcgmId());
     }
@@ -214,7 +214,7 @@ public class QcGroupMemberController {
         if(parentId != null){
            Boolean result = qcGroupMemberDao.checkRepeat(parentId,name);
            if(result){
-               return R.error("请检查是否有重复成员");
+               return R.error("该成员已存在");
            }
         }
         qcGroupMemberService.save(qcGroupMember);

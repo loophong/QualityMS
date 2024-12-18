@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface UserDeptInfoDao extends BaseMapper<UserEntity> {
 
-    @Select("SELECT dept_name, user_id, username FROM sys_user ORDER BY dept_name")
+    @Select("SELECT dept, user_id, username, nickname FROM sys_user ORDER BY dept")
     List<UserDeptInfoDTO> getEmployeesGroupedByDepartment();
 
 }

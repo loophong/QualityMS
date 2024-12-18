@@ -322,6 +322,19 @@ public class IssueTableController {
     }
 
     /**
+     * 获取问题统计（当月统计不同状态）
+     */
+    @RequestMapping("/truecurrentall")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R gettruecurrentall() {
+        Map<String, Integer> stats = issueTableService.gettruecurrentall();
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
      * 获取问题统计（当月统计不同类型）
      */
     @RequestMapping("/currentMonthInProgressCategoryStats")
@@ -437,7 +450,7 @@ public class IssueTableController {
     public R listuserinfo(){
         System.out.println("=====获取用户信息----开始");
         String userinfo = issueTableService.getuserinfo();
-        Map<String, Object> response = new HashMap<>();
+//        Map<String, Object> response = new HashMap<>();
 //        response.put("code", 0);
 //        response.put("issueTable", userinfo);
         System.out.println(userinfo);

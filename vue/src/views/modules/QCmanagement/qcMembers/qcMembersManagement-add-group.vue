@@ -25,20 +25,28 @@
                 </el-option>
               </el-option-group>
             </el-select>
-
-
           </el-form-item>
-          <el-form-item label="角色">
+          <!-- <el-form-item label="角色">
             <el-select v-model="dataForm.memberRole" placeholder="请选择">
               <el-option v-for="role in roleIdList" :key="role.roleId" :label="role.roleName"
                 :value="role.roleId"></el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item prop="number" label="员工编号">
+          </el-form-item> -->
+          <!-- <el-form-item prop="number" label="员工编号">
             <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
-          </el-form-item>
-          <el-form-item v-if="isAdmin" prop="department" label="单位">
-            <el-input v-model="dataForm.department" placeholder="请输入单位"></el-input>
+          </el-form-item> -->
+          <el-form-item v-if="isAdmin" prop="department" label="科室">
+            <el-select v-model="dataForm.department" placeholder="请选择科室">
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item v-if="isAdmin" prop="team" label="小组类型">
             <el-select v-model="dataForm.team" placeholder="请选择小组类型">
@@ -46,6 +54,14 @@
               <el-option label="现场" value="现场"></el-option>
               <el-option label="管理" value="管理"></el-option>
               <el-option label="服务" value="服务"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="isAdmin" prop="position" label="小组顾问">
+            <el-select v-model="dataForm.position" filterable placeholder="请选择顾问">
+              <el-option-group v-for="group in consultantOptions" :key="group.label" :label="group.label">
+                <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.name">
+                </el-option>
+              </el-option-group>
             </el-select>
           </el-form-item>
           <el-form-item v-if="!isAdmin" label="组内角色" prop="roleInTopic">
@@ -100,7 +116,7 @@
       <el-form-item>
         <br>
 
-        <el-button v-if="!dataForm.qcgmId || isAddMember" type="primary" @click="addMember">新增成员</el-button>
+        <!-- <el-button v-if="!dataForm.qcgmId || isAddMember" type="primary" @click="addMember">新增成员</el-button> -->
       </el-form-item>
     </el-form>
 
@@ -124,6 +140,7 @@ export default {
       memberRole: '',
 
       membersOptions: [],
+      consultantOptions: [],
       isAddMember: false,
       parentFlag: '',
       visible: false,
@@ -173,10 +190,27 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     this.setDefaultDate();
     this.parentFlag = this.dataForm.qcgmId;
-
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.consultantOptions = data.map(o => {
+        return {
+          ...o, // 复制原对象属性
+          options: o.options.map(e => {
+            const match = e.label.match(/\(([^)]+)\)/);
+            return {
+              ...e, // 复制原选项属性
+              name: match ? match[1] : e.name || ''
+            };
+          }).filter(e => e.label.includes('孙哲') || e.label.includes('于腾')) // 筛选条件;
+        };
+      })
+    });
   },
   computed: {
     isAdmin() {

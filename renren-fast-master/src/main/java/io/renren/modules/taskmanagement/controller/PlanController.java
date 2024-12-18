@@ -10,6 +10,7 @@ import cn.hutool.log.Log;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
 import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
@@ -19,6 +20,7 @@ import io.renren.modules.taskmanagement.service.TaskService;
 import io.renren.modules.taskmanagement.vo.PlanExportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +54,8 @@ public class PlanController {
     private FileService fileService;
     @Autowired
     private ApprovalService approvalService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @RequestMapping("/export")
     public void export(HttpServletResponse response){
@@ -63,6 +67,43 @@ public class PlanController {
             throw new RuntimeException(e);
         }
 
+    }
+
+    /** 
+     * @description: 分页查询
+     * @param: planQueryParamDTO 
+     * @return: io.renren.common.utils.R 
+     * @author: hong
+     * @date: 2024/12/16 16:58
+     */ 
+    @PostMapping("/queryPageByParams")
+    public R queryPageByParams(@RequestBody PlanQueryParamDTO planQueryParamDTO) {
+        log.info("查询条件：" + planQueryParamDTO);
+        PageUtils page = planService.queryPageByPlanParams(planQueryParamDTO);
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * @description: 图中点击计划时，查询计划的全部信息和计划文件
+     * @param: null
+     * @return:
+     * @author: hong
+     * @date: 2024/12/12 15:50
+     */
+    @PostMapping("/planAllInfo")
+    public R planAllInfo(@RequestBody String param) throws Exception {
+        log.info("param:" + param);
+        Map<String, Object> jsonMap = objectMapper.readValue(param, Map.class);
+        String planId = (String) jsonMap.get("paramPlanId");
+        log.info("paramPlanId:" + planId);
+        PlanEntity plan = planService.query().eq("plan_id", planId).one();
+        // 查询plan的文件
+        List<FileEntity> files = fileService.list(new QueryWrapper<FileEntity>().eq("plan_id", planId));
+        if (files != null){
+            return R.ok().put("plan", plan).put("files", files);
+        }else {
+            return R.ok().put("plan", plan).put("files", null);
+        }
     }
 
     /**
@@ -226,6 +267,28 @@ public class PlanController {
         return R.ok();
     }
 
+    /** 
+     * @description: 保存计划，直系任务，文件，并且根据计划的审批人进行送审
+     * @param: planDTO 
+     * @return: io.renren.common.utils.R 
+     * @author: hong
+     * @date: 2024/12/15 13:18
+     */ 
+    @PostMapping("/saveAndApproval")
+    @RequiresPermissions("taskmanagement:plan:save")
+    public R saveAndApproval(@RequestBody PlanDTO planDTO) {
+        log.info("新增计划：" + planDTO);
+        planService.saveAllPlanInfoAndApproval(planDTO);
+        return R.ok();
+    }
+
+    @RequestMapping("/reApproval")
+    @RequiresPermissions("taskmanagement:plan:update")
+    public R reApproval(@RequestBody PlanDTO planDTO) {
+        planService.reApproval(planDTO);
+        return R.ok();
+    }
+
     /**
      * @description: 更新计划和任务
      * @author: hong
@@ -262,6 +325,8 @@ public class PlanController {
         return R.ok();
     }
 
+
+
     /**
      * @description: 删除计划时删除其全部子任务
      * @author: hong
@@ -285,7 +350,7 @@ public class PlanController {
         fileService.remove(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
 
         // 删除所有的审批信息
-        approvalService.remove(new LambdaQueryWrapper<ApprovalEntity>().eq(ApprovalEntity::getTaskAssociatedIndicatorsId, planId));
+        approvalService.remove(new LambdaQueryWrapper<ApprovalEntity>().eq(ApprovalEntity::getTaskAssociatedPlanId, planId));
 
         return R.ok();
     }

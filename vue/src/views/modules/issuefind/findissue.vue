@@ -1,58 +1,146 @@
 
 <template>
-  <div class="mod-config">
-    <el-dialog title="整改情况" :visible.sync="dialogVisible" width="400px">
-      <p>{{ fullDescription }}</p>
-    </el-dialog>
-    <el-dialog title="原因分析" :visible.sync="dialogVisible1" width="400px">
-      <p>{{ fullCause }}</p>
-    </el-dialog>
-    <el-dialog title="验证整改情况" :visible.sync="dialogVisible2" width="400px">
-      <p>{{ fullRetStates }}</p>
-    </el-dialog>
-    <el-tabs type="border-card" action="tabClickHandle">
+  <el-tabs v-model="activeName" type="border-card" >
 
-      <!-- 问题添加 Tab Pane -->
-      <el-tab-pane label="问题添加">
-        <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-          <!--          <el-form-item>-->
-          <!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-          <!--          </el-form-item>-->
+    <!-- 问题添加 Tab Pane -->
+    <el-tab-pane label="问题添加" name="1">
+      <el-form v-if="showForm" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+        <!--          <el-form-item>-->
+        <!--            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+        <!--          </el-form-item>-->
+        <el-form-item>
+          <!--            <el-button @click="getDataList()">查询</el-button>-->
+          <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
+                     @click="addOrUpdateHandle()">新增</el-button>
+          <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
+                     :disabled="dataListSelections.length <= 0">批量删除</el-button>
+          <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
+                     @click="openRegistration()">课题登记</el-button>
+          <!--            <el-button v-if="isAuth('generator:issuetable:save')" type="primary"-->
+          <!--                       @click="openTools()">QC工具</el-button>-->
+          <!-- QC工具下拉菜单 -->
+          <!--            <el-dropdown v-if="isAuth('generator:issuetable:save')">-->
+          <!--              <el-button type="primary" class="el-dropdown-link">-->
+          <!--                QC工具-->
+          <!--                <i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
+          <!--              </el-button>-->
+          <!--              <el-dropdown-menu slot="dropdown">-->
+          <!--                <el-dropdown-item-->
+          <!--                  v-for="tool in tools"-->
+          <!--                  :key="tool.routeName"-->
+          <!--                  @click.native="navigateTo(tool.routeName)"-->
+          <!--                >-->
+          <!--                  {{ tool.label }}-->
+          <!--                </el-dropdown-item>-->
+          <!--              </el-dropdown-menu>-->
+          <!--            </el-dropdown>-->
+        </el-form-item>
+        <el-form-item>
+          <el-upload class="upload-demo" :before-upload="beforeUpload" :show-file-list="false"
+                     :on-success="handleUploadSuccess" :on-error="handleUploadError">
+            <el-button size="small" type="primary">点击上传 Excel</el-button>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+
+      <el-table  :data="dataList" border v-loading="dataListLoading"
+                 @selection-change="selectionChangeHandle" style="width: 100%;">
+        <el-table-column type="selection" header-align="center" align="center" width="50">
+        </el-table-column>
+        <el-table-column prop="issueNumber" header-align="center" align="center" label="问题编号">
+        </el-table-column>
+        <el-table-column prop="inspectionDepartment" header-align="center" align="center" label="检查科室">
+        </el-table-column>
+        <el-table-column prop="inspectionDate" header-align="center" align="center" label="检查日期">
+        </el-table-column>
+        <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
+        </el-table-column>
+        <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
+        </el-table-column>
+        <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
+        </el-table-column>
+        <el-table-column prop="secondFaultyParts" header-align="center" align="center" label="故障件二级">
+        </el-table-column>
+        <el-table-column prop="faultType" header-align="center" align="center" label="故障类别">
+        </el-table-column>
+        <el-table-column prop="faultModel" header-align="center" align="center" label="故障模式">
+        </el-table-column>
+        <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
+        </el-table-column>
+        <el-table-column prop="vehicleNumberId" header-align="center" align="center" label="车号">
+        </el-table-column>
+        <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
+        </el-table-column>
+        <el-table-column prop="peliminaryAnalysis" header-align="center" align="center" label="初步分析">
+        </el-table-column>
+        <!--          <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
+        <!--            <template slot-scope="scope">-->
+        <!--              <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+        <!--            </template>-->
+        <!--          </el-table-column>-->
+        <el-table-column
+          prop="issuePhoto"
+          header-align="center"
+          align="center"
+          label="问题照片">
+          <template slot-scope="scope">
+            <img
+              :src="getImageUrl(scope.row.issuePhoto)"
+              alt="问题照片"
+              style="width: 100px; height: auto; cursor: pointer;"
+              @click="handleFileAction(scope.row.issuePhoto ,scope.row.issueId)"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column prop="rectificationRequirement" header-align="center" align="center" label="整改要求">
+        </el-table-column>
+        <el-table-column prop="requiredCompletionTime" header-align="center" align="center" label="要求完成时间">
+        </el-table-column>
+        <el-table-column prop="responsibleDepartment" header-align="center" align="center" label="责任科室">
+        </el-table-column>
+<!--        <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
+<!--        </el-table-column>-->
+        <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+          <template slot-scope="scope">
+            <div>
+      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+      </span>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+                     :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+                     layout="total, sizes, prev, pager, next, jumper">
+      </el-pagination>
+    </el-tab-pane>
+
+    <!-- 整改记录 Tab Pane -->
+    <el-tab-pane label="整改记录" name="2">
+      <div class="mod-config">
+        <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+          <!--            <el-form-item>-->
+          <!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+          <!--            </el-form-item>-->
           <el-form-item>
-            <!--            <el-button @click="getDataList()">查询</el-button>-->
-            <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
-                       @click="addOrUpdateHandle()">新增</el-button>
+            <!--              <el-button @click="getDataList()">查询</el-button>-->
+            <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
             <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
                        :disabled="dataListSelections.length <= 0">批量删除</el-button>
-            <el-button v-if="isAuth('generator:issuetable:save')" type="primary"
-                       @click="openRegistration()">课题登记</el-button>
-<!--            <el-button v-if="isAuth('generator:issuetable:save')" type="primary"-->
-<!--                       @click="openTools()">QC工具</el-button>-->
-            <!-- QC工具下拉菜单 -->
-<!--            <el-dropdown v-if="isAuth('generator:issuetable:save')">-->
-<!--              <el-button type="primary" class="el-dropdown-link">-->
-<!--                QC工具-->
-<!--                <i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
-<!--              </el-button>-->
-<!--              <el-dropdown-menu slot="dropdown">-->
-<!--                <el-dropdown-item-->
-<!--                  v-for="tool in tools"-->
-<!--                  :key="tool.routeName"-->
-<!--                  @click.native="navigateTo(tool.routeName)"-->
-<!--                >-->
-<!--                  {{ tool.label }}-->
-<!--                </el-dropdown-item>-->
-<!--              </el-dropdown-menu>-->
-<!--            </el-dropdown>-->
-          </el-form-item>
-          <el-form-item>
-            <el-upload class="upload-demo" :before-upload="beforeUpload" :show-file-list="false"
-                       :on-success="handleUploadSuccess" :on-error="handleUploadError">
-              <el-button size="small" type="primary">点击上传 Excel</el-button>
-            </el-upload>
           </el-form-item>
         </el-form>
-
         <el-table  :data="dataList" border v-loading="dataListLoading"
                    @selection-change="selectionChangeHandle" style="width: 100%;">
           <el-table-column type="selection" header-align="center" align="center" width="50">
@@ -83,11 +171,11 @@
           </el-table-column>
           <el-table-column prop="peliminaryAnalysis" header-align="center" align="center" label="初步分析">
           </el-table-column>
-          <!--          <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
-          <!--            <template slot-scope="scope">-->
-          <!--              <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
-          <!--            </template>-->
-          <!--          </el-table-column>-->
+          <!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
+          <!--              <template slot-scope="scope">-->
+          <!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+          <!--              </template>-->
+          <!--            </el-table-column>-->
           <el-table-column
             prop="issuePhoto"
             header-align="center"
@@ -108,360 +196,392 @@
           </el-table-column>
           <el-table-column prop="responsibleDepartment" header-align="center" align="center" label="责任科室">
           </el-table-column>
+          <!--            <el-table-column-->
+          <!--              prop="causeAnalysis"-->
+          <!--              header-align="center"-->
+          <!--              align="center"-->
+          <!--              label="原因分析">-->
+          <!--            </el-table-column>-->
+<!--          <el-table-column prop="causeAnalysis" header-align="center" align="center" label="原因分析">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div-->
+<!--                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"-->
+<!--                @click="showFullCauseAnalysis(scope.row.causeAnalysis)">-->
+<!--                  <span v-if="scope.row.causeAnalysis.length > 8">-->
+<!--                    {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> &lt;!&ndash; 显示前八个字符，加粗省略号 &ndash;&gt;-->
+<!--                  </span>-->
+<!--                <span v-else>-->
+<!--                    {{ scope.row.causeAnalysis }} &lt;!&ndash; 显示完整描述 &ndash;&gt;-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="causeAnalysis"
+            header-align="center"
+            align="center"
+            label="原因分析">
+            <template slot-scope="scope">
+              <div
+                v-if="scope.row.causeAnalysis"
+                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
+                @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
+                <span v-if="scope.row.causeAnalysis.length > 8">
+                  {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+               </span>
+                <span v-else>
+                   {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+                </span>
+              </div>
+              <div v-else>
+                <!-- 如果 causeAnalysis 为空，显示空白 -->
+                &nbsp;
+              </div>
+            </template>
+          </el-table-column>
+
+          <!--            <el-table-column-->
+          <!--              prop="rectificationStatus"-->
+          <!--              header-align="center"-->
+          <!--              align="center"-->
+          <!--              label="整改情况">-->
+          <!--            </el-table-column>-->
+<!--          <el-table-column prop="rectificationStatus" header-align="center" align="center" label="整改情况">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div-->
+<!--                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"-->
+<!--                @click="showFullDescription(scope.row.rectificationStatus)">-->
+<!--                {{ truncateDescription(scope.row.rectificationStatus) }}-->
+<!--                <span v-if="scope.row.rectificationStatus.length > 20">-->
+<!--                    <strong>...</strong> &lt;!&ndash; 将省略号加粗 &ndash;&gt;-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--              <div v-else>-->
+<!--                &lt;!&ndash; 如果 rectificationStatus 为空，显示空白 &ndash;&gt;-->
+<!--                &nbsp;-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="rectificationStatus"
+            header-align="center"
+            align="center"
+            label="整改情况">
+            <template slot-scope="scope">
+              <div
+                v-if="scope.row.rectificationStatus"
+                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
+                @click="showFullDescription(scope.row.rectificationStatus)">
+                {{ truncateDescription(scope.row.rectificationStatus) }}
+                <span v-if="scope.row.rectificationStatus.length > 20">
+                  <strong>...</strong> <!-- 将省略号加粗 -->
+             </span>
+              </div>
+              <div v-else>
+                <!-- 如果 rectificationStatus 为空，显示空白 -->
+                &nbsp;
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
+          </el-table-column>
+          <el-table-column
+            prop="rectificationPhotoDeliverable"
+            header-align="center"
+            align="center"
+            label="整改照片交付物">
+            <template slot-scope="scope">
+              <el-button type="text" @click="showFileList(scope.row.rectificationPhotoDeliverable)">
+                预览
+              </el-button>
+            </template>
+          </el-table-column>
+          <!--                        <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">-->
+          <!--                          <template slot-scope="scope">-->
+          <!--                            <el-button type="text" size="small"-->
+          <!--                                       @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
+          <!--                          </template>-->
+          <!--                        </el-table-column>-->
+          <!--            <el-table-column-->
+          <!--              prop="rectificationPhotoDeliverable"-->
+          <!--              header-align="center"-->
+          <!--              align="center"-->
+          <!--              label="整改照片交付物">-->
+          <!--              <template slot-scope="scope">-->
+          <!--                <img-->
+          <!--                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"-->
+          <!--                  alt="整改照片交付物"-->
+          <!--                  style="width: 100px; height: auto; cursor: pointer;"-->
+          <!--                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"-->
+          <!--                />-->
+          <!--              </template>-->
+          <!--            </el-table-column>-->
+          <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.rectificationResponsiblePerson) }}
+            </template>
+          </el-table-column>
+<!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
+<!--          </el-table-column>-->
+          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+            <template slot-scope="scope">
+              <div>
+      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+      </span>
+              </div>
+            </template>
+          </el-table-column>
+
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
+              <el-button type="text" size="small"
+                         @click="handleRectificationRecords(scope.row.rectificationResponsiblePerson, scope.row.issueId)">整改记录</el-button>
+              <!--          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>-->
+              <el-button type="text" size="small"
+                         @click="assetOrUpdateHandle(scope.row.issueId, scope.row.issueNumber, scope.row.level)">任务发起</el-button>
+              <el-button type="text" size="small"
+                         @click="openflow(scope.row.issueId, scope.row.issueNumber)">任务流程</el-button>
+              <el-button type="text" size="small"
+                         @click="openNewPage(scope.row.issueId, scope.row.issueNumber)">任务列表</el-button>
+              <el-button type="text" size="small"
+                         @click="handleVerificationRecords(scope.row.issueId, scope.row.issueNumber, scope.row.rectificationResponsiblePerson, scope.row.level)">验证指定</el-button>
             </template>
           </el-table-column>
         </el-table>
-
         <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
                        :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
                        layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
-      </el-tab-pane>
+      </div>
+    </el-tab-pane>
 
-      <!-- 整改记录 Tab Pane -->
-      <el-tab-pane label="整改记录">
-        <div class="mod-config">
-          <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-            <!--            <el-form-item>-->
-            <!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-            <!--            </el-form-item>-->
-            <el-form-item>
-              <!--              <el-button @click="getDataList()">查询</el-button>-->
-              <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
-              <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
-                         :disabled="dataListSelections.length <= 0">批量删除</el-button>
-            </el-form-item>
-          </el-form>
-          <el-table  :data="dataList" border v-loading="dataListLoading"
-                     @selection-change="selectionChangeHandle" style="width: 100%;">
-            <el-table-column type="selection" header-align="center" align="center" width="50">
-            </el-table-column>
-            <el-table-column prop="issueNumber" header-align="center" align="center" label="问题编号">
-            </el-table-column>
-            <el-table-column prop="inspectionDepartment" header-align="center" align="center" label="检查科室">
-            </el-table-column>
-            <el-table-column prop="inspectionDate" header-align="center" align="center" label="检查日期">
-            </el-table-column>
-            <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
-            </el-table-column>
-            <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
-            </el-table-column>
-            <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
-            </el-table-column>
-            <el-table-column prop="secondFaultyParts" header-align="center" align="center" label="故障件二级">
-            </el-table-column>
-            <el-table-column prop="faultType" header-align="center" align="center" label="故障类别">
-            </el-table-column>
-            <el-table-column prop="faultModel" header-align="center" align="center" label="故障模式">
-            </el-table-column>
-            <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
-            </el-table-column>
-            <el-table-column prop="vehicleNumberId" header-align="center" align="center" label="车号">
-            </el-table-column>
-            <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
-            </el-table-column>
-            <el-table-column prop="peliminaryAnalysis" header-align="center" align="center" label="初步分析">
-            </el-table-column>
-            <!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
-            <!--              <template slot-scope="scope">-->
-            <!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
-            <!--              </template>-->
-            <!--            </el-table-column>-->
-            <el-table-column
-              prop="issuePhoto"
-              header-align="center"
-              align="center"
-              label="问题照片">
-              <template slot-scope="scope">
-                <img
-                  :src="getImageUrl(scope.row.issuePhoto)"
-                  alt="问题照片"
-                  style="width: 100px; height: auto; cursor: pointer;"
-                  @click="handleFileAction(scope.row.issuePhoto ,scope.row.issueId)"
-                />
-              </template>
-            </el-table-column>
-            <el-table-column prop="rectificationRequirement" header-align="center" align="center" label="整改要求">
-            </el-table-column>
-            <el-table-column prop="requiredCompletionTime" header-align="center" align="center" label="要求完成时间">
-            </el-table-column>
-            <el-table-column prop="responsibleDepartment" header-align="center" align="center" label="责任科室">
-            </el-table-column>
-            <!--            <el-table-column-->
-            <!--              prop="causeAnalysis"-->
-            <!--              header-align="center"-->
-            <!--              align="center"-->
-            <!--              label="原因分析">-->
-            <!--            </el-table-column>-->
-            <el-table-column prop="causeAnalysis" header-align="center" align="center" label="原因分析">
-              <template slot-scope="scope">
-                <div
-                  style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
-                  @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
-                  <span v-if="scope.row.causeAnalysis.length > 8">
-                    {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
-                  </span>
-                  <span v-else>
-                    {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
-                  </span>
-                </div>
-              </template>
-            </el-table-column>
-            <!--            <el-table-column-->
-            <!--              prop="rectificationStatus"-->
-            <!--              header-align="center"-->
-            <!--              align="center"-->
-            <!--              label="整改情况">-->
-            <!--            </el-table-column>-->
-            <el-table-column prop="rectificationStatus" header-align="center" align="center" label="整改情况">
-              <template slot-scope="scope">
-                <div
-                  style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
-                  @click="showFullDescription(scope.row.rectificationStatus)">
-                  {{ truncateDescription(scope.row.rectificationStatus) }}
-                  <span v-if="scope.row.rectificationStatus.length > 20">
-                    <strong>...</strong> <!-- 将省略号加粗 -->
-                  </span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
-            </el-table-column>
-            <el-table-column
-              prop="rectificationPhotoDeliverable"
-              header-align="center"
-              align="center"
-              label="整改照片交付物">
-              <template slot-scope="scope">
-                <el-button type="text" @click="showFileList(scope.row.rectificationPhotoDeliverable)">
-                  预览
-                </el-button>
-              </template>
-            </el-table-column>
-<!--                        <el-table-column prop="rectificationPhotoDeliverable" header-align="center" align="center" label="整改照片交付物">-->
-<!--                          <template slot-scope="scope">-->
-<!--                            <el-button type="text" size="small"-->
-<!--                                       @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
-<!--                          </template>-->
-<!--                        </el-table-column>-->
-<!--            <el-table-column-->
-<!--              prop="rectificationPhotoDeliverable"-->
-<!--              header-align="center"-->
-<!--              align="center"-->
-<!--              label="整改照片交付物">-->
-<!--              <template slot-scope="scope">-->
-<!--                <img-->
-<!--                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"-->
-<!--                  alt="整改照片交付物"-->
-<!--                  style="width: 100px; height: auto; cursor: pointer;"-->
-<!--                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"-->
-<!--                />-->
-<!--              </template>-->
-<!--            </el-table-column>-->
-            <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
-            </el-table-column>
-            <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
-              <template slot-scope="scope">
-                <el-button type="text" size="small"
-                           @click="handleRectificationRecords(scope.row.issueNumber, scope.row.issueId)">整改记录</el-button>
-                <!--          <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>-->
-                <el-button type="text" size="small"
-                           @click="assetOrUpdateHandle(scope.row.issueId, scope.row.issueNumber)">任务发起</el-button>
-                <el-button type="text" size="small"
-                           @click="openflow(scope.row.issueId, scope.row.issueNumber)">任务流程</el-button>
-                <el-button type="text" size="small"
-                           @click="openNewPage(scope.row.issueId, scope.row.issueNumber)">任务列表</el-button>
-                <el-button type="text" size="small"
-                           @click="handleVerificationRecords(scope.row.issueId, scope.row.issueNumber)">验证指定</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-                         :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
-                         layout="total, sizes, prev, pager, next, jumper">
-          </el-pagination>
-        </div>
-      </el-tab-pane>
+    <!-- 问题验证 Tab Pane -->
+    <el-tab-pane label="问题验证" name="3">
+      <div class="mod-config">
+        <el-form v-if="showForm1" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+          <!--            <el-form-item>-->
+          <!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
+          <!--            </el-form-item>-->
+          <el-form-item>
+            <!--              <el-button @click="getDataList()">查询</el-button>-->
+            <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
+            <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
+                       :disabled="dataListSelections.length <= 0">批量删除</el-button>
+          </el-form-item>
+        </el-form>
+        <el-table :data="dataList" border v-loading="dataListLoading"
+                  @selection-change="selectionChangeHandle" style="width: 100%;">
+          <el-table-column type="selection" header-align="center" align="center" width="50">
+          </el-table-column>
+          <!--      <el-table-column-->
+          <!--        prop="issueId"-->
+          <!--        header-align="center"-->
+          <!--        align="center"-->
+          <!--        label="">-->
+          <!--      </el-table-column>-->
+          <!--      <el-table-column-->
+          <!--        prop="serialNumber"-->
+          <!--        header-align="center"-->
+          <!--        align="center"-->
+          <!--        label="序号">-->
+          <!--      </el-table-column>-->
+          <el-table-column prop="issueNumber" header-align="center" align="center" label="问题编号">
+          </el-table-column>
+          <el-table-column prop="inspectionDepartment" header-align="center" align="center" label="检查科室">
+          </el-table-column>
+          <el-table-column prop="inspectionDate" header-align="center" align="center" label="检查日期">
+          </el-table-column>
+          <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
+          </el-table-column>
+          <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
+          </el-table-column>
+          <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
+          </el-table-column>
+          <el-table-column prop="secondFaultyParts" header-align="center" align="center" label="故障件二级">
+          </el-table-column>
+          <el-table-column prop="faultType" header-align="center" align="center" label="故障类别">
+          </el-table-column>
+          <el-table-column prop="faultModel" header-align="center" align="center" label="故障模式">
+          </el-table-column>
+          <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
+          </el-table-column>
+          <el-table-column prop="vehicleNumberId" header-align="center" align="center" label="车号">
+          </el-table-column>
+          <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
+          </el-table-column>
+          <el-table-column prop="peliminaryAnalysis" header-align="center" align="center" label="初步分析">
+          </el-table-column>
+          <!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
+          <!--              <template slot-scope="scope">-->
+          <!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
+          <!--              </template>-->
+          <!--            </el-table-column>-->
+          <el-table-column
+            prop="issuePhoto"
+            header-align="center"
+            align="center"
+            label="问题照片">
+            <template slot-scope="scope">
+              <img
+                :src="getImageUrl(scope.row.issuePhoto)"
+                alt="问题照片"
+                style="width: 100px; height: auto; cursor: pointer;"
+                @click="handleFileAction(scope.row.issuePhoto ,scope.row.issueId)"
+              />
+            </template>
+          </el-table-column>
+          <!--      <el-table-column-->
+          <!--        prop="issuePhoto"-->
+          <!--        header-align="center"-->
+          <!--        align="center"-->
+          <!--        label="问题照片">-->
+          <!--      </el-table-column>-->
+          <el-table-column prop="rectificationRequirement" header-align="center" align="center" label="整改要求">
+          </el-table-column>
+          <el-table-column prop="requiredCompletionTime" header-align="center" align="center" label="要求完成时间">
+          </el-table-column>
+          <el-table-column prop="responsibleDepartment" header-align="center" align="center" label="责任科室">
+          </el-table-column>
+          <!--            <el-table-column-->
+          <!--              prop="causeAnalysis"-->
+          <!--              header-align="center"-->
+          <!--              align="center"-->
+          <!--              label="原因分析">-->
+          <!--            </el-table-column>-->
+          <el-table-column
+            prop="causeAnalysis"
+            header-align="center"
+            align="center"
+            label="原因分析">
+            <template slot-scope="scope">
+              <div
+                v-if="scope.row.causeAnalysis"
+                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
+                @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
+                <span v-if="scope.row.causeAnalysis.length > 8">
+                  {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
+               </span>
+                <span v-else>
+                   {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
+                </span>
+              </div>
+              <div v-else>
+                <!-- 如果 causeAnalysis 为空，显示空白 -->
+                &nbsp;
+              </div>
+            </template>
+          </el-table-column>
+          <!--            <el-table-column-->
+          <!--              prop="rectificationStatus"-->
+          <!--              header-align="center"-->
+          <!--              align="center"-->
+          <!--              label="整改情况">-->
+          <!--            </el-table-column>-->
+          <el-table-column
+            prop="rectificationStatus"
+            header-align="center"
+            align="center"
+            label="整改情况">
+            <template slot-scope="scope">
+              <div
+                v-if="scope.row.rectificationStatus"
+                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
+                @click="showFullDescription(scope.row.rectificationStatus)">
+                {{ truncateDescription(scope.row.rectificationStatus) }}
+                <span v-if="scope.row.rectificationStatus.length > 20">
+                  <strong>...</strong> <!-- 将省略号加粗 -->
+             </span>
+              </div>
+              <div v-else>
+                <!-- 如果 rectificationStatus 为空，显示空白 -->
+                &nbsp;
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
+          </el-table-column>
+          <el-table-column
+            prop="rectificationPhotoDeliverable"
+            header-align="center"
+            align="center"
+            label="整改照片交付物">
+            <template slot-scope="scope">
+              <el-button type="text" @click="showFileList(scope.row.rectificationPhotoDeliverable)">
+                预览
+              </el-button>
+            </template>
+          </el-table-column>
+          <!--            <el-table-column-->
+          <!--              prop="rectificationPhotoDeliverable"-->
+          <!--              header-align="center"-->
+          <!--              align="center"-->
+          <!--              label="整改照片交付物">-->
+          <!--              <template slot-scope="scope">-->
+          <!--                <img-->
+          <!--                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"-->
+          <!--                  alt="整改照片交付物"-->
+          <!--                  style="width: 100px; height: auto; cursor: pointer;"-->
+          <!--                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable,scope.row.issueId)"-->
+          <!--                />-->
+          <!--              </template>-->
+          <!--            </el-table-column>-->
+          <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.rectificationResponsiblePerson) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="associatedIssueAddition" header-align="center" align="center" label="关联问题">
+          </el-table-column>
+<!--          <el-table-column prop="rectificationVerificationStatus" header-align="center" align="center" label="整改验证情况">-->
+<!--            <template slot-scope="scope">-->
+<!--              <div-->
+<!--                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"-->
+<!--                @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">-->
+<!--                  <span v-if="scope.row.rectificationVerificationStatus.length > 50">-->
+<!--                    {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong>-->
+<!--                    &lt;!&ndash; 显示前八个字符，加粗省略号 &ndash;&gt;-->
+<!--                  </span>-->
+<!--                <span v-else>-->
+<!--                    {{ scope.row.rectificationVerificationStatus }} &lt;!&ndash; 显示完整描述 &ndash;&gt;-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+          <el-table-column
+            prop="rectificationVerificationStatus"
+            header-align="center"
+            align="center"
+            label="整改验证情况">
+            <template slot-scope="scope">
+              <div
+                v-if="scope.row.rectificationVerificationStatus"
+                style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
+                @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">
+             <span v-if="scope.row.rectificationVerificationStatus.length > 50">
+                  {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong>
+        <!-- 显示前五十个字符，加粗省略号 -->
+               </span>
+                <span v-else>
+        {{ scope.row.rectificationVerificationStatus }} <!-- 显示完整描述 -->
+              </span>
+              </div>
+              <div v-else>
+                <!-- 如果 rectificationVerificationStatus 为空，显示空白 -->
+                &nbsp;
+              </div>
+            </template>
+          </el-table-column>
 
-      <!-- 问题验证 Tab Pane -->
-      <el-tab-pane label="问题验证">
-        <div class="mod-config">
-          <el-form v-if="showForm1" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-            <!--            <el-form-item>-->
-            <!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-            <!--            </el-form-item>-->
-            <el-form-item>
-              <!--              <el-button @click="getDataList()">查询</el-button>-->
-              <!--        <el-button v-if="isAuth('generator:issuetable:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
-              <el-button v-if="isAuth('generator:issuetable:delete')" type="danger" @click="deleteHandle()"
-                         :disabled="dataListSelections.length <= 0">批量删除</el-button>
-            </el-form-item>
-          </el-form>
-          <el-table :data="dataList" border v-loading="dataListLoading"
-                    @selection-change="selectionChangeHandle" style="width: 100%;">
-            <el-table-column type="selection" header-align="center" align="center" width="50">
-            </el-table-column>
-            <!--      <el-table-column-->
-            <!--        prop="issueId"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="">-->
-            <!--      </el-table-column>-->
-            <!--      <el-table-column-->
-            <!--        prop="serialNumber"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="序号">-->
-            <!--      </el-table-column>-->
-            <el-table-column prop="issueNumber" header-align="center" align="center" label="问题编号">
-            </el-table-column>
-            <el-table-column prop="inspectionDepartment" header-align="center" align="center" label="检查科室">
-            </el-table-column>
-            <el-table-column prop="inspectionDate" header-align="center" align="center" label="检查日期">
-            </el-table-column>
-            <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
-            </el-table-column>
-            <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
-            </el-table-column>
-            <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
-            </el-table-column>
-            <el-table-column prop="secondFaultyParts" header-align="center" align="center" label="故障件二级">
-            </el-table-column>
-            <el-table-column prop="faultType" header-align="center" align="center" label="故障类别">
-            </el-table-column>
-            <el-table-column prop="faultModel" header-align="center" align="center" label="故障模式">
-            </el-table-column>
-            <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
-            </el-table-column>
-            <el-table-column prop="vehicleNumberId" header-align="center" align="center" label="车号">
-            </el-table-column>
-            <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
-            </el-table-column>
-            <el-table-column prop="peliminaryAnalysis" header-align="center" align="center" label="初步分析">
-            </el-table-column>
-            <!--            <el-table-column prop="issuePhoto" header-align="center" align="center" label="问题照片">-->
-            <!--              <template slot-scope="scope">-->
-            <!--                <el-button type="text" size="small" @click="handleFileAction(scope.row.issuePhoto)">预览</el-button>-->
-            <!--              </template>-->
-            <!--            </el-table-column>-->
-            <el-table-column
-              prop="issuePhoto"
-              header-align="center"
-              align="center"
-              label="问题照片">
-              <template slot-scope="scope">
-                <img
-                  :src="getImageUrl(scope.row.issuePhoto)"
-                  alt="问题照片"
-                  style="width: 100px; height: auto; cursor: pointer;"
-                  @click="handleFileAction(scope.row.issuePhoto ,scope.row.issueId)"
-                />
-              </template>
-            </el-table-column>
-            <!--      <el-table-column-->
-            <!--        prop="issuePhoto"-->
-            <!--        header-align="center"-->
-            <!--        align="center"-->
-            <!--        label="问题照片">-->
-            <!--      </el-table-column>-->
-            <el-table-column prop="rectificationRequirement" header-align="center" align="center" label="整改要求">
-            </el-table-column>
-            <el-table-column prop="requiredCompletionTime" header-align="center" align="center" label="要求完成时间">
-            </el-table-column>
-            <el-table-column prop="responsibleDepartment" header-align="center" align="center" label="责任科室">
-            </el-table-column>
-            <!--            <el-table-column-->
-            <!--              prop="causeAnalysis"-->
-            <!--              header-align="center"-->
-            <!--              align="center"-->
-            <!--              label="原因分析">-->
-            <!--            </el-table-column>-->
-            <el-table-column prop="causeAnalysis" header-align="center" align="center" label="原因分析">
-              <template slot-scope="scope">
-                <div
-                  style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
-                  @click="showFullCauseAnalysis(scope.row.causeAnalysis)">
-                  <span v-if="scope.row.causeAnalysis.length > 8">
-                    {{ scope.row.causeAnalysis.slice(0, 8) }}<strong>...</strong> <!-- 显示前八个字符，加粗省略号 -->
-                  </span>
-                  <span v-else>
-                    {{ scope.row.causeAnalysis }} <!-- 显示完整描述 -->
-                  </span>
-                </div>
-              </template>
-            </el-table-column>
-            <!--            <el-table-column-->
-            <!--              prop="rectificationStatus"-->
-            <!--              header-align="center"-->
-            <!--              align="center"-->
-            <!--              label="整改情况">-->
-            <!--            </el-table-column>-->
-            <el-table-column prop="rectificationStatus" header-align="center" align="center" label="整改情况">
-              <template slot-scope="scope">
-                <div
-                  style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
-                  @click="showFullDescription(scope.row.rectificationStatus)">
-                  {{ truncateDescription(scope.row.rectificationStatus) }}
-                  <span v-if="scope.row.rectificationStatus.length > 20">
-                    <strong>...</strong> <!-- 将省略号加粗 -->
-                  </span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="actualCompletionTime" header-align="center" align="center" label="实际完成时间">
-            </el-table-column>
-            <el-table-column
-              prop="rectificationPhotoDeliverable"
-              header-align="center"
-              align="center"
-              label="整改照片交付物">
-              <template slot-scope="scope">
-                <el-button type="text" @click="showFileList(scope.row.rectificationPhotoDeliverable)">
-                  预览
-                </el-button>
-              </template>
-            </el-table-column>
-<!--            <el-table-column-->
-<!--              prop="rectificationPhotoDeliverable"-->
-<!--              header-align="center"-->
-<!--              align="center"-->
-<!--              label="整改照片交付物">-->
-<!--              <template slot-scope="scope">-->
-<!--                <img-->
-<!--                  :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"-->
-<!--                  alt="整改照片交付物"-->
-<!--                  style="width: 100px; height: auto; cursor: pointer;"-->
-<!--                  @click="handleFileAction(scope.row.rectificationPhotoDeliverable,scope.row.issueId)"-->
-<!--                />-->
-<!--              </template>-->
-<!--            </el-table-column>-->
-            <el-table-column prop="rectificationResponsiblePerson" header-align="center" align="center" label="整改责任人">
-            </el-table-column>
-            <el-table-column prop="associatedIssueAddition" header-align="center" align="center" label="关联问题">
-            </el-table-column>
-            <el-table-column prop="rectificationVerificationStatus" header-align="center" align="center" label="整改验证情况">
-              <template slot-scope="scope">
-                <div
-                  style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;"
-                  @click="showFullRectificationStatus(scope.row.rectificationVerificationStatus)">
-                  <span v-if="scope.row.rectificationVerificationStatus.length > 50">
-                    {{ scope.row.rectificationVerificationStatus.slice(0, 50) }}<strong>...</strong>
-                    <!-- 显示前八个字符，加粗省略号 -->
-                  </span>
-                  <span v-else>
-                    {{ scope.row.rectificationVerificationStatus }} <!-- 显示完整描述 -->
-                  </span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="verificationDeadline" header-align="center" align="center" label="验证截止时间">
-            </el-table-column>
-            <el-table-column prop="verificationConclusion" header-align="center" align="center" label="验证结论">
-              <template slot-scope="scope">
-                <div>
+          <el-table-column prop="verificationDeadline" header-align="center" align="center" label="验证截止时间">
+          </el-table-column>
+          <el-table-column prop="verificationConclusion" header-align="center" align="center" label="验证结论">
+            <template slot-scope="scope">
+              <div>
                   <span v-for="(state, index) in getStates(scope.row.verificationConclusion)" :key="index">
                     <el-tag v-if="state === '未完成'" type="danger" disable-transitions>{{ state }}</el-tag>
                     <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
@@ -471,26 +591,55 @@
                     <el-tag v-else-if="state === '持续，未完成'" type="info" disable-transitions>{{ state }}</el-tag>
                     <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
                   </span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="verifier" header-align="center" align="center" label="验证人">
-            </el-table-column>
-            <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
-              <template slot-scope="scope">
-                <el-button type="text" size="small" @click="checkStateAndHandle(scope.row)">验证记录</el-button>
-                <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-                         :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
-                         layout="total, sizes, prev, pager, next, jumper">
-          </el-pagination>
-        </div>
-      </el-tab-pane>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="verifier" header-align="center" align="center" label="验证人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.verifier) }}
+            </template>
+          </el-table-column>
+<!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
+<!--          </el-table-column>-->
+          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+            <template slot-scope="scope">
+              <div>
+                <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+                  <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
+                  <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
+                </span>
+              </div>
+            </template>
+          </el-table-column>
 
-    </el-tabs>
+          <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="checkStateAndHandle(scope.row)">验证</el-button>
+              <el-button type="text" size="small" @click="deleteHandle(scope.row.issueId)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+                       :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+                       layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination>
+      </div>
+    </el-tab-pane>
+
+  <div class="mod-config">
+    <el-dialog title="整改情况" :visible.sync="dialogVisible" width="400px">
+      <p>{{ fullDescription }}</p>
+    </el-dialog>
+    <el-dialog title="原因分析" :visible.sync="dialogVisible1" width="400px">
+      <p>{{ fullCause }}</p>
+    </el-dialog>
+    <el-dialog title="验证整改情况" :visible.sync="dialogVisible2" width="400px">
+      <p>{{ fullRetStates }}</p>
+    </el-dialog>
+
 
     <!-- 弹窗, 新增/修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
@@ -520,6 +669,8 @@
       </div>
     </el-dialog>
   </div>
+
+  </el-tabs>
 </template>
 
 <script>
@@ -537,6 +688,7 @@ import AddOrUpdateV from '../RectVerification/issuetable-add-or-update.vue'
 export default {
   data() {
     return {
+      activeName: '1', // 控制tab显示
       fileDialogVisible: false, // 控制文件预览弹窗显示
       fileList: [], // 存储当前记录的附件列表
       tools: [
@@ -571,6 +723,7 @@ export default {
       dialogVisible1: false, // 控制对话框显示
       fullCause: '',    // 用于存储完整描述
       dialogVisible2: false,
+      options: '',
       fullRetStates: '',
     }
   },
@@ -579,9 +732,19 @@ export default {
     AddOrUpdateT,
     AddOrUpdateV
   },
+  created() {
+    this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.options = data;
+      // console.log("所有的用户信息" ,data);
+    })
+  },
   activated() {
     this.getDataList()
   },
+
   methods: {
     // 显示文件列表弹窗
     showFileList(annex) {
@@ -662,48 +825,69 @@ export default {
       return verificationConclusion.split(',').map(state => state.trim());
     },
     checkStateAndHandle(row) {
-      if (!row.verificationDeadline) {
-        this.$message.warning("验证时间未到");
-        return;
-      }
+      this.fetchuserinform().then(userinfo => {
+        // 判断是否为验证人
+        if (userinfo === row.verifier) {
+          // 如果一致，执行 addOrUpdateHandleR 方法
+          if (row.level === '等待验证') {
+            this.addOrUpdateHandlev(row.issueId);
+          } else {
+            //如果不一致，弹出提示
+            this.$message.error('未到验证阶段');
+          }
+        } else {
+          // 如果不一致，弹出提示
+          this.$message.error('您不是验证人');
+        }
+      });
 
-      const currentTime = new Date();
-      const verificationDeadline = new Date(row.verificationDeadline);
-
-      if (currentTime < verificationDeadline) {
-        this.$message.warning("验证时间未到");
-      } else {
-        this.addOrUpdateHandlev(row.issueId);
-      }
     },
     addOrUpdateHandlev(id) {
       this.addOrUpdateVisibleV = true
       this.$nextTick(() => {
         this.$refs.addOrUpdateV.init(id)
+        // this.$refs.addOrUpdateV.
       })
     },
-    handleRectificationRecords(issueNumber, issueId) {
-      // this.$http({
-      //   url: this.$http.adornUrl('/generator/issuemasktable/records'),
-      //   method: 'post',
-      //   params: this.$http.adornParams({ issueNumber: issueNumber })
-      // }).then(({ data }) => {
-      //   console.log("返回数据：", data)
-      //   if (data && data.msg === 'success') {
-      //     console.log('整改得到的id为', issueId)
-      //     // 操作成功后触发addOrUpdateHandle
-      //
-      //   } else if (data && data.msg === 'error') {
-      //     this.$message.error('任务未全部完成')
-      //   } else {
-      //     this.$message.error('操作失败')
-      //   }
-      // }).catch(() => {
-      //   this.$message.error('请求失败')
-      // })
-      this.addOrUpdateHandleR(issueId)
+    // handleRectificationRecords(rectificationResponsiblePerson, issueId) {
+    //   this.addOrUpdateHandleR(issueId)
+    // },
+    handleRectificationRecords(rectificationResponsiblePerson, issueId) {
+      // 调用 fetchuserinform 方法获取用户信息
+      this.fetchuserinform().then(userinfo => {
+        // 判断是否为整改责任人
+        if (userinfo === rectificationResponsiblePerson) {
+          // 如果一致，执行 addOrUpdateHandleR 方法
+          this.addOrUpdateHandleR(issueId);
+        } else {
+          // 如果不一致，弹出提示
+          this.$message.error('您不是整改责任人');
+        }
+      });
     },
-    handleVerificationRecords(issueId, issueNumber) {
+    fetchuserinform() {
+      return new Promise((resolve, reject) => {
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/useinfo'),
+          method: 'get',
+          params: this.$http.adornParams()
+        })
+          .then(({ data }) => {
+            if (data && data.code === 0) {
+              // 返回用户信息
+              resolve(data.userinfo);
+            } else {
+              console.error('获取用户信息失败:', data.msg);
+              reject(data.msg);
+            }
+          })
+          .catch(error => {
+            console.error('获取用户信息时发生错误:', error);
+            reject(error);
+          });
+      });
+    },
+    handleVerificationRecords(issueId, issueNumber, rectificationResponsiblePerson, level) {
       this.$http({
         url: this.$http.adornUrl('/generator/issuemasktable/records'),
         method: 'post',
@@ -713,8 +897,23 @@ export default {
         if (data && data.msg === 'success') {
           // console.log('整改得到的id为', issueId)
           // 操作成功后触发addOrUpdateHandleVe
-          this.addOrUpdateHandleVe(issueId)
-
+          // this.addOrUpdateHandleVe(issueId)
+          // 调用 fetchuserinform 方法获取用户信息
+          this.fetchuserinform().then(userinfo => {
+            // 判断是否为整改责任人
+            if (userinfo === rectificationResponsiblePerson) {
+              // 如果一致，执行 addOrUpdateHandleR 方法
+              if (level === '等待验证指定' || level === '等待验证') {
+                this.addOrUpdateHandleVe(issueId);
+              } else {
+                //如果不一致，弹出提示
+                this.$message.error('未到验证阶段');
+              }
+            } else {
+              // 如果不一致，弹出提示
+              this.$message.error('您不是整改责任人');
+            }
+          });
         } else if (data && data.msg === 'error') {
           this.$message.error('任务未全部完成')
         } else {
@@ -861,11 +1060,17 @@ export default {
       })
     },
     // 任务发起
-    assetOrUpdateHandle(id, issueNumber) {
-      this.addOrUpdateVisibleT = true
-      this.$nextTick(() => {
-        this.$refs.addOrUpdateT.init1(id, issueNumber)
-      })
+    assetOrUpdateHandle(id, issueNumber, level) {
+      if (level === '等待任务下发(处理)') {
+        // 如果一致，执行 addOrUpdateHandleR 方法
+        this.addOrUpdateVisibleT = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdateT.init1(id, issueNumber)
+        })
+      } else {
+        // 如果不一致，弹出提示
+        this.$message.error('未到任务下发阶段');
+      }
     },
     //图片预览
     // previewImage(imageUrl) {
@@ -992,12 +1197,12 @@ export default {
     },
     // 新增的完整原因分析显示方法
     showFullCauseAnalysis(causeAnalysis) {
-      this.fullCause = causeAnalysis; // 存储原因分析完整描述
+      this.fullCause = causeAnalysis || ''; // 存储原因分析完整描述
       this.dialogVisible1 = true; // 显示对话框
     },
     // 新增显示整改验证情况的完整方法
     showFullRectificationStatus(rectificationVerificationStatus) {
-      this.fullRetStates = rectificationVerificationStatus; // 存储整改验证情况完整描述
+      this.fullRetStates = rectificationVerificationStatus || ''; // 存储整改验证情况完整描述
       this.dialogVisible2 = true; // 显示对话框
     }
   }

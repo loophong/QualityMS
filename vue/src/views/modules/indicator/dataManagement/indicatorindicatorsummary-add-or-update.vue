@@ -282,7 +282,7 @@
             this.dataForm.indicatorClassification = data.page.list[0].indicatorClassification
             console.log("this.dataForm=====>",this.dataForm);
             if(data.page.list[0].indicatorBoundFlag === 1) {
-              if(this.dataForm.indicatorValue <= this.dataForm.indicatorActualValue)
+              if(this.dataForm.indicatorActualValue <= this.dataForm.indicatorValue)
                 this.dataForm.finishedFlag = 1
               else this.dataForm.finishedFlag = 0
             }

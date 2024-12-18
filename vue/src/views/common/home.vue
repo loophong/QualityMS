@@ -39,19 +39,19 @@
 <template>
   <div id="index">
     <header>
-      <h1>盘锦企管系统</h1>
+      <h1>盘锦数据展示</h1>
       <div class="showTime">{{ currentTime }}</div>
     </header>
     <section class="mainbox">
       <div class="column">
         <div class="panel indicator1">
           <h2>部门指标统计</h2>
-          <div id="indicatorChart1" ref="indicatorChart1"></div>
+          <div id="indicatorChart1" ref="indicatorChart1" @click="toIndicatorOverview"></div>
           <div class="panel-footer"></div>
         </div>
         <div class="panel indicator2">
           <h2>分级指标统计</h2>
-          <div id="indicatorChart2" ref="indicatorChart2"></div>
+          <div id="indicatorChart2" ref="indicatorChart2" @click="toIndicatorOverview"></div>
           <div class="panel-footer"></div>
         </div>
         <div class="panel issue">
@@ -203,6 +203,12 @@ export default {
         console.log('classificationCountList:', this.classificationCountList);
         this.renderChart2();
       });
+    },
+    //指标总览页面跳转
+    toIndicatorOverview() {
+      this.$router.push({
+        name: 'indicator-indicatorOverview',
+      })
     },
     renderChart1() {
       // 销毁旧的实例，防止缓存导致问题

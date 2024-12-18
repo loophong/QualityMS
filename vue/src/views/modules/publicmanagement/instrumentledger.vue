@@ -18,12 +18,12 @@
         <!-- <el-button v-if="isAuth('publicmanagement:instrumentledger:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button> -->
         <el-button v-if="isAuth('publicmanagement:instrumentledger:delete')"  type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
          <!--Excel 参数导入 -->
-      <el-button
+      <!-- <el-button
         type="primary"
         @click="showDialog = true"
         v-if="isAuth('publicmanagement:instrumentledger:upload')"
         ><i class="fa fa-download"></i>导入Excel文件
-      </el-button>
+      </el-button> -->
       <el-dialog
         title="导入Excel文件"
         :visible.sync="showDialog"

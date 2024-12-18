@@ -26,6 +26,8 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
 
     String newIssuemaskNumber(String issueNumber);
 
+    String statechange(String issueNumber);
+
     List<IssueMaskTableEntity> listAll(String issueNumber);
 
     String listRecords(String issueNumber);
@@ -35,5 +37,9 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
     PageUtils acceptqueryPage(Map<String, Object> params);
 
     PageUtils distributequeryPage(Map<String, Object> params);
+
+    PageUtils creatormaskqueryPage(Map<String, Object> params);
+
+    String listserialNumber(String issueNumber ,String serialNumber);
 }
 

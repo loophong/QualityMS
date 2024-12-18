@@ -160,6 +160,7 @@
             <el-button v-if="isAuth('spc:spcxrchart:save')" type="primary" @click="XRChartaddOrUpdateHandle()">新增</el-button>
             <el-button v-if="isAuth('spc:spcxrchart:delete')" type="danger" @click="XRChartdeleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
             <el-button type="primary" @click="showDialog = true">导入Excel文件</el-button>
+            <el-button type="primary" @click="showDialog2 = true">统计用数据导入</el-button>
           </el-form-item>
         </el-form>
         <el-table
@@ -858,6 +859,24 @@
       </span>
     </el-dialog>
 
+    <!-- 导入标准数据excel文件弹窗 -->
+    <el-dialog title="导入标准数据Excel文件" :visible.sync="showDialog2" width="30%" :before-close="handleClose" @close="resetFileInput">
+      <i class="el-icon-upload"></i>
+      <input type="file" id="inputFile" ref="fileInput"  />
+
+      <!-- 进度动画条 -->
+      <div v-if="progress > 0">
+        <el-progress
+          :percentage="progress"
+          color="rgb(19, 194, 194)"
+        ></el-progress>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showDialog2 = false">取 消</el-button>
+        <el-button type="primary" @click="fileSendStandards()">确 定</el-button>
+      </span>
+    </el-dialog>
 
   </div>
 </template>
@@ -900,6 +919,7 @@
         //导入相关参数
         showDialog: false,
         showDialog1: false,
+        showDialog2: false,
         progress: 0,
 
         //Xbar-R
@@ -1627,6 +1647,38 @@
           }
       },
 
+      fileSendStandards(){
+        const formData = new FormData();
+        const file = this.$refs.fileInput.files[0]; // 使用 $refs 获取文件对象 
+          if (file) {
+              formData.append("file", file);
+
+              this.$http({
+                  url: this.$http.adornUrl('/SPC/spc/standards'),
+                  method: 'post',
+                  data: formData,
+                  headers: {
+                      'Content-Type': 'multipart/form-data' // 设置正确的请求头
+                  }
+              }).then(response => {
+                  // response.data 包含了从服务器返回的数据
+                  this.responseData = response.data;          
+
+                  // 2秒后关闭上传面板，这里应该根据实际情况来决定是否需要刷新页面
+                  setTimeout(() => {
+                      this.showDialog2 = false; // 关闭上传面板
+                      // 如果需要刷新页面，取消注释下面的代码
+                      // location.reload();
+                  }, 1000); // 2000毫秒后执行
+              }).catch(error => {
+                  // 处理错误
+                  console.error('Error uploading file:', error);
+              });
+          } else {
+              console.error('No file selected.');
+          }
+      },
+
       handleClose(done) {
         this.$confirm('确认关闭？')
             .then(_ => {
@@ -1659,62 +1711,112 @@
       //Xbar_R图表 Xbar-Chart
       //初始化图表
       initChartXbarR_Xbar() {
+          const XbarRCharXbar = this.XbarRChartData[0];
+          const XbarRCharXbarUCL = this.XbarRChartData[1];
+          const XbarRCharXbarCL = this.XbarRChartData[2];
+          const XbarRCharXbarLCL = this.XbarRChartData[3];
+          const xAxisData = Array.from({ length: XbarRCharXbar.length }, (_, index) => index + 1);
 
-        const XbarRCharXbar = this.XbarRChartData[0];
-        const XbarRCharXbarUCL = this.XbarRChartData[1];
-        const XbarRCharXbarCL = this.XbarRChartData[2];
-        const XbarRCharXbarLCL = this.XbarRChartData[3];
-        const xAxisData = Array.from({ length: XbarRCharXbar.length }, (_, index) => index + 1);
+          if (this.$refs.XbarR_XbarChart) {
+              this.chartInstanceXbarR_Xbar = echarts.init(this.$refs.XbarR_XbarChart);
 
+              const option = {
+                  legend: {
+                      data: ['X-bar', 'UCL', 'CL', 'LCL'] // 添加图例
+                  },
+                  title: {
+                      text: 'X-bar'
+                  },
+                  tooltip: {
+                      trigger: 'axis'
+                  },
+                  xAxis: {
+                      type: 'category',
+                      boundaryGap: false,
+                      data: xAxisData
+                  },
+                  yAxis: {
+                      type: 'value',
+                      scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                      axisLabel: {
+                          formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                      }
+                  },
+                  grid: {
+                      top: '20%',
+                      left: '10%',
+                      right: '10%',
+                      bottom: '20%'
+                  },
+                  dataZoom: [{
+                      type: 'inside',  // 使用内部缩放控件
+                      start: 0,
+                      end: 100
+                  }, {
+                      type: 'slider',  // 使用滑块缩放控件
+                      show: true,
+                      top: '90%',
+                      left: '10%',
+                      right: '10%'
+                  }],
+                  series: [
+                      {
+                          name: 'X-bar',
+                          data: XbarRCharXbar,
+                          type: 'line',
+                          lineStyle: {
+                              width: 3,  // 增加线宽
+                          },
+                          symbolSize: 8,  // 增大线上的点的大小
+                          areaStyle: {
+                              opacity: 0.3,  // 增加透明度
+                          },
+                      },
+                      {
+                          name: 'UCL',
+                          data: XbarRCharXbarUCL,
+                          type: 'line',
+                          lineStyle: {
+                              width: 2,
+                              type: 'dashed',  // 设置虚线
+                          },
+                          symbolSize: 8,
+                          areaStyle: {
+                              opacity: 0.1,
+                          },
+                      },
+                      {
+                          name: 'CL',
+                          data: XbarRCharXbarCL,
+                          type: 'line',
+                          lineStyle: {
+                              width: 2,
+                          },
+                          symbolSize: 8,
+                          areaStyle: {
+                              opacity: 0.1,
+                          },
+                      },
+                      {
+                          name: 'LCL',
+                          data: XbarRCharXbarLCL,
+                          type: 'line',
+                          lineStyle: {
+                              width: 2,
+                              type: 'dashed',  // 设置虚线
+                          },
+                          symbolSize: 8,
+                          areaStyle: {
+                              opacity: 0.1,
+                          },
+                      }
+                  ]
+              };
 
-        if (this.$refs.XbarR_XbarChart) {
-          this.chartInstanceXbarR_Xbar = echarts.init(this.$refs.XbarR_XbarChart);
-          
-          const option = {
-            legend: {
-                data: ['X-bar', 'UCL', 'CL', 'LCL'] // 添加图例
-            },
-            title: {
-                text: 'X-bar'
-            },
-            tooltip: {
-                trigger: 'axis'
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: xAxisData
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [
-                {
-                    name: 'X-bar',
-                    data: XbarRCharXbar,
-                    type: 'line'
-                },
-                {
-                    name: 'UCL',
-                    data: XbarRCharXbarUCL,
-                    type: 'line'
-                },
-                {
-                    name: 'CL',
-                    data: XbarRCharXbarCL,
-                    type: 'line'
-                },
-                {
-                    name: 'LCL',
-                    data: XbarRCharXbarLCL,
-                    type: 'line'
-                }
-            ]
-            };
-
-          this.chartInstanceXbarR_Xbar.setOption(option);
-        }
+              this.chartInstanceXbarR_Xbar.setOption(option);
+          }
       },
+
       //更新图表
       updateChartXbarR_Xbar() {
         const XbarRCharXbar = this.XbarRChartData[0];
@@ -1739,28 +1841,79 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'X-bar',
                     data: XbarRCharXbar,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 3,  // 增加线宽
+                    },
+                    symbolSize: 8,  // 增大线上的点的大小
+                    areaStyle: {
+                        opacity: 0.3,  // 增加透明度
+                    },
                 },
                 {
                     name: 'UCL',
                     data: XbarRCharXbarUCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'CL',
                     data: XbarRCharXbarCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'LCL',
                     data: XbarRCharXbarLCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 }
             ]
             };
@@ -1798,31 +1951,82 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
             {
                     name: 'R',
                     data: XbarRCharR,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 3,  // 增加线宽
+                    },
+                    symbolSize: 8,  // 增大线上的点的大小
+                    areaStyle: {
+                        opacity: 0.3,  // 增加透明度
+                    },
                 },
                 {
                     name: 'UCL',
                     data: XbarRCharRUCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'CL',
                     data: XbarRCharRCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'LCL',
                     data: XbarRCharRLCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 }
             ]
-        };
+          };
           this.chartInstanceXbarR_R.setOption(option);
         }
       },
@@ -1851,28 +2055,79 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
             {
                     name: 'R',
                     data: XbarRCharR,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 3,  // 增加线宽
+                    },
+                    symbolSize: 8,  // 增大线上的点的大小
+                    areaStyle: {
+                        opacity: 0.3,  // 增加透明度
+                    },
                 },
                 {
                     name: 'UCL',
                     data: XbarRCharRUCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'CL',
                     data: XbarRCharRCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'LCL',
                     data: XbarRCharRLCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 }
             ]
         };
@@ -1911,28 +2166,79 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'X-bar',
                     data: XbarSCharXbar,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 3,  // 增加线宽
+                    },
+                    symbolSize: 8,  // 增大线上的点的大小
+                    areaStyle: {
+                        opacity: 0.3,  // 增加透明度
+                    },
                 },
                 {
                     name: 'UCL',
                     data: XbarSCharXbarUCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'CL',
                     data: XbarSCharXbarCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'LCL',
                     data: XbarSCharXbarLCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 }
             ]
             };
@@ -1964,28 +2270,79 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
-            {
+                {
                     name: 'X-bar',
                     data: XbarSCharXbar,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 3,  // 增加线宽
+                    },
+                    symbolSize: 8,  // 增大线上的点的大小
+                    areaStyle: {
+                        opacity: 0.3,  // 增加透明度
+                    },
                 },
                 {
                     name: 'UCL',
                     data: XbarSCharXbarUCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'CL',
                     data: XbarSCharXbarCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'LCL',
                     data: XbarSCharXbarLCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 }
             ]
         };
@@ -2022,28 +2379,79 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'S',
                     data: XbarSCharS,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 3,  // 增加线宽
+                    },
+                    symbolSize: 8,  // 增大线上的点的大小
+                    areaStyle: {
+                        opacity: 0.3,  // 增加透明度
+                    },
                 },
                 {
                     name: 'UCL',
                     data: XbarSCharSUCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'CL',
                     data: XbarSCharSCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'LCL',
                     data: XbarSCharSLCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 }
             ]
             };
@@ -2075,28 +2483,79 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
-            {
+                {
                     name: 'S',
                     data: XbarSCharS,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 3,  // 增加线宽
+                    },
+                    symbolSize: 8,  // 增大线上的点的大小
+                    areaStyle: {
+                        opacity: 0.3,  // 增加透明度
+                    },
                 },
                 {
                     name: 'UCL',
                     data: XbarSCharSUCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'CL',
                     data: XbarSCharSCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 },
                 {
                     name: 'LCL',
                     data: XbarSCharSLCL,
-                    type: 'line'
+                    type: 'line',
+                    lineStyle: {
+                        width: 2,
+                        type: 'dashed',  // 设置虚线
+                    },
+                    symbolSize: 8,
+                    areaStyle: {
+                        opacity: 0.1,
+                    },
                 }
             ]
         };
@@ -2135,8 +2594,29 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'Me',
@@ -2187,8 +2667,29 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'Me',
@@ -2245,8 +2746,29 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'R',
@@ -2297,8 +2819,29 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'R',
@@ -2357,8 +2900,29 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'I',
@@ -2409,8 +2973,29 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'I',
@@ -2467,8 +3052,29 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'MR',
@@ -2519,8 +3125,29 @@
                 data: xAxisData
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                scale: true,  // 启用缩放，使得小范围内的差距更容易察觉
+                axisLabel: {
+                    formatter: (value) => value.toFixed(4)  // 保留四位小数，增强细微差距的可见性
+                }
             },
+            grid: {
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            dataZoom: [{
+                type: 'inside',  // 使用内部缩放控件
+                start: 0,
+                end: 100
+            }, {
+                type: 'slider',  // 使用滑块缩放控件
+                show: true,
+                top: '90%',
+                left: '10%',
+                right: '10%'
+            }],
             series: [
                 {
                     name: 'MR',

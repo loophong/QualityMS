@@ -18,6 +18,7 @@
         <el-form-item>
           <br>
           <el-button type="primary" @click="addEdge">新增</el-button>
+          <el-button type="primary" @click="removeEdge">删除</el-button>
           <el-button type="success" @click="downloadAsImage">下载</el-button>
           <el-button type="success" @click="dialogVisibleSave = true" v-if="!valueConPlan">保存为模版</el-button>
         </el-form-item>
@@ -52,6 +53,20 @@
           <el-button type="primary" @click="addNode">确定</el-button>
         </div>
       </el-dialog>
+      <el-dialog title="删除节点" :visible.sync="removeDialogVisible" width="30%" :modal="false">
+        <el-form >
+          <el-form-item label="节点名称">
+            <el-select v-model="selectedNodeToDelete" placeholder="请选择父节点">
+              <el-option v-for="item in nodeNames" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="removeDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="confirmDeleteNode">确定</el-button>
+        </div>
+      </el-dialog>
       <el-dialog title="模版名" :visible.sync="dialogVisibleSave">
         <el-input v-model="inputName" placeholder="请输入模版名" style="width:50%"></el-input>
         <div slot="footer" class="dialog-footer">
@@ -80,8 +95,10 @@ export default {
         name: '',
         link: ''
       },
+      selectedNodeToDelete: '', // 存储用户选择要删除的节点ID
       currentNode: null, // 用于存储当前被点击的节点
       addDialogVisible: false, // 控制新增弹出框的可见性
+      removeDialogVisible: false, // 控制删除弹出框的可见性
       newNode: { // 用于存储新增节点的信息
         name: '',
         link: '',
@@ -188,6 +205,69 @@ export default {
       this.nodeNames = [] // 清空现有的 nodeNames 数组
       this.getNodeNames(this.testFishData) // 重新获取最新的 nodeNames
       this.addDialogVisible = true // 打开新增节点对话框
+    },
+    removeEdge() {
+      this.nodeNames = [] // 清空现有的 nodeNames 数组
+      this.getNodeNames(this.testFishData) // 重新获取最新的 nodeNames
+      this.removeDialogVisible = true // 打开新增节点对话框
+    },
+    // removeEdge() {
+    //   if (this.currentNode) {
+    //     const parentNode = this.findParentNode(this.testFishData, this.currentNode.id);
+    //     if (parentNode) {
+    //       const index = parentNode.children.findIndex(child => child.id === this.currentNode.id);
+    //       if (index !== -1) {
+    //         parentNode.children.splice(index, 1);
+    //         this.initFishBone(); // 重新初始化鱼骨图
+    //       }
+    //     } else {
+    //       // 如果没有找到父节点，说明是根节点，这里可以选择不删除或做其他处理
+    //       console.log("Cannot delete root node");
+    //     }
+    //     this.currentNode = null; // 清除当前节点
+    //   } else {
+    //     this.$message({
+    //       message: '请选择要删除的节点',
+    //       type: 'warning',
+    //       duration: 1500,
+    //     });
+    //   }
+    // },
+    confirmDeleteNode() {
+      if (this.selectedNodeToDelete) {
+        const parentNode = this.findParentNode(this.testFishData, this.selectedNodeToDelete);
+        if (parentNode) {
+          const index = parentNode.children.findIndex(child => child.id === this.selectedNodeToDelete);
+          if (index !== -1) {
+            parentNode.children.splice(index, 1);
+            this.initFishBone(); // 重新初始化鱼骨图
+          }
+        } else {
+          // 如果没有找到父节点，说明是根节点，这里可以选择不删除或做其他处理
+          console.log("Cannot delete root node");
+        }
+        this.selectedNodeToDelete = ''; // 清除已选择的节点ID
+        this.removeDialogVisible = false; // 关闭删除节点对话框
+      } else {
+        this.$message({
+          message: '请选择要删除的节点',
+          type: 'warning',
+          duration: 1500,
+        });
+      }
+    },
+    findParentNode(nodeList, id) {
+      for (let i = 0; i < nodeList.length; i++) {
+        if (nodeList[i].children && nodeList[i].children.some(child => child.id === id)) {
+          return nodeList[i];
+        } else if (nodeList[i].children && nodeList[i].children.length > 0) {
+          const found = this.findParentNode(nodeList[i].children, id);
+          if (found) {
+            return found;
+          }
+        }
+      }
+      return null;
     },
     addNode() {
       const parentNode = this.findNodeById(this.testFishData, this.newNode.parentId)

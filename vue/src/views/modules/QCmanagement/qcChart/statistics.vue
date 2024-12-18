@@ -1,6 +1,6 @@
 <template>
   <div>
-    <qc-all-count @allCount="handleEvent"></qc-all-count>
+    <qc-all-count v-if="isAuth('qcManagement:qcAllCount:info')" @allCount="handleEvent"></qc-all-count>
     <div style="display: flex;">
       <div id="barChart" ref="barChart" style="width: 50%; height: 300px;"></div>
       <div id="pieChart" ref="pieChart" style="width: 50%; height: 300px;"></div>
@@ -120,6 +120,10 @@ export default {
       await this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/all'),
         method: 'get',
+        params: this.$http.adornParams({
+          'page': this.pageIndex,
+          'limit': 10000000,
+        })
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.stageNumData = data.page.list.filter(item => item.topicReviewStatus === 3);

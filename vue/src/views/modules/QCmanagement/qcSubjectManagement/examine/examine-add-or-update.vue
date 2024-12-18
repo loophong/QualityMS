@@ -66,11 +66,23 @@
       <el-form-item label="备注" prop="note">
         <el-input v-model="dataForm.note" placeholder="备注" disabled></el-input>
       </el-form-item>
-      <el-form-item label="课题审核结果" prop="topicReviewStatus">
-        <el-select v-model="dataForm.topicReviewStatus" placeholder="请选择课题审核结果">
-          <el-option label="通过" value="3"></el-option>
+      <el-form-item v-if="already == 1" label="管理员初审结果" prop="topicReviewGroup">
+        <el-select v-model="dataForm.topicReviewGroup" placeholder="请选择课题审核结果">
+          <el-option label="通过" value="1"></el-option>
           <el-option label="不通过" value="0"></el-option>
         </el-select>
+      </el-form-item>
+      <el-form-item v-else label="科室初审结果" prop="topicReviewDepartment">
+        <el-select v-model="dataForm.topicReviewDepartment" placeholder="请选择科室初审结果">
+          <el-option label="通过" value="1"></el-option>
+          <el-option label="不通过" value="0"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="already == 1" label="管理员初审意见" prop="secondComment">
+        <el-input v-model="dataForm.secondComment" autosize type="textarea" placeholder="管理员初审意见"></el-input>
+      </el-form-item>
+      <el-form-item v-else label="科室初审意见" prop="firstComment">
+        <el-input v-model="dataForm.firstComment" autosize type="textarea" placeholder="科室初审意见"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -92,15 +104,19 @@ export default {
         topicLeader: '',
         topicConsultant: '',
         teamNumberIds: '',
+        firstComment: '',
+        secondComment: '',
         createDate: '',
         creator: '',
         modificationDate: '',
         modifier: '',
         startDate: '',
         endDate: '',
+        topicReviewGroup: '',
         topicReviewStatus: '',
         topicDescription: '',
         topicType: '',
+        topicReviewDepartment: '',
         activityCharacteristics: '',
         activityPlan: '',
         keywords: '',
@@ -109,11 +125,17 @@ export default {
         deleteFlag: '',
         note: ''
       },
+      already: 0,
       dataRule: {
-        topicReviewStatus: [
-          { required: true, message: '课题审核状态不能为空', trigger: 'blur' }
+        // topicReviewStatus: [
+        //   { required: true, message: '课题审核状态不能为空', trigger: 'blur' }
+        // ],
+        topicReviewGroup: [
+          { required: true, message: '组内管理员审核状态不能为空', trigger: 'blur' }
         ],
-
+        topicReviewDepartment: [
+          { required: true, message: '科室初审状态不能为空', trigger: 'blur' }
+        ],
       }
     }
   },
@@ -151,6 +173,11 @@ export default {
               this.dataForm.topicActivityResult = data.qcSubjectRegistration.topicActivityResult
               this.dataForm.deleteFlag = data.qcSubjectRegistration.deleteFlag
               this.dataForm.note = data.qcSubjectRegistration.note
+              this.dataForm.firstComment = data.qcSubjectRegistration.firstComment
+              this.dataForm.secondComment = data.qcSubjectRegistration.secondComment
+              this.dataForm.topicReviewDepartment = data.qcSubjectRegistration.topicReviewDepartment
+              this.already = data.qcSubjectRegistration.topicReviewDepartment
+              this.dataForm.topicReviewGroup = data.qcSubjectRegistration.topicReviewGroup
             }
           })
         }
@@ -160,12 +187,26 @@ export default {
     dataFormSubmit() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          var result = 0;
+          if (this.dataForm.topicReviewDepartment == 0) {
+            result = 0;
+          } else if (this.dataForm.topicReviewDepartment == 1 && this.dataForm.topicReviewGroup == 0) {
+            result = 0;
+          } else if (this.dataForm.topicReviewDepartment == 1 && (this.dataForm.topicReviewGroup == '' || this.dataForm.topicReviewGroup == null || this.dataForm.topicReviewGroup == undefined)) {
+            result = 2;
+          } else if (this.dataForm.topicReviewDepartment == 1 && this.dataForm.topicReviewGroup == 1) {
+            result = 3;
+          }
           this.$http({
             url: this.$http.adornUrl(`/qcSubject/registration/${!this.dataForm.qcsrId ? 'save' : 'update'}`),
             method: 'post',
             data: this.$http.adornData({
               'qcsrId': this.dataForm.qcsrId || undefined,
-              'topicReviewStatus': this.dataForm.topicReviewStatus,
+              'topicReviewDepartment': this.dataForm.topicReviewDepartment,
+              'firstComment': this.dataForm.firstComment || undefined,
+              'topicReviewGroup': this.dataForm.topicReviewGroup,
+              'secondComment': this.dataForm.secondComment || undefined,
+              'topicReviewStatus': result,
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {

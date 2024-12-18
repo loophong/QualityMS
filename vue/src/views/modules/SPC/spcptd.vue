@@ -1,20 +1,21 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getPTDChartDataList()">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('spc:spcptd:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('spc:spcptd:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button @click="getPTDChartDataList()">查询</el-button>
+        <el-button v-if="isAuth('spc:spcptd:save')" type="primary" @click="PTDChartaddOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('spc:spcptd:delete')" type="danger" @click="PTDChartdeleteHandle()" :disabled="PTDChartdataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
       :data="dataList"
       border
       v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
+      @selection-change="PTDChartselectionChangeHandle"
       style="width: 100%;">
       <el-table-column
         type="selection"
@@ -95,14 +96,14 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="PTDChartaddOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="PTDChartdeleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-pagination
-      @size-change="sizeChangeHandle"
-      @current-change="currentChangeHandle"
+      @size-change="PTDChartsizeChangeHandle"
+      @current-change="PTDChartcurrentChangeHandle"
       :current-page="pageIndex"
       :page-sizes="[10, 20, 50, 100]"
       :page-size="pageSize"
@@ -110,7 +111,8 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <add-or-update v-if="PTDChartaddOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getPTDChartDataList"></add-or-update>
+
   </div>
 </template>
 
@@ -122,24 +124,24 @@
         dataForm: {
           key: ''
         },
-        dataList: [],
+        PTDChartdataList: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
-        dataListSelections: [],
-        addOrUpdateVisible: false
+        PTDChartdataListSelections: [],
+        PTDChartaddOrUpdateVisible: false
       }
     },
     components: {
       AddOrUpdate
     },
     activated () {
-      this.getDataList()
+      this.getPTDChartDataList()
     },
     methods: {
       // 获取数据列表
-      getDataList () {
+      getPTDChartDataList () {
         this.dataListLoading = true
         this.$http({
           url: this.$http.adornUrl('/spc/spcptd/list'),
@@ -151,40 +153,40 @@
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
-            this.dataList = data.page.list
+            this.PTDChartdataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
-            this.dataList = []
+            this.PTDChartdataList = []
             this.totalPage = 0
           }
           this.dataListLoading = false
         })
       },
       // 每页数
-      sizeChangeHandle (val) {
+      PTDChartsizeChangeHandle (val) {
         this.pageSize = val
         this.pageIndex = 1
-        this.getDataList()
+        this.getPTDChartDataList()
       },
       // 当前页
-      currentChangeHandle (val) {
+      PTDChartcurrentChangeHandle (val) {
         this.pageIndex = val
-        this.getDataList()
+        this.getPTDChartDataList()
       },
       // 多选
-      selectionChangeHandle (val) {
-        this.dataListSelections = val
+      PTDChartselectionChangeHandle (val) {
+        this.PTDChartdataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
+      PTDChartaddOrUpdateHandle (id) {
+        this.PTDChartaddOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
         })
       },
       // 删除
-      deleteHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
+      PTDChartdeleteHandle (id) {
+        var ids = id ? [id] : this.PTDChartdataListSelections.map(item => {
           return item.id
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
@@ -203,7 +205,7 @@
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  this.getDataList()
+                  this.getPTDChartDataList()
                 }
               })
             } else {

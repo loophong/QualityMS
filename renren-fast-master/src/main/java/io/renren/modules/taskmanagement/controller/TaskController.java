@@ -8,13 +8,16 @@ import java.util.*;
 import com.alibaba.excel.util.DateUtils;
 import com.aliyun.oss.common.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.notice.entity.CreateNoticeParams;
 import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.taskmanagement.dto.TaskQueryParamDTO;
+import io.renren.modules.taskmanagement.dto.TaskSubmitApprovalDTO;
 import io.renren.modules.taskmanagement.entity.*;
+import io.renren.modules.taskmanagement.service.ApprovalFileService;
 import io.renren.modules.taskmanagement.service.ApprovalService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +49,46 @@ public class TaskController {
     private ApprovalService approvalService;
     @Autowired
     private MessageNotificationService messageService;
+    @Autowired
+    private ApprovalFileService approvalFileService;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    /**
+     * @description: 图中点击任务时，查询任务的全部信息和审批文件
+     * @param: null
+     * @return:
+     * @author: hong
+     * @date: 2024/12/11 17:00
+     */
+    @PostMapping("/taskAllInfo")
+    public R taskAllInfo(@RequestBody String param) throws Exception {
+        log.info("param:" + param);
+        Map<String, Object> jsonMap = objectMapper.readValue(param, Map.class);
+        String taskId = (String) jsonMap.get("taskId");
+        log.info("taskId:" + taskId);
+        TaskEntity task = taskService.query().eq("task_id", taskId).one();
+        // 检查task状态，如果通过则查询审批文件
+        if (task.getTaskCurrentState() != TaskStatus.COMPLETED) {
+            return R.ok().put("task", task).put("fileList", null);
+        }
+
+        // 查询审批编号
+        ApprovalEntity approval = approvalService.query()
+                .eq("task_id", taskId)
+                .eq("approval_status", ApprovalStatus.APPROVED)
+                .orderByDesc("task_submission_time") // 按照 submit_time 降序排序
+                .last("limit 1") // 限制结果为一条记录
+                .one();// 获取一条记录
+        // 检查是否有审批文件
+        List<ApprovalFileEntity> fileList = approvalFileService.list(new QueryWrapper<ApprovalFileEntity>()
+                .eq("approval_id", approval.getApprovalId()));
+        if (fileList.size() > 0) {
+            return R.ok().put("task", task).put("fileList", fileList);
+        } else {
+            return R.ok().put("task", task).put("fileList", null);
+        }
+    }
 
     /**
      * @description: 任务折线图展示
@@ -72,48 +115,48 @@ public class TaskController {
     }
 
 
-    /** 
+    /**
      * @description: 小屏问题，任务进度，与任务关联的指标中，显示指标的已完成和未完成数
-     * @return: io.renren.common.utils.R 
+     * @return: io.renren.common.utils.R
      * @author: hong
      * @date: 2024/11/28 14:49
-     */ 
+     */
     @RequestMapping("/statisticsOnTaskRelatedIndicators")
     public R statisticsOnTaskRelatedIndicators() {
         List<TaskEntity> unfinishedList = taskService.list(
                 new QueryWrapper<TaskEntity>()
-                .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id","")
-                .eq("task_is_completed", 0));
+                        .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id", "")
+                        .eq("task_is_completed", 0));
         List<TaskEntity> finishedList = taskService.list(
                 new QueryWrapper<TaskEntity>()
-                .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id","")
-                .eq("task_is_completed", 1));
+                        .isNotNull("task_associated_indicators_id").ne("task_associated_indicators_id", "")
+                        .eq("task_is_completed", 1));
         log.info("未完成的任务数量为：" + unfinishedList);
         log.info("未完成的任务数量为：" + unfinishedList.size());
         log.info("已完成的任务数量为：" + finishedList);
         log.info("已完成的任务数量为：" + finishedList.size());
         // 将上面两个数封装成json返回给前端
-        return R.ok().put("unfinishedNum", unfinishedList.size()).put("finishedNum", finishedList.size());
+        return R.ok().put("unfinishedNum", unfinishedList.size() > 0 ? unfinishedList.size() : 0).put("finishedNum", finishedList.size() > 0 ? finishedList.size() : 0);
     }
 
 
-    /** 
+    /**
      * @description: 小屏问题，指标任务数
-     * @return: io.renren.common.utils.R 
+     * @return: io.renren.common.utils.R
      * @author: hong
      * @date: 2024/11/28 15:01
-     */ 
+     */
     @RequestMapping("/countTaskRelatedIndicatorsNum")
     public R countTaskRelatedIndicatorsNum() {
         List<TaskEntity> list = taskService.list(
                 new QueryWrapper<TaskEntity>()
-                .isNotNull("task_associated_indicators_id")
-                        .ne("task_associated_indicators_id",""));
+                        .isNotNull("task_associated_indicators_id")
+                        .ne("task_associated_indicators_id", ""));
 
         log.info("指标任务数：" + list);
         log.info("指标任务数：" + list.size());
 
-        return R.ok().put("indicatorRelatedTaskNum", list.size());
+        return R.ok().put("indicatorRelatedTaskNum", list.size() > 0 ? list.size() : 0);
     }
 
 
@@ -184,11 +227,12 @@ public class TaskController {
      * @date: 2024/8/24 18:50
      */
     @Transactional
-    @RequestMapping("/submitApprover")
+    @PostMapping("/submitApprover")
     //    @RequiresPermissions("taskmanagement:task:list")
-    public R executeTask(String taskId, String taskApprovalor) {
+    public R approval(@RequestBody TaskSubmitApprovalDTO taskSubmitApprovalDTO) {
+        log.info("提交审批" + taskSubmitApprovalDTO);
 
-        log.info("当前任务id为：" + taskId);
+        String taskId = taskSubmitApprovalDTO.getTaskId();
         TaskEntity task = taskService.getByTaskId(taskId);
 
         // 审批之前先检查其子任务是否全部完成
@@ -204,44 +248,107 @@ public class TaskController {
 
         if (task.getTaskCurrentState() == TaskStatus.IN_PROGRESS) {
             ApprovalEntity approvalEntity = new ApprovalEntity();
+            approvalEntity.setApprovalContent(taskSubmitApprovalDTO.getApprovalContent());
             approvalEntity.setTaskId(taskId);
             approvalEntity.setTaskName(task.getTaskName());
             approvalEntity.setTaskContent(task.getTaskContent());
             approvalEntity.setTaskAssociatedPlanId(task.getTaskAssociatedPlanId());
-            log.info("当前任务的task信息为：" + task);
-
             approvalEntity.setTaskPrincipal(task.getTaskPrincipal());
-
             log.info("当前任务的AssociatedIndicatorsId为：" + task.getTaskAssociatedIndicatorsId());
             if (task.getTaskAssociatedIndicatorsId() != null && !task.getTaskAssociatedIndicatorsId().equals("")) {
                 approvalEntity.setTaskAssociatedIndicatorsId(task.getTaskAssociatedIndicatorsId());
             }
             //获取当前时间
-
             approvalEntity.setTaskStartDate(task.getTaskStartDate());
             approvalEntity.setTaskSubmissionTime(new Date());
-//            approvalEntity.setTaskStartDate(task.getTaskStartDate());
-            approvalEntity.setApprover(taskApprovalor);
+            approvalEntity.setApprover(taskSubmitApprovalDTO.getApprovalor());
             approvalEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
-
-
-            task.setTaskCurrentState(TaskStatus.APPROVAL_IN_PROGRESS);
-
-            taskService.updateById(task);
             approvalService.save(approvalEntity);
+            // 设置当前任务的状态为审批中
+            task.setTaskCurrentState(TaskStatus.APPROVAL_IN_PROGRESS);
+            taskService.updateById(task);
+
+            // 保存文件信息
+            for (FileEntity file : taskSubmitApprovalDTO.getFiles()) {
+                ApprovalFileEntity fileEntity = new ApprovalFileEntity();
+                fileEntity.setTaskId(taskId);
+                fileEntity.setName(file.getName());
+                fileEntity.setUrl(file.getUrl());
+                fileEntity.setApprovalId(approvalEntity.getApprovalId());
+                approvalFileService.save(fileEntity);
+            }
+
         } else {
             return R.error("当前任务状态不是进行中，不能进行审核");
         }
-//
-//
-//        taskService.updateById(taskEntity);
 
-        // 发送消息
-        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()}, "您有一个任务需要审批，请及时审批！", "任务审批通知"));
-
+////        taskService.updateById(taskEntity);
+//
+//        // 发送消息
+//        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()}, "您有一个任务需要审批，请及时审批！", "任务审批通知"));
+//
         return R.ok();
 
     }
+//    @Transactional
+//    @RequestMapping("/submitApprover")
+//    //    @RequiresPermissions("taskmanagement:task:list")
+//    public R executeTask(String taskId, String taskApprovalor) {
+//
+//        log.info("当前任务id为：" + taskId);
+//        TaskEntity task = taskService.getByTaskId(taskId);
+//
+//        // 审批之前先检查其子任务是否全部完成
+//        // 查询当前任务的子任务
+//        List<TaskEntity> childrenTasks = taskService.list(new QueryWrapper<TaskEntity>().eq("task_parent_node", taskId));
+//        if (childrenTasks.size() > 0) {
+//            for (TaskEntity childrenTask : childrenTasks) {
+//                if (childrenTask.getTaskCurrentState() != TaskStatus.COMPLETED) {
+//                    return R.error("当前任务子任务未全部完成，不能进行审批");
+//                }
+//            }
+//        }
+//
+//        if (task.getTaskCurrentState() == TaskStatus.IN_PROGRESS) {
+//            ApprovalEntity approvalEntity = new ApprovalEntity();
+//            approvalEntity.setTaskId(taskId);
+//            approvalEntity.setTaskName(task.getTaskName());
+//            approvalEntity.setTaskContent(task.getTaskContent());
+//            approvalEntity.setTaskAssociatedPlanId(task.getTaskAssociatedPlanId());
+//            log.info("当前任务的task信息为：" + task);
+//
+//            approvalEntity.setTaskPrincipal(task.getTaskPrincipal());
+//
+//            log.info("当前任务的AssociatedIndicatorsId为：" + task.getTaskAssociatedIndicatorsId());
+//            if (task.getTaskAssociatedIndicatorsId() != null && !task.getTaskAssociatedIndicatorsId().equals("")) {
+//                approvalEntity.setTaskAssociatedIndicatorsId(task.getTaskAssociatedIndicatorsId());
+//            }
+//            //获取当前时间
+//
+//            approvalEntity.setTaskStartDate(task.getTaskStartDate());
+//            approvalEntity.setTaskSubmissionTime(new Date());
+////            approvalEntity.setTaskStartDate(task.getTaskStartDate());
+//            approvalEntity.setApprover(taskApprovalor);
+//            approvalEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
+//
+//
+//            task.setTaskCurrentState(TaskStatus.APPROVAL_IN_PROGRESS);
+//
+//            taskService.updateById(task);
+//            approvalService.save(approvalEntity);
+//        } else {
+//            return R.error("当前任务状态不是进行中，不能进行审核");
+//        }
+////
+////
+////        taskService.updateById(taskEntity);
+//
+//        // 发送消息
+//        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()}, "您有一个任务需要审批，请及时审批！", "任务审批通知"));
+//
+//        return R.ok();
+//
+//    }
 
     /**
      * @description: 测试获取当前登录的用户信息用户信息

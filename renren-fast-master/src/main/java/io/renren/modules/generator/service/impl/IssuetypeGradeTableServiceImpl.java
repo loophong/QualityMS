@@ -21,13 +21,22 @@ public class IssuetypeGradeTableServiceImpl extends ServiceImpl<IssuetypeGradeTa
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        // 构建查询条件
+        QueryWrapper<IssuetypeGradeTableEntity> queryWrapper = new QueryWrapper<>();
+
+        // 按 ID 降序排序
+        queryWrapper.orderByDesc("grade_ID");
+
+        // 分页查询
         IPage<IssuetypeGradeTableEntity> page = this.page(
                 new Query<IssuetypeGradeTableEntity>().getPage(params),
-                new QueryWrapper<IssuetypeGradeTableEntity>()
+                queryWrapper
         );
 
+        // 返回分页数据
         return new PageUtils(page);
     }
+
 
     @Override
     public List<IssuetypeGradeTableEntity> listAll() {

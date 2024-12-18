@@ -5,6 +5,19 @@
       <el-form-item label="课题名称" prop="topicName">
         <el-input v-model="dataForm.topicName" placeholder="课题名称"></el-input>
       </el-form-item>
+      <el-form-item label="课题科室" prop="topicDepartment">
+        <el-select v-model="dataForm.topicDepartment" placeholder="请选择科室">
+          <el-option label="生产科" value="生产科"></el-option>
+          <el-option label="供应科" value="供应科"></el-option>
+          <el-option label="市场科" value="市场科"></el-option>
+          <el-option label="技术科" value="技术科"></el-option>
+          <el-option label="质量科" value="质量科"></el-option>
+          <el-option label="财务科" value="财务科"></el-option>
+          <el-option label="安环设备科" value="安环设备科"></el-option>
+          <el-option label="企业管理科" value="企业管理科"></el-option>
+          <el-option label="党群办公室" value="党群办公室"></el-option>
+        </el-select>
+      </el-form-item>
       <!-- <el-form-item label="课题编号" prop="topicNumber">
         <el-input v-model="dataForm.topicNumber" placeholder="课题编号"></el-input>
       </el-form-item> -->
@@ -21,7 +34,7 @@
         <el-input v-model="dataForm.topicConsultant" placeholder="课题顾问"></el-input>
       </el-form-item> -->
       <el-form-item label="课题顾问" prop="topicConsultant">
-        <el-select v-model="dataForm.topicConsultant" filterable placeholder="请选择课题顾问">
+        <el-select v-model="dataForm.topicConsultant" :disabled="true" filterable placeholder="请选择课题顾问">
           <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
             <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
             </el-option>
@@ -119,6 +132,7 @@ export default {
         topicReviewStatus: '',
         topicDescription: '',
         topicType: '',
+        topicDepartment: '',
         activityCharacteristics: '',
         activityPlan: [],
         activityPlanEnd: '',
@@ -168,6 +182,9 @@ export default {
         activityPlan: [
           { required: true, message: '活动计划不能为空', trigger: 'blur' }
         ],
+        topicDepartment: [
+          { required: true, message: '课题单位不能为空', trigger: 'blur' }
+        ],
         // keywords: [
         //   { required: true, message: '课题关键字tag不能为空', trigger: 'blur' }
         // ],
@@ -178,32 +195,55 @@ export default {
     }
   },
   methods: {
-    updateOptions() {
+    updateOptions(number) {
       // 首先找到匹配的组名的项
       try {
-        this.dataForm.topicConsultant = '';
-        this.dataForm.teamNumberIds = '';
-
+        console.log(number)
+        if (number != '清除') {
+          this.dataForm.topicConsultant = '';
+          this.dataForm.teamNumberIds = '';
+        }
         // console.log(this.dataForm.groupName)
         // console.log(this.dataForm.topicConsultant)
         // console.log(this.dataForm.teamNumberIds)
-        console.log(this.groupMemberList)
+        console.log(this.membersOptions)
         // console.log(this.dataForm)
-        const matchedItem = Object.values(this.groupMemberList).find(item => {
+
+        var matchedItem = Object.values(this.groupMemberList).find(item => {
           return item.groupName === this.dataForm.groupName;
         });
+
         if (matchedItem) {
+          console.log(matchedItem)
+          //更新组长
           this.dataForm.topicLeader = matchedItem.name
-          // 更新顾问选项
-          this.consultantOptions = matchedItem.children.filter(member => member.roleInTopic === '顾问').map(member => ({
-            value: member.name,
-            label: member.name
-          }));
+          // 更新顾问
+          this.dataForm.topicConsultant = matchedItem.position
+          // this.consultantOptions = matchedItem.children.filter(member => member.roleInTopic === '顾问').map(member => ({
+          //   value: member.name,
+          //   label: member.name
+          // }));
+
           // 更新成员选项
           this.membersSelect = matchedItem.children.filter(member => member.roleInTopic === '成员').map(member => ({
             value: member.name,
             label: member.name
           }));
+          console.log(this.membersSelect)
+          console.log('-----------')
+          this.membersOptions.forEach(a => {
+            a.options.forEach(b => {
+              this.membersSelect.forEach(c => {
+                if (b.name === c.label) {
+                  c.label = b.label
+                }
+              })
+            })
+          })
+          console.log(this.membersSelect)
+
+
+
         } else {
           // 如果没有找到匹配项，可以清空选项
           this.consultantOptions = [];
@@ -214,7 +254,17 @@ export default {
       }
 
     },
-
+    numberToName(number) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.name == number) {
+            result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      return result
+    },
     init(id) {
 
       this.dataForm.qcsrId = id || 0
@@ -232,7 +282,7 @@ export default {
               this.dataForm.topicNumber = data.qcSubjectRegistration.topicNumber
               this.dataForm.topicLeader = data.qcSubjectRegistration.topicLeader
               this.dataForm.topicConsultant = data.qcSubjectRegistration.topicConsultant
-              this.dataForm.teamNumberIds = data.qcSubjectRegistration.teamNumberIds
+              this.dataForm.teamNumberIds = JSON.parse(data.qcSubjectRegistration.teamNumberIds)
               this.dataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus
               this.dataForm.topicDescription = data.qcSubjectRegistration.topicDescription
               this.dataForm.topicType = data.qcSubjectRegistration.topicType
@@ -240,12 +290,14 @@ export default {
               this.dataForm.activityPlan = [new Date(data.qcSubjectRegistration.activityPlan), new Date(data.qcSubjectRegistration.activityPlanEnd)]
               // this.dataForm.activityPlan[1] = new Date(data.qcSubjectRegistration.activityPlanEnd)
               this.dataForm.keywords = data.qcSubjectRegistration.keywords
+              this.dataForm.topicDepartment = data.qcSubjectRegistration.topicDepartment
               this.dataForm.topicActivityStatus = data.qcSubjectRegistration.topicActivityStatus
               this.dataForm.topicActivityResult = data.qcSubjectRegistration.topicActivityResult
               this.dataForm.deleteFlag = data.qcSubjectRegistration.deleteFlag
               this.dataForm.note = data.qcSubjectRegistration.note
               this.dataForm.groupName = data.qcSubjectRegistration.groupName
             }
+            this.updateOptions('清除')
             // data.userName
             console.log(this.groupMemberList)
             if ((this.groupMemberList && typeof this.groupMemberList === 'object' && !Array.isArray(this.groupMemberList) && !this.isAuth('qcManagement:group:admin'))) {
@@ -370,7 +422,7 @@ export default {
         }
 
       })
-
+      // this.updateOptions()
     },
 
     ifUpdate() {
@@ -378,7 +430,6 @@ export default {
         this.flag = 1;
       }
     },
-    //TODO: 课题组长和课题顾问的下拉框
     // handleFormEdit() {
     //   this.groupMemberList.filter(item => {
     //     if (item.groupName === this.dataForm.groupName) {
@@ -422,8 +473,8 @@ export default {
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                if (!this.dataForm.qcsrId && data.exist) {
-                  this.$message.error('课题名称已存在!')
+                if (data.exist) {
+                  this.$message.warning('课题名称已存在!')
                   return
                 } else {
                   this.$http({
@@ -435,7 +486,7 @@ export default {
                       'topicNumber': this.dataForm.topicNumber,
                       'topicLeader': this.dataForm.topicLeader,
                       'topicConsultant': `${this.dataForm.topicConsultant}`,
-                      'teamNumberIds': `${this.dataForm.teamNumberIds}`,
+                      'teamNumberIds': JSON.stringify(this.dataForm.teamNumberIds),
                       'topicReviewStatus': this.dataForm.qcsrId ? this.dataForm.topicReviewStatus : 1,
                       'topicDescription': this.dataForm.topicDescription ? this.dataForm.topicDescription : '',
                       'topicType': this.dataForm.topicType,
@@ -448,6 +499,7 @@ export default {
                       'deleteFlag': this.dataForm.deleteFlag,
                       'note': this.dataForm.note,
                       'groupName': this.dataForm.groupName,
+                      'topicDepartment': this.dataForm.topicDepartment,
                     })
                   }).then(({ data }) => {
                     if (data && data.code === 0) {

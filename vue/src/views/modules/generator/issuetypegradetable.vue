@@ -22,12 +22,12 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
-        prop="gradeId"
-        header-align="center"
-        align="center"
-        label="id">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="gradeId"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="id">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="grade"
         header-align="center"

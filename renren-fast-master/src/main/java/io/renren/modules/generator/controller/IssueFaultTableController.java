@@ -76,7 +76,15 @@ public class IssueFaultTableController {
 
         return R.ok().put("page", page);
     }
-
+    /**
+     * 查询列表
+     */
+    @RequestMapping("/Querylist")
+    @RequiresPermissions("generator:issuetable:list")
+    public R Querylist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueFaultTableService.QueryPage(params);
+        return R.ok().put("page", page);
+    }
 
     /**
      * 信息

@@ -7,18 +7,27 @@
           <el-form-item v-if="isAdmin" prop="groupName" label="小组名称">
             <el-input v-model="dataForm.groupName" placeholder="请输入小组名称"></el-input>
           </el-form-item>
-          <el-form-item prop="mainName" label="组长姓名">
+          <el-form-item v-if="dataForm.roleInTopic == '组长'" prop="mainName" label="组长姓名">
             <!-- <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input> -->
             <el-select v-model="dataForm.mainName" filterable placeholder="请选择角色">
               <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
-                <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
+                <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.name">
                 </el-option>
               </el-option-group>
             </el-select>
           </el-form-item>
-          <el-form-item prop="number" label="员工编号">
-            <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
+          <el-form-item v-else prop="mainName" label="姓名">
+            <!-- <el-input v-model="dataForm.mainName" placeholder="请输入姓名"></el-input> -->
+            <el-select v-model="dataForm.mainName" filterable placeholder="请选择角色">
+              <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
+                <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.name">
+                </el-option>
+              </el-option-group>
+            </el-select>
           </el-form-item>
+          <!-- <el-form-item prop="number" label="员工编号">
+            <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
+          </el-form-item> -->
           <el-form-item v-if="isAdmin" prop="department" label="单位">
             <el-input v-model="dataForm.department" placeholder="请输入单位"></el-input>
           </el-form-item>
@@ -35,7 +44,11 @@
               <el-option label="成员" value="成员"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item prop="participationDate" label="创建QC小组时间">
+          <el-form-item v-if="dataForm.roleInTopic == '组长'" prop="participationDate" label="创建QC小组时间">
+            <el-date-picker v-model="dataForm.participationDate" type="date" value-format="yyyy-MM-dd"
+              placeholder="请选择日期" clearable></el-date-picker>
+          </el-form-item>
+          <el-form-item v-else prop="participationDate" label="加入QC小组时间">
             <el-date-picker v-model="dataForm.participationDate" type="date" value-format="yyyy-MM-dd"
               placeholder="请选择日期" clearable></el-date-picker>
           </el-form-item>
@@ -59,14 +72,14 @@
                 <!-- <el-input v-model="member.name" placeholder="请输入姓名"></el-input> -->
                 <el-select v-model="member.name" filterable placeholder="请选择角色">
                   <el-option-group v-for="group in membersOptions" :key="group.label" :label="group.label">
-                    <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
+                    <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.name">
                     </el-option>
                   </el-option-group>
                 </el-select>
               </el-form-item>
-              <el-form-item label="员工编号" prop="number">
+              <!-- <el-form-item label="员工编号" prop="number">
                 <el-input v-model="member.number" placeholder="请输入员工编号"></el-input>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="组内角色" prop="roleInTopic">
                 <el-select v-model="member.roleInTopic" placeholder="请选择组内角色">
                   <el-option label="成员" value="成员"></el-option>
@@ -107,6 +120,7 @@ export default {
   data() {
     return {
       membersOptions: [],
+      allMembersOptions: [],
       isAddMember: false,
       parentFlag: '',
       visible: false,
@@ -173,6 +187,7 @@ export default {
       this.dataForm.members.joinDate = currentDate;
     },
     init(id) {
+      console.log('----')
       console.log(this.membersOptions)
       this.dataForm.qcgmId = id || 0;
       this.visible = true;
@@ -285,6 +300,8 @@ export default {
         data: this.$http.adornData({
           'qcgmId': this.dataForm.qcgmId,
           'examineStatus': '待审核',
+          'examineDepartment': '',
+          'examineGroup': '',
         })
       })
       Promise.all(this.dataForm.members.map(member => {

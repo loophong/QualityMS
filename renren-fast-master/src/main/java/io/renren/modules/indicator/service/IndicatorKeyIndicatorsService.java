@@ -24,5 +24,10 @@ public interface IndicatorKeyIndicatorsService extends IService<IndicatorKeyIndi
 
 
     List<IndicatorKeyIndicatorsEntity> queryList(Map<String, Object> params);
+
+
+    boolean clearStorageFlag(List<Integer> ids);
 }
+
+
 

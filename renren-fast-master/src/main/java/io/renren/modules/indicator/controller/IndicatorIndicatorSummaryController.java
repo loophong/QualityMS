@@ -14,14 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import io.renren.common.annotation.SysLog;
 import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
 import io.renren.modules.indicator.service.IndicatorIndicatorSummaryService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.xml.crypto.Data;
 
 
 /**
@@ -118,7 +115,6 @@ public class IndicatorIndicatorSummaryController {
     /**
      * 上传excel
      */
-    @PostMapping("/upload")
     public R simpleRead(@RequestParam("multipartFile") MultipartFile multipartFile, @RequestParam("yearMonth") @DateTimeFormat(pattern = "yyyy-MM") Date yearMonth) {
         try (InputStream inputStream = multipartFile.getInputStream()) {
             InputStream inputStream2 = multipartFile.getInputStream();

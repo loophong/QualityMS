@@ -6,13 +6,10 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.indicator.entity.IndicatorKeyIndicatorsEntity;
 import io.renren.modules.indicator.service.IndicatorKeyIndicatorsService;
@@ -25,6 +22,7 @@ import io.renren.common.utils.R;
  * @email sunlightcs@gmail.com
  * @date 2024-07-21 18:47:20
  */
+@Slf4j
 @RestController
 @RequestMapping("indicator/indicatorkeyindicators")
 public class IndicatorKeyIndicatorsController {
@@ -115,8 +113,36 @@ public class IndicatorKeyIndicatorsController {
     @RequiresPermissions("indicator:indicatorkeyindicators:delete")
     public R delete(@RequestBody Integer[] keyIndicatorIds) {
         indicatorKeyIndicatorsService.removeByIds(Arrays.asList(keyIndicatorIds));
-
         return R.ok();
     }
 
+
+    @PostMapping("/clearStorageFlag")
+//    @RequiresPermissions("indicator:indicatorkeyindicators:clearStorageFlag")
+    public R clearStorageFlag(@RequestBody Integer[] keyIndicatorIds) {
+        if (keyIndicatorIds == null || keyIndicatorIds.length == 0) {
+            return R.error("Invalid input: keyIndicatorIds cannot be null or empty");
+        }
+
+        try {
+            List<Integer> ids = Arrays.asList(keyIndicatorIds);
+            System.out.println("ids===>"+ids);
+            boolean result = indicatorKeyIndicatorsService.clearStorageFlag(ids);
+            if (result) {
+                return R.ok();
+            } else {
+                return R.error("Failed to clear storage_flag");
+            }
+        } catch (Exception e) {
+            // 记录日志
+            e.printStackTrace();
+            return R.error("An error occurred while clearing storage_flag: " + e.getMessage());
+        }
+    }
+
 }
+
+
+
+
+

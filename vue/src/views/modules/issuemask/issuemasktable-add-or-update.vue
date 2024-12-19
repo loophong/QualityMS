@@ -14,9 +14,9 @@
     <el-form-item label="审核人" prop="reviewers">
 <!--      <el-input v-model="dataForm.reviewers" placeholder="审核人"></el-input>-->
       <el-select v-model="dataForm.reviewers" filterable placeholder="请选择审核人">
-        <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+        <el-option-group v-for="group in options" :key="group.value" :label="group.label">
           <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                     :value="item.label">
+                     :value="item.value">
           </el-option>
         </el-option-group>
       </el-select>
@@ -24,9 +24,9 @@
     <el-form-item label="接收人" prop="recipients">
 <!--      <el-input v-model="dataForm.recipients" placeholder="接收人"></el-input>-->
       <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">
-        <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+        <el-option-group v-for="group in options" :key="group.value" :label="group.label">
           <el-option v-for="item in group.options" :key="item.value" :label="item.label"
-                     :value="item.label">
+                     :value="item.value">
           </el-option>
         </el-option-group>
       </el-select>
@@ -221,6 +221,7 @@
           issueNumber: '',
           reviewers: '',
           reviewerOpinion: '',
+          issuecreators: '',
           recipients: '',
           maskcontent: '',
           handlingscenarios:'',
@@ -229,6 +230,7 @@
           creationTime: '', // 初始化为当前时间
           state: '',
           requiredCompletionTime: '',
+          rectificationResponsiblePerson: '',
           superiorMask: '',
           subtasks: [{ name: '', assignee: '', parentTask: '', serialNumber: '', key: Date.now() }],
           options: ''
@@ -472,6 +474,8 @@
                 this.dataForm.recipients = data.issueMaskTable.recipients
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
                 this.dataForm.creator = data.issueMaskTable.creator
+                this.dataForm.rectificationResponsiblePerson = data.issueMaskTable.rectificationResponsiblePerson
+                this.dataForm.issuecreators = data.issueMaskTable.issuecreator
                 this.dataForm.creationTime = this.formattedCreationTime // 初始化为当前时间
                 this.dataForm.requiredCompletionTime = data.issueMaskTable.requiredCompletionTime
                 this.dataForm.superiorMask = data.issueMaskTable.superiorMask
@@ -511,13 +515,15 @@
           }
         })
       },
-      async distribute (issueNumber, maskNumber, creator) {
+      async distribute (issueNumber, maskNumber, creator, rrp, issuecreator) {
         // this.fetchTasksByIssueNumber(issueNumber)
         this.dataForm.issuemaskId = 0
         this.visible3 = true
         this.dataForm.issueNumber = issueNumber
         this.dataForm.serialNumber = maskNumber
         this.dataForm.creator = creator
+        this.dataForm.rectificationResponsiblePerson = rrp
+        this.dataForm.issuecreators = issuecreator
         // 为第一个子任务生成序列号
         // this.dataForm.subtasks = [{ name: '', assignee: '', parentTask: '', serialNumber: this.generateSerialNumber(issueNumber), key: Date.now() }];
         this.dataForm.subtasks = [
@@ -586,6 +592,8 @@
                   'recipients': subtask.assignee,
                   'maskcontent': subtask.name,
                   'creator': this.dataForm.creator,
+                  'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+                  'issuecreator': this.dataForm.issuecreators,
                   'creationTime': this.dataForm.creationTime,
                   'requiredCompletionTime': this.dataForm.requiredCompletionTime,
                   'superiorMask': this.dataForm.serialNumber,
@@ -609,10 +617,11 @@
                     url: this.$http.adornUrl(`/notice/save`),
                     method: 'post',
                     data: this.$http.adornData({
-                      'receiverId': receiverId, // 审核人ID
-                      'senderId': creatorId, // 发起人ID
-                      'content': `有新的任务需要审核`, // 消息内容
-                      'type': '任务审核' // 消息类型
+                      'receiverId': this.dataForm.reviewers, // 审核人ID
+                      'senderId': this.dataForm.creator, // 发起人ID
+                      'content': `任务内容：`+ subtask.name, // 消息内容
+                      'type': '任务审核通知', // 消息类型
+                      'jumpdepart': '2' // 跳转部门
                     })
                   });
                 } else {
@@ -745,6 +754,8 @@
                 'handlingscenarios': this.dataForm.handlingscenarios,
                 'annex': this.dataForm.annex,
                 'creator': this.dataForm.creator,
+                'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
+                'issuecreator': this.dataForm.issuecreators,
                 'creationTime': this.dataForm.creationTime,
                 'requiredCompletionTime': this.dataForm.requiredCompletionTime,
                 'superiorMask': this.dataForm.superiorMask,
@@ -772,6 +783,18 @@
                     this.$emit('refreshDataList')
                   }
                 })
+                // 发送消息通知给审核人
+                this.$http({
+                  url: this.$http.adornUrl(`/notice/save`),
+                  method: 'post',
+                  data: this.$http.adornData({
+                    'receiverId': this.dataForm.reviewers, // 审核人ID
+                    'senderId': this.dataForm.creator, // 发起人ID
+                    'content': '任务内容：'+ this.dataForm.maskcontent, // 消息内容
+                    'type': '任务审核通知', // 消息类型
+                    'jumpdepart': '2' // 跳转部门
+                  })
+                });
               } else {
                 this.$message.error(data.msg)
               }

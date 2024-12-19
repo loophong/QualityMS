@@ -84,6 +84,8 @@
               <span v-else-if="scope.row.planCurrentState === 'COMPLETED'">
             <el-tag type="success" disable-transitions>已完成</el-tag></span>
               <span v-else-if="scope.row.planCurrentState === 'CREATED_BUT_NOT_APPROVED'">
+            <el-tag type="success" disable-transitions>未初审</el-tag></span>
+              <span v-else-if="scope.row.planCurrentState === 'PREAPPROVAL_IN_PROGRESS'">
             <el-tag type="success" disable-transitions>初审中</el-tag></span>
               <span v-else-if="scope.row.planCurrentState === 'PREAPPROVAL_NOT_PASSED'">
             <el-tag type="danger" disable-transitions>未通过初审</el-tag></span>
@@ -148,7 +150,12 @@
               <!--              </el-button>-->
               <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
-              <el-button type="text" size="small" @click="updatePlanPage(scope.row.planId)">修改</el-button>
+              <el-button v-if="scope.row.planCurrentState !== 'PREAPPROVAL_IN_PROGRESS'"
+                         type="text" size="small" @click="updatePlanPage(scope.row)">修改
+              </el-button>
+              <el-button v-if="scope.row.planCurrentState === 'PREAPPROVAL_IN_PROGRESS'"
+                         type="text" size="small" @click="cancelPreApproval(scope.row.planId)">取消初审
+              </el-button>
               <el-button type="text" size="small" @click="deleteHandle(scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -159,6 +166,75 @@
         </el-pagination>
 
       </el-tab-pane>
+
+      <el-tab-pane label="审批记录">
+        <el-table :data="approvalDataList" border v-loading="approvalListLoading"
+                  style="width: 100%;">
+          <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
+          </el-table-column> -->
+          <el-table-column prop="approvalId" header-align="center" align="center" label="审批编号" width="100">
+          </el-table-column>
+          <el-table-column prop="planId" header-align="center" align="center" label="计划编号" width="100">
+          </el-table-column>
+          <el-table-column prop="planName" header-align="center" align="center" label="计划名" width="150">
+          </el-table-column>
+          <el-table-column prop="planContent" header-align="center" align="center" label="计划内容">
+          </el-table-column>
+          <!--          <el-table-column prop="planStartDate" header-align="center" align="center" label="开始日期" width="110">-->
+          <!--          </el-table-column>-->
+          <!--          <el-table-column prop="planScheduleCompletionDate" header-align="center" align="center" label="计划完成日期" width="110">-->
+          <!--          </el-table-column>-->
+          <!--          <el-table-column prop="planScheduleDays" header-align="center" align="center" label="计划天数">-->
+          <!--          </el-table-column>-->
+          <el-table-column prop="planPrincipal" header-align="center" align="center" label="负责人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.planPrincipal) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="planAssociatedIndicatorsId" header-align="center" align="center" label="关联指标名">
+            <template slot-scope="scope">
+              {{ getIndicatorNameById(scope.row.planAssociatedIndicatorsId) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="planSubmissionTime" header-align="center" align="center" label="计划送审时间">
+          </el-table-column>
+          <el-table-column prop="submitter" header-align="center" align="center" label="送审人">
+            <template slot-scope="scope">
+              {{ getUsernameByUserId(scope.row.submitter) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="approvalStatus" label="审批状态" header-align="center" align="center">
+            <template slot-scope="scope">
+              <span v-if="scope.row.approvalStatus === 'PENDING'">
+                <el-tag disable-transitions>待审批</el-tag></span>
+              <span v-else-if="scope.row.approvalStatus === 'APPROVED'">
+                <el-tag type="success" disable-transitions>已通过</el-tag></span>
+              <span v-else-if="scope.row.approvalStatus === 'REJECTED'">
+                <el-tag type="danger" disable-transitions>已拒绝</el-tag></span>
+              <span v-else-if="scope.row.approvalStatus === 'CANCEL'">
+                <el-tag type="info" disable-transitions>已取消</el-tag></span>
+              <span v-else>-</span> <!-- 处理未知状态 -->
+            </template>
+          </el-table-column>
+          <el-table-column prop="approvalComments" header-align="center" align="center" label="审批意见">
+          </el-table-column>
+          <el-table-column prop="remarks" header-align="center" align="center" label="备注">
+          </el-table-column>
+
+          <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
+              <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination @size-change="approvalSizeChangeHandle" @current-change="approvalCurrentChangeHandle" :current-page="approvalPageIndex"
+                       :page-sizes="[10, 20, 50, 100]" :page-size="approvalPageSize" :total="approvalTotalPage"
+                       layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination>
+
+      </el-tab-pane>
+
 
       <el-tab-pane label="已完成计划">
 
@@ -316,8 +392,9 @@
               <!--              </el-button>-->
               <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
-              <el-button type="text" size="small" @click="updatePlanPage(scope.row.planId)">修改</el-button>
-              <el-button type="text" size="small" @click="deleteHandle(scope.row)">删除</el-button>
+              <el-button v-if="scope.row.addBase === 0" type="text" size="small" @click="addBase(scope.row.tmPid)">入库</el-button>
+              <!--              <el-button type="text" size="small" @click="updatePlanPage(scope.row)">修改</el-button>-->
+<!--              <el-button type="text" size="small" @click="deleteHandle(scope.row)">删除</el-button>-->
             </template>
           </el-table-column>
         </el-table>
@@ -332,7 +409,7 @@
     </el-tabs>
 
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataQueryList"></add-or-update>
+    <!--    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataQueryList"></add-or-update>-->
 
 
     <div>
@@ -373,7 +450,7 @@
 </template>
 
 <script>
-import AddOrUpdate from './taskmanagementplan-add-or-update'
+// import AddOrUpdate from './taskmanagementplan-add-or-update'
 
 export default {
   data() {
@@ -417,14 +494,22 @@ export default {
       // 附件列表
       files: [],
 
+      // 审批相关
+      approvalDataList: [],
+      approvalPageIndex: 1,
+      approvalPageSize: 10,
+      approvalTotalPage: 0,
+      approvalListLoading: false,
+
     }
   },
   components: {
-    AddOrUpdate
+    // AddOrUpdate
   },
   activated() {
     this.getDataQueryList()
     this.getFinishedPlanList()
+    this.getApprovalDataQueryList()
   },
   async created() {
     // 获取分组后的员工数据
@@ -557,6 +642,38 @@ export default {
     selectionChangeHandle(val) {
       this.dataListSelections = val
     },
+
+    // 审批
+    // 每页数
+    approvalSizeChangeHandle(val) {
+      this.approvalPageSize = val
+      this.approvalPageIndex = 1
+      this.getApprovalDataQueryList()
+    },
+    // 当前页
+    approvalCurrentChangeHandle(val) {
+      this.approvalPageIndex = val
+      this.getApprovalDataQueryList()
+    },
+
+    getApprovalDataQueryList(){
+      this.approvalListLoading = true
+      this.$http({
+        url: this.$http.adornUrl('/taskmanagement/planApproval/getMySubmitApprovalList'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'page': this.approvalPageIndex,
+          'limit': this.approvalPageSize
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.approvalDataList= data.page.list
+          this.approvalListLoading = false
+        }
+      })
+    },
+
+
     // 新增 / 修改
     // addOrUpdateHandle(id) {
     //   this.addOrUpdateVisible = true
@@ -577,13 +694,26 @@ export default {
     //   // 使用 window.open 打开新标签页
     //   window.open(url, '_blank');
     // },
+
     // 修改
-    updatePlanPage(planId) {
-      // 使用Vue Router进行页面跳转
-      this.$router.push({
-        name: 'plan-update-page',
-        query: {planId} // 如果需要，可以通过query传递参数
-      });
+    updatePlanPage(row) {
+      // console.log("传入的row为 :"+JSON.stringify(row) )
+      const planId = row.planId
+      if (row.planCurrentState === "PREAPPROVAL_NOT_PASSED" || row.planCurrentState === "CREATED_BUT_NOT_APPROVED") {
+        console.log("初审未通过")
+        // 使用Vue Router进行页面跳转
+        this.$router.push({
+          name: 'plan-reject-reapproval-page',
+          query: {planId} // 如果需要，可以通过query传递参数
+        });
+      } else {
+        console.log("其他状态")
+        // 使用Vue Router进行页面跳转
+        this.$router.push({
+          name: 'plan-update-page',
+          query: {planId} // 如果需要，可以通过query传递参数
+        });
+      }
     },
 
     // 查看计划树
@@ -593,6 +723,34 @@ export default {
         name: 'plan-tree',
         query: {planId} // 如果需要，可以通过query传递参数
       });
+    },
+
+    // 取消初审
+    cancelPreApproval(planId) {
+      this.$confirm(`确定取消审核计划[${planId}]?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/taskmanagement/planApproval/cancelPreApproval/' + planId),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataQueryList()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      })
     },
 
     // 删除
@@ -737,7 +895,43 @@ export default {
         // 释放 URL 对象
         window.URL.revokeObjectURL(url);
       })
-    }
+    },
+
+    addBase(tmPid) {
+      this.$confirm('是否将数据入库?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/taskmanagement/plan/addBase/' + tmPid),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // 提示用户入库成功
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getFinishedPlanList()
+              }
+            })
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消入库'
+          });
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消入库'
+        });
+      });
+    },
 
 
   }

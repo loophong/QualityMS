@@ -62,6 +62,7 @@
         imageList: [],
         dialogVisible: false,
         newissuenumber: '',
+        connectissue: '',
         dataForm: {
           userinfo: '',
           vehicles: [{vehicleTypeId: '', vehicleNumber: '', key: Date.now()}],
@@ -114,9 +115,10 @@
           reviewers: '',
           level: '',
           state: '',
+          parentQuestion: '',
           formula: '',
           isRelatedIssue: '否',  // 添加此行以初始化
-          isaccessory: '否',  // 添加此行以初始化
+          isaccessory: '',  // 添加此行以初始化
         },
         verificationOptions: [
           {label: '未完成', value: '未完成'},
@@ -138,7 +140,9 @@
           {value: '企管科', label: '企管科'}
           // 其他科室选项
         ],
-        dataRule: {},
+        dataRule: {  isaccessory: [
+            { required: true, message: '请选择验证结论', trigger: 'blur' }
+          ]},
         options: ''
       }
     },
@@ -171,6 +175,39 @@
     },
     methods: {
       //问题编号
+      async generateconnectNumber(id, issuenumber) {
+
+        const regex = /^(ZL-IS-\d{8}-\d{4})/;  // 匹配格式：ZL-IS-YYYYMMDD-XXXX
+
+        try {
+          const R = await this.$http({
+            url: this.$http.adornUrl(`/generator/issuetable/connectNumber`),
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json', // 设置 Content-Type 为 application/json
+            },
+            data: { id },  // 通过请求体传递 id
+          });
+          // 返回问题编号，确保 random 是从后端返回的字符串
+          const random2 = R.data.usedID;
+          if(random2 === 1){
+            return `${issuenumber}-${random2}`;
+          }else {
+            const match = issuenumber.match(regex);
+            if (match) {
+              const extracted = match[1]; // 提取到的部分
+              console.log(extracted);  // 输出: ZL-IS-20241216-0002
+              return `${extracted}-${random2}`;
+            } else {
+              console.log('No match found');
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch new issue number:', error);
+          throw new Error('Failed to generate serial number');
+        }
+      },
+      //问题编号
       async generateSerialNumber() {
         const now = new Date();
         const year = now.getFullYear();
@@ -192,6 +229,35 @@
           console.error('Failed to fetch new issue number:', error);
           throw new Error('Failed to generate serial number');
         }
+      },
+      //修改原问题状态
+      changeparentquestion(issuenumber) {
+        // 检查 issuenumber 是否为空
+        // if (!issuenumber) {
+        //   this.$message.error("问题编号不能为空！");
+        //   return;
+        // }
+
+        // 发送请求到后端修改原问题状态
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/updateParentQuestion'),
+          method: 'post',
+          data: this.$http.adornData({
+            issuenumber: issuenumber
+          })
+        }).then(({ data }) => {
+          // 检查后端返回的结果
+          // if (data && data.code === 0) {
+          //   this.$message.success("原问题状态已成功更新！");
+          //   // 可以调用数据刷新方法
+          //   this.getDataList && this.getDataList();
+          // } else {
+          //   this.$message.error(data.msg || "更新失败，请稍后重试！");
+          // }
+        }).catch(error => {
+          console.error("更新原问题状态失败：", error);
+          this.$message.error("请求出错，请检查网络或稍后再试！");
+        });
       },
       handleAccessoryChange(value) {
         // 检查验证状态是否为 "通过"
@@ -398,7 +464,7 @@
           data: this.$http.adornData({
             'issueId': undefined,
             // 'serialNumber': this.dataForm.serialNumber,
-            'issueNumber': this.newissuenumber,
+            'issueNumber': this.connectissue,
             'inspectionDepartment': this.dataForm.inspectionDepartment,
             'inspectionDate': this.dataForm.inspectionDate,
             'issueCategoryId': this.dataForm.issueCategoryId, // 使用转换后的字符串
@@ -435,20 +501,35 @@
             // 'reviewers': this.dataForm.reviewers,
             'level': '等待整改记录填写',
             'state': '持续',
+            'parentQuestion': this.dataForm.parentQuestion
             // 'formula': this.dataForm.formula
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
+            // 发送消息通知给整改负责人
+            this.$http({
+              url: this.$http.adornUrl(`/notice/save`),
+              method: 'post',
+              data: this.$http.adornData({
+                'receiverId': this.dataForm.rectificationResponsiblePerson, // 审核人ID
+                'senderId': this.dataForm.creator, // 发起人ID
+                'content': '问题描述：'+ this.dataForm.issueDescription, // 消息内容
+                'type': '问题整改通知', // 消息类型
+                'jumpdepart': '1', // 跳转部门
+              })
+            });
           } else {
           }
         })
       },
 
-      async init(id) {
+      async init(id, issuenumber) {
         console.log("开始初始化")
         // this.fetchuserinform() //获取用户名
         // 生成问题编号
         this.newissuenumber = await this.generateSerialNumber();
+        this.connectissue = await this.generateconnectNumber(id, issuenumber);
+        console.log("成功生成问题编号：", this.connectissue)
         this.dataForm.issueId = id || 0
         this.visible = true
         // console.log("成功获取用户名：" ,this.dataForm.userinfo)
@@ -499,6 +580,7 @@
                 this.dataForm.verifier = data.issueTable.verifier
                 this.dataForm.formula = data.issueTable.formula
                 this.dataForm.verificationDeadline = data.issueTable.verificationDeadline
+                this.dataForm.parentQuestion = data.issueTable.parentQuestion
                 // 设置关联问题
                 this.dataForm.associatedIssueIds = data.issueTable.associatedIssueAddition ? data.issueTable.associatedIssueAddition.split(',') : [] // 将逗号分隔的字符串转换为数组
               console.log("成功获取数据：" ,this.dataForm)
@@ -569,7 +651,7 @@
             // 创建 vehicleTypeIds 数组
             // this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
             // this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
-            console.log('Successfully 获得 vehicle:', this.dataForm.vehicleTypeIds)
+            // console.log('Successfully 获得 vehicle:', this.dataForm.vehicleTypeIds)
             // 确保 issueCategoryId 是一个数组
             // if (!Array.isArray(this.dataForm.issueCategoryId)) {
             //   this.dataForm.issueCategoryId = [this.dataForm.issueCategoryId]
@@ -579,11 +661,17 @@
               this.dataForm.verificationConclusion = '结项'
               this.dataForm.level = '结项'
               this.dataForm.state = '已完成'
-
+              if(this.dataForm.parentQuestion !== null){
+                this.changeparentquestion(this.dataForm.parentQuestion)
+              }
             } else {
-              this.dataForm.verificationConclusion = '结项'
+              this.dataForm.verificationConclusion = '持续'
               this.dataForm.level = '未通过验证'
               this.dataForm.state = '未完成'
+              if(this.dataForm.parentQuestion === '' || this.dataForm.parentQuestion === null){
+                this.dataForm.parentQuestion = this.dataForm.issueNumber
+                // console.log("父问题为空")
+              }
               this.newissue()
             }
             this.$http({
@@ -623,7 +711,6 @@
                 // 'reviewers': this.dataForm.reviewers,
                 'level': this.dataForm.level,
                 'state': this.dataForm.state,
-                // 'formula': this.dataForm.formula
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

@@ -141,6 +141,17 @@ public class QcSubjectRegistrationController {
     }
 
     /**
+     * 关于我的列表
+     */
+    @RequestMapping("/aboutMeList")
+    @RequiresPermissions("qcSubject:registration:list")
+    public R aboutMeList(@RequestParam Map<String, Object> params){
+        log.info("关于我："+(String) params.get("key"));
+        PageUtils page = qcSubjectRegistrationService.queryPageAboutAndLead(params);
+        return R.ok().put("page", page);
+    }
+
+    /**
      * 我参与的列表,通过审核
      */
     @RequestMapping("/myListFilter")
@@ -243,7 +254,7 @@ public class QcSubjectRegistrationController {
         }
 
     /**
-     * QC知识库
+     * QC知识库列表
      */
 
     @RequestMapping("/finishedList")
@@ -252,12 +263,23 @@ public class QcSubjectRegistrationController {
         PageUtils page =  qcSubjectRegistrationService.queryPageFinishedList(params);
         return R.ok().put("page", page);
     }
+
     @RequestMapping("/finishedList01")
     @RequiresPermissions("qcSubject:registration:list")
     public List<QcknowledgebaseEntity>list1(@RequestParam Map<String, Object> params){
         List<QcknowledgebaseEntity> list = qcSubjectRegistrationService.queryFinishedList1(params);
          return list;
     }
+    /**
+     * QC知识库删除
+     */
+    @RequestMapping("/deletekb")
+    @RequiresPermissions("qcSubject:registration:delete")
+    public R deletekb(@RequestBody Long[] qcsrIds){
+        qcSubjectRegistrationService.updateStorageFlagToZero(qcsrIds);
+        return R.ok();
+    }
+
 }
 
 

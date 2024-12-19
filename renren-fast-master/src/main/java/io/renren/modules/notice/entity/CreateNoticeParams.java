@@ -22,4 +22,8 @@ public class CreateNoticeParams {
      * 消息类型
      */
     private String type;
+    /**
+     * 跳转位
+     */
+    private String jumpdepart;
 }

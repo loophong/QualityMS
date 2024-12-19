@@ -1,6 +1,6 @@
 package io.renren.modules.spc.service.impl;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+
 import io.renren.modules.spc.dao.SpcXrchartStandardsDao;
 import io.renren.modules.spc.entity.SpcXrchartStandardsEntity;
 import org.springframework.beans.factory.annotation.Autowired;

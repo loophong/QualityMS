@@ -31,4 +31,5 @@ public interface PlanDao extends BaseMapper<PlanEntity> {
     Page<PlanEntity> queryPageByParams(Page<PlanEntity> page, PlanEntity plan);
 
     List<PlanExportVO> export();
+    List<PlanExportVO> exportKnowledgeBase();
 }

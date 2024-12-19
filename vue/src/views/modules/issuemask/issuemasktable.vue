@@ -250,6 +250,8 @@
         const issueNumber = row.issueNumber;
         const maskNumber = row.serialNumber;
         const creator = row.recipients;
+        const rrp = row.rectificationResponsiblePerson;
+        const issuecreator = row.issuecreator;
         // const id = row.issuemaskId;
         // console.log('issueNumber', issueNumber)
         // console.log('maskNumber', maskNumber)
@@ -264,7 +266,7 @@
           this.$message.error('任务审核未通过！')
         else {
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.distribute(issueNumber, maskNumber, creator)
+          this.$refs.addOrUpdate.distribute(issueNumber, maskNumber, creator, rrp, issuecreator)
         })
         }
       },
@@ -479,7 +481,7 @@
           this.$http({
             url: this.$http.adornUrl('/generator/issuemasktable/serialNumber'),
             method: 'post',
-            params: this.$http.adornParams({ issueNumber: row.serialNumber, })
+            params: this.$http.adornParams({ issueNumber: row.issueNumber, serialNumber:row.serialNumber })
           }).then(({ data }) => {
             // console.log("返回数据：", data)
             if (data && data.msg === 'success') {

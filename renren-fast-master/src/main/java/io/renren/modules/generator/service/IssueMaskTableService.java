@@ -24,6 +24,8 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
 
     PageUtils AuditqueryPage(Map<String, Object> params);
 
+    PageUtils AuditedqueryPage(Map<String, Object> params);
+
     String newIssuemaskNumber(String issueNumber);
 
     String statechange(String issueNumber);
@@ -40,6 +42,6 @@ public interface IssueMaskTableService extends IService<IssueMaskTableEntity> {
 
     PageUtils creatormaskqueryPage(Map<String, Object> params);
 
-    String listserialNumber(String issueNumber);
+    String listserialNumber(String issueNumber ,String serialNumber);
 }
 

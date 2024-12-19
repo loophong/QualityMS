@@ -36,7 +36,7 @@ public interface PlanService extends IService<PlanEntity> {
 
     PageUtils queryPageFinishedPlan(Map<String, Object> params);
 
-    PageUtils queryPageGetHistoryPlan(Map<String, Object> params);
+    PageUtils queryPageGetHistoryPlan(PlanQueryParamDTO planQueryParamDTO);
 
     void saveAllPlanInfo(PlanDTO planDTO);
 
@@ -47,7 +47,12 @@ public interface PlanService extends IService<PlanEntity> {
     PageUtils queryPageFinishedPlan(PlanQueryParamDTO planQueryParamDTO);
 
     List<PlanExportVO> export();
+    List<PlanExportVO> exportKnowledgeBase();
 
     void saveAllPlanInfoAndApproval(PlanDTO planDTO);
+
+    void reApproval(PlanDTO planDTO);
+
+    PageUtils queryPageByPlanParams(PlanQueryParamDTO planQueryParamDTO);
 }
 

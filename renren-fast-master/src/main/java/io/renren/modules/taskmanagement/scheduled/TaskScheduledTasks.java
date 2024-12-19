@@ -2,6 +2,9 @@ package io.renren.modules.taskmanagement.scheduled;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.common.utils.DateUtils;
+import io.renren.modules.app.service.UserService;
+import io.renren.modules.notice.entity.CreateNoticeParams;
+import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.taskmanagement.entity.TaskEntity;
 import io.renren.modules.taskmanagement.entity.TaskStatus;
 import io.renren.modules.taskmanagement.service.PlanService;
@@ -21,23 +24,27 @@ public class TaskScheduledTasks {
     private PlanService planService;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private MessageNotificationService messageService;
+    @Autowired
+    private UserService userService;
 
 
     //    @Scheduled(cron = "0 0 4 * * *")
     @Scheduled(cron = "0,30 * * * * *")
     public void taskScheduledTasks() {
         log.info("定时任务执行了");
-        checkPlanIsCanStart();
+//        checkPlanIsCanStart();
         checkTaskIsCanStart();
 
-        checkPlanIsOverdue();
-        checkTaskIsOverdue();
+//        checkPlanIsOverdue();
+//        checkTaskIsOverdue();
 
-        checkTaskIsCompleted();
-        checkPlanIsCompleted();
+//        checkTaskIsCompleted();
+//        checkPlanIsCompleted();
 
-        trackPlanProgress();
-        trackTaskProgress();
+//        trackPlanProgress();
+//        trackTaskProgress();
     }
 
     /**
@@ -47,8 +54,9 @@ public class TaskScheduledTasks {
      * @version: 1.0
      */
     public void checkPlanIsCanStart() {
+        log.info("检查计划是否可以开始执行");
         planService.query().eq("plan_current_state", TaskStatus.NOT_STARTED).list().forEach(plan -> {
-            log.info("当前检查的计划为：" + plan);
+            log.info("检查计划是否可以开始执行,当前检查的计划为：" + plan);
             Date now = DateUtils.getNow();
             log.info("当前时间：" + now);
             // 判断当前时间是否大于等于计划开始时间
@@ -57,6 +65,18 @@ public class TaskScheduledTasks {
                 plan.setPlanCurrentState(TaskStatus.IN_PROGRESS);
                 planService.updateById(plan);
             }
+            // 发送通知
+            for (String s : plan.getPlanExecutor()) {
+                log.info("发送通知的用户id：" + s);
+                messageService.sendMessages(new CreateNoticeParams(
+                        Long.parseLong(plan.getPlanInitiator()) ,
+                        new Long[]{Long.valueOf(s)},
+                        "您的计划" + plan.getPlanName() + "已开始执行",
+                        "计划开始通知",
+                        "plan_page"
+                ));
+            }
+
         });
     }
 
@@ -67,8 +87,9 @@ public class TaskScheduledTasks {
      * @version: 1.0
      */
     public void checkTaskIsCanStart() {
+        log.info("检查任务是否可以开始执行");
         taskService.query().eq("task_current_state", TaskStatus.NOT_STARTED).list().forEach(task -> {
-            log.info("当前检查的任务为：" + task);
+            log.info("检查任务是否可以开始执行,当前检查的任务为：" + task);
             Date now = DateUtils.getNow();
             log.info("当前时间：" + now);
             // 判断当前时间是否大于等于计划开始时间
@@ -76,6 +97,16 @@ public class TaskScheduledTasks {
                 log.info("任务" + task.getTaskId() + "开始执行");
                 task.setTaskCurrentState(TaskStatus.IN_PROGRESS);
                 taskService.updateById(task);
+            }
+            // 发送通知
+            for (String s : task.getTaskExecutor()) {
+                messageService.sendMessages(new CreateNoticeParams(
+                        Long.parseLong(task.getTaskPrincipal()) ,
+                        new Long[]{Long.valueOf(s)},
+                        "您的任务" + task.getTaskName() + "已开始执行",
+                        "任务执行通知",
+                        "task_page"
+                ));
             }
         });
     }
@@ -88,7 +119,7 @@ public class TaskScheduledTasks {
      */
     public void checkPlanIsOverdue() {
         planService.query().eq("plan_current_state", TaskStatus.IN_PROGRESS).list().forEach(plan -> {
-            log.info("当前检查的计划为：" + plan);
+            log.info("检查计划是否超期,当前检查的计划为：" + plan);
             Date now = DateUtils.getNow();
             log.info("当前时间：" + now);
             // 判断计划预计完成时间是否小于等于当前时间
@@ -109,7 +140,7 @@ public class TaskScheduledTasks {
      */
     public void checkTaskIsOverdue() {
         taskService.query().eq("task_current_state", TaskStatus.IN_PROGRESS).list().forEach(task -> {
-            log.info("当前检查的任务为：" + task);
+            log.info("检查任务是否超期,当前检查的任务为：" + task);
             Date now = DateUtils.getNow();
             log.info("当前时间：" + now);
             // 判断计划预计完成时间是否小于等于当前时间

@@ -59,10 +59,24 @@
               </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item @click.native="updatePasswordHandle()">修改密码</el-dropdown-item>
+<!--              <el-dropdown-item-->
+<!--                @click.native="openNotice()"-->
+<!--                :style="{ color: hasUnreadMessages ? 'red' : 'inherit' }">-->
+<!--                消息通知-->
+<!--              </el-dropdown-item>-->
               <el-dropdown-item
-                @click.native="openNotice()"
-                :style="{ color: hasUnreadMessages ? 'red' : 'inherit' }">
-                消息通知
+                @click.native="openNotice"
+                class="menu-notification"
+              >
+                <span>
+                  消息通知
+                  <el-badge
+                    v-if="hasUnreadMessages"
+                    class="notification-dot"
+                    type="error"
+                    value=""
+                  ></el-badge>
+                </span>
               </el-dropdown-item>
               <el-dropdown-item @click.native="logoutHandle()">退出</el-dropdown-item>
             </el-dropdown-menu>
@@ -167,14 +181,15 @@
 </script>
 
 <style scoped>
-.red-dot {
-  width: 8px;
-  height: 8px;
-  background-color: red;
+.notification-dot {
+  margin-left: 8px; /* 让小红点与“消息通知”文字有间距 */
+  height: 10px; /* 小红点大小 */
+  width: 10px;
   border-radius: 50%;
-  position: absolute;
-  top: 5px; /* 根据需要调整位置 */
-  right: 5px; /* 根据需要调整位置 */
+  display: inline-block;
+  position: relative;
+  top: -2px; /* 调整垂直对齐 */
+  background-color: red; /* 小红点颜色 */
 }
 </style>
 

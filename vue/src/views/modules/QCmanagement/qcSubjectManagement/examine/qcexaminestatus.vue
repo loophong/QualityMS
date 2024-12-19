@@ -1,6 +1,6 @@
 <template>
   <el-tabs v-model="activeName" type="border-card">
-    <el-tab-pane label="审核记录" name="1" v-if="isAuth('qcManagement:group:admin')">
+    <el-tab-pane label="审核记录" name="1">
       <div class="mod-config">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
           <!-- <el-form-item>
@@ -104,7 +104,8 @@
       </el-table-column> -->
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcExamineId)">修改</el-button>
+              <el-button type="text" size="small" v-if="isAuth('qcManagement:group:admin')"
+                @click="addOrUpdateHandle(scope.row.qcExamineId)">修改</el-button>
               <!-- <el-button type="text" size="small" @click="deleteHandle(scope.row.qcExamineId)">删除</el-button> -->
             </template>
           </el-table-column>

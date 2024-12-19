@@ -473,7 +473,7 @@ export default {
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                if (data.exist) {
+                if (data.exist && (!this.dataForm.qcsrId)) {
                   this.$message.warning('课题名称已存在!')
                   return
                 } else {

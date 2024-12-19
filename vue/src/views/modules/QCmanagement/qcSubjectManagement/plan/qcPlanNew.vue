@@ -109,7 +109,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -199,7 +201,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -289,7 +293,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -377,7 +383,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -466,7 +474,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -554,7 +564,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -642,7 +654,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -736,7 +750,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -824,7 +840,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -912,7 +930,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1023,7 +1043,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1111,7 +1133,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1199,7 +1223,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1287,7 +1313,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1375,7 +1403,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1463,7 +1493,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1551,7 +1583,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1645,7 +1679,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1733,7 +1769,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1821,7 +1859,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -1930,7 +1970,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -2018,7 +2060,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -2108,7 +2152,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -2197,7 +2243,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -2286,7 +2334,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -2381,7 +2431,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -2470,7 +2522,9 @@
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -2558,8 +2612,11 @@
                 :disabled="!((currentUserName == routerParam.topicConsultant) && (isAuth('qc:group:consultant')))"
                 autosize v-model="form.stageConsultant"></el-input>
             </el-form-item>
+
             <el-form-item label="评审意见">
-              <el-input type="textarea" autosize v-model="form.stageReview"></el-input>
+              <el-input type="textarea"
+                :disabled="!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment'))"
+                autosize v-model="form.stageReview"></el-input>
             </el-form-item>
             <el-form-item label="备注">
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
@@ -2862,9 +2919,10 @@ export default {
     this.getPlanStepDataList();
     this.getUserName();
     console.log('------------+++')
-    console.log(!((this.currentUserName == this.routerParam.topicConsultant) && (this.isAuth('qc:group:consultant'))))
-    console.log((this.currentUserName == this.routerParam.topicConsultant))
-    console.log(this.isAuth('qc:group:consultant'))
+    // console.log(!((this.currentUserName == this.routerParam.topicConsultant) && (this.isAuth('qc:group:consultant'))))
+    // console.log((this.currentUserName == this.routerParam.topicConsultant))
+    // console.log(this.isAuth('qc:group:consultant'))
+    console.log(!(this.isAuth('qcExamine:first:comment')) || (this.isAuth('qcExamine:second:comment')))
   },
   computed: {
     lastDisabled1() {
@@ -2953,7 +3011,6 @@ export default {
     },
 
     // 按照conplanType对数据进行分类
-    //跳
     async groupDataByType(selected) {
       this.groupedData = {
         mixChart: [],
@@ -3518,6 +3575,7 @@ export default {
               duration: 1500,
               onClose: () => {
                 this.visible = false;
+                this.getPlanStepDataList()
               },
             });
             if (this.routerParam.qcsrId) {

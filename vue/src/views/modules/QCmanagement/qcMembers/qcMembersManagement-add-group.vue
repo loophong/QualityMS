@@ -184,6 +184,9 @@ export default {
         // number: [
         //   { required: true, message: '员工编号不能为空', trigger: 'blur' }
         // ],
+        department: [
+          { required: true, message: '科室不能为空', trigger: 'blur' }
+        ],
         participationDate: [
           { required: true, message: '参加时间不能为空', trigger: 'blur' }
         ],

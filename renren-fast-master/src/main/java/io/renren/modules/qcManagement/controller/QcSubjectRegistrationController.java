@@ -209,11 +209,12 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/save")
     @RequiresPermissions("qcSubject:registration:save")
     public R save(@RequestBody QcSubjectRegistrationEntity qcSubjectRegistration){
-        Integer tmpId = qcSubjectRegistrationDao.maxOfId();
-        // 获取当前年份
         Date currentDate = new Date();
+        // 获取当前年份
         SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
         String currentYear = yearFormat.format(currentDate);
+        //获取当前年编号个数
+        Integer tmpId = qcSubjectRegistrationDao.maxOfId(currentYear);
         String topicNumber = "PJHLQCKT-"+currentYear +"-"+(tmpId+1);
         log.info("课题编号:"+topicNumber);
         qcSubjectRegistration.setTopicNumber(topicNumber);

@@ -23,8 +23,9 @@
               <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
               <el-tag
                 v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
-              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
-                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
+                type="danger">未通过(管理员)</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">未通过(科室)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
                 }}</el-tag>
               <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
@@ -206,7 +207,7 @@
                 @click="addMemberHandle(scope.row.id)">新增成员</el-button> -->
               <el-button type="text" size="small" v-if="!scope.row.parentId"
                 :disabled="!checkIfAdmit(scope.row.department, scope.row.examineStatus, scope.row.examineDepartment)"
-                @click="handleExamine(scope.row.id, scope.row.registrationNum, scope.row.examineDepartment)">处理审核</el-button>
+                @click="handleExamine(scope.row.id, scope.row.registrationNum, scope.row.examineDepartment, scope.row.firstComment, scope.row.secondComment)">处理审核</el-button>
               <!-- <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
                 @click="deleteHandle(scope.row.id)">删除</el-button> -->
             </template>
@@ -230,6 +231,13 @@
                 <el-option label="未通过" value="0"></el-option>
               </el-select>
             </el-form-item>
+            <el-form-item v-if="already == '1'" label="管理员审核意见" prop="comment">
+              <el-input v-model="examineFrom.secondComment" autosize type="textarea" placeholder="管理员审核意见"></el-input>
+            </el-form-item>
+            <el-form-item v-else label="科室审核意见" prop="comment">
+              <el-input v-model="examineFrom.firstComment" autosize type="textarea" placeholder="科室审核意见"></el-input>
+            </el-form-item>
+
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -254,6 +262,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Loading } from "element-ui";
 import { group } from 'd3';
+import { first } from 'lodash';
 export default {
   data() {
     return {
@@ -267,6 +276,8 @@ export default {
       examineFrom: {
         department: '',
         group: '',
+        firstComment: '',
+        secondComment: '',
         result: ''
       },
       dialogFormVisible: false,
@@ -479,6 +490,8 @@ export default {
                 examineDepartment: item.examineDepartment,
                 examineGroup: item.examineGroup,
                 position: item.position,
+                firstComment: item.firstComment,
+                secondComment: item.secondComment,
                 registrationNum: item.registrationNum,
                 children: []
               };
@@ -748,6 +761,8 @@ export default {
                   examineStatus: item.examineStatus,
                   examineDepartment: item.examineDepartment,
                   examineGroup: item.examineGroup,
+                  firstComment: item.firstComment,
+                  secondComment: item.secondComment,
                   registrationNum: item.registrationNum,
                   children: []
                 };
@@ -886,8 +901,10 @@ export default {
         this.$refs.addOrUpdate.init(id)
       })
     },
-    handleExamine(id, num, department) {
+    handleExamine(id, num, department, first, second) {
       this.already = department
+      this.examineFrom.firstComment = first
+      this.examineFrom.secondComment = second
       console.log(department)
       // this.registrationNum = '';
       if (num) {
@@ -934,6 +951,8 @@ export default {
           'examineGroup': this.examineFrom.group,
           'examineDepartment': this.examineFrom.group == '0' ? '' : this.examineFrom.department,
           'examineStatus': result,
+          'firstComment': this.examineFrom.firstComment,
+          'secondComment': this.examineFrom.secondComment,
           'registrationNum': (this.registrationNum == '' || this.registrationNum == null) ? this.num : this.registrationNum,
         })
       }).then(({ data }) => {

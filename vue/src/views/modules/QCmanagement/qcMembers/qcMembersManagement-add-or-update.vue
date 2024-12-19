@@ -28,8 +28,18 @@
           <!-- <el-form-item prop="number" label="员工编号">
             <el-input v-model="dataForm.number" placeholder="请输入员工编号"></el-input>
           </el-form-item> -->
-          <el-form-item v-if="isAdmin" prop="department" label="单位">
-            <el-input v-model="dataForm.department" placeholder="请输入单位"></el-input>
+          <el-form-item v-if="isAdmin" prop="department" label="科室">
+            <el-select v-model="dataForm.department" placeholder="请选择科室">
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item v-if="isAdmin" prop="team" label="小组类型">
             <el-select v-model="dataForm.team" placeholder="请选择小组类型">
@@ -106,7 +116,7 @@
     </el-form>
 
     <span slot="footer">
-      <div v-if="isAddMember" style="color:#e6a23c">点击添加将重置审核状态</div>
+      <!-- <div v-if="isAddMember" style="color:#e6a23c">点击添加将重置审核状态</div> -->
       <br>
       <el-button class="dialog-footer" @click="visible = false">取消</el-button>
       <el-button class="dialog-footer" type="primary" v-if="!isAddMember" @click="dataFormSubmit()">确定</el-button>
@@ -157,6 +167,9 @@ export default {
         ],
         memberName: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
+        ],
+        department: [
+          { required: true, message: '科室不能为空', trigger: 'blur' }
         ],
         // number: [
         //   { required: true, message: '员工编号不能为空', trigger: 'blur' }
@@ -212,6 +225,8 @@ export default {
               this.dataForm.topic = data.qcGroupMember.topic;
               this.dataForm.roleInTopic = data.qcGroupMember.roleInTopic;
               this.dataForm.deleteFlag = data.qcGroupMember.deleteFlag;
+              this.dataForm.examineGroup = data.qcGroupMember.examineGroup;
+              this.dataForm.examineDepartment = data.qcGroupMember.examineDepartment;
               this.dataForm.groupName = data.qcGroupMember.groupName;
               this.dataForm.parentId = data.qcGroupMember.parentId || '';
               this.dataForm.members = data.qcGroupMember.members || [];
@@ -239,6 +254,8 @@ export default {
               'team': this.dataForm.team,
               'participationDate': this.dataForm.participationDate,
               'topic': this.dataForm.topic,
+              'examineDepartment': '',
+              'examineGroup': '',
               'roleInTopic': '组长',
               'deleteFlag': 0,
               'groupName': this.dataForm.groupName,
@@ -299,7 +316,7 @@ export default {
         method: 'post',
         data: this.$http.adornData({
           'qcgmId': this.dataForm.qcgmId,
-          'examineStatus': '待审核',
+          'examineStatus': this.dataForm.examineStatus,
           'examineDepartment': '',
           'examineGroup': '',
         })

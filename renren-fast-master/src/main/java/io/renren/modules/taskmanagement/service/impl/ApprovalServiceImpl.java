@@ -1,6 +1,7 @@
 package io.renren.modules.taskmanagement.service.impl;
 
 import io.renren.modules.taskmanagement.entity.ApprovalStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -12,7 +13,6 @@ import io.renren.common.utils.Query;
 import io.renren.modules.taskmanagement.dao.ApprovalDao;
 import io.renren.modules.taskmanagement.entity.ApprovalEntity;
 import io.renren.modules.taskmanagement.service.ApprovalService;
-
 
 @Service("taskManagementApprovalTableService")
 public class ApprovalServiceImpl extends ServiceImpl<ApprovalDao, ApprovalEntity> implements ApprovalService {

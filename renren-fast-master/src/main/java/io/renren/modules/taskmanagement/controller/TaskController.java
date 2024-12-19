@@ -70,7 +70,7 @@ public class TaskController {
         TaskEntity task = taskService.query().eq("task_id", taskId).one();
         // 检查task状态，如果通过则查询审批文件
         if (task.getTaskCurrentState() != TaskStatus.COMPLETED) {
-            return R.ok().put("task", task).put("fileList", null);
+            return R.ok().put("task", task).put("approval", null).put("fileList", null);
         }
 
         // 查询审批编号
@@ -83,11 +83,11 @@ public class TaskController {
         // 检查是否有审批文件
         List<ApprovalFileEntity> fileList = approvalFileService.list(new QueryWrapper<ApprovalFileEntity>()
                 .eq("approval_id", approval.getApprovalId()));
-        if (fileList.size() > 0) {
-            return R.ok().put("task", task).put("fileList", fileList);
-        } else {
-            return R.ok().put("task", task).put("fileList", null);
-        }
+        log.info("approval" + approval);
+
+
+        return R.ok().put("task", task).put("approval", approval).put("fileList", fileList.size() > 0 ? fileList : null);
+
     }
 
     /**

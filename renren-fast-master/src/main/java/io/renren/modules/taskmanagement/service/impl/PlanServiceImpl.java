@@ -167,6 +167,27 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
     }
 
     @Override
+    public List<PlanExportVO> exportKnowledgeBase() {
+        List<PlanExportVO> planList = planDao.exportKnowledgeBase();
+        List<PlanExportVO> planExportVO = new ArrayList<>();
+        log.info("planExportVOS" + planList);
+        for (PlanExportVO plan : planList) {
+            planExportVO.add(plan);
+            List<PlanExportVO> taskList = taskDao.selectTaskByPlanId(plan.getPlanId());
+            log.info("taskList" + taskList);
+            planExportVO.addAll(taskList);
+        }
+
+        // 统一将VO中的用户ID转为名称
+        for (PlanExportVO plan : planExportVO) {
+            convert(plan);
+        }
+
+        log.info("转换后的vo：" + planExportVO);
+        return planExportVO;
+    }
+
+    @Override
     public void saveAllPlanInfoAndApproval(PlanDTO planDTO) {
         // 保存计划信息
         PlanEntity plan = new PlanEntity();
@@ -335,12 +356,21 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
      * @date: 2024/11/10 17:19
      */
     @Override
-    public PageUtils queryPageGetHistoryPlan(Map<String, Object> params) {
-        IPage<PlanEntity> page = this.page(
-                new Query<PlanEntity>().getPage(params),
-                new QueryWrapper<PlanEntity>().eq("plan_current_state", TaskStatus.COMPLETED)
+    public PageUtils queryPageGetHistoryPlan(PlanQueryParamDTO planQueryParamDTO) {
+        PlanEntity plan = planQueryParamDTO.getPlan();
+        Page<PlanEntity> page = new Page<>(planQueryParamDTO.getPage(), planQueryParamDTO.getLimit());
+
+        IPage<PlanEntity> planList = planDao.selectPage(
+                page,
+                new LambdaQueryWrapper<PlanEntity>()
+                        .like(plan.getPlanId() != null && !"".equals(plan.getPlanId()),PlanEntity::getPlanId, plan.getPlanId())
+                        .like(plan.getPlanName() != null && !"".equals(plan.getPlanName()),PlanEntity::getPlanName, plan.getPlanName())
+                        .eq(plan.getPlanAssociatedIndicatorsId() != null && !"".equals(plan.getPlanAssociatedIndicatorsId()),PlanEntity::getPlanAssociatedIndicatorsId, plan.getPlanAssociatedIndicatorsId())
+                        .eq(PlanEntity::getAddBase, 1)
+                        .orderByDesc(PlanEntity::getPlanStartDate)
         );
-        return new PageUtils(page);
+
+        return new PageUtils(planList);
     }
 
     /**

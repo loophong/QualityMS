@@ -1940,6 +1940,18 @@ export default {
                 this.visibleR = false;
                 this.$emit('refreshDataList');
                 this.$message.success("操作成功");
+                // 发送消息通知给整改负责人
+                this.$http({
+                  url: this.$http.adornUrl(`/notice/save`),
+                  method: 'post',
+                  data: this.$http.adornData({
+                    'receiverId': this.dataForm.rectificationResponsiblePerson, // 审核人ID
+                    'senderId': this.dataForm.creator, // 发起人ID
+                    'content': '问题描述：'+ this.dataForm.issueDescription, // 消息内容
+                    'type': '问题整改通知', // 消息类型
+                    'jumpdepart': '1', // 跳转部门
+                  })
+                });
               } else {
                 throw new Error(saveData.msg);
               }
@@ -2632,7 +2644,7 @@ export default {
           this.dataForm.vehicleTypeIds = this.dataForm.vehicles.map(vehicle => vehicle.vehicleTypeId)
           this.dataForm.vehicleNumbers = this.dataForm.vehicles.map(vehicle => vehicle.vehicleNumber)
           // 将选中的责任人ID数组转换为字符串
-          this.dataForm.rectificationResponsiblePerson = this.selectedResponsiblePersons.join(',');
+          // this.dataForm.rectificationResponsiblePerson = this.selectedResponsiblePersons.join(',');
           // 确保 issueCategoryId 是一个数组
           if (!Array.isArray(this.dataForm.issueCategoryId)) {
             this.dataForm.issueCategoryId = [this.dataForm.issueCategoryId]
@@ -2684,6 +2696,18 @@ export default {
               //     }
               //   });
               // }
+              // 发送消息通知给验证人
+              this.$http({
+                url: this.$http.adornUrl(`/notice/save`),
+                method: 'post',
+                data: this.$http.adornData({
+                  'receiverId': this.dataForm.verifier, // 审核人ID
+                  'senderId': this.dataForm.rectificationResponsiblePerson, // 发起人ID
+                  'content': '问题描述：'+ this.dataForm.issueDescription, // 消息内容
+                  'type': '问题验证通知', // 消息类型
+                  'jumpdepart': '1', // 跳转部门
+                })
+              });
             } else {
               this.$message.error(data.msg)
             }

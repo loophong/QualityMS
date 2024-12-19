@@ -45,6 +45,9 @@
         <!-- <el-button type="danger" @click="toIssue()">问题添加</el-button> -->
       </el-form-item>
      <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button v-if="isAuth('qcSubject:registration:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+      </el-col>
        <el-col :span="1.5">
         <el-button v-if="isAuth('qcSubject:registration:list')"  type="primary" @click="exportAll()">导出</el-button>
       </el-col>
@@ -146,7 +149,7 @@ export default {
       dataForm: {
         key: ''
       },
-      dataList: [],
+       dataList: [],
       dataList01: [], //列表数据(不分页)
       pageIndex: 1,
       pageSize: 10,
@@ -311,9 +314,9 @@ export default {
       return new Date(time).toLocaleString();
     },
     // 获取数据列表
-    async getDataList() {
+    getDataList() {
       this.dataListLoading = true
-      await this.$http({
+      this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/finishedList'),
         method: 'get',
         params: this.$http.adornParams({
@@ -361,17 +364,17 @@ export default {
       })
     },
     // 删除
-    deleteHandle(id) {
+     deleteHandle(id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {
         return item.qcsrId
       })
-      this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         this.$http({
-          url: this.$http.adornUrl('/qcSubject/registration/delete'),
+          url: this.$http.adornUrl('/qcSubject/registration/deletekb'),
           method: 'post',
           data: this.$http.adornData(ids, false)
         }).then(({ data }) => {
@@ -390,9 +393,10 @@ export default {
         })
       })
     },
+
     //导出excel
     async exportAll(){
-        await this.$http({
+      await this.$http({
           url: this.$http.adornUrl('/qcSubject/registration/finishedList01'),
           method: 'get',
           params: this.$http.adornParams({

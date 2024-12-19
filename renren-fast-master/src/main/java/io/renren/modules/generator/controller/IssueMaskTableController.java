@@ -95,12 +95,23 @@ public class IssueMaskTableController {
     }
 
     /**
-     * 列表，审核人可见
+     * 列表，审核人可见未审核
      */
     @RequestMapping("/Auditlist")
     @RequiresPermissions("generator:issuemasktable:list")
     public R Auditlist(@RequestParam Map<String, Object> params){
         PageUtils page = issueMaskTableService.AuditqueryPage(params);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 列表，审核人可见已审核
+     */
+    @RequestMapping("/Auditedlist")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R Auditedlist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueMaskTableService.AuditedqueryPage(params);
 
         return R.ok().put("page", page);
     }
@@ -167,9 +178,9 @@ public class IssueMaskTableController {
      */
     @RequestMapping("/serialNumber")
     @RequiresPermissions("generator:issuemasktable:list")
-    public R serialNumber(@RequestParam String issueNumber){
+    public R serialNumber(@RequestParam String issueNumber , @RequestParam String serialNumber){
 //        System.out.println("获取任务编号成功："+issueNumber);
-        String fin = issueMaskTableService.listserialNumber(issueNumber);
+        String fin = issueMaskTableService.listserialNumber(issueNumber ,serialNumber);
 //        System.out.println("返回的数据为："+fin);
         return R.ok(fin);
     }

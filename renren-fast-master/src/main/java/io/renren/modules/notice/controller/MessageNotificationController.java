@@ -62,7 +62,7 @@ public class MessageNotificationController {
 
     /**
      * @description: 新增消息
-     * @param: 发送者id，接受者id，消息内容，消息类型[模块]
+     * @param: 发送者id，接受者id，消息内容，消息类型[模块]，消息跳转位[1.问题详情页，2.问题下任务审核页，3.问题下任务执行页，4.任务，5.其他]
      * @author: hong
      * @date: 2024/10/25 11:10
      * @version: 1.0
@@ -72,6 +72,7 @@ public class MessageNotificationController {
     public R save(@RequestBody MessageNotificationEntity messageNotification){
         messageNotification.setCreatedAt(new java.util.Date());
         messageNotification.setStatus(String.valueOf(NoticeStatus.UNREAD));
+        System.out.println("messageNotification："+messageNotification);
         messageNotificationService.save(messageNotification);
         return R.ok();
     }

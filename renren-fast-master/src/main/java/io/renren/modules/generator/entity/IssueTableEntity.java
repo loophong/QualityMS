@@ -185,6 +185,10 @@ public class IssueTableEntity implements Serializable {
 	 */
 	private String level;
 	/**
+	 * 父问题
+	 */
+	private String parentQuestion;
+	/**
 	 * 问题状态
 	 */
 	private String state;

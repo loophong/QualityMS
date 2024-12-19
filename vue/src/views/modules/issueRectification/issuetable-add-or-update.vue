@@ -186,6 +186,7 @@
           issueId: 0,
           serialNumber: '',
           issueNumber: '',
+          issuecreator: '',
           inspectionDepartment: '',
           inspectionDate: '',
           issueCategoryId: '',
@@ -456,6 +457,8 @@
                   'recipients': subtask.assignee,
                   'maskcontent': subtask.name,
                   'creator': this.dataForm.creator,
+                  'issuecreator': this.dataForm.issuecreator,
+                  'rectificationResponsiblePerson': this.dataForm.rectificationResponsiblePerson,
                   'creationTime': this.dataForm.creationTime,
                   'requiredCompletionTime': this.dataForm.requiredCompletionTime,
                   'superiorMask': subtask.parentTask,
@@ -479,10 +482,11 @@
                     url: this.$http.adornUrl(`/notice/save`),
                     method: 'post',
                     data: this.$http.adornData({
-                      'receiverId': receiverId, // 审核人ID
-                      'senderId': creatorId, // 发起人ID
-                      'content': `有新的任务需要审核`, // 消息内容
-                      'type': '任务审核' // 消息类型
+                      'receiverId': this.dataForm.reviewers, // 审核人ID
+                      'senderId': this.dataForm.creator, // 发起人ID
+                      'content': '任务内容：'+ subtask.name, // 消息内容
+                      'type': '任务审核通知', // 消息类型
+                      'jumpdepart': '2' // 跳转部门
                     })
                   });
                 } else {
@@ -490,8 +494,8 @@
                 }
               });
 
-              console.log('时间:', this.dataForm.requiredCompletionTime);
-              console.log('发起人:', this.dataForm.userinfo);
+              // console.log('时间:', this.dataForm.requiredCompletionTime);
+              // console.log('发起人:', this.dataForm.userinfo);
             });
           }
           // 重置 subtasks 数组，只保留一个初始组合
@@ -776,6 +780,7 @@
                 this.dataForm.responsibleDepartment = data.issueTable.responsibleDepartment
                 this.dataForm.rectificationStatus = data.issueTable.rectificationStatus
                 this.dataForm.actualCompletionTime = data.issueTable.actualCompletionTime
+                this.dataForm.issuecreator = data.issueTable.creator
                 this.dataForm.rectificationPhotoDeliverable = data.issueTable.rectificationPhotoDeliverable
                 this.dataForm.rectificationResponsiblePerson = data.issueTable.rectificationResponsiblePerson
                 this.dataForm.requiredSecondRectificationTime = data.issueTable.requiredSecondRectificationTime

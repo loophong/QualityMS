@@ -16,5 +16,7 @@ import java.util.Map;
  */
 public interface PlanApprovalTableService extends IService<PlanApprovalTableEntity> {
     PageUtils queryPage(Map<String, Object> params);
+
+    PageUtils queryPageGetMySubmitApprovalList(Map<String, Object> params);
 }
 

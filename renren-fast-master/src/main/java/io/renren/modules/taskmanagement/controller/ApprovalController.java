@@ -22,6 +22,8 @@ import io.renren.modules.taskmanagement.service.ApprovalService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 
+import javax.annotation.Resource;
+
 
 /**
  * 任务审批表
@@ -42,7 +44,8 @@ public class ApprovalController {
 
     @Autowired
     private MessageNotificationService messageService;
-    @Autowired
+
+    @Resource
     private ApprovalFileService approvalFileService;
 
     /**
@@ -67,15 +70,15 @@ public class ApprovalController {
         TaskEntity task = taskService.getByTaskId(taskId);
         if (task.getTaskCurrentState() != TaskStatus.APPROVAL_IN_PROGRESS) {
             return R.error("当前任务状态不允许取消审批");
-        }else {
+        } else {
             task.setTaskCurrentState(TaskStatus.IN_PROGRESS);
         }
 
         // 通过任务id获取审批信息
-        ApprovalEntity approvalEntity = approvalService.query().eq("task_id", taskId).eq("approval_status",ApprovalStatus.PENDING).one();
-        if (approvalEntity != null){
+        ApprovalEntity approvalEntity = approvalService.query().eq("task_id", taskId).eq("approval_status", ApprovalStatus.PENDING).one();
+        if (approvalEntity != null) {
             approvalEntity.setApprovalStatus(ApprovalStatus.CANCEL);
-        }else {
+        } else {
             return R.error("当前任务不存在审批信息");
         }
 
@@ -167,9 +170,9 @@ public class ApprovalController {
     public R info(@PathVariable("approvalId") Long approvalId) {
         ApprovalEntity taskManagementApprovalTable = approvalService.getById(approvalId);
         List<ApprovalFileEntity> files = approvalFileService.query().eq("approval_id", approvalId).list();
-        if (files != null){
+        if (files != null) {
             return R.ok().put("taskManagementApprovalTable", taskManagementApprovalTable).put("files", files);
-        }else {
+        } else {
             return R.ok().put("taskManagementApprovalTable", taskManagementApprovalTable);
         }
     }
@@ -232,7 +235,7 @@ public class ApprovalController {
             }
 
             // 任务是否按时完工
-            if (DateUtils.getZeroTime().getTime() == task.getTaskScheduleCompletionDate().getTime() ) {
+            if (DateUtils.getZeroTime().getTime() == task.getTaskScheduleCompletionDate().getTime()) {
                 task.setTaskIsOnTime(0L);
             } else {
                 task.setTaskIsOnTime(1L);
@@ -252,7 +255,7 @@ public class ApprovalController {
         approvalService.updateById(taskManagementApprovalTable);
 
         // 发送消息
-        messageService.sendMessages(new CreateNoticeParams( Long.parseLong(taskManagementApprovalTable.getApprover()), new Long[]{Long.valueOf(taskManagementApprovalTable.getSubmitter())} ,
+        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskManagementApprovalTable.getApprover()), new Long[]{Long.valueOf(taskManagementApprovalTable.getSubmitter())},
                 "您有一个任务审批结果，请及时查看！", "任务审批结果通知"));
 
 

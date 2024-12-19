@@ -140,4 +140,9 @@ public class PlanEntity implements Serializable {
      */
     private String planFile;
 
+    /**
+     * 是否入库
+     */
+    private Integer addBase;
+
 }

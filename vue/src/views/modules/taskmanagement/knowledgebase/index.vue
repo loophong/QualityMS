@@ -3,15 +3,28 @@
     <el-tabs type="border-card">
 
 
-      <el-form :inline="true" :model="finishedDataForm" @keyup.enter.native="getFinishedPlanList()">
-<!--        <el-form-item>-->
-<!--          <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
-<!--        </el-form-item>-->
-<!--        <el-form-item>-->
-<!--          <el-button @click="getFinishedPlanList()">查询</el-button>-->
-<!--        </el-form-item>-->
+      <el-form :inline="true" :model="queryParams" @keyup.enter.native="getDataList()">
+        <el-form-item label="计划编号">
+          <el-input v-model="queryParams.planId" placeholder="参数名"></el-input>
+        </el-form-item>
+        <el-form-item label="计划名">
+          <el-input v-model="queryParams.planName" placeholder="计划名"></el-input>
+        </el-form-item>
+        <el-form-item label="指标名">
+          <!--     下拉选择框       -->
+          <el-select v-model="queryParams.planAssociatedIndicatorsId" placeholder="请选择指标">
+            <el-option v-for="item in indicatorOptions" :key="item.value" :label="item.label"
+                       :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="getDataList()">查询</el-button>
+          <el-button @click="clearPage()">重置</el-button>
+          <el-button type="success" @click="exportFile()">导出</el-button>
+        </el-form-item>
       </el-form>
-      <el-table :data="finishedPlanList" border v-loading="finishedListLoading"
+
+      <el-table :data="dataList" border v-loading="dataListLoading"
                 @selection-change="selectionChangeHandle"
                 style="width: 100%;">
         <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
@@ -29,16 +42,9 @@
         </el-table-column>
         <el-table-column prop="planScheduleDays" header-align="center" align="center" label="计划天数">
         </el-table-column>
-        <el-table-column prop="planActualCompletionDate" header-align="center" align="center" label="实际完成日期"
-                         width="110">
-          <template slot-scope="scope">
-            <span v-if="scope.row.planActualCompletionDate === null" style="color: gray;">-</span>
-          </template>
+        <el-table-column prop="planActualCompletionDate" header-align="center" align="center" label="实际完成日期" width="110">
         </el-table-column>
         <el-table-column prop="planActualDays" header-align="center" align="center" label="实际天数">
-          <template slot-scope="scope">
-            <span v-if="scope.row.planActualDays === null" style="color: gray;">-</span>
-          </template>
         </el-table-column>
         <el-table-column prop="planTasksAssignment" header-align="center" align="center" label="任务派发">
         </el-table-column>
@@ -133,13 +139,9 @@
         </el-table-column>
         <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
           <template slot-scope="scope">
-            <!--     如果planFile不为null,显示下载附件按钮     -->
-            <el-button v-if="scope.row.planFile !== null" type="text" size="small"
-                       @click="downloadFile(scope.row.planFile)">下载附件
-            </el-button>
+            <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
             <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
-            <!--              <el-button type="text" size="small" @click="updatePlanPage(scope.row.planId)">修改</el-button>-->
-            <!--              <el-button type="text" size="small" @click="deleteHandle(scope.row)">删除</el-button>-->
+            <el-button type="text" size="small" @click="removeFromBase(scope.row.tmPid)">移除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -153,6 +155,25 @@
 
     <!-- 弹窗, 新增 / 修改 -->
     <!--    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>-->
+    <div>
+      <!--       弹窗组件-->
+      <el-dialog :visible.sync="filesDialogVisible" title="附件列表">
+        <ul>
+          <el-form>
+            <el-row v-for="file in files" :key="file.name" style="margin-bottom: 4px">
+              <el-col :span="12">
+                {{ file.name }}
+              </el-col>
+              <el-col :span="12">
+                <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>
+              </el-col>
+            </el-row>
+          </el-form>
+        </ul>
+      </el-dialog>
+    </div>
+
+
   </div>
 </template>
 
@@ -175,18 +196,25 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
 
-      // 已完成计划，数据和分页
-      finishedPlanList: [],
-      finishedPageIndex: 1,
-      finishedPageSize: 10,
-      finishedTotalPage: 0,
-      finishedListLoading: false,
+
 
       addOrUpdateVisible: false,
 
       //员工列表
       options: [],
       indicatorOptions: [],
+
+      //查询参数
+      queryParams: {
+        planId: '',
+        planName: '',
+        planAssociatedIndicatorsId: ''
+      },
+
+      // 附件弹窗组件
+      filesDialogVisible: false,
+      // 附件列表
+      files: [],
     }
   },
   components: {
@@ -194,12 +222,11 @@ export default {
   },
   activated() {
     this.getDataList()
-    this.getFinishedPlanList()
   },
   async created() {
     // 获取分组后的员工数据
     this.$http({
-      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      url: this.$http.adornUrl(`/taskmanagement/user/getName`),
       method: 'get',
     }).then(({data}) => {
       this.options = data;
@@ -225,13 +252,12 @@ export default {
     getDataList() {
       this.dataListLoading = true
       this.$http({
-        // url: this.$http.adornUrl('/taskmanagement/plan/list'),
-        url: this.$http.adornUrl('/taskmanagement/plan/unfinished'),
-        method: 'get',
-        params: this.$http.adornParams({
-          'page': this.pageIndex,
-          'limit': this.pageSize,
-          'key': this.dataForm.key
+        url: this.$http.adornUrl('/taskmanagement/knowledge/list'),
+        method: 'post',
+        data: this.$http.adornParams({
+          page: this.pageIndex,
+          limit: this.pageSize,
+          plan: this.queryParams
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
@@ -245,27 +271,6 @@ export default {
       })
     },
 
-    getFinishedPlanList() {
-      this.finishedListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('/taskmanagement/plan/finish'),
-        method: 'get',
-        params: this.$http.adornParams({
-          'page': this.finishedPageIndex,
-          'limit': this.finishedPageSize,
-          'key': this.finishedDataForm.key
-        })
-      }).then(({data}) => {
-        if (data && data.code === 0) {
-          this.finishedPlanList = data.page.list
-          this.finishedTotalPage = data.page.totalCount
-        } else {
-          this.finishedPlanList = []
-          this.finishedTotalPage = 0
-        }
-        this.finishedListLoading = false
-      })
-    },
 
 
     // 每页数
@@ -389,6 +394,101 @@ export default {
       }
       return "-";
     },
+
+    // 清空页码数据
+    clearPage() {
+      this.pageIndex = 1
+      this.queryParams.planId = ''
+      this.queryParams.planName = ''
+      this.queryParams.planAssociatedIndicatorsId = ''
+      this.getDataList()
+    },
+
+    exportFile(){
+      this.$http({
+        url: this.$http.adornUrl('/taskmanagement/plan/export'),
+        method: 'get',
+        params: this.$http.adornParams(),
+        responseType: 'blob'
+      }).then(res => {
+        // 创建 Blob 对象
+        const blob = new Blob([res.data], {type: 'application/octet-stream'});
+
+        // 创建一个临时的 URL
+        const url = window.URL.createObjectURL(blob);
+
+        // 创建一个隐藏的 <a> 标签
+        const link = document.createElement('a');
+        link.href = url;
+        // 获取当前时间
+        const currentTime = new Date();
+        // 格式化为中国时间
+        var time = currentTime.toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).replace(/\/|:/g, '-').replace(' ', ' ');
+
+        // 设置下载的文件名
+        link.download = time + '计划导出.xlsx'; // 你可以根据实际情况设置文件名
+
+        // 将 <a> 标签添加到文档中
+        document.body.appendChild(link);
+
+        // 触发点击事件
+        link.click();
+
+        // 移除 <a> 标签
+        document.body.removeChild(link);
+
+        // 释放 URL 对象
+        window.URL.revokeObjectURL(url);
+      })
+    },
+
+    // 查看附件
+    viewAttachments(planId) {
+      this.$http({
+        url: this.$http.adornUrl('/taskmanagement/plan/files/' + planId),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          console.log("当前文件附件为" + JSON.stringify(data))
+          this.files = data.files
+          this.filesDialogVisible = true
+        }
+      })
+    },
+
+    // 从知识库中移除
+    removeFromBase(tmPid){
+      this.$confirm(`确定从知识库中移除该计划?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/taskmanagement/knowledge/removeFromBase'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'tmPid': tmPid
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // 提示用户移除
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          }
+        })
+      })
+    }
 
   }
 }

@@ -48,5 +48,9 @@ public class MessageNotificationEntity implements Serializable {
 	 * 消息状态
 	 */
 	private String status;
+	/**
+	 * 跳转位
+	 */
+	private String jumpdepart;
 
 }

@@ -15,6 +15,7 @@ import io.renren.modules.taskmanagement.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -41,6 +42,14 @@ public class PlanApprovalTableController {
     @Autowired
     private TaskService taskService;
 
+    /** 
+     * @description: 进行审批
+     * @param: planApprovalTable 
+     * @return: io.renren.common.utils.R 
+     * @author: hong
+     * @date: 2024/12/16 15:43
+     */
+    @Transactional
     @PostMapping("/approval")
     public R approval(@RequestBody PlanApprovalTableEntity planApprovalTable){
         log.info("提交审批" + planApprovalTable);
@@ -65,6 +74,7 @@ public class PlanApprovalTableController {
 
         // 更新任务状态
         List<TaskEntity> taskList = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, planApprovalTable.getPlanId()));
+        log.info("更新任务状态"+taskList);
         for (TaskEntity task : taskList) {
             if (planApprovalTable.getApprovalStatus() == ApprovalStatus.APPROVED){
                 task.setTaskCurrentState(TaskStatus.NOT_STARTED);
@@ -76,6 +86,28 @@ public class PlanApprovalTableController {
         return R.ok();
     }
 
+    /** 
+     * @description: 计划取消初审
+     * @param: planId 
+     * @return: io.renren.common.utils.R 
+     * @author: hong
+     * @date: 2024/12/16 15:04
+     */
+    @GetMapping("/cancelPreApproval/{planId}")
+    public R approval(@PathVariable("planId") String planId){
+        PlanEntity plan = planService.getOne(new LambdaQueryWrapper<PlanEntity>().eq(PlanEntity::getPlanId, planId));
+        plan.setPlanCurrentState(TaskStatus.CREATED_BUT_NOT_APPROVED);
+        planService.updateById(plan);
+        List<PlanApprovalTableEntity> list = planApprovalTableService.list(new LambdaQueryWrapper<PlanApprovalTableEntity>().eq(PlanApprovalTableEntity::getPlanId, planId));
+        for (PlanApprovalTableEntity planApprovalTable : list) {
+            if(planApprovalTable.getApprovalStatus() == ApprovalStatus.PENDING){
+                planApprovalTable.setApprovalStatus(ApprovalStatus.CANCEL);
+            }
+            planApprovalTableService.updateById(planApprovalTable);
+        }
+        return R.ok();
+    }
+
     /**
      * 列表
      */
@@ -83,6 +115,17 @@ public class PlanApprovalTableController {
 //    @RequiresPermissions("generator:taskmanagementplanapprovaltable:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = planApprovalTableService.queryPage(params);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 列表
+     */
+    @RequestMapping("/getMySubmitApprovalList")
+//    @RequiresPermissions("generator:taskmanagementplanapprovaltable:list")
+    public R getMySubmitApprovalList(@RequestParam Map<String, Object> params){
+        PageUtils page = planApprovalTableService.queryPageGetMySubmitApprovalList(params);
 
         return R.ok().put("page", page);
     }

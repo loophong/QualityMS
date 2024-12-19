@@ -66,6 +66,11 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
     String newIssueNumber();
 
+    String connectNumber(Integer id);
+
+
+
+
 
     Map<String, Integer> getMonthlyCountByYear(int year); // 月度统计
 
@@ -77,5 +82,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     List<IssueTableEntity> listAll01(Map<String, Object> params);
 
     Map<String, Integer> gettruecurrentall();
+
+    boolean updateParentQuestion(String issueNumber);
 }
 

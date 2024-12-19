@@ -6,7 +6,8 @@
 
       <el-tab-pane label="正态分布图表" name="first">
         <div ref="lineChartPTD" style="width: 1500px;height:300px;"></div>
-        
+        <h1>PValue: {{ PValue }}</h1>
+    
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getPTDChartDataList()">
           <el-form-item>
             <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
@@ -123,6 +124,17 @@
 
       <!-- 计量型图表 -->
       <el-tab-pane label="计量型图表" name="second">
+
+        <el-select v-model="XRselectedTable" placeholder="请选择">  
+          <el-option  
+            v-for="tableName in XRtableNames"  
+            :key="tableName"  
+            :label="tableName"  
+            :value="tableName">  
+          </el-option>  
+        </el-select>
+
+        <!-- 图表部分 -->
         <el-tabs v-model="secondactivename" type="card">
           <!-- Xbar-R图数据及图表 -->
           <el-tab-pane label="Xbar-R" name="first" @@tab-click="getXbarRchart">
@@ -159,7 +171,7 @@
             <el-button @click="getXRChartDataList()">查询</el-button>
             <el-button v-if="isAuth('spc:spcxrchart:save')" type="primary" @click="XRChartaddOrUpdateHandle()">新增</el-button>
             <el-button v-if="isAuth('spc:spcxrchart:delete')" type="danger" @click="XRChartdeleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-            <el-button type="primary" @click="showDialog = true">导入Excel文件</el-button>
+            <el-button type="primary" @click="showDialog = true">控制用数据导入</el-button>
             <el-button type="primary" @click="showDialog2 = true">统计用数据导入</el-button>
           </el-form-item>
         </el-form>
@@ -499,6 +511,15 @@
       <!-- 计数型图表 -->
       <el-tab-pane label="计数型图表" name="third">
 
+        <el-select v-model="PselectedTable" placeholder="请选择">  
+          <el-option  
+            v-for="tableName in PtableNames"  
+            :key="tableName"  
+            :label="tableName"  
+            :value="tableName">  
+          </el-option>  
+        </el-select>
+
         <el-tabs v-model="thirdactiveName" type="card" >
           <!-- P图数据及图表 -->
 
@@ -523,6 +544,9 @@
               <el-button @click="getPChartDataList()">查询</el-button>
               <el-button v-if="isAuth('spc:spcpchart:save')" type="primary" @click="PChartaddOrUpdateHandle()">新增</el-button>
               <el-button v-if="isAuth('spc:spcpchart:delete')" type="danger" @click="PChartdeleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+             <!-- 1216 TODO 计数型 excel数据导入  -->
+             <el-button type="primary" @click="showDialog3 = true">控制用数据导入</el-button>
+              <el-button type="primary" @click="showDialog4 = true">统计用数据导入</el-button>
             </el-form-item>
           </el-form>
           <el-table
@@ -821,8 +845,8 @@
 
 
 
-    <!-- 导入excel文件弹窗 -->
-    <el-dialog title="导入Excel文件" :visible.sync="showDialog" width="30%" :before-close="handleClose" @close="resetFileInput">
+    <!-- 导入XR图控制用数据 -->
+    <el-dialog title="导入XR图控制用数据" :visible.sync="showDialog" width="30%" :before-close="handleClose" @close="resetFileInput">
       <i class="el-icon-upload"></i>
       <input type="file" id="inputFile" ref="fileInput" @change="checkFile" />
 
@@ -837,6 +861,25 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="showDialog = false">取 消</el-button>
         <el-button type="primary" @click="fileSend()">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 导入P图控制用数据 -->
+    <el-dialog title="导入P图控制用数据" :visible.sync="showDialog3" width="30%" :before-close="handleClose" @close="resetFileInput">
+      <i class="el-icon-upload"></i>
+      <input type="file" id="inputFile" ref="fileInput" @change="checkFile" />
+
+      <!-- 进度动画条 -->
+      <div v-if="progress > 0">
+        <el-progress
+          :percentage="progress"
+          color="rgb(19, 194, 194)"
+        ></el-progress>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showDialog3 = false">取 消</el-button>
+        <el-button type="primary" @click="fileSendP()">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -859,8 +902,8 @@
       </span>
     </el-dialog>
 
-    <!-- 导入标准数据excel文件弹窗 -->
-    <el-dialog title="导入标准数据Excel文件" :visible.sync="showDialog2" width="30%" :before-close="handleClose" @close="resetFileInput">
+    <!-- 导入XR图统计用数据 -->
+    <el-dialog title="导入XR图统计用数据" :visible.sync="showDialog2" width="30%" :before-close="handleClose" @close="resetFileInput">
       <i class="el-icon-upload"></i>
       <input type="file" id="inputFile" ref="fileInput"  />
 
@@ -875,6 +918,25 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="showDialog2 = false">取 消</el-button>
         <el-button type="primary" @click="fileSendStandards()">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 导入P图统计用数据 -->
+    <el-dialog title="导入P图统计用数据" :visible.sync="showDialog4" width="30%" :before-close="handleClose" @close="resetFileInput">
+      <i class="el-icon-upload"></i>
+      <input type="file" id="inputFile" ref="fileInput"  />
+
+      <!-- 进度动画条 -->
+      <div v-if="progress > 0">
+        <el-progress
+          :percentage="progress"
+          color="rgb(19, 194, 194)"
+        ></el-progress>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showDialog4 = false">取 消</el-button>
+        <el-button type="primary" @click="fileSendStandardsP()">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -920,6 +982,8 @@
         showDialog: false,
         showDialog1: false,
         showDialog2: false,
+        showDialog3: false,
+        showDialog4: false,
         progress: 0,
 
         //Xbar-R
@@ -983,9 +1047,68 @@
 
         //正态分布图相关参数
         PTDChartData: [],
+        PValue: null,
+
+        //XR图对应的表名和选中的表名
+        XRtableNames: [],  // 存放从后端获取的表名  
+        XRselectedTable: null,  // 选中的表名  
+
+        //P图对应的表名和选中的表名
+        PtableNames: [],  // 存放从后端获取的表名  
+        PselectedTable: null,  // 选中的表名  
+
+
+        //警告弹窗参数
+
 
       }
     },
+
+    watch: {  
+      XRselectedTable(newValue, oldValue) {  
+        // 当 XRselectedTable 改变时调用更新图表的函数  
+        if (newValue !== oldValue) {  
+            //获取新数据
+            this.getXbarRchart();
+            this.getXbarSchart();
+            this.getMeRchart();
+            this.getIMRchart();
+
+            //更新图表
+            this.updateChartXbarR_Xbar();
+            this.updateChartXbarR_R();
+
+            this.updateChartXbarS_Xbar();
+            this.updateChartXbarS_S();
+
+            this.updateChartMeR_Me();
+            this.updateChartMeR_R();
+
+            this.updateChartIMR_I();
+            this.updateChartIMR_MR();
+
+        }  
+      },
+
+      PselectedTable(newValue, oldValue) {  
+        // 当 PselectedTable 改变时调用更新图表的函数  
+        if (newValue !== oldValue) {  
+            //获取新数据
+            this.getPchart();
+            this.getNPchart();
+            this.getUchart();
+            this.getCchart();
+
+            //更新图表
+            this.updateChartP();
+            this.updateChartNP();
+            this.updateChartU();
+            this.updateChartC();
+
+        }  
+      }  
+    }, 
+
     components: {
       AddOrUpdate,
       PChartAddOrUpdate,
@@ -997,116 +1120,106 @@
       this.getPChartDataList();
       this.getPTDChartDataList();
     },
-    mounted() {
 
-      this.getXbarRchart().then(() => {  
-        console.log(this.XbarRChartData);
+    async mounted() {  
+    try {  
+          // 获取表名  
+          await this.fetchOptionsXR();  
+          await this.fetchOptionsP();
+          
+          // 加载 Xbar R Chart 数据  
+          await this.getXbarRchart();  
+          console.log(this.XbarRChartData); 
           // 确保数据已加载  
-          if (this.XbarRChartData.length = 8) {  
+          if (this.XbarRChartData.length === 8) {  
               this.initChartXbarR_Xbar();  
-              this.initChartXbarR_R();
+              this.initChartXbarR_R();  
           } else {  
-              console.error("XbarRChartData length is less than 5");  
+              console.error("XbarRChartData length is less than 8");  
           }  
-      }).catch(error => {  
-          console.error("Error loading XbarRChartData:", error);  
-      }); 
 
-      this.getXbarSchart().then(() => {
+          // 加载 Xbar S Chart 数据  
+          await this.getXbarSchart();   
           // 确保数据已加载  
-          if (this.XbarSChartData.length = 8) {  
-            this.initChartXbarS_Xbar();
-            this.initChartXbarS_S();
+          if (this.XbarSChartData.length === 8) {  
+              this.initChartXbarS_Xbar();  
+              this.initChartXbarS_S();  
           } else {  
-              console.error("XbarRChartData length is less than 5");  
-          }  
-      }).catch(error => {  
-          console.error("Error loading XbarSChartData:", error);  
-      }); 
+              console.error("XbarSChartData length is less than 8");  
+          }   
 
-      this.getMeRchart().then(() => {
+          // 加载 Me R Chart 数据  
+          await this.getMeRchart();   
           // 确保数据已加载  
-          if (this.MeRChartData.length = 8) {  
-            this.initChartMeR_Me();
-            this.initChartMeR_R();
+          if (this.MeRChartData.length === 8) {  
+              this.initChartMeR_Me();  
+              this.initChartMeR_R();  
           } else {  
-              console.error("MeRChartData length is less than 5");  
-          }  
-      }).catch(error => {  
-          console.error("Error loading MeRChartData:", error);  
-      }); 
+              console.error("MeRChartData length is less than 8");  
+          }   
 
-      this.getIMRchart().then(() => {
+          // 加载 IMR Chart 数据  
+          await this.getIMRchart();   
           // 确保数据已加载  
-          if (this.IMRChartData.length = 8) {  
-            this.initChartIMR_I();
-            this.initChartIMR_MR();
+          if (this.IMRChartData.length === 8) {  
+              this.initChartIMR_I();  
+              this.initChartIMR_MR();  
           } else {  
-              console.error("IMRChartData length is less than 5");  
-          }  
-      }).catch(error => {  
-          console.error("Error loading IMRChartData:", error);  
-      }); 
+              console.error("IMRChartData length is less than 8");  
+          }   
 
-      this.getPchart().then(() => {
+          // 加载 P Chart 数据  
+          await this.getPchart();   
           // 确保数据已加载  
-          if (this.PChartData.length = 4) {  
-            this.initChartP();
+          if (this.PChartData.length === 4) {  
+              this.initChartP();  
           } else {  
-              console.error("PChartData length is less than 5");  
-          }  
-      }).catch(error => {  
-          console.error("Error loading PChartData:", error);  
-      }); 
+              console.error("PChartData length is less than 4");  
+          }   
 
-      this.getNPchart().then(() => {
+          // 加载 NP Chart 数据  
+          await this.getNPchart();   
           // 确保数据已加载  
-          if (this.NPChartData.length = 4) {  
-            this.initChartNP();
+          if (this.NPChartData.length === 4) {  
+              this.initChartNP();  
           } else {  
-              console.error("NPChartData length is less than 5");  
-          }  
-      }).catch(error => {  
-          console.error("Error loading NPChartData:", error);  
-      }); 
+              console.error("NPChartData length is less than 4");  
+          }   
 
-      this.getUchart().then(() => {
+          // 加载 U Chart 数据  
+          await this.getUchart();   
           // 确保数据已加载  
-          if (this.UChartData.length = 4) {  
-            this.initChartU();
+          if (this.UChartData.length === 4) {  
+              this.initChartU();  
           } else {  
-              console.error("UChartData length is less than 5");  
-          }  
-      }).catch(error => {  
-          console.error("Error loading UChartData:", error);  
-      }); 
+              console.error("UChartData length is less than 4");  
+          }   
 
-      this.getCchart().then(() => {
+          // 加载 C Chart 数据  
+          await this.getCchart();   
           // 确保数据已加载  
-          if (this.CChartData.length = 4) {  
-            this.initChartC();
+          if (this.CChartData.length === 4) {  
+              this.initChartC();  
           } else {  
-              console.error("CChartData length is less than 5");  
-          }  
-      }).catch(error => {  
-          console.error("Error loading CChartData:", error);  
-      }); 
+              console.error("CChartData length is less than 4");  
+          }   
 
-      this.getPTDchart().then(() => {
+          // 加载 PTD Chart 数据  
+          await this.getPTDchart();   
           // 确保数据已加载  
-          if (this.PTDChartData.length = 3) {  
-            this.initChartPTD();
+          if (this.PTDChartData.length === 3) {  
+              this.initChartPTD();  
+              await this.getPTDPValue();
+              // 检查 PValue，并决定是否显示弹窗  
+              this.PTDWarning();
+
           } else {  
-              console.error("PTDChartData length is less than 5");  
-          }  
-      }).catch(error => {  
-          console.error("Error loading PTDChartData:", error);  
-      }); 
-
-
-
-
-      // this.setDefaultChartOptions();
+              console.error("PTDChartData length is less than 3");  
+          }   
+        
+        } catch (error) {  
+            console.error("Error loading data:", error);  
+        }   
     },
 
     methods: {
@@ -1133,7 +1246,6 @@
           }
           this.dataListLoading = false
         })
-        console.log(this.dataList);
       },
       // 每页数
       XRChartsizeChangeHandle (val) {
@@ -1280,7 +1392,6 @@
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.PTDChartdataList = data.page.list
-            console.log("========"+this.PTDChartdataList);
             this.totalPage = data.page.totalCount
           } else {
             this.PTDChartdataList = []
@@ -1350,7 +1461,10 @@
         try {  
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcxrchart/chart/Xbar_R'),  
-                method: 'get',  
+                method: 'get', 
+                params: this.$http.adornParams({  
+                    tableName: this.XRselectedTable  // 直接通过 params 传递 XRselectedTable  
+                }),
             });  
 
             // 检查 data 对象是否包含 Xbar-R_Info 属性  
@@ -1373,6 +1487,9 @@
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcxrchart/chart/Xbar_S'),  
                 method: 'get',  
+                params: this.$http.adornParams({  
+                    tableName: this.XRselectedTable  // 直接通过 params 传递 XRselectedTable  
+                }),
             });  
 
             // 检查 data 对象是否包含 Xbar-R_Info 属性  
@@ -1394,7 +1511,10 @@
         try {  
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcxrchart/chart/Me_R'),  
-                method: 'get',  
+                method: 'get', 
+                params: this.$http.adornParams({  
+                    tableName: this.XRselectedTable  // 直接通过 params 传递 XRselectedTable  
+                }), 
             });  
 
             // 检查 data 对象是否包含 Xbar-R_Info 属性  
@@ -1417,6 +1537,9 @@
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcxrchart/chart/I_MR'),  
                 method: 'get',  
+                params: this.$http.adornParams({  
+                    tableName: this.XRselectedTable  // 直接通过 params 传递 XRselectedTable  
+                }),
             });  
 
             // 检查 data 对象是否包含 Xbar-R_Info 属性  
@@ -1439,6 +1562,9 @@
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcpchart/chart/p'),  
                 method: 'get',  
+                params: this.$http.adornParams({  
+                    tableName: this.PselectedTable  // 直接通过 params 传递 XRselectedTable  
+                }),
             });  
 
             // 检查 data 对象是否包含 p-chart_Info 属性  
@@ -1460,7 +1586,10 @@
         try {  
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcpchart/chart/np'),  
-                method: 'get',  
+                method: 'get', 
+                params: this.$http.adornParams({  
+                    tableName: this.PselectedTable  // 直接通过 params 传递 PselectedTable  
+                }), 
             });  
 
             // 检查 data 对象是否包含 np-chart_Info 属性  
@@ -1482,7 +1611,10 @@
         try {  
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcpchart/chart/u'),  
-                method: 'get',  
+                method: 'get', 
+                params: this.$http.adornParams({  
+                    tableName: this.PselectedTable  // 直接通过 params 传递 PselectedTable  
+                }), 
             });  
 
             // 检查 data 对象是否包含 np-chart_Info 属性  
@@ -1505,6 +1637,9 @@
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcpchart/chart/c'),  
                 method: 'get',  
+                params: this.$http.adornParams({  
+                    tableName: this.PselectedTable  // 直接通过 params 传递 PselectedTable  
+                }),
             });  
 
             // 检查 data 对象是否包含 np-chart_Info 属性  
@@ -1543,6 +1678,29 @@
         }  
       },
 
+      //调用spc/spcptd/chart/pValue接口获取p值
+      async getPTDPValue() {  
+        try {  
+            const { data } = await this.$http({  
+                url: this.$http.adornUrl('/spc/spcptd/chart/pValue'),  
+                method: 'get',  
+            });  
+
+            // 检查 data 对象是否包含 np-chart_Info 属性  
+            if (data) { // 注意这里用方括号访问对象属性  
+                this.PValue = data['ptd-p-value'];  
+
+            } else {  
+                console.error("Received data is missing ptd-p-value or is not an array:", data);  
+                this.PValue = null; // 设置为空数组  
+            }  
+        } catch (error) {  
+            // 处理错误  
+            console.error('Error:', error);  
+            this.PValue = null; // 出错时设置为空数组  
+        }  
+      },
+
       //导入相关方法
       fileSend() {
           const formData = new FormData();
@@ -1551,7 +1709,7 @@
               formData.append("file", file);
 
               this.$http({
-                  url: this.$http.adornUrl('/SPC/spc/list'),
+                  url: this.$http.adornUrl('/SPC/spc/XR'),
                   method: 'post',
                   data: formData,
                   headers: {
@@ -1566,10 +1724,10 @@
                   this.getXbarSchart();
                   this.getMeRchart();
                   this.getIMRchart();
-                  this.getPchart();
-                  this.getNPchart();
-                  this.getUchart();
-                  this.getCchart();
+                  // this.getPchart();
+                  // this.getNPchart();
+                  // this.getUchart();
+                  // this.getCchart();
 
 
                   // 更新图表Xbar-R
@@ -1586,10 +1744,10 @@
                   this.updateChartIMR_I();
                   this.updateChartIMR_MR();
 
-                  this.updateChartP();
-                  this.updateChartNP();
-                  this.updateChartU();
-                  this.updateChartC();
+                  // this.updateChartP();
+                  // this.updateChartNP();
+                  // this.updateChartU();
+                  // this.updateChartC();
 
 
                   // 2秒后关闭上传面板，这里应该根据实际情况来决定是否需要刷新页面
@@ -1606,6 +1764,52 @@
               console.error('No file selected.');
           }
       },
+
+      fileSendP(){
+        const formData = new FormData();
+          const file = document.getElementById("inputFile").files[0]; // 获取文件对象
+          if (file) {
+              formData.append("file", file);
+
+              this.$http({
+                  url: this.$http.adornUrl('/SPC/spc/P'),
+                  method: 'post',
+                  data: formData,
+                  headers: {
+                      'Content-Type': 'multipart/form-data' // 设置正确的请求头
+                  }
+              }).then(response => {
+                  // response.data 包含了从服务器返回的数据
+                  this.responseData = response.data;
+                  
+                  //获取新数据
+                  this.getPchart();
+                  this.getNPchart();
+                  this.getUchart();
+                  this.getCchart();
+
+
+                  this.updateChartP();
+                  this.updateChartNP();
+                  this.updateChartU();
+                  this.updateChartC();
+
+
+                  // 2秒后关闭上传面板，这里应该根据实际情况来决定是否需要刷新页面
+                  setTimeout(() => {
+                      this.showDialog3 = false; // 关闭上传面板
+                      // 如果需要刷新页面，取消注释下面的代码
+                      // location.reload();
+                  }, 2000); // 2000毫秒后执行
+              }).catch(error => {
+                  // 处理错误
+                  console.error('Error uploading file:', error);
+              });
+          } else {
+              console.error('No file selected.');
+          }
+      },
+
 
       fileSendPTD() {
           const formData = new FormData();
@@ -1654,7 +1858,7 @@
               formData.append("file", file);
 
               this.$http({
-                  url: this.$http.adornUrl('/SPC/spc/standards'),
+                  url: this.$http.adornUrl('/SPC/spc/standardsXR'),
                   method: 'post',
                   data: formData,
                   headers: {
@@ -1668,7 +1872,39 @@
                   setTimeout(() => {
                       this.showDialog2 = false; // 关闭上传面板
                       // 如果需要刷新页面，取消注释下面的代码
-                      // location.reload();
+                      location.reload();
+                  }, 1000); // 2000毫秒后执行
+              }).catch(error => {
+                  // 处理错误
+                  console.error('Error uploading file:', error);
+              });
+          } else {
+              console.error('No file selected.');
+          }
+      },
+
+      fileSendStandardsP(){
+        const formData = new FormData();
+        const file = this.$refs.fileInput.files[0]; // 使用 $refs 获取文件对象 
+          if (file) {
+              formData.append("file", file);
+
+              this.$http({
+                  url: this.$http.adornUrl('/SPC/spc/standardsP'),
+                  method: 'post',
+                  data: formData,
+                  headers: {
+                      'Content-Type': 'multipart/form-data' // 设置正确的请求头
+                  }
+              }).then(response => {
+                  // response.data 包含了从服务器返回的数据
+                  this.responseData = response.data;          
+
+                  // 2秒后关闭上传面板，这里应该根据实际情况来决定是否需要刷新页面
+                  setTimeout(() => {
+                      this.showDialog4 = false; // 关闭上传面板
+                      // 如果需要刷新页面，取消注释下面的代码
+                      location.reload();
                   }, 1000); // 2000毫秒后执行
               }).catch(error => {
                   // 处理错误
@@ -1685,7 +1921,7 @@
             done();
             })
             .catch(_ => {});
-        },
+      },
 
       //导入excel，取消按钮绑定取消所选的xlsx
       resetFileInput() {
@@ -1823,6 +2059,7 @@
         const XbarRCharXbarUCL = this.XbarRChartData[1];
         const XbarRCharXbarCL = this.XbarRChartData[2];
         const XbarRCharXbarLCL = this.XbarRChartData[3];
+        console.log("XbarRCharXbar"+XbarRCharXbar.length);
         const xAxisData = Array.from({ length: XbarRCharXbar.length }, (_, index) => index + 1);
 
         const option = {
@@ -3818,6 +4055,68 @@
       },
 
       /** -------------------------------------  **/ 
+
+      //获取XR表名
+      async fetchOptionsXR() {  
+        try {  
+            const response = await this.$http({  
+                url: this.$http.adornUrl('/spc/spcxrchart/options'), // 替换为实际的 API URL  
+                method: 'get', // 使用 GET 方法   
+            });  
+            
+            this.XRtableNames = response.data.table_name;  // 获取表名列表  
+            
+            // 设置默认选中的表名为列表中的最后一个  
+            if (this.XRtableNames.length > 0) {  
+                this.XRselectedTable = this.XRtableNames[this.XRtableNames.length - 1]; // 默认选中最后一个表名  
+            } else {  
+                this.XRselectedTable = null; // 如果没有表名，清空选中  
+            }   
+
+        } catch (error) {  
+            console.error('获取表名时出错：', error);  
+            this.XRselectedTable = null; // 在出错时清空选中  
+        }  
+      }, 
+
+      //获取P表名
+      async fetchOptionsP() {  
+        try {  
+            const response = await this.$http({  
+                url: this.$http.adornUrl('/spc/spcpchart/options'), 
+                method: 'get', // 使用 GET 方法   
+            });  
+            
+            this.PtableNames = response.data.table_name;  // 获取表名列表  
+            
+            // 设置默认选中的表名为列表中的最后一个  
+            if (this.PtableNames.length > 0) {  
+                this.PselectedTable = this.PtableNames[this.PtableNames.length - 1]; // 默认选中最后一个表名  
+            } else {  
+                this.PselectedTable = null; // 如果没有表名，清空选中  
+            }   
+
+        } catch (error) {  
+            console.error('获取表名时出错：', error);  
+            this.PselectedTable = null; // 在出错时清空选中  
+        }  
+      }, 
+
+
+      //预警方法
+      //PTD图预警
+      closeAlert() {  
+        this.showAlert = false; // 关闭弹窗  
+      }, 
+
+      PTDWarning(){
+        if(this.PValue > 0.05){
+          this.$message({
+            message: 'P值大于0.05',
+            type: 'warning'
+          });
+        }
+      },
 
     }
   }

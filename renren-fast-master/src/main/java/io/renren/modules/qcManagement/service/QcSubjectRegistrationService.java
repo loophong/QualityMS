@@ -32,5 +32,7 @@ public interface QcSubjectRegistrationService extends IService<QcSubjectRegistra
     PageUtils queryPageAll(Map<String, Object> params);
 
     List<QcknowledgebaseEntity>queryFinishedList1(Map<String, Object> params);
+
+    void updateStorageFlagToZero(Long[] qcsrIds);
 }
 

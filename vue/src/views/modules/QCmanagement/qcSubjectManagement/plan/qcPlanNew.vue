@@ -3096,7 +3096,7 @@ export default {
         method: "get",
         params: this.$http.adornParams({
           page: 1,
-          limit: 100,
+          limit: 1000000,
           key: this.routerParam.qcsrId,
         }),
       }).then(({ data }) => {

@@ -98,8 +98,9 @@
               <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
               <el-tag
                 v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
-              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
-                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
+                type="danger">未通过(管理员)</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">未通过(科室)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
                 }}</el-tag>
               <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
@@ -133,7 +134,7 @@
               <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.admitEdit)"
                 type="text" size="small" @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
               <el-button
-                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus === '未通过')"
+                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus == '未通过')"
                 type="text" size="small" @click="handleReexamine(scope.row.id)">提交审核</el-button>
               <el-button type="text" size="small"
                 v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.admitEdit)"

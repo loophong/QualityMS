@@ -198,12 +198,7 @@ const mainRoutes = {
       meta: {title: 'QC工具-关联图', isDynamic: true, isTab: false}
     },
 
-    {
-      path: '/issue-issuetable',
-      component: _import('modules/issueRectification/Rectificationissue'),
-      name: 'issue-issueRectification',
-      meta: {title: '任务详情', isDynamic: true, isTab: true}
-    },
+
 
     //仪器仪表
     {
@@ -213,11 +208,32 @@ const mainRoutes = {
       meta: {title: '关联检验方法', isDynamic: true, isTab: true}
     },
     //问题
+
+    // {
+    //   path: '/issue-issuetable',
+    //   component: _import('modules/issueRectification/Rectificationissue'),
+    //   name: 'issue-issueRectification',
+    //   meta: {title: '任务详情', isDynamic: true, isTab: true}
+    // },
+
+
     {
       path: '/issue-issuetable',
       component: _import('modules/issueRectification/Rectificationissue'),
       name: 'issue-issueRectification',
       meta: {title: '任务详情', isDynamic: true, isTab: true}
+    },
+    {
+      path: '/issue-issuetable',
+      component: _import('modules/issueexamine/issueExamine'),
+      name: 'issue-issueexamine',
+      meta: {title: '任务审核', isDynamic: true, isTab: true}
+    },
+    {
+      path: '/issue-issuemask',
+      component: _import('modules/issuemask/issuemasktable'),
+      name: 'issue-issuemasktable',
+      meta: {title: '任务执行', isDynamic: true, isTab: false}
     },
     {
       path: '/issue-issuemask',
@@ -247,7 +263,7 @@ const mainRoutes = {
       path: '/otherToIssue',
       component: _import('modules/issuefind/findissue'),
       name: 'otherToIssue',
-      meta: {title: '任务流程', isDynamic: true, isTab: true}
+      meta: {title: '问题操作', isDynamic: true, isTab: true}
     },
     {
       path: '/issue-issueView',

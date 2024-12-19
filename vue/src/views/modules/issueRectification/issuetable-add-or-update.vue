@@ -482,10 +482,11 @@
                     url: this.$http.adornUrl(`/notice/save`),
                     method: 'post',
                     data: this.$http.adornData({
-                      'receiverId': receiverId, // 审核人ID
-                      'senderId': creatorId, // 发起人ID
-                      'content': `有新的任务需要审核`, // 消息内容
-                      'type': '任务审核' // 消息类型
+                      'receiverId': this.dataForm.reviewers, // 审核人ID
+                      'senderId': this.dataForm.creator, // 发起人ID
+                      'content': '任务内容：'+ subtask.name, // 消息内容
+                      'type': '任务审核通知', // 消息类型
+                      'jumpdepart': '2' // 跳转部门
                     })
                   });
                 } else {
@@ -493,8 +494,8 @@
                 }
               });
 
-              console.log('时间:', this.dataForm.requiredCompletionTime);
-              console.log('发起人:', this.dataForm.userinfo);
+              // console.log('时间:', this.dataForm.requiredCompletionTime);
+              // console.log('发起人:', this.dataForm.userinfo);
             });
           }
           // 重置 subtasks 数组，只保留一个初始组合

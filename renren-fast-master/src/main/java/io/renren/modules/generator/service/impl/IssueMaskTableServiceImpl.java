@@ -95,6 +95,21 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
     }
 
     @Override
+    public PageUtils AuditedqueryPage(Map<String, Object> params) {
+        SysUserEntity role = ShiroUtils.getUserEntity();
+        String rolename = String.valueOf(role.getUserId());
+//        System.out.println("当前登录人信息"+role);
+        IPage<IssueMaskTableEntity> page = this.page(
+                new Query<IssueMaskTableEntity>().getPage(params),
+                new QueryWrapper<IssueMaskTableEntity>()
+                        .eq("Reviewers", rolename) // 筛选Reviewers为当前登录用户
+                        .ne("state", "审核中") // 筛选state不为“审核中”的数据
+                        .orderByDesc("issuemask_id")          // 按 ID 降序排序
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
     public String newIssuemaskNumber(String issueNumber) {
         //查询相同问题编号的问题
         List<IssueMaskTableEntity> list1 = this.list(

@@ -63,7 +63,9 @@ public class MessageNotificationServiceImpl extends ServiceImpl<MessageNotificat
     public PageUtils queryPageMyNoticeList(Map<String, Object> params, Long userId) {
         IPage<MessageNotificationEntity> page = this.page(
                 new Query<MessageNotificationEntity>().getPage(params),
-                new QueryWrapper<MessageNotificationEntity>().eq("receiver_id", userId)
+                new QueryWrapper<MessageNotificationEntity>()
+                        .eq("receiver_id", userId)
+                        .orderByDesc("created_at") // 按创建时间降序排序
         );
 
         return new PageUtils(page);

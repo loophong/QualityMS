@@ -95,12 +95,23 @@ public class IssueMaskTableController {
     }
 
     /**
-     * 列表，审核人可见
+     * 列表，审核人可见未审核
      */
     @RequestMapping("/Auditlist")
     @RequiresPermissions("generator:issuemasktable:list")
     public R Auditlist(@RequestParam Map<String, Object> params){
         PageUtils page = issueMaskTableService.AuditqueryPage(params);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 列表，审核人可见已审核
+     */
+    @RequestMapping("/Auditedlist")
+    @RequiresPermissions("generator:issuemasktable:list")
+    public R Auditedlist(@RequestParam Map<String, Object> params){
+        PageUtils page = issueMaskTableService.AuditedqueryPage(params);
 
         return R.ok().put("page", page);
     }

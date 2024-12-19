@@ -421,9 +421,9 @@ export default {
         series: [
           {
             data: [
-              this.stateData['问题添加'],
-              this.stateData['问题整改'],
               this.stateData['问题验证'],
+              this.stateData['问题整改'],
+              this.stateData['问题添加'],
             ],
             type: 'bar',
           }
@@ -583,41 +583,137 @@ export default {
     //
     //   chart4.setOption(options);  // 渲染图表
     // },
+//     renderIssueCategoryChart() {
+//       const chart4 = echarts.init(this.$refs.barChart4);
+//
+//       // 获取问题类别和问题数
+//       const categories = Object.keys(this.issueCategoryStats).filter(category => this.issueCategoryStats[category] > 0);  // 过滤无效问题类别
+//       const issueCounts = categories.map(category => this.issueCategoryStats[category]);  // 对应问题数
+//
+//       // 图表配置项
+//       const options = {
+//         title: {
+//           text: '前十问题展示'
+//         },
+//         tooltip: {
+//           trigger: 'axis',
+//         },
+//         xAxis: {
+//           type: 'value',
+//           name: '数量',  // Y轴显示数量
+//           splitLine: { show: false },  // 隐藏Y轴的网格线
+//         },
+//         yAxis: {
+//           type: 'category',
+//           data: categories,  // 问题类别
+//         },
+//         series: [
+//           {
+//             data: issueCounts,  // 问题数
+//             type: 'bar',  // 设置为柱状图
+//           }
+//         ]
+//       };
+//
+//       chart4.setOption(options);  // 渲染图表
+//     }
+// ,
     renderIssueCategoryChart() {
       const chart4 = echarts.init(this.$refs.barChart4);
 
+      // 确保数据存在且有效
+      if (!this.issueCategoryStats || Object.keys(this.issueCategoryStats).length === 0) {
+        console.warn('No issue category data available');
+        return;
+      }
+
       // 获取问题类别和问题数
       const categories = Object.keys(this.issueCategoryStats).filter(category => this.issueCategoryStats[category] > 0);  // 过滤无效问题类别
-      const issueCounts = categories.map(category => this.issueCategoryStats[category]);  // 对应问题数
+      let issueCounts = categories.map(category => this.issueCategoryStats[category]);  // 对应问题数
+
+      // 对数据进行从小到大的排序
+      const sortedData = categories
+        .map((category, index) => ({
+          category,
+          count: issueCounts[index]
+        }))
+        .sort((a, b) => a.count - b.count);  // 按照问题数从小到大排序
+
+      // 排序后的类别和问题数
+      const sortedCategories = sortedData.map(item => item.category);
+      const sortedIssueCounts = sortedData.map(item => item.count);
 
       // 图表配置项
       const options = {
         title: {
-          text: '前十问题展示'
+          text: '前十问题展示',
+          left: 'center',
+          top: '10',  // 设置标题的位置
+          textStyle: {
+            fontSize: 18,  // 设置标题的字体大小
+            fontWeight: 'bold',
+          }
         },
         tooltip: {
           trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',  // 阴影指示器
+          },
+          backgroundColor: 'rgba(50, 50, 50, 0.7)',  // 提示框背景色
+          textStyle: {
+            color: '#fff',  // 提示框文字颜色
+          }
         },
         xAxis: {
           type: 'value',
-          name: '数量',  // Y轴显示数量
-          splitLine: { show: false },  // 隐藏Y轴的网格线
+          name: '数量',  // X轴显示“数量”
+          splitLine: { show: false },  // 隐藏X轴的网格线
+          axisLabel: {
+            formatter: '{value}',  // X轴数字格式化
+          }
         },
         yAxis: {
           type: 'category',
-          data: categories,  // 问题类别
+          data: sortedCategories,  // 排序后的问题类别
+          axisLabel: {
+            formatter: (value) => {
+              // 根据需要调整Y轴标签的显示格式
+              return value.length > 10 ? value.slice(0, 10) + '...' : value;
+            },
+          }
         },
         series: [
           {
-            data: issueCounts,  // 问题数
+            data: sortedIssueCounts,  // 排序后的问题数
             type: 'bar',  // 设置为柱状图
+            itemStyle: {
+              color: '#4caf50',  // 设置柱状图颜色
+            },
+            barWidth: '40%',  // 设置柱状图的宽度
+            label: {
+              show: true,  // 显示柱子上的数据
+              position: 'insideRight',  // 数据显示在柱子的右侧
+              valueAnimation: true,  // 启动数据动画
+            }
           }
-        ]
+        ],
+        grid: {
+          left: '10%',
+          right: '10%',
+          bottom: '10%',
+          top: '20%',
+        },
+        animationDuration: 1000,  // 动画时长
       };
 
-      chart4.setOption(options);  // 渲染图表
-    }
-,
+      // 渲染图表
+      chart4.setOption(options);
+
+      // 适配窗口尺寸变化
+      window.addEventListener('resize', () => {
+        chart4.resize();
+      });
+    },
 
 
 

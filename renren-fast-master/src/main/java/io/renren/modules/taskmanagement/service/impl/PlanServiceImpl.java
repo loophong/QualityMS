@@ -7,6 +7,8 @@ import io.renren.common.utils.DateUtils;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.app.service.UserService;
 import io.renren.modules.indicator.service.IndicatorDictionaryService;
+import io.renren.modules.notice.entity.CreateNoticeParams;
+import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.taskmanagement.dao.TaskDao;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
@@ -51,6 +53,8 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
     private IndicatorDictionaryService indicatorDictionaryService;
     @Autowired
     private PlanApprovalTableService planApprovalTableService;
+    @Autowired
+    private MessageNotificationService messageService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -218,6 +222,9 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         List<FileEntity> files = planDTO.getFiles();
         log.info("files: " + files);
         fileService.saveBatch(files);
+
+        // 发送通知
+        messageService.sendMessages(new CreateNoticeParams(ShiroUtils.getUserId(), new Long[]{Long.valueOf(plan.getPlanAuditor())},"您有一个新建计划未审批", "新建计划审批通知","plan_approval_page"));
     }
 
     @Transactional
@@ -257,6 +264,9 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         planApprovalTableEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
         log.info("planApprovalTableEntity: " + planApprovalTableEntity);
         planApprovalTableService.save(planApprovalTableEntity);
+
+        // 发送通知
+        messageService.sendMessages(new CreateNoticeParams(ShiroUtils.getUserId(), new Long[]{Long.valueOf(plan.getPlanAuditor())},"您有一个新建计划未审批", "新建计划审批通知","plan_approval_page"));
     }
 
     @Override

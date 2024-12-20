@@ -19,6 +19,7 @@ import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.service.QcSubjectRegistrationService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,6 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
             List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,startDate,endDate);
             page.setRecords(result);
             page.setTotal(result.size());
-
             log.info("result" + page);
             return new PageUtils(page);
         } catch (Exception e) {
@@ -63,6 +63,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
             return new PageUtils(page);
         }
     }
+
     public List<QcknowledgebaseEntity> queryFinishedList1(Map<String, Object> params) {
     log.info("param" + params.get("page") + "------" + params.get("limit"));
 
@@ -82,7 +83,10 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
         return Collections.emptyList(); // 返回空列表
     }
 }
-
+    @Override
+    public void updateStorageFlagToZero(Long[] qcsrIds) {
+            qcSubjectRegistrationDao.updateStorageFlagToZero(Arrays.asList(qcsrIds));
+    }
 
 
     ;
@@ -248,6 +252,52 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     }
 
     @Override
+    public PageUtils queryPageAboutAndLead(Map<String, Object> params) {
+
+        QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
+        String valueTwo = ShiroUtils.getUserEntity().getUsername();
+        queryWrapper.lambda()
+                .and(wrapper -> wrapper.eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo)
+                        .or().like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
+                        .or().eq(QcSubjectRegistrationEntity::getTopicLeader, valueTwo));
+
+        String key = (String) params.get("key");
+        if (key != null && !key.isEmpty()) {
+            try {
+                // 将 key 字符串解析为 Map
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> keyMap = objectMapper.readValue(key, Map.class);
+
+                // 遍历 Map 并添加查询条件
+                for (Map.Entry<String, String> entry : keyMap.entrySet()) {
+                    String field = entry.getKey();
+                    String value = entry.getValue();
+
+                    if (value != null && !value.isEmpty()) {
+                        switch (field) {
+                            case "topicName":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicName, value);
+                                break;
+                            case "keywords":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
+                                break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        IPage<QcSubjectRegistrationEntity> page = this.page(
+                new Query<QcSubjectRegistrationEntity>().getPage(params, "qcsr_Id", false),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
     public PageUtils queryPageAboutFilter(Map<String, Object> params) {
 
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
@@ -285,8 +335,6 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                 e.printStackTrace();
             }
         }
-
-
 
 
         IPage<QcSubjectRegistrationEntity> page = this.page(

@@ -1,10 +1,7 @@
 package io.renren.modules.indicator.service.impl;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.renren.modules.generator.dao.IssueTableDao;
-import io.renren.modules.indicator.entity.IndicatorDictionaryEntity;
-import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +17,8 @@ import io.renren.common.utils.Query;
 import io.renren.modules.indicator.dao.IndicatorKeyIndicatorsDao;
 import io.renren.modules.indicator.entity.IndicatorKeyIndicatorsEntity;
 import io.renren.modules.indicator.service.IndicatorKeyIndicatorsService;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+
 
 @Slf4j
 @Service("indicatorKeyIndicatorsService")
@@ -150,5 +149,14 @@ public class IndicatorKeyIndicatorsServiceImpl extends ServiceImpl<IndicatorKeyI
 
         // 返回查询结果列表
         return list(queryWrapper);
+    }
+    @Override
+    public boolean clearStorageFlag(List<Integer> ids) {
+        List<IndicatorKeyIndicatorsEntity> list = this.list(new LambdaQueryWrapper<IndicatorKeyIndicatorsEntity>().in(IndicatorKeyIndicatorsEntity::getKeyIndicatorId, ids));
+        for (IndicatorKeyIndicatorsEntity indicatorKeyIndicatorsEntity : list) {
+            indicatorKeyIndicatorsEntity.setStorageFlag(0);
+        }
+        this.saveOrUpdateBatch(list);
+        return true;
     }
 }

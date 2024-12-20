@@ -73,6 +73,7 @@
     </el-dialog>
     <el-table
       :data="dataList"
+      height="750"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
@@ -502,6 +503,7 @@
           { value: '企管科', label: '企管科' }
           // 其他科室选项
         ],
+        heightTable: 0,
         currentIssues: [],
         tableData: [],
         dataForm: {
@@ -554,6 +556,10 @@
       this.fetchVehicleTypes()
       this.getDataList()
       // this.fetchData()
+    },
+    computed: {
+
+
     },
     methods: {
       // 显示文件列表弹窗
@@ -852,6 +858,8 @@
               }
               return item;
             });
+            this.heightTable=data.page.totalCount*300;
+            console.log(this.heightTable)
 
             // 排序操作前，输出每个元素的 overDue 和 creationTime
             // console.log("排序前的 dataList: ", this.dataList);
@@ -861,19 +869,19 @@
             });
 
             // 排序操作
-            this.dataList.sort((a, b) => {
-              // 转换 overDue 为布尔值，'true' 转为 true，其他转为 false
-              const isOverDueA = a.overDue === 'true';
-              const isOverDueB = b.overDue === 'true';
-
-              // 优先按照 overDue 排序，overDue 为 true 的排在前面
-              if (isOverDueA !== isOverDueB) {
-                return isOverDueA ? -1 : 1;
-              }
-
-              // 如果 overDue 相同，则按创建时间排序
-              return new Date(b.creationTime) - new Date(a.creationTime);
-            });
+            // this.dataList.sort((a, b) => {
+            //   // 转换 overDue 为布尔值，'true' 转为 true，其他转为 false
+            //   const isOverDueA = a.overDue === 'true';
+            //   const isOverDueB = b.overDue === 'true';
+            //
+            //   // 优先按照 overDue 排序，overDue 为 true 的排在前面
+            //   if (isOverDueA !== isOverDueB) {
+            //     return isOverDueA ? -1 : 1;
+            //   }
+            //
+            //   // 如果 overDue 相同，则按创建时间排序
+            //   return new Date(b.creationTime) - new Date(a.creationTime);
+            // });
 
             // 排序后再输出一次以确认排序结果
             // console.log("排序后的 dataList: ", this.dataList);

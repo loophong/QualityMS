@@ -152,7 +152,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId)">修改</el-button>
+          <el-button v-if="showButtons" type="text" size="small" @click="addOrUpdateHandle(scope.row.issuemaskId,scope.row.state)">修改</el-button>
           <el-button v-if="showButtons" type="text" size="small" @click="deleteHandle(scope.row.issuemaskId)">删除</el-button>
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="executeHandle(scope.row.issuemaskId)">执行</el-button>-->
 <!--          <el-button v-if="showButtons" type="text" size="small" @click="dispatchHandle(scope.row.issuemaskId)">派发</el-button>-->
@@ -370,12 +370,18 @@ export default {
       this.dataListSelections = val
     },
     // 新增 / 修改
-    addOrUpdateHandle (id) {
+    addOrUpdateHandle (id, state) {
       this.addOrUpdateVisible = true
-      console.log('id获取' ,id)
+      // console.log('id获取' ,id)
+      if(state === '已派发')
+        this.$message.error('任务已派发！')
+      if(state === '已完成')
+        this.$message.error('任务已完成！')
+      else{
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
       })
+      }
     },
     // 删除
     deleteHandle (id) {

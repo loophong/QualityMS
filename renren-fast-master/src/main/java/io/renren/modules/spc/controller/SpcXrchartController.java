@@ -91,24 +91,27 @@ public class SpcXrchartController {
 
 
     @RequestMapping("/chart/Xbar_R")
-    public R getXbar_RChart(){
-
-        return R.ok().put("Xbar-R_Info", spcXrchartService.getXbar_RChart());
+    public R getXbar_RChart(@RequestParam String tableName){
+        return R.ok().put("Xbar-R_Info", spcXrchartService.getXbar_RChart(tableName));
     }
 
     @RequestMapping("/chart/Xbar_S")
-    public R getXbar_SChart(){
-        return R.ok().put("Xbar-S_Info", spcXrchartService.getXbar_SChart());
+    public R getXbar_SChart(@RequestParam String tableName){
+        return R.ok().put("Xbar-S_Info", spcXrchartService.getXbar_SChart(tableName));
     }
 
     @RequestMapping("/chart/Me_R")
-    public R getMe_RChart(){
-        return R.ok().put("Me-R_Info", spcXrchartService.getMe_RChart());
+    public R getMe_RChart(@RequestParam String tableName){
+        return R.ok().put("Me-R_Info", spcXrchartService.getMe_RChart(tableName));
     }
 
     @RequestMapping("/chart/I_MR")
-    public R getI_MRChart(){
-        return R.ok().put("I-MR_Info", spcXrchartService.getI_MRChart());
+    public R getI_MRChart(@RequestParam String tableName){
+        return R.ok().put("I-MR_Info", spcXrchartService.getI_MRChart(tableName));
     }
 
+    @RequestMapping("/options")
+    public R getTableName(){
+        return R.ok().put("table_name",spcXrchartService.getTableName());
+    }
 }

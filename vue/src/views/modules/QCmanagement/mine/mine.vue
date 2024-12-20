@@ -2,15 +2,15 @@
   <el-tabs v-model="activeName" type="border-card">
     <el-tab-pane label="我的课题" name="1">
       <div class="mod-config">
-        <el-form :inline="true" :model="myQueryParam" @keyup.enter.native="getDataList()">
+        <el-form :inline="true" :model="myQueryParamSubject" @keyup.enter.native="getSubjectList()">
           <el-form-item>
-            <el-input v-model="myQueryParam.topicName" placeholder="课题名称" clearable></el-input>
+            <el-input v-model="myQueryParamSubject.topicName" placeholder="课题名称" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
+            <el-input v-model="myQueryParamSubject.keywords" placeholder="课题关键字" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button @click="getDataList()">查询</el-button>
+            <el-button @click="getSubjectList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="warning" @click="reuseHandle()"
@@ -21,11 +21,23 @@
             </el-badge>
           </el-form-item>
         </el-form>
-        <el-table :data="subjectDataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%" stripe>
-          <el-table-column type="selection" header-align="center" align="center" width="50">
+        <el-table :data="subjectDataList" border v-loading="dataListLoading" style="width: 100%" stripe>
+          <el-table-column prop="qcsrId" header-align="center" align="center" label="课题ID" fixed>
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+          </el-table-column>
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室">
+          </el-table-column>
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 2 && !scope.row.topicReviewDepartment">审核中(科室)</el-tag>
+              <el-tag
+                v-else-if="scope.row.topicReviewStatus === 2 && scope.row.topicReviewDepartment == 1">审核中(管理员)</el-tag>
+              <el-tag v-else-if="scope.row.topicReviewStatus === 3" type="success">已通过</el-tag>
+              <el-tag v-else>-</el-tag>
+            </template>
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
@@ -69,16 +81,8 @@
           </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
-          <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
-            <template slot-scope="scope">
-              <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628;">未通过</span>
-              <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray;">未开始</span>
-              <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb;">审核中</span>
-              <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146;">已通过</span>
-              <span v-else>-</span>
-            </template>
-          </el-table-column> -->
-          <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+
+          <!-- <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
                 @click="newPlanHandle(scope.row.qcsrId)">关联计划</el-button>
@@ -87,11 +91,11 @@
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
                 @click="examineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
             </template>
-          </el-table-column>
+          </el-table-column> -->
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
-          :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPageSubject"
-          layout="total, sizes, prev, pager, next, jumper">
+        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle"
+          :current-page="pageIndexSubject" :page-sizes="[10, 20, 50, 100]" :page-size="pageSizeSubject"
+          :total="totalPageSubject" layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
         <!-- 弹窗, 新增 / 修改 -->
         <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getSubjectList"></add-or-update>
@@ -421,8 +425,10 @@ export default {
       dataList: [], //标签页2，我的小组
       consultantList: [], //标签页，我指导的小组
       examineList: [], //标签页3，我的审核
+      pageIndexSubject: 1,
       pageIndex: 1,
       pageSize: 10,
+      pageSizeSubject: 10,
       totalPage: 0,
       totalPageGroup: 0,
       totalPageSubject: 0,
@@ -431,9 +437,9 @@ export default {
       addOrUpdateVisible: false,
       groupMemberList: [],
       firstList: [],
-      myQueryParam: {
-        topicName: "",
-        keywords: "",
+      myQueryParamSubject: {
+        topicName: '',
+        keywords: '',
       },
       reuseStepId: "",
       superScriptNumber: "", //消息详情角标
@@ -691,9 +697,8 @@ export default {
         url: this.$http.adornUrl("/qcMembers/qcGroupMember/myList"),
         method: "get",
         params: this.$http.adornParams({
-          page: 1,
-          limit: 1000000,
-          // 'key': 1,
+          'page': 1,
+          'limit': 1000000,
           // 'reuseStepId': 5
         }),
       }).then(({ data }) => {
@@ -882,18 +887,16 @@ export default {
       console.log(tipList);
       console.log("----------");
     },
-    // 获取我的课题数据列表
+    // 获取关于我的课题数据列表
     async getSubjectList() {
       this.dataListLoading = true;
       await this.$http({
-        url: this.$http.adornUrl("/qcSubject/registration/myList"),
+        url: this.$http.adornUrl("/qcSubject/registration/aboutMeList"),
         method: "get",
         params: this.$http.adornParams({
-          'page': this.pageIndex,
-          'limit': this.pageSize,
-          'key': {
-            join: '',
-          },
+          'page': this.pageIndexSubject,
+          'limit': this.pageSizeSubject,
+          'key': this.myQueryParamSubject,
           // 'reuseStepId': 5
         }),
       }).then(({ data }) => {

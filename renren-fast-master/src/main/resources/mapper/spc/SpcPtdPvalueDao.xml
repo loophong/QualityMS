@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.spc.dao.SpcPtdPvalueDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.spc.entity.SpcPtdPvalueEntity" id="spcPtdPvalueMap">
+        <result property="pvalueId" column="pvalue_id"/>
+        <result property="bValue" column="B_value"/>
+        <result property="cValue" column="C_value"/>
+        <result property="dValue" column="D_value"/>
+        <result property="tableName" column="table_name"/>
+        <result property="datatime" column="datatime"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="alternateFields1" column="alternate_fields1"/>
+        <result property="alternateFields2" column="alternate_fields2"/>
+        <result property="alternateFields3" column="alternate_fields3"/>
+        <result property="alternateFields4" column="alternate_fields4"/>
+        <result property="deleteFlag" column="delete_flag"/>
+    </resultMap>
+
+    <!-- 批量插入数据 -->
+    <insert id="batchInsertSpcPtdPValueCharts" parameterType="java.util.List">
+        INSERT INTO spc_PTD_Pvalue (
+        pvalue_id, B_value, C_value, D_value, table_name, datatime, create_by, create_time,
+        alternate_fields1, alternate_fields2, alternate_fields3, alternate_fields4, delete_flag
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.pvalueId}, #{item.bValue}, #{item.cValue}, #{item.dValue}, #{item.tableName},
+            #{item.datatime}, #{item.createBy}, #{item.createTime}, #{item.alternateFields1}, #{item.alternateFields2},
+            #{item.alternateFields3}, #{item.alternateFields4}, #{item.deleteFlag})
+        </foreach>
+    </insert>
+
+    <select id="getTableName" resultType="java.lang.String">
+        SELECT DISTINCT table_name FROM spc_PTD_Pvalue;
+    </select>
+
+    <!-- 查询当月数据 -->
+    <select id="getSpcPtdPValueEntityByMonth" parameterType="java.util.Date" resultMap="spcPtdPvalueMap">
+        SELECT *
+        FROM spc_PTD_Pvalue
+        WHERE MONTH(datatime) = MONTH(#{datatime})
+        AND YEAR(datatime) = YEAR(#{datatime});
+    </select>
+
+    <!-- 按照表名查询数据 -->
+    <select id="getSpcPtdPValueEntityByTableName" parameterType="java.lang.String" resultMap="spcPtdPvalueMap">
+        SELECT *
+        FROM spc_PTD_Pvalue
+        WHERE table_name = #{tableName};
+    </select>
+
+
+    <!-- 根据月份删除数据 -->
+    <delete id="deleteDataByMonth" parameterType="java.util.Date">
+        DELETE FROM spc_PTD_Pvalue
+        WHERE MONTH(datatime) = MONTH(#{datatime})
+        AND YEAR(datatime) = YEAR(#{datatime});
+    </delete>
+
+    <!-- 根据表名删除数据 -->
+    <delete id="deleteDataByTableName" parameterType="java.lang.String">
+        DELETE FROM spc_PTD_Pvalue
+        WHERE table_name = #{tableName};
+    </delete>
+</mapper>

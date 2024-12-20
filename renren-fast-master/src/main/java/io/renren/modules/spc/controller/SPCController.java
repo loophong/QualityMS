@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.aliyun.oss.ServiceException;
@@ -31,11 +33,7 @@ import java.time.ZoneId;
 @RequestMapping("SPC/spc")
 public class SPCController {
 
-    public int  arrayLength = 0;
-    public int arraySize = 0;
 
-    public int standards_arrayLength = 0;
-    public int standards_arraySize = 0;
 
     @Resource
     private SpcXrchartService spcXrchartService;
@@ -47,15 +45,18 @@ public class SPCController {
     private SpcPtdService spcPtdService;
 
     @Resource
+    private SpcPtdPvalueService spcPtdPvalueService;
+
+    @Resource
     private SpcXrchartStandardsService spcXrchartStandardsService;
 
     @Resource
     private SpcPchartStandardsService spcPchartStandardsService;
 
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public ResponseEntity<?> list(@RequestParam("file") MultipartFile excelFile){
+    @RequestMapping(value = "/XR", method = RequestMethod.POST)
+    public ResponseEntity<?> importXR(@RequestParam("file") MultipartFile excelFile){
 
-        System.out.println("------------import-------import------------");
+        System.out.println("------------XR-------XR------------");
         try {
 
             /**
@@ -65,17 +66,29 @@ public class SPCController {
             List<SpcXrchartEntity> XRchartDataList = parseExcel2XRchart(excelFile);
             spcXrchartService.importData(XRchartDataList);
 
+            return ResponseEntity.ok("Success");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("excel上传失败");
+        }
+    }
+
+    @RequestMapping(value = "/P", method = RequestMethod.POST)
+    public ResponseEntity<?> importP(@RequestParam("file") MultipartFile excelFile){
+
+        System.out.println("------------P-------P------------");
+        try {
+
             /**
              * 导入P-chart图表数据
              * 从表中获取一些固定值，当前日期（以上传日期为准）
              * */
 
             List<SpcPchartEntity> PchartDataList = parseExcel2Pchart(excelFile);
-            System.out.println(PchartDataList);
             spcPchartService.importData(PchartDataList);
 
-            //旧版本代码
-//            List<List<Double>> date = parseExcel(excelFile);
             return ResponseEntity.ok("Success");
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,7 +99,7 @@ public class SPCController {
     }
 
     @RequestMapping(value = "/PTD", method = RequestMethod.POST)
-    public ResponseEntity<?> listPTD(@RequestParam("file") MultipartFile excelFile){
+    public ResponseEntity<?> importPTD(@RequestParam("file") MultipartFile excelFile){
 
         System.out.println("------------test-------test------------");
         try {
@@ -96,8 +109,14 @@ public class SPCController {
              *
              * */
             List<SpcPtdEntity> PtdDataList = parseExcel2Ptd(excelFile);
-            System.out.println(PtdDataList);
             spcPtdService.importData(PtdDataList);
+
+            /**
+             * 导入P值图表数据
+             *
+             * */
+            List<SpcPtdPvalueEntity> PtdPValueDataList = parseExcel2PtdPvalue(excelFile);
+            spcPtdPvalueService.importData(PtdPValueDataList);
 
             return ResponseEntity.ok("Success");
         } catch (IOException e) {
@@ -108,10 +127,10 @@ public class SPCController {
         }
     }
 
-    @RequestMapping(value = "/standards", method = RequestMethod.POST)
-    public ResponseEntity<?> listStandards(@RequestParam("file") MultipartFile excelFile){
+    @RequestMapping(value = "/standardsXR", method = RequestMethod.POST)
+    public ResponseEntity<?> importStandardsXR(@RequestParam("file") MultipartFile excelFile){
 
-        System.out.println("------------standards-------standards------------");
+        System.out.println("------------standardsXR-------standardsXR------------");
         try {
 
             /**
@@ -120,6 +139,21 @@ public class SPCController {
              * */
             List<SpcXrchartStandardsEntity> XRchartStandardsDataList = parseExcel2XRchartStandards(excelFile);
             spcXrchartStandardsService.importData(XRchartStandardsDataList);
+
+            return ResponseEntity.ok("Success");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("excel上传失败");
+        }
+    }
+
+    @RequestMapping(value = "/standardsP", method = RequestMethod.POST)
+    public ResponseEntity<?> importStandardsP(@RequestParam("file") MultipartFile excelFile){
+
+        System.out.println("------------standardsP-------standardsP------------");
+        try {
 
             /**
              * 导入P-chart图表数据
@@ -151,51 +185,14 @@ public class SPCController {
 
         Sheet sheet = workbook.getSheetAt(0);
 
-        //子组大小
-        arrayLength = getCellValueAsInt(sheet.getRow(3).getCell(12));
+        String table_name = getStringCellValue(sheet.getRow(0).getCell(0));
 
-        arraySize = getCellValueAsInt(sheet.getRow(5).getCell(12));
+        //子组大小
+        int arrayLength = getCellValueAsInt(sheet.getRow(3).getCell(12));
+
+        int arraySize = getCellValueAsInt(sheet.getRow(5).getCell(12));
 
         DecimalFormat df = new DecimalFormat("#.00");
-        //标准上限、中心限、下限
-        double Standards_usl = getNumericCellValue(sheet.getRow(3).getCell(10));
-        double Standards_cl = getNumericCellValue(sheet.getRow(4).getCell(10));
-        double Standards_lsl = getNumericCellValue(sheet.getRow(5).getCell(10));
-
-        String formatted_Standards_usl = df.format(Standards_usl);
-        String formatted_Standards_cl = df.format(Standards_cl);
-        String formatted_Standards_lsl = df.format(Standards_lsl);
-
-        double rounded_Standards_usl = Double.parseDouble(formatted_Standards_usl);
-        double rounded_Standards_cl = Double.parseDouble(formatted_Standards_cl);
-        double rounded_Standards_lsl = Double.parseDouble(formatted_Standards_lsl);
-
-        //X图上限、中心限、下限
-        double X_ucl = getNumericCellValue(sheet.getRow(3).getCell(16));
-        double X_cl = getNumericCellValue(sheet.getRow(4).getCell(16));
-        double X_lcl = getNumericCellValue(sheet.getRow(5).getCell(16));
-
-        String formattedX_ucl = df.format(X_ucl);
-        String formattedX_cl = df.format(X_cl);
-        String formattedX_lcl = df.format(X_lcl);
-
-        double roundedX_ucl = Double.parseDouble(formattedX_ucl);
-        double roundedX_cl = Double.parseDouble(formattedX_cl);
-        double roundedX_lcl = Double.parseDouble(formattedX_lcl);
-
-        //R图上限、中心限、下限
-        double R_ucl = getNumericCellValue(sheet.getRow(3).getCell(18));
-        double R_cl = getNumericCellValue(sheet.getRow(4).getCell(18));
-        double R_lcl = getNumericCellValue(sheet.getRow(5).getCell(18));
-
-        String formattedR_ucl = df.format(R_ucl);
-        String formattedR_cl = df.format(R_cl);
-        String formattedR_lcl = df.format(R_lcl);
-
-        double roundedR_ucl = Double.parseDouble(formattedR_ucl);
-        double roundedR_cl = Double.parseDouble(formattedR_cl);
-        double roundedR_lcl = Double.parseDouble(formattedR_lcl);
-
 
 
         double[][] date = new double[arrayLength][arraySize];
@@ -210,27 +207,17 @@ public class SPCController {
             n++;
         }
 
-        for (int i = 0; i < date.length; i++){
+        for (double[] doubles : date) {
             SpcXrchartEntity spcXrchartEntity = new SpcXrchartEntity();
 
             for (int j = 0; j < Math.min(arraySize, 31); j++) {
-                spcXrchartEntity.setData(j + 1, (float) date[i][j]);
+                spcXrchartEntity.setData(j + 1, (float) doubles[j]);
             }
 
-            spcXrchartEntity.setUpperLimitStandards((float) rounded_Standards_usl);
-            spcXrchartEntity.setCenterLimitStandards((float) rounded_Standards_cl);
-            spcXrchartEntity.setLowerLimitStandards((float) rounded_Standards_lsl);
-
-            spcXrchartEntity.setUpperLimitX((float) roundedX_ucl);
-            spcXrchartEntity.setCenterLimitX((float) roundedX_cl);
-            spcXrchartEntity.setLowerLimitX((float) roundedX_lcl);
-
-            spcXrchartEntity.setUpperLimitR((float) roundedR_ucl);
-            spcXrchartEntity.setCenterLimitR((float) roundedR_cl);
-            spcXrchartEntity.setLowerLimitR((float) roundedR_lcl);
 
             //存入日期
             spcXrchartEntity.setDatatime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            spcXrchartEntity.setAlternateFields1(table_name);
 
             dataList.add(spcXrchartEntity);
         }
@@ -250,11 +237,12 @@ public class SPCController {
         X-R图
         * */
         Sheet sheet = workbook.getSheetAt(0);
+        String table_name = getStringCellValue(sheet.getRow(0).getCell(0));
 
         //子组大小
-        standards_arrayLength = getCellValueAsInt(sheet.getRow(3).getCell(12));
+        int standards_arrayLength = getCellValueAsInt(sheet.getRow(3).getCell(12));
 
-        standards_arraySize = getCellValueAsInt(sheet.getRow(5).getCell(12));
+        int standards_arraySize = getCellValueAsInt(sheet.getRow(5).getCell(12));
 
         double[][] date = new double[standards_arrayLength][standards_arraySize];
         int n = 0;
@@ -268,15 +256,15 @@ public class SPCController {
             n++;
         }
 
-        for (int i = 0; i < date.length; i++){
+        for (double[] doubles : date) {
             SpcXrchartStandardsEntity spcXrchartStandardsEntity = new SpcXrchartStandardsEntity();
 
             for (int j = 0; j < Math.min(standards_arraySize, 31); j++) {
-                spcXrchartStandardsEntity.setData(j + 1, (float) date[i][j]);
+                spcXrchartStandardsEntity.setData(j + 1, (float) doubles[j]);
             }
             //存入日期
             spcXrchartStandardsEntity.setDatatime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-
+            spcXrchartStandardsEntity.setAlternateFields1(table_name);
             dataList.add(spcXrchartStandardsEntity);
         }
 
@@ -295,7 +283,10 @@ public class SPCController {
         P-chart图
         * */
 
-        Sheet sheet = workbook.getSheetAt(1);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        String table_name = getStringCellValue(sheet.getRow(0).getCell(0));
+        int arraySize = getCellValueAsInt(sheet.getRow(1).getCell(2));
 
         int[] sampling_Tests_Number = new int[arraySize];
         int[] defects_Number = new int[arraySize];
@@ -349,6 +340,9 @@ public class SPCController {
         sampling_SpcPchartEntity.setDataContent("抽检数");
         defects_SpcPchartEntity.setDataContent("不良数");
 
+        sampling_SpcPchartEntity.setAlternateFields1(table_name);
+        defects_SpcPchartEntity.setAlternateFields1(table_name);
+
         dataList.add(sampling_SpcPchartEntity);
         dataList.add(defects_SpcPchartEntity);
 
@@ -366,16 +360,16 @@ public class SPCController {
         P-chart图
         * */
 
-        Sheet sheet = workbook.getSheetAt(1);
+        Sheet sheet = workbook.getSheetAt(0);
+        String table_name = getStringCellValue(sheet.getRow(0).getCell(0));
 
+        int standards_arraySize = getCellValueAsInt(sheet.getRow(1).getCell(2));
         int[] sampling_Tests_Number = new int[standards_arraySize];
         int[] defects_Number = new int[standards_arraySize];
 
         Row row6 = sheet.getRow(5);   //抽检数一行
         Row row7 = sheet.getRow(6);   //不良数一行
 
-        System.out.println(standards_arrayLength);
-        System.out.println(standards_arraySize);
         for (int i = 1; i < 1 + standards_arraySize; i++){
             sampling_Tests_Number[i-1] = getCellValueAsInt(row6.getCell(i));
             defects_Number[i-1] = getCellValueAsInt(row7.getCell(i));
@@ -423,6 +417,9 @@ public class SPCController {
         sampling_SpcPchartStandardsEntity.setDataContent("抽检数");
         defects_SpcPchartStandardsEntity.setDataContent("不良数");
 
+        sampling_SpcPchartStandardsEntity.setAlternateFields1(table_name);
+        defects_SpcPchartStandardsEntity.setAlternateFields1(table_name);
+
         dataList.add(sampling_SpcPchartStandardsEntity);
         dataList.add(defects_SpcPchartStandardsEntity);
 
@@ -437,6 +434,7 @@ public class SPCController {
         Sheet sheet = workbook.getSheetAt(0);
         Iterator<Row> rowIterator = sheet.rowIterator();
 
+        String table_name = getStringCellValue(sheet.getRow(0).getCell(4));
         // Skip header row
         if (rowIterator.hasNext()) {
             rowIterator.next();
@@ -453,9 +451,41 @@ public class SPCController {
             spcPtdEntity.setAcceptanceRegion(getNumericCellValue(row.getCell(1)));
             spcPtdEntity.setFrequency(getCellValueAsInt(row.getCell(3)));
             spcPtdEntity.setDataImportTime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            spcPtdEntity.setSpare(table_name);
             dataList.add(spcPtdEntity);
         }
 
+        return dataList;
+    }
+
+    public List<SpcPtdPvalueEntity> parseExcel2PtdPvalue(MultipartFile file)throws IOException{
+        List<SpcPtdPvalueEntity> dataList = new ArrayList<>();
+
+        ZipSecureFile.setMinInflateRatio(0);
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+
+        //获取表名
+        Sheet sheet = workbook.getSheetAt(0);
+        String table_name = getStringCellValue(sheet.getRow(0).getCell(4));
+
+
+        Sheet sheet1 = workbook.getSheetAt(1);
+        Iterator<Row> rowIterator = sheet1.rowIterator();
+
+        while (rowIterator.hasNext()){
+            Row row = rowIterator.next();
+
+            if(getCellValueAsInt(row.getCell(1)) == 0 && getCellValueAsInt(row.getCell(2)) == 0 && getCellValueAsInt(row.getCell(3)) == 0){
+                continue;
+            }
+            SpcPtdPvalueEntity spcPtdPvalueEntity = new SpcPtdPvalueEntity();
+            spcPtdPvalueEntity.setBValue(getCellValueAsInt(row.getCell(1)));
+            spcPtdPvalueEntity.setCValue(getCellValueAsInt(row.getCell(2)));
+            spcPtdPvalueEntity.setDValue(getCellValueAsInt(row.getCell(3)));
+            spcPtdPvalueEntity.setDatatime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            spcPtdPvalueEntity.setTableName(table_name);
+            dataList.add(spcPtdPvalueEntity);
+        }
         return dataList;
     }
 
@@ -707,6 +737,26 @@ public class SPCController {
         }
         cell.setCellType(CellType.NUMERIC);
         return cell.getNumericCellValue();
+    }
+
+    // 将单元格内容转换为String类型值
+    private static String getStringCellValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        cell.setCellType(CellType.STRING);
+        return cell.getStringCellValue();
+    }
+
+    // 将单元格内容转换为Date类型值
+    private static Date getDateCellValue(String dateString) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        try {
+            return sdf.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static BigDecimal calculateUCL(BigDecimal p, int samplingTestsNumber) {

@@ -21,10 +21,15 @@ public interface SpcXrchartDao extends BaseMapper<SpcXrchartEntity> {
     // 删除指定月份的数据
     void deleteDataByMonth(@Param("datatime") Date datatime);
 
+    // 删除指定表名的数据
+    void deleteDataByTableName(@Param("tableName") String tableName);
+
     // 批量插入数据
     void batchInsertSpcXrcharts(@Param("list") List<SpcXrchartEntity> list);
 
     List<SpcXrchartEntity> getSpcXrchartEntityByMonth(@Param("datatime") Date datatime);
+
+    List<SpcXrchartEntity> getSpcXrchartEntityByTableName(@Param("tableName") String tableName);
 
     Double getConstantForXbarR_A2(@Param("subarray") int subarray_capacity);
 
@@ -49,4 +54,6 @@ public interface SpcXrchartDao extends BaseMapper<SpcXrchartEntity> {
     Double getConstantForIMR_D3(@Param("subarray") int subarray_capacity);
 
     Double getConstantForIMR_D4(@Param("subarray") int subarray_capacity);
+
+    List<String> getTableName();
 }

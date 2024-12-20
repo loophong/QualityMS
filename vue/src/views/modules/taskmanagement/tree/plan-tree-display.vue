@@ -72,16 +72,36 @@
                     v-model="taskInfo.taskContent" disabled maxlength="1000">
           </el-input>
         </el-form-item>
-        <el-form-item v-if="taskFiles && taskFiles.length > 0" label="审批附件">
-          <el-row v-for="file in taskFiles" :key="file.name" style="margin-bottom: 4px">
-            <el-col :span="12">
-              {{ file.name }}
-            </el-col>
-            <el-col :span="12">
-              <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>
-            </el-col>
-          </el-row>
-        </el-form-item>
+
+        <div v-if="approvalInfo !== null && approvalInfo !== ''">
+          <el-form-item v-if="approvalInfo !== '' && approvalInfo !== null" label="审批内容" prop="approvalContent">
+            <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }"
+                      v-model="approvalInfo.approvalContent" disabled maxlength="1000">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="审批附件">
+            <el-row v-for="file in taskFiles" :key="file.name" style="margin-bottom: 4px">
+              <el-col :span="12">
+                {{ file.name }}
+              </el-col>
+              <el-col :span="12">
+                <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>
+              </el-col>
+            </el-row>
+          </el-form-item>
+          <el-form-item v-if="approvalInfo !== '' && approvalInfo !== null" label="审批意见" prop="approvalComments">
+            <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }"
+                      v-model="approvalInfo.approvalComments" disabled maxlength="1000">
+            </el-input>
+          </el-form-item>
+          <el-form-item v-if="approvalInfo !== '' && approvalInfo !== null" label="审批备注" prop="remarks">
+            <el-input type="textarea"
+                      v-model="approvalInfo.remarks" disabled maxlength="1000">
+            </el-input>
+          </el-form-item>
+        </div>
+
+
       </el-form>
     </el-dialog>
 
@@ -185,8 +205,10 @@ export default {
     return {
       rootData: null,
       dataList: [], // 这里的数据会从服务器获取
+
       taskInfo: '',
       taskFiles: [],
+      approvalInfo: '',
 
       planInfo: '',
       planFiles: [],
@@ -501,8 +523,10 @@ export default {
         console.log("获取任务的全部信息 和 审核文件:", data);
         this.taskInfo = data.task
         this.taskFiles = data.fileList
+        this.approvalInfo = data.approval
         console.log("获取任务信息:", this.taskInfo);
-        console.log("获取任务审核文件:", this.taskFiles);
+        console.log("获取任务审批信息:", this.taskFiles);
+        console.log("获取任务审核文件:", this.approvalInfo);
         this.isTaskVisible = true;
       });
     },

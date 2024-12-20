@@ -274,6 +274,24 @@ public class IssueTableController {
     }
 
     /**
+     * 修改原问题状态
+     */
+    @PostMapping("/updateParentQuestion")
+    @RequiresPermissions("generator:issuetable:update")
+    public R updateParentQuestion(@RequestBody Map<String, Object> params) {
+        String issueNumber = (String) params.get("issuenumber");
+        if (issueNumber == null || issueNumber.isEmpty()) {
+            return R.error("问题编号不能为空");
+        }
+        boolean success = issueTableService.updateParentQuestion(issueNumber);
+        if (success) {
+            return R.ok().put("msg", "原问题状态更新成功");
+        } else {
+            return R.error("更新失败，请检查问题编号是否正确");
+        }
+    }
+
+    /**
      * 关闭相关任务
      */
     @RequestMapping("/closeRelatedTasks/{issueId}/{closeRelated}")
@@ -294,6 +312,18 @@ public class IssueTableController {
         String useID = issueTableService.newIssueNumber(); // 直接调用服务层方法
         System.out.println("获取的新编号为：" + useID);
         return R.ok().put("useID", useID);
+    }
+
+    /**
+     * 问题编号(未通过验证)
+     */
+    @RequestMapping("/connectNumber")
+    @RequiresPermissions("generator:issuetable:save")
+    public R connectNumber(@RequestBody Map<String, Object> request) {
+        Integer id = (Integer) request.get("id");
+        String useID = issueTableService.connectNumber(id); // 直接调用服务层方法
+        System.out.println("获取的新编号为：" + useID);
+        return R.ok().put("usedID", useID);
     }
 
     /**
@@ -441,6 +471,22 @@ public class IssueTableController {
 //        System.out.println("=====获取问题列表----结束");
         return list;
     }
+    /**
+     * 获取所有问题列表   知识库模块
+     */
+    @RequestMapping("/issuesAllExport")
+    @RequiresPermissions("generator:issuetable:list")
+    public List<IssueTableEntity> listAll01(@RequestParam Map<String, Object> params){
+//        System.out.println("=====获取问题列表----开始");
+        List<IssueTableEntity> list = issueTableService.listAll01(params);
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("code", 0);
+//        response.put("issueTable", issues);
+//        System.out.println(response);
+//        System.out.println("=====获取问题列表----结束");
+        return list;
+    }
+
 
     /**
      * 获取用户信息

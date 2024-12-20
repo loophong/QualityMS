@@ -7,8 +7,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import http from '@/utils/httpRequest'
-import { isURL } from '@/utils/validate'
-import { clearLoginInfo } from '@/utils'
+import {isURL} from '@/utils/validate'
+import {clearLoginInfo} from '@/utils'
 
 Vue.use(Router)
 
@@ -17,8 +17,8 @@ const _import = require('./import-' + process.env.NODE_ENV)
 
 // 全局路由(无需嵌套上左右整体布局)
 const globalRoutes = [
-  { path: '/404', component: _import('common/404'), name: '404', meta: { title: '404未找到' } },
-  { path: '/login', component: _import('common/login'), name: 'login', meta: { title: '登录' } }
+  {path: '/404', component: _import('common/404'), name: '404', meta: {title: '404未找到'}},
+  {path: '/login', component: _import('common/login'), name: 'login', meta: {title: '登录'}}
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
@@ -26,28 +26,38 @@ const mainRoutes = {
   path: '/',
   component: _import('main'),
   name: 'main',
-  redirect: { name: 'home' },
-  meta: { title: '主入口整体布局' },
+  redirect: {name: 'home'},
+  meta: {title: '主入口整体布局'},
   children: [
     // 通过meta对象设置路由展示方式
     // 1. isTab: 是否通过tab展示内容, true: 是, false: 否
     // 2. iframeUrl: 是否通过iframe嵌套展示内容, '以http[s]://开头': 是, '': 否
     // 提示: 如需要通过iframe嵌套展示内容, 但不通过tab打开, 请自行创建组件使用iframe处理!
-    { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
-    { path: '/theme', component: _import('common/theme'), name: 'theme', meta: { title: '主题' } },
-    { path: '/demo-echarts', component: _import('demo/echarts'), name: 'demo-echarts', meta: { title: 'demo-echarts', isTab: true } },
-    { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } },
+    {path: '/home', component: _import('common/home'), name: 'home', meta: {title: '首页'}},
+    {path: '/theme', component: _import('common/theme'), name: 'theme', meta: {title: '主题'}},
+    {
+      path: '/demo-echarts',
+      component: _import('demo/echarts'),
+      name: 'demo-echarts',
+      meta: {title: 'demo-echarts', isTab: true}
+    },
+    {
+      path: '/demo-ueditor',
+      component: _import('demo/ueditor'),
+      name: 'demo-ueditor',
+      meta: {title: 'demo-ueditor', isTab: true}
+    },
     {
       path: '/plan-add-page',
       component: _import('modules/taskmanagement/plan/plan-add-page'),
       name: 'plan-add-page',
-      meta: { title: '计划新建页', isDynamic: false, isTab: false }
+      meta: {title: '计划新建页', isDynamic: false, isTab: false}
     },
     {
-      path: '/plan-list',
+      path: '/plan-index',
       component: _import('modules/taskmanagement/plan/plan-index'),
-      name: 'plan-list',
-      meta: { title: '工作计划', isDynamic: true, isTab: true }
+      name: 'plan-index',
+      meta: {title: '工作计划', isDynamic: false, isTab: false}
     },
     // {
     //   path: 'publicmanagement/instrumenttestmethod',
@@ -69,38 +79,38 @@ const mainRoutes = {
     //   }
     // })
     {
-      path: '/my-tasks',
+      path: 'taskmanagement/task/my-tasks',
       component: _import('modules/taskmanagement/task/my-tasks'),
       name: 'task-list',
-      meta: { title: '我的任务', isDynamic: true, isTab: true },
+      meta: {title: '我的任务', isDynamic: true, isTab: true},
     },
     {
       path: '/task-update-page',
       component: _import('modules/taskmanagement/task/task-update-page'),
       name: 'task-update-page',
-      meta: { title: '任务修改页', isDynamic: true, isTab: false },
+      meta: {title: '任务修改页', isDynamic: true, isTab: false},
       props: true
     },
     {
       path: '/plan-tree',
       component: _import('modules/taskmanagement/tree/plan-tree-display'),
       name: 'plan-tree',
-      meta: { title: '计划结构图', isDynamic: false, isTab: false },
+      meta: {title: '计划结构图', isDynamic: false, isTab: false},
       props: true
     },
-
-    // this.$router.push({
-    //   path: '/taskmanagement/task/task-detail-page',
-    //   query: {
-    //     taskId: taskId
-    //   }
-    // })
 
     {
       path: '/plan-update-page/:plabId',
       component: _import('modules/taskmanagement/plan/plan-update-page'),
       name: 'plan-update-page',
-      meta: { title: '计划修改页', isDynamic: false, isTab: false },
+      meta: {title: '计划修改页', isDynamic: false, isTab: false},
+      props: true
+    },
+    {
+      path: '/plan-approval-page/:plabId',
+      component: _import('modules/taskmanagement/plan-approval/plan-approval-index'),
+      name: 'plan-approval-index',
+      meta: {title: '计划审批首页', isDynamic: false, isTab: false},
       props: true
     },
 
@@ -108,134 +118,172 @@ const mainRoutes = {
       path: '/plan-approval-page/:plabId',
       component: _import('modules/taskmanagement/plan-approval/plan-approval-page'),
       name: 'plan-approval-page',
-      meta: { title: '计划审批页', isDynamic: false, isTab: false },
+      meta: {title: '计划审批页', isDynamic: false, isTab: false},
       props: true
     },
+    {
+      path: '/plan-reject-reapproval-page/:plabId',
+      component: _import('modules/taskmanagement/plan/plan-reject-reapproval-page'),
+      name: 'plan-reject-reapproval-page',
+      meta: { title: '计划修改页', isDynamic: false, isTab: false },
+      props: true
+    },
+    {
+      path: '/plan-indicator-index/:data',
+      component: _import('modules/taskmanagement/plan/plan-indicator-index'),
+      name: 'plan-indicator-index',
+      meta: { title: '计划-指标关联页', isDynamic: false, isTab: false },
+      props: true
+    },
+    {
+      path: '/approval-index',
+      component: _import('modules/taskmanagement/approval/approval-index'),
+      name: 'task_approval-index',
+      meta: { title: '任务审批首页', isDynamic: false, isTab: false },
+      props: true
+    },
+
 
     //QC
     {
       path: '/qcPlanNew',
       component: _import('modules/QCmanagement/qcSubjectManagement/plan/qcPlanNew'),
       name: 'qcPlanNew',
-      meta: { title: '新建计划', isDynamic: true, isTab: false }
+      meta: {title: '新建计划', isDynamic: true, isTab: false}
     },
     {
       path: '/submitEx',
       component: _import('modules/QCmanagement/qcSubjectManagement/examine/submitEx'),
       name: 'qcExamineStatus',
-      meta: { title: '计划审核', isDynamic: true, isTab: false }
+      meta: {title: '计划审核', isDynamic: true, isTab: false}
     },
     {
       path: '/SubjectRegistration',
       component: _import('modules/QCmanagement/qcSubjectManagement/registration/qcSubjectRegistration'),
       name: 'qcSubjectRegistration',
-      meta: { title: '课题登记', isDynamic: true, isTab: false }
+      meta: {title: '课题登记', isDynamic: true, isTab: false}
     },
     {
       path: '/statistics',
       component: _import('modules/QCmanagement/qcChart/statistics'),
       name: 'statistics',
-      meta: { title: '点检统计', isDynamic: true, isTab: false }
+      meta: {title: '点检统计', isDynamic: true, isTab: false}
     },
     {
       path: '/qcTools',
       component: _import('modules/QCmanagement/qcTools/system'),
       name: 'qcTools',
-      meta: { title: 'QC工具-系统图', isDynamic: true, isTab: false }
+      meta: {title: 'QC工具-系统图', isDynamic: true, isTab: false}
     },
     {
       path: '/Scatter',
       component: _import('modules/QCmanagement/qcTools/Scatter'),
       name: 'Scatter',
-      meta: { title: 'QC工具-散点图', isDynamic: true, isTab: false }
+      meta: {title: 'QC工具-散点图', isDynamic: true, isTab: false}
     },
     {
       path: '/histogram',
       component: _import('modules/QCmanagement/qcTools/histogram'),
       name: 'histogram',
-      meta: { title: 'QC工具-直方图', isDynamic: true, isTab: false }
+      meta: {title: 'QC工具-直方图', isDynamic: true, isTab: false}
     },
     {
       path: '/control',
       component: _import('modules/QCmanagement/qcTools/control'),
       name: 'control',
-      meta: { title: 'QC工具-控制图', isDynamic: true, isTab: false }
+      meta: {title: 'QC工具-控制图', isDynamic: true, isTab: false}
     },
     {
       path: '/fishBone',
       component: _import('modules/QCmanagement/qcTools/fishBone'),
       name: 'fishBone',
-      meta: { title: 'QC工具-鱼骨图', isDynamic: true, isTab: false }
+      meta: {title: 'QC工具-鱼骨图', isDynamic: true, isTab: false}
     },
     {
       path: '/lineAndBar',
       component: _import('modules/QCmanagement/qcTools/lineAndBar'),
       name: 'lineAndBar',
-      meta: { title: 'QC工具-折线图', isDynamic: true, isTab: false }
+      meta: {title: 'QC工具-折线图', isDynamic: true, isTab: false}
     },
     {
       path: '/RelationGraph',
       component: _import('modules/QCmanagement/qcTools/RelationGraph'),
       name: 'RelationGraph',
-      meta: { title: 'QC工具-关联图', isDynamic: true, isTab: false }
+      meta: {title: 'QC工具-关联图', isDynamic: true, isTab: false}
     },
 
+
+
+    //仪器仪表
     {
-      path: '/issue-issuetable',
-      component: _import('modules/issueRectification/Rectificationissue'),
-      name: 'issue-issueRectification',
-      meta: { title: '任务详情', isDynamic: true, isTab: true }
+      path: '/instrument-testmethod',
+      component: _import('modules/publicmanagement/instrumenttestmethod'),
+      name: 'instrument-testmethod',
+      meta: {title: '关联检验方法', isDynamic: true, isTab: true}
     },
-
-  //仪器仪表
-  {
-    path: '/instrument-testmethod',
-    component: _import('modules/publicmanagement/instrumenttestmethod'),
-    name: 'instrument-testmethod',
-    meta: { title: '关联检验方法', isDynamic: true, isTab: true }
-  },
     //问题
+
+    // {
+    //   path: '/issue-issuetable',
+    //   component: _import('modules/issueRectification/Rectificationissue'),
+    //   name: 'issue-issueRectification',
+    //   meta: {title: '任务详情', isDynamic: true, isTab: true}
+    // },
+
+
     {
       path: '/issue-issuetable',
       component: _import('modules/issueRectification/Rectificationissue'),
       name: 'issue-issueRectification',
-      meta: { title: '任务详情', isDynamic: true, isTab: true }
+      meta: {title: '任务详情', isDynamic: true, isTab: true}
+    },
+    {
+      path: '/issue-issuetable',
+      component: _import('modules/issueexamine/issueExamine'),
+      name: 'issue-issueexamine',
+      meta: {title: '任务审核', isDynamic: true, isTab: true}
+    },
+    {
+      path: '/issue-issuemask',
+      component: _import('modules/issuemask/issuemasktable'),
+      name: 'issue-issuemasktable',
+      meta: {title: '任务执行', isDynamic: true, isTab: false}
     },
     {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/creatorissuemask'),
       name: 'issue-issuemask',
-      meta: { title: '任务详情', isDynamic: true, isTab: false }
+      meta: {title: '任务详情', isDynamic: true, isTab: false}
     },
     {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/creatormask'),
       name: 'issue-issuenewmask',
-      meta: { title: '任务详情', isDynamic: true, isTab: false }
+      meta: {title: '任务详情', isDynamic: true, isTab: false}
     },
     {
       path: '/issue-issuemask',
       component: _import('modules/issuemask/issueAllmask'),
       name: 'issue-issueAllmask',
-      meta: { title: '任务详情', isDynamic: true, isTab: false }
+      meta: {title: '任务详情', isDynamic: true, isTab: false}
     },
     {
       path: '/issue-issueflow',
       component: _import('modules/issuemask/issuemaskflow'),
       name: 'issue-issueflow',
-      meta: { title: '任务流程', isDynamic: true, isTab: false }
+      meta: {title: '任务流程', isDynamic: true, isTab: false}
     },
     {
       path: '/otherToIssue',
       component: _import('modules/issuefind/findissue'),
       name: 'otherToIssue',
-      meta: { title: '任务流程', isDynamic: true, isTab: true }
+      meta: {title: '问题操作', isDynamic: true, isTab: true}
     },
     {
       path: '/issue-issueView',
       component: _import('modules/issuetable/issueView'),
       name: 'issue-issueView',
-      meta: { title: '问题展示', isDynamic: true, isTab: false }
+      meta: {title: '问题展示', isDynamic: true, isTab: false}
     },
     //指标
     // 指标
@@ -243,13 +291,13 @@ const mainRoutes = {
       path: '/indicator-display-charts-indicatorchart/:indicatorName',
       component: _import('modules/indicator/display/charts/indicatorchart'),
       name: 'indicatorchart',
-      meta: { title: '指标详情', isTab: true }
+      meta: {title: '指标详情', isTab: true}
     },
     {
       path: '/indicator-keyControlIndicators-indicatorkeyindicators',
       component: _import('modules/indicator/keyControlIndicators/indicatorkeyindicators'),
       name: 'indicator-key-indicators',
-      meta: { title: '重点管控指标', isTab: true }
+      meta: {title: '重点管控指标', isTab: true}
     },
     {
       path: '/indicator-indicatorOverview',
@@ -268,7 +316,7 @@ const mainRoutes = {
       path: '/toNotice',
       component: _import('modules/notice/messagenotification'),
       name: 'toNotice',
-      meta: { title: '消息通知', isDynamic: true, isTab: false }
+      meta: {title: '消息通知', isDynamic: true, isTab: false}
     },
 
   ],
@@ -276,7 +324,7 @@ const mainRoutes = {
     let token = Vue.cookie.get('token')
     if (!token || !/\S/.test(token)) {
       clearLoginInfo()
-      next({ name: 'login' })
+      next({name: 'login'})
     }
     next()
   }
@@ -284,7 +332,7 @@ const mainRoutes = {
 
 const router = new Router({
   mode: 'hash',
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({y: 0}),
   isAddDynamicMenuRoutes: false, // 是否已经添加动态(菜单)路由
   routes: globalRoutes.concat(mainRoutes)
 })
@@ -300,13 +348,13 @@ router.beforeEach((to, from, next) => {
       url: http.adornUrl('/sys/menu/nav'),
       method: 'get',
       params: http.adornParams()
-    }).then(({ data }) => {
+    }).then(({data}) => {
       if (data && data.code === 0) {
         fnAddDynamicMenuRoutes(data.menuList)
         router.options.isAddDynamicMenuRoutes = true
         sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))
         sessionStorage.setItem('permissions', JSON.stringify(data.permissions || '[]'))
-        next({ ...to, replace: true })
+        next({...to, replace: true})
       } else {
         sessionStorage.setItem('menuList', '[]')
         sessionStorage.setItem('permissions', '[]')
@@ -314,7 +362,7 @@ router.beforeEach((to, from, next) => {
       }
     }).catch((e) => {
       console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-      router.push({ name: 'login' })
+      router.push({name: 'login'})
     })
   }
 })
@@ -367,7 +415,8 @@ function fnAddDynamicMenuRoutes(menuList = [], routes = []) {
       } else {
         try {
           route['component'] = _import(`modules/${menuList[i].url}`) || null
-        } catch (e) { }
+        } catch (e) {
+        }
       }
       routes.push(route)
     }
@@ -379,7 +428,7 @@ function fnAddDynamicMenuRoutes(menuList = [], routes = []) {
     mainRoutes.children = routes
     router.addRoutes([
       mainRoutes,
-      { path: '*', redirect: { name: '404' } }
+      {path: '*', redirect: {name: '404'}}
     ])
     sessionStorage.setItem('dynamicMenuRoutes', JSON.stringify(mainRoutes.children || '[]'))
     console.log('\n')

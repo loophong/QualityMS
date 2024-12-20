@@ -129,7 +129,7 @@
 
     <!-- 整改记录 Tab Pane -->
     <el-tab-pane label="整改记录" name="2">
-      <div class="mod-config">
+<!--      <div class="mod-config">-->
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
           <!--            <el-form-item>-->
           <!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
@@ -357,12 +357,12 @@
                        :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
                        layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
-      </div>
+<!--      </div>-->
     </el-tab-pane>
 
     <!-- 问题验证 Tab Pane -->
     <el-tab-pane label="问题验证" name="3">
-      <div class="mod-config">
+<!--      <div class="mod-config">-->
         <el-form v-if="showForm1" :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
           <!--            <el-form-item>-->
           <!--              <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>-->
@@ -626,7 +626,7 @@
                        :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
                        layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
-      </div>
+<!--      </div>-->
     </el-tab-pane>
 
   <div class="mod-config">
@@ -830,7 +830,7 @@ export default {
         if (userinfo === row.verifier) {
           // 如果一致，执行 addOrUpdateHandleR 方法
           if (row.level === '等待验证') {
-            this.addOrUpdateHandlev(row.issueId);
+            this.addOrUpdateHandlev(row.issueId, row.issueNumber);
           } else {
             //如果不一致，弹出提示
             this.$message.error('未到验证阶段');
@@ -842,10 +842,10 @@ export default {
       });
 
     },
-    addOrUpdateHandlev(id) {
+    addOrUpdateHandlev(id, isuueNumber) {
       this.addOrUpdateVisibleV = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdateV.init(id)
+        this.$refs.addOrUpdateV.init(id, isuueNumber)
         // this.$refs.addOrUpdateV.
       })
     },
@@ -903,7 +903,7 @@ export default {
             // 判断是否为整改责任人
             if (userinfo === rectificationResponsiblePerson) {
               // 如果一致，执行 addOrUpdateHandleR 方法
-              if (level === '等待验证指定') {
+              if (level === '等待验证指定' || level === '等待验证') {
                 this.addOrUpdateHandleVe(issueId);
               } else {
                 //如果不一致，弹出提示

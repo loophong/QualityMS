@@ -223,10 +223,6 @@ export default {
     renderChart1() {
       const chart = echarts.init(this.$refs.indicatorChart1);
       const option = {
-        title: {
-          text: "月度指标完成情况",
-          left: 'center',
-        },
         tooltip: {
           trigger: 'axis',
           axisPointer: {
@@ -236,6 +232,9 @@ export default {
         legend: {
           data: ['达标', '未达标'],
           top: '10%',
+          textStyle: {
+            color: 'white'
+          }
         },
         grid: {
           left: '3%',

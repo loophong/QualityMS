@@ -208,23 +208,28 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
     @Override
     public int saveDecompositionTasks(List<TaskEntity> tasks) {
         if (tasks != null && tasks.size() > 0) {
-
+            List<TaskEntity> newTaskList = new ArrayList<>();
             for (TaskEntity task : tasks) {
-                TaskEntity task1 = taskDao.selectById(task.getTmTid());
+                TaskEntity isExit = taskDao.selectById(task.getTmTid());
                 log.info("当前task为" + task.getTaskId());
-                log.info("当前task是否存在" + task1);
-                if (task1 != null) {
+                log.info("当前task是否存在" + isExit);
+                if (isExit != null) {
                     // 更新
                     taskDao.updateById(task);
+                    TaskEntity newTask = taskDao.selectById(task.getTmTid());
+                    newTaskList.add(newTask);
                 } else {
                     // 插入
-                    taskDao.insert(task);
+                    task.setTaskCurrentState(TaskStatus.NOT_STARTED);
+                    newTaskList.add(task);
                 }
+                log.info("父节点"+task.getTaskParentNode());
             }
 
-            // 根据taskId检查当前数据是否存在，如果存在则更新，不存在则插入
-
-
+            // 移除父节点下的全部子节点
+            taskDao.delete(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskParentNode, tasks.get(0).getTaskParentNode()));
+            //存入新的节点
+            this.saveBatch(newTaskList);
         }
         return 0;
     }

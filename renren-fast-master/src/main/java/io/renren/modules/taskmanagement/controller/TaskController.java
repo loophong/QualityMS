@@ -7,6 +7,7 @@ import java.util.*;
 
 import com.alibaba.excel.util.DateUtils;
 import com.aliyun.oss.common.utils.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.org.apache.bcel.internal.generic.NEW;
@@ -16,6 +17,7 @@ import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.taskmanagement.dto.TaskQueryParamDTO;
 import io.renren.modules.taskmanagement.dto.TaskSubmitApprovalDTO;
+import io.renren.modules.taskmanagement.dto.TaskUpdateDTO;
 import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.ApprovalFileService;
 import io.renren.modules.taskmanagement.service.ApprovalService;
@@ -196,12 +198,22 @@ public class TaskController {
      */
     @PostMapping("/decomposition")
 //    @RequiresPermissions("taskmanagement:task:list")
-    public R decompositionTask(@RequestBody TaskDetailDTO taskDetailDTO) {
-        log.info("当前分解的任务详情为：" + taskDetailDTO);
-        int i = taskService.saveDecompositionTasks(taskDetailDTO.getTasks());
+    public R decompositionTask(@RequestBody TaskUpdateDTO taskUpdateDto) {
+        log.info("当前分解的任务详情为：" + taskUpdateDto);
+        if(taskUpdateDto.getChildTask() == null || taskUpdateDto.getChildTask().size() == 0){
+            taskService.remove(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskParentNode, taskUpdateDto.getParentTask().getTaskId()));
+        }
+        taskService.saveDecompositionTasks(taskUpdateDto.getChildTask());
         return R.ok();
-
     }
+//    @PostMapping("/decomposition")
+////    @RequiresPermissions("taskmanagement:task:list")
+//    public R decompositionTask(@RequestBody TaskDetailDTO taskDetailDTO) {
+//        log.info("当前分解的任务详情为：" + taskDetailDTO);
+//        int i = taskService.saveDecompositionTasks(taskDetailDTO.getTasks());
+//        return R.ok();
+//
+//    }
 
 
     /**
@@ -497,13 +509,7 @@ public class TaskController {
 
 //    }
 
-    /**
-     * @description:
-     * @param: null
-     * @return:
-     * @author: hong
-     * @date: 2024/8/21 19:51
-     */
+
 
 
     /**

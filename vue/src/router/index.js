@@ -78,7 +78,7 @@ const mainRoutes = {
       path: 'taskmanagement/task/my-tasks',
       component: _import('modules/taskmanagement/task/my-tasks'),
       name: 'task-list',
-      meta: {title: '我的任务', isDynamic: true, isTab: true},
+      meta: {title: '我的任务', isDynamic: false, isTab: false},
     },
     {
       path: '/task-update-page',

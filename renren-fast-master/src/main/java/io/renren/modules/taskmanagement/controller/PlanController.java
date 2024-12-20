@@ -14,9 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
 import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
-import io.renren.modules.taskmanagement.service.ApprovalService;
-import io.renren.modules.taskmanagement.service.FileService;
-import io.renren.modules.taskmanagement.service.TaskService;
+import io.renren.modules.taskmanagement.service.*;
 import io.renren.modules.taskmanagement.vo.PlanExportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -26,7 +24,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import io.renren.modules.taskmanagement.service.PlanService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 
@@ -56,9 +53,10 @@ public class PlanController {
     private ApprovalService approvalService;
     @Autowired
     private ObjectMapper objectMapper;
-
+    @Autowired
+    private PlanApprovalTableService planApprovalTableService;
     @RequestMapping("/export")
-    public void export(HttpServletResponse response){
+    public void export(HttpServletResponse response) {
         List<PlanExportVO> planExportVO = planService.export();
         String fileName = "任务表" + System.currentTimeMillis() + ".xlsx";
         try {
@@ -70,13 +68,13 @@ public class PlanController {
     }
 
 
-    /** 
+    /**
      * @description: 计划入库
-     * @param: tmPid 
-     * @return: io.renren.common.utils.R 
+     * @param: tmPid
+     * @return: io.renren.common.utils.R
      * @author: hong
      * @date: 2024/12/19 15:10
-     */ 
+     */
     @RequestMapping("/addBase/{tmPid}")
     public R addBase(@PathVariable("tmPid") Long tmPid) {
         log.info("计划入库：" + tmPid);
@@ -86,13 +84,13 @@ public class PlanController {
         return R.ok();
     }
 
-    /** 
+    /**
      * @description: 分页查询
-     * @param: planQueryParamDTO 
-     * @return: io.renren.common.utils.R 
+     * @param: planQueryParamDTO
+     * @return: io.renren.common.utils.R
      * @author: hong
      * @date: 2024/12/16 16:58
-     */ 
+     */
     @PostMapping("/queryPageByParams")
     public R queryPageByParams(@RequestBody PlanQueryParamDTO planQueryParamDTO) {
         log.info("查询条件：" + planQueryParamDTO);
@@ -116,9 +114,9 @@ public class PlanController {
         PlanEntity plan = planService.query().eq("plan_id", planId).one();
         // 查询plan的文件
         List<FileEntity> files = fileService.list(new QueryWrapper<FileEntity>().eq("plan_id", planId));
-        if (files != null){
+        if (files != null) {
             return R.ok().put("plan", plan).put("files", files);
-        }else {
+        } else {
             return R.ok().put("plan", plan).put("files", null);
         }
     }
@@ -217,6 +215,7 @@ public class PlanController {
         PageUtils page = planService.queryPageFinishedPlan(planQueryParamDTO);
         return R.ok().put("page", page);
     }
+
     @RequestMapping("/finish")
     @RequiresPermissions("taskmanagement:plan:list")
     public R finishedList(@RequestParam Map<String, Object> params) {
@@ -284,13 +283,13 @@ public class PlanController {
         return R.ok();
     }
 
-    /** 
+    /**
      * @description: 保存计划，直系任务，文件，并且根据计划的审批人进行送审
-     * @param: planDTO 
-     * @return: io.renren.common.utils.R 
+     * @param: planDTO
+     * @return: io.renren.common.utils.R
      * @author: hong
      * @date: 2024/12/15 13:18
-     */ 
+     */
     @PostMapping("/saveAndApproval")
     @RequiresPermissions("taskmanagement:plan:save")
     public R saveAndApproval(@RequestBody PlanDTO planDTO) {
@@ -299,6 +298,13 @@ public class PlanController {
         return R.ok();
     }
 
+    /**
+     * @description: 重新提交审批
+     * @param: planDTO
+     * @return: io.renren.common.utils.R
+     * @author: hong
+     * @date: 2024/12/20 13:13
+     */
     @RequestMapping("/reApproval")
     @RequiresPermissions("taskmanagement:plan:update")
     public R reApproval(@RequestBody PlanDTO planDTO) {
@@ -343,7 +349,6 @@ public class PlanController {
     }
 
 
-
     /**
      * @description: 删除计划时删除其全部子任务
      * @author: hong
@@ -369,6 +374,7 @@ public class PlanController {
         // 删除所有的审批信息
         approvalService.remove(new LambdaQueryWrapper<ApprovalEntity>().eq(ApprovalEntity::getTaskAssociatedPlanId, planId));
 
+        planApprovalTableService.remove(new LambdaQueryWrapper<PlanApprovalTableEntity>().eq(PlanApprovalTableEntity::getPlanId, planId));
         return R.ok();
     }
 
@@ -403,7 +409,7 @@ public class PlanController {
 //    }
 
     /**
-     * @description: 查询计划的全部信息、直属任务、文件
+     * @description: 查询计划的全部信息、任务、文件
      * @param: planId
      * @return:
      * @author: hong
@@ -417,6 +423,30 @@ public class PlanController {
 
         PlanEntity plan = planService.getOne(new LambdaQueryWrapper<PlanEntity>().eq(PlanEntity::getPlanId, planId));
         List<TaskEntity> taskList = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, planId));
+        List<FileEntity> fileList = fileService.list(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
+
+        planDTO.setPlan(plan);
+        planDTO.setTasks(taskList);
+        planDTO.setFiles(fileList);
+
+        return planDTO;
+    }
+
+    /**
+     * @description: 查询计划的全部信息、直属任务、文件
+     * @param: planId
+     * @return:
+     * @author: hong
+     * @date: 2024/11/10 17:25
+     */
+    @GetMapping("/getPlanAndChildTask")
+    public PlanDTO getPlanAndChildTask(@RequestParam String planId) {
+        log.info("planId:{}", planId);
+
+        PlanDTO planDTO = new PlanDTO();
+
+        PlanEntity plan = planService.getOne(new LambdaQueryWrapper<PlanEntity>().eq(PlanEntity::getPlanId, planId));
+        List<TaskEntity> taskList = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskParentNode, planId));
         List<FileEntity> fileList = fileService.list(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
 
         planDTO.setPlan(plan);

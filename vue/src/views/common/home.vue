@@ -45,7 +45,7 @@
     <section class="mainbox">
       <div class="column">
         <div class="panel indicator1">
-          <h2>部门指标统计</h2>
+          <h2>月度指标完成情况</h2>
           <div id="indicatorChart1" ref="indicatorChart1" @click="toIndicatorOverview"></div>
           <div class="panel-footer"></div>
         </div>
@@ -120,6 +120,7 @@ export default {
       indicatorCounts: 0,
       departmentCountsList: [], //按部门查询返回list
       classificationCountList: [],  //按指标分级查询返回list
+      dataList1: [],  //月度指标完成情况
 
       //----------------任务模块-----------------
       taskData: {},
@@ -203,6 +204,15 @@ export default {
         console.log('classificationCountList:', this.classificationCountList);
         this.renderChart2();
       });
+
+      //月度指标完成情况
+      this.$http({
+        url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/chart1'),
+        method: 'get',
+      }).then(({data}) => {
+        this.dataList1 = data;
+        this.renderChart1();
+      })
     },
     //指标总览页面跳转
     toIndicatorOverview() {
@@ -211,6 +221,76 @@ export default {
       })
     },
     renderChart1() {
+      const chart = echarts.init(this.$refs.indicatorChart1);
+      const option = {
+        title: {
+          text: "月度指标完成情况",
+          left: 'center',
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        legend: {
+          data: ['达标', '未达标'],
+          top: '10%',
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: this.dataList1.map(item => item.yearMonth),
+          axisLabel: {
+            color: "rgba(255,255,255,.6)",
+            fontSize: 12,
+          },
+          axisLine: {
+            show: false,
+            lineStyle: {
+              color: "rgba(255,255,255,.1)",
+              width: 2,
+            },
+          },
+        },
+        yAxis: {
+          type: 'value',
+          axisLabel: {
+            color: "rgba(255,255,255,.6)",
+            fontSize: 12,
+          },
+          splitLine: {
+            show: false
+          }
+        },
+        series: [
+          {
+            name: '达标',
+            type: 'bar',
+            data: this.dataList1.map(item => item.finishedCounts),
+            itemStyle: {
+              normal: {
+                color: '#409EFF',
+              },
+            },
+          },
+          {
+            name: '未达标',
+            type: 'bar',
+            data: this.dataList1.map(item => item.unfinishedCounts),
+          }
+        ],
+      };
+
+      chart.setOption(option);
+
+    },
+    renderChart12() {
       // 销毁旧的实例，防止缓存导致问题
       if (this.chartInstance1) {
         this.chartInstance1.dispose();

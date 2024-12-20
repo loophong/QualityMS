@@ -109,9 +109,11 @@ export default {
         method: 'get',
       }).then(({data}) => {
         this.dataList1 = data;
+        console.log('dataList1:', this.dataList1);
         this.dataList3 = data.at(-1);
+        console.log('dataList3:', this.dataList3)
         this.renderChart1();
-        this.renderChart3();
+        // this.renderChart3();
       })
 
       //图2
@@ -239,7 +241,7 @@ export default {
       const chart = echarts.init(this.$refs.indicatorCharts1);
       const option = {
         title: {
-          text: "月度指标完成情况",
+          text: "当月指标完成情况",
           left: 'center',
         },
         tooltip: {
@@ -260,7 +262,8 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: this.dataList1.map(item => item.yearMonth),
+          // data: this.dataList1.map(item => item.yearMonth),
+          data: [this.dataList3.yearMonth],
         },
         yAxis: {
           type: 'value',
@@ -269,12 +272,14 @@ export default {
           {
             name: '达标',
             type: 'bar',
-            data: this.dataList1.map(item => item.finishedCounts),
+            // data: this.dataList1.map(item => item.finishedCounts),
+            data: [this.dataList3.finishedCounts],
           },
           {
             name: '未达标',
             type: 'bar',
-            data: this.dataList1.map(item => item.unfinishedCounts),
+            // data: this.dataList1.map(item => item.unfinishedCounts),
+            data: [this.dataList3.unfinishedCounts],
           }
         ],
       };

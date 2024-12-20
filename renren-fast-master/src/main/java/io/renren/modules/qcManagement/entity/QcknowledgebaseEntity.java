@@ -228,5 +228,5 @@ public class QcknowledgebaseEntity implements Serializable {
 	/**
 	 * 入库标识
 	 */
-	private String storageflag;
+	private String qcStorageFlag;
 }

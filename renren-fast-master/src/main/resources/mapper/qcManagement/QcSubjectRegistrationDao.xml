@@ -82,7 +82,7 @@
         <result property="qcFirstLevel" column="qc_first_level"/>
         <result property="qcSecondTotal" column="qc_second_total"/>
         <result property="qcSecondLevel" column="qc_second_level"/>
-        <result property="storageflag" column="qc_storage_flag"/>
+        <result property="qcStorageFlag" column="qc_storage_flag"/>
 
     </resultMap>
 <!--    <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity">-->

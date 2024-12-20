@@ -40,7 +40,8 @@ public class SpcPchartStandardsServiceImpl extends ServiceImpl<SpcPchartStandard
     @Override
     public void importData(List<SpcPchartStandardsEntity> datalist){
 
-        spcPchartStandardsDao.deleteDataByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+//        spcPchartStandardsDao.deleteDataByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        spcPchartStandardsDao.deleteDataByTableName(datalist.get(0).getAlternateFields1());
         spcPchartStandardsDao.batchInsertSpcPchartStandards(datalist);
     }
 

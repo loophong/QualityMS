@@ -209,11 +209,12 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/save")
     @RequiresPermissions("qcSubject:registration:save")
     public R save(@RequestBody QcSubjectRegistrationEntity qcSubjectRegistration){
-        Integer tmpId = qcSubjectRegistrationDao.maxOfId();
-        // 获取当前年份
         Date currentDate = new Date();
+        // 获取当前年份
         SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
         String currentYear = yearFormat.format(currentDate);
+        //获取当前年编号个数
+        Integer tmpId = qcSubjectRegistrationDao.maxOfId(currentYear);
         String topicNumber = "PJHLQCKT-"+currentYear +"-"+(tmpId+1);
         log.info("课题编号:"+topicNumber);
         qcSubjectRegistration.setTopicNumber(topicNumber);
@@ -254,7 +255,7 @@ public class QcSubjectRegistrationController {
         }
 
     /**
-     * QC知识库
+     * QC知识库列表
      */
 
     @RequestMapping("/finishedList")
@@ -263,12 +264,23 @@ public class QcSubjectRegistrationController {
         PageUtils page =  qcSubjectRegistrationService.queryPageFinishedList(params);
         return R.ok().put("page", page);
     }
+
     @RequestMapping("/finishedList01")
     @RequiresPermissions("qcSubject:registration:list")
     public List<QcknowledgebaseEntity>list1(@RequestParam Map<String, Object> params){
         List<QcknowledgebaseEntity> list = qcSubjectRegistrationService.queryFinishedList1(params);
          return list;
     }
+    /**
+     * QC知识库删除
+     */
+    @RequestMapping("/deletekb")
+    @RequiresPermissions("qcSubject:registration:delete")
+    public R deletekb(@RequestBody Long[] qcsrIds){
+        qcSubjectRegistrationService.updateStorageFlagToZero(qcsrIds);
+        return R.ok();
+    }
+
 }
 
 

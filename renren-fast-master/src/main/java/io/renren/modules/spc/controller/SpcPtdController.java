@@ -91,5 +91,9 @@ public class SpcPtdController {
         return R.ok().put("ptd-chart_Info", spcPtdService.getPTDChart());
     }
 
+    @RequestMapping("/chart/pValue")
+    public R getPTDPValue(){
+        return R.ok().put("ptd-p-value", spcPtdService.getPTDPValue());
+    }
 
 }

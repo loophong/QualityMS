@@ -48,22 +48,24 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
     @Override
     public void importData(List<SpcXrchartEntity> datalist){
 
-        spcXrchartDao.deleteDataByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        spcXrchartDao.deleteDataByTableName(datalist.get(0).getAlternateFields1());
         spcXrchartDao.batchInsertSpcXrcharts(datalist);
     }
 
 
     /**
+     * 修改1
      * Xbar-R图需要返回平均值、R值，以及各自上限、中心限、下限
-     *
      * */
     @Override
-    public List<List<Double>> getXbar_RChart(){
+    public List<List<Double>> getXbar_RChart(String tableName){
 
         List<List<Double>> result = new ArrayList<>();
 
-        List<SpcXrchartEntity> datalist = getData();
-        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
+        //获取控制用数据
+        List<SpcXrchartEntity> datalist = getDataByTableName(tableName);
+        //获取统计用数据
+        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsDataByTableName(tableName);
 
         List<Double> average = getAverage(datalist);
         List<Double> R = getR(datalist);
@@ -104,12 +106,19 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         return result;
     }
 
+    /**
+     * 修改2
+     * @return
+     */
     @Override
-    public List<List<Double>> getXbar_SChart(){
+    public List<List<Double>> getXbar_SChart(String tableName){
         List<List<Double>> result = new ArrayList<>();
 
-        List<SpcXrchartEntity> datalist = getData();
-        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
+        //12/18 替换原来的通过时间获取数据 getData()、getStandardsData() -->  通过名字获取数据 getDataByTableName()、getStandardsDataByTableName
+//        List<SpcXrchartEntity> datalist = getData();
+        List<SpcXrchartEntity> datalist = getDataByTableName(tableName);
+//        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
+        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsDataByTableName(tableName);
 
         //计算均值
         List<Double> average = getAverage(datalist);
@@ -157,12 +166,19 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
 
     }
 
+    /**
+     * 修改3
+     * @return
+     */
     @Override
-    public List<List<Double>> getMe_RChart(){
+    public List<List<Double>> getMe_RChart(String tableName){
         List<List<Double>> result = new ArrayList<>();
 
-        List<SpcXrchartEntity> datalist = getData();
-        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
+        //12/18 替换原来的通过时间获取数据 getData()、getStandardsData() -->  通过名字获取数据 getDataByTableName()、getStandardsDataByTableName
+//        List<SpcXrchartEntity> datalist = getData();
+//        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
+        List<SpcXrchartEntity> datalist = getDataByTableName(tableName);
+        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsDataByTableName(tableName);
 
         //计算中位数Me
         List<Double> Me = getMe(datalist);
@@ -204,12 +220,19 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         return result;
     }
 
+    /**
+     * 修改4
+     * @return
+     */
     @Override
-    public List<List<Double>> getI_MRChart(){
+    public List<List<Double>> getI_MRChart(String tableName){
         List<List<Double>> result = new ArrayList<>();
 
-        List<SpcXrchartEntity> datalist = getData();
-        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
+        //12/18 替换原来的通过时间获取数据 getData()、getStandardsData() -->  通过名字获取数据 getDataByTableName()、getStandardsDataByTableName
+//        List<SpcXrchartEntity> datalist = getData();
+//        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsData();
+        List<SpcXrchartEntity> datalist = getDataByTableName(tableName);
+        List<SpcXrchartStandardsEntity> datalist_standards = getStandardsDataByTableName(tableName);
 
         //计算单值I
         List<Double> I = getI(datalist);
@@ -252,14 +275,27 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         return result;
     }
 
+    @Override
+    public List<String> getTableName(){
+        return spcXrchartDao.getTableName();
+    }
     //策略步骤1：获取数据步骤
     public List<SpcXrchartEntity> getData(){
         return spcXrchartDao.getSpcXrchartEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
     }
 
+    public List<SpcXrchartEntity> getDataByTableName(String tableName){
+        return spcXrchartDao.getSpcXrchartEntityByTableName(tableName);
+    }
+
     //获取标准数据
     public List<SpcXrchartStandardsEntity> getStandardsData(){
         return spcXrchartStandardsDao.getSpcXrchartStandardsEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+
+    //获取标准数据
+    public List<SpcXrchartStandardsEntity> getStandardsDataByTableName(String tableName){
+        return spcXrchartStandardsDao.getSpcXrchartStandardsEntityByTableName(tableName);
     }
 
     //策略步骤2：根据需要生成的图表类型，使用不同方法计算
@@ -577,7 +613,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
                     BigDecimal range = BigDecimal.valueOf(Math.abs(values.get(i) - values.get(i - 1)));
                     sum = sum.add(range);
                 }
-                result.add(sum.divide(BigDecimal.valueOf(values.size()-1)).setScale(2, RoundingMode.HALF_UP).doubleValue());
+                result.add(sum.divide(BigDecimal.valueOf(values.size()-1),2,RoundingMode.HALF_UP).doubleValue());
             }
 
         }
@@ -605,7 +641,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
                     BigDecimal range = BigDecimal.valueOf(Math.abs(values.get(i) - values.get(i - 1)));
                     sum = sum.add(range);
                 }
-                result.add(sum.divide(BigDecimal.valueOf(values.size()-1)).setScale(2, RoundingMode.HALF_UP).doubleValue());
+                result.add(sum.divide(BigDecimal.valueOf(values.size()-1),2,RoundingMode.HALF_UP).doubleValue());
             }
 
         }
@@ -637,6 +673,7 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
         //读取常数
         Double constant_A2 = spcXrchartDao.getConstantForXbarR_A2(datalist.size());
 
+
         if (constant_A2 != null){
             BigDecimal constant_A2_bigDecimal = new BigDecimal(constant_A2);
 
@@ -649,9 +686,9 @@ public class SpcXrchartServiceImpl extends ServiceImpl<SpcXrchartDao, SpcXrchart
             result.add(cl.doubleValue());
             result.add(lcl.doubleValue());
         }else {
-            result.add(0.0);
             result.add(cl.doubleValue());
-            result.add(0.0);
+            result.add(cl.doubleValue());
+            result.add(cl.doubleValue());
         }
 
         return result;

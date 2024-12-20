@@ -88,23 +88,27 @@ public class SpcPchartController {
     }
 
     @RequestMapping("/chart/p")
-    public R getPChart(){
-        return R.ok().put("p-chart_Info", spcPchartService.getPChart());
+    public R getPChart(@RequestParam String tableName){
+        return R.ok().put("p-chart_Info", spcPchartService.getPChart(tableName));
     }
 
     @RequestMapping("/chart/np")
-    public R getNPChart(){
-        return R.ok().put("np-chart_Info", spcPchartService.getNPChart());
+    public R getNPChart(@RequestParam String tableName){
+        return R.ok().put("np-chart_Info", spcPchartService.getNPChart(tableName));
     }
 
     @RequestMapping("/chart/u")
-    public R getUChart(){
-        return R.ok().put("u-chart_Info", spcPchartService.getUChart());
+    public R getUChart(@RequestParam String tableName){
+        return R.ok().put("u-chart_Info", spcPchartService.getUChart(tableName));
     }
 
     @RequestMapping("/chart/c")
-    public R getCChart(){
-        return R.ok().put("c-chart_Info", spcPchartService.getCChart());
+    public R getCChart(@RequestParam String tableName){
+        return R.ok().put("c-chart_Info", spcPchartService.getCChart(tableName));
     }
 
+    @RequestMapping("/options")
+    public R getTableName(){
+        return R.ok().put("table_name",spcPchartService.getTableName());
+    }
 }

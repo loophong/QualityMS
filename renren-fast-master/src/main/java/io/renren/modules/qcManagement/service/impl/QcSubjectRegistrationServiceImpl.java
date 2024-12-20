@@ -19,6 +19,7 @@ import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.service.QcSubjectRegistrationService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,6 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
             List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,startDate,endDate);
             page.setRecords(result);
             page.setTotal(result.size());
-
             log.info("result" + page);
             return new PageUtils(page);
         } catch (Exception e) {
@@ -63,6 +63,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
             return new PageUtils(page);
         }
     }
+
     public List<QcknowledgebaseEntity> queryFinishedList1(Map<String, Object> params) {
     log.info("param" + params.get("page") + "------" + params.get("limit"));
 
@@ -82,7 +83,10 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
         return Collections.emptyList(); // 返回空列表
     }
 }
-
+    @Override
+    public void updateStorageFlagToZero(Long[] qcsrIds) {
+            qcSubjectRegistrationDao.updateStorageFlagToZero(Arrays.asList(qcsrIds));
+    }
 
 
     ;
@@ -141,8 +145,17 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                             case "keywords":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
                                 break;
-                            case "join":
-                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTeamNumberIds, value);
+                            case "topicLeader":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicLeader, value);
+                                break;
+                            case "topicConsultant":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicConsultant, value);
+                                break;
+                            case "topicReviewStatus":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicReviewStatus, value);
+                                break;
+                            case "topicDepartment":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
                                 break;
                         }
                     }
@@ -187,6 +200,18 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                             case "join":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTeamNumberIds, value);
                                 break;
+                            case "topicLeader":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicLeader, value);
+                                break;
+                            case "topicConsultant":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicConsultant, value);
+                                break;
+                            case "topicReviewStatus":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicReviewStatus, value);
+                                break;
+                            case "topicDepartment":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
+                                break;
                         }
                     }
                 }
@@ -230,6 +255,18 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                                 break;
                             case "keywords":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
+                                break;
+                            case "topicLeader":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicLeader, value);
+                                break;
+                            case "topicConsultant":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicConsultant, value);
+                                break;
+                            case "topicReviewStatus":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicReviewStatus, value);
+                                break;
+                            case "topicDepartment":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
                                 break;
                         }
                     }
@@ -277,6 +314,18 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                             case "keywords":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
                                 break;
+                            case "topicLeader":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicLeader, value);
+                                break;
+                            case "topicConsultant":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicConsultant, value);
+                                break;
+                            case "topicReviewStatus":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicReviewStatus, value);
+                                break;
+                            case "topicDepartment":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
+                                break;
                         }
                     }
                 }
@@ -323,6 +372,18 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                                 break;
                             case "keywords":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
+                                break;
+                            case "topicLeader":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicLeader, value);
+                                break;
+                            case "topicConsultant":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicConsultant, value);
+                                break;
+                            case "topicReviewStatus":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicReviewStatus, value);
+                                break;
+                            case "topicDepartment":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
                                 break;
                         }
                     }
@@ -375,6 +436,18 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                             case "keywords":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
                                 break;
+                            case "topicLeader":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicLeader, value);
+                                break;
+                            case "topicConsultant":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicConsultant, value);
+                                break;
+                            case "topicReviewStatus":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicReviewStatus, value);
+                                break;
+                            case "topicDepartment":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
+                                break;
                         }
                     }
                 }
@@ -418,6 +491,18 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                                 break;
                             case "keywords":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getKeywords, value);
+                                break;
+                            case "topicLeader":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicLeader, value);
+                                break;
+                            case "topicConsultant":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicConsultant, value);
+                                break;
+                            case "topicReviewStatus":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicReviewStatus, value);
+                                break;
+                            case "topicDepartment":
+                                queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
                                 break;
                         }
                     }

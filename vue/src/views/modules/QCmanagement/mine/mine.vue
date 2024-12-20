@@ -72,7 +72,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-              }}</span>
+                }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -82,24 +82,37 @@
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
 
-          <!-- <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
-                @click="newPlanHandle(scope.row.qcsrId)">关联计划</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
-                @click="addOrUpdateHandle(scope.row.qcsrId)">提交计划</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
-                @click="examineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
+              <div v-if="scope.row.topicReviewStatus == '3'">
+                <el-button type="text" size="small" v-if="(isAuth('qcPlan:step:list'))"
+                  @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
+                <el-button type="text" size="small" v-if="(isAuth('qcSubject:plan:submit'))"
+                  @click="handleSubmitPlan(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
+                <el-button type="text" size="small" v-if="(isAuth('qcManagement:examineStatus:list'))"
+                  @click="examineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
+              </div>
+              <div v-else>
+                <el-button type="text" size="small" @click="subjectEditHandle(scope.row.qcsrId)"
+                  :disabled="!groupLead">修改</el-button>
+                <!-- <el-button type="text" size="small" @click="deleteHandle(scope.row.qcsrId)"
+                  :disabled="!groupLead">删除</el-button> -->
+                <el-button type="text" size="small"
+                  :disabled="((scope.row.topicReviewStatus == 3) || (scope.row.topicReviewStatus == 2)) || !groupLead"
+                  @click="checkHandle(scope.row.qcsrId)">提交审核</el-button>
+              </div>
             </template>
-          </el-table-column> -->
+          </el-table-column>
         </el-table>
         <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle"
           :current-page="pageIndexSubject" :page-sizes="[10, 20, 50, 100]" :page-size="pageSizeSubject"
           :total="totalPageSubject" layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
         <!-- 弹窗, 新增 / 修改 -->
-        <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getSubjectList"></add-or-update>
+        <result-type v-if="resultTypeVisible" ref="resultType" @refreshDataList="getSubjectList"></result-type>
+        <subject-edit v-if="subjectEditVisible" ref="subjectEdit" @refreshDataList="getSubjectList"></subject-edit>
       </div>
+      <first-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getFirstList"></first-update>
     </el-tab-pane>
     <el-tab-pane label="我的小组" name="2">
       <div class="mod-config">
@@ -119,6 +132,19 @@
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名">
+          </el-table-column>
+          <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
+            <template slot-scope="scope">
+              <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
+              <el-tag
+                v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
+                type="danger">未通过(管理员)</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">未通过(科室)</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
+                }}</el-tag>
+              <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
+            </template>
           </el-table-column>
           <el-table-column prop="memberName" header-align="center" align="center" label="姓名">
           </el-table-column>
@@ -230,8 +256,8 @@
         <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
           <template slot-scope="scope">
             <span>{{
-              toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-            }}</span>
+              toStatus(scope.row.topicActivityStatus, scope.row.topicType) }}
+            </span>
           </template>
         </el-table-column>
         <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
@@ -250,7 +276,7 @@
         <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
-              @click="messagePlanHandle(scope.row.qcsrId)">关联计划</el-button>
+              @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
             <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
               messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
               ">审核状态</el-button>
@@ -354,6 +380,256 @@
         <first-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getFirstList"></first-update>
       </div>
     </el-tab-pane>
+    <el-tab-pane label="成果科室批准" name="6" v-if="isAuth('qcExamine:department:submit')">
+      <el-table :data="departmentExamineList" stripe border v-loading="messageListLoading" style="width: 100%"
+        row-key="id">
+        <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+        </el-table-column>
+        <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室" fixed>
+        </el-table-column>
+        <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
+        </el-table-column>
+        <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+        </el-table-column>
+        <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+        </el-table-column>
+        <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+        </el-table-column>
+        <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+        </el-table-column>
+        <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+        </el-table-column>
+        <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+        </el-table-column>
+        <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <template slot-scope="scope">
+            <span>{{
+              toStatus(scope.row.topicActivityStatus, scope.row.topicType) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+        </el-table-column>
+        <el-table-column prop="note" header-align="center" align="center" label="备注">
+        </el-table-column>
+        <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628">未通过</span>
+            <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray">未开始</span>
+            <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb">审核中</span>
+            <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146">已通过</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
+              @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
+            <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
+              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              ">审核状态</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
+    <el-tab-pane label="成果确认" name="7" v-if="isAuth('qcExamine:Achievement:recognition')">
+      <el-table :data="recognitionExamineList" stripe border v-loading="messageListLoading" style="width: 100%"
+        row-key="id">
+        <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+        </el-table-column>
+        <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
+        </el-table-column>
+        <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column> -->
+        <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+        </el-table-column>
+        <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+        </el-table-column>
+        <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+        </el-table-column>
+        <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+        </el-table-column>
+        <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+        </el-table-column>
+        <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <template slot-scope="scope">
+            <span>{{
+              toStatus(scope.row.topicActivityStatus, scope.row.topicType) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+        </el-table-column>
+        <el-table-column prop="note" header-align="center" align="center" label="备注">
+        </el-table-column>
+        <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628">未通过</span>
+            <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray">未开始</span>
+            <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb">审核中</span>
+            <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146">已通过</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
+              @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
+            <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
+              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              ">审核状态</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
+    <el-tab-pane label="初评课题" name="8" v-if="isAuth('qcExamine:first:comment')">
+      <el-table :data="firstExamineList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
+        <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+        </el-table-column>
+        <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
+        </el-table-column>
+        <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column> -->
+        <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+        </el-table-column>
+        <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+        </el-table-column>
+        <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+        </el-table-column>
+        <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+        </el-table-column>
+        <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+        </el-table-column>
+        <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <template slot-scope="scope">
+            <span>{{
+              toStatus(scope.row.topicActivityStatus, scope.row.topicType) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+        </el-table-column>
+        <el-table-column prop="note" header-align="center" align="center" label="备注">
+        </el-table-column>
+        <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628">未通过</span>
+            <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray">未开始</span>
+            <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb">审核中</span>
+            <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146">已通过</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
+              @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
+            <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
+              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              ">审核状态</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
+    <el-tab-pane label="经济效果确认" name="9" v-if="isAuth('qcExamine:finance:department')">
+      <el-table :data="financialExamineList" stripe border v-loading="messageListLoading" style="width: 100%"
+        row-key="id">
+        <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+        </el-table-column>
+        <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
+        </el-table-column>
+        <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column> -->
+        <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+        </el-table-column>
+        <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+        </el-table-column>
+        <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+        </el-table-column>
+        <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+        </el-table-column>
+        <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+        </el-table-column>
+        <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <template slot-scope="scope">
+            <span>{{
+              toStatus(scope.row.topicActivityStatus, scope.row.topicType) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+        </el-table-column>
+        <el-table-column prop="note" header-align="center" align="center" label="备注">
+        </el-table-column>
+        <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628">未通过</span>
+            <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray">未开始</span>
+            <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb">审核中</span>
+            <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146">已通过</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
+              @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
+            <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
+              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              ">审核状态</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
+    <el-tab-pane label="成果复评" name="10" v-if="isAuth('qcExamine:second:comment')">
+      <el-table :data="secondExamineList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
+        <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
+        </el-table-column>
+        <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
+        </el-table-column>
+        <!-- <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+          </el-table-column> -->
+        <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+        </el-table-column>
+        <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+        </el-table-column>
+        <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+        </el-table-column>
+        <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+        </el-table-column>
+        <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+        </el-table-column>
+        <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <template slot-scope="scope">
+            <span>{{
+              toStatus(scope.row.topicActivityStatus, scope.row.topicType) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
+        </el-table-column>
+        <el-table-column prop="note" header-align="center" align="center" label="备注">
+        </el-table-column>
+        <!-- <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.topicReviewStatus === 0" style="color: #f43628">未通过</span>
+            <span v-else-if="scope.row.topicReviewStatus === 1" style="color: gray">未开始</span>
+            <span v-else-if="scope.row.topicReviewStatus === 2" style="color: #3f9ccb">审核中</span>
+            <span v-else-if="scope.row.topicReviewStatus === 3" style="color: #8dc146">已通过</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
+              @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
+            <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
+              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              ">审核状态</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
     <el-dialog title="消息详情" :visible.sync="dialogMessageVisible">
       <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
@@ -376,7 +652,7 @@
           <template slot-scope="scope">
             <span>{{
               toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-            }}</span>
+              }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
@@ -395,7 +671,7 @@
         <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
-              @click="messagePlanHandle(scope.row.qcsrId)">关联计划</el-button>
+              @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
             <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
               messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
               ">审核状态</el-button>
@@ -408,8 +684,10 @@
 
 <script>
 // import AddOrUpdate from './qcSubjectRegistration-add-or-update'
-import AddOrUpdate from "../qcSubjectManagement/plan/qcPlan-add-or-update";
+import resultType from "../qcSubjectManagement/plan/qcPlan-add-or-update";
 import firstUpdate from "../qcSubjectManagement/examine/examine-add-or-update";
+import subjectEdit from "../qcSubjectManagement/registration/qcSubjectRegistration-add-or-update";
+import { group } from "d3";
 export default {
   name: "mine",
   data() {
@@ -431,11 +709,19 @@ export default {
       pageSizeSubject: 10,
       totalPage: 0,
       totalPageGroup: 0,
+      groupLead: false, //是否是组长
       totalPageSubject: 0,
       dataListLoading: false,
       dataListSelections: [],
+      resultTypeVisible: false,
+      subjectEditVisible: false,
       addOrUpdateVisible: false,
       groupMemberList: [],
+      departmentExamineList: [], // 部门审核列表
+      recognitionExamineList: [],
+      firstExamineList: [], // 初评列表
+      secondExamineList: [], // 复评列表
+      financialExamineList: [], // 财务审核列表
       firstList: [],
       myQueryParamSubject: {
         topicName: '',
@@ -448,8 +734,9 @@ export default {
     };
   },
   components: {
-    AddOrUpdate,
+    resultType,
     firstUpdate,
+    subjectEdit,
   },
   computed: {
     filteredDataList() {
@@ -465,13 +752,7 @@ export default {
     this.getSubjectList();
     this.getFirstList();
     this.handleTip();
-    // this.getGroupList().then(groupList => {
-    //   this.groupMemberList = groupList;
-    // });
-    // console.log('+++++++++++++++++++++++++++++++')
-    // console.log(this.isAuth('qcExamine:interested:technology'))
-    // console.log('+++++++++++++++++++++++++++++++')
-    // 获取分组后的员工数据
+    this.ifGroupLead();
     await this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
@@ -490,8 +771,21 @@ export default {
       });
       // console.log(this.membersOptions)
     });
+
   },
   methods: {
+    async ifGroupLead() {
+      this.$http({
+        url: this.$http.adornUrl('/qcSubject/registration/ifGroupLead'),
+        method: 'get',
+        params: this.$http.adornParams({
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.groupLead = data.ifLead
+        }
+      });
+    },
     numberToNameArray(numbers) {
       if (Array.isArray(numbers)) {
         let result = numbers.map(number => this.numberToName(number));
@@ -513,17 +807,27 @@ export default {
     },
 
     checkIfAdmit(department, examineStatus, examineDepartment) {
-      console.log(examineStatus + '/////' + examineDepartment);
-
+      // console.log(examineStatus + '/////' + examineDepartment);
       if (examineStatus == '2' && examineDepartment != '1') {
         if ((department == '生产科' && this.isAuth('department:product:leader'))) {
-          console.log('返回 true - 生产科领导');
           return true;
         } else if ((department == '质量科' && this.isAuth('department:quality:leader'))) {
-          console.log('返回 true - 质量科领导');
+          return true;
+        } else if ((department == '党群办公室' && this.isAuth('department:party:leader'))) {
+          return true;
+        } else if ((department == '供应科' && this.isAuth('department:supply:leader'))) {
+          return true;
+        } else if ((department == '市场科' && this.isAuth('department:market:leader'))) {
+          return true;
+        } else if ((department == '财务科' && this.isAuth('department:financial:leader'))) {
+          return true;
+        } else if ((department == '技术科' && this.isAuth('department:tech:leader'))) {
+          return true;
+        } else if ((department == '安环设备科' && this.isAuth('department:safety:leader'))) {
+          return true;
+        } else if ((department == '企业管理科' && this.isAuth('department:enterprise:leader'))) {
           return true;
         } else {
-          console.log('返回 false - 非部门领导');
           return false;
         }
       } else if (examineStatus == '2' && examineDepartment == '1') {
@@ -659,6 +963,9 @@ export default {
                 roleInTopic: "组长",
                 team: item.team,
                 department: item.department,
+                examineStatus: item.examineStatus,
+                examineDepartment: item.examineDepartment,
+                examineGroup: item.examineGroup,
                 registrationNum: item.registrationNum,
                 children: [],
               };
@@ -689,6 +996,39 @@ export default {
 
         this.dataListLoading = false;
       });
+    },
+    handleSubmitPlan(id, status, type) {
+      console.log(id)
+      console.log(status)
+      console.log(type)
+      if (type == '创新型') {
+        if (status != '8') {
+          this.$message({
+            message: '请先完成课题计划',
+            type: 'warning',
+            duration: 1500
+          })
+        } else {
+          this.resultTypeVisible = true
+          this.$nextTick(() => {
+            this.$refs.resultType.init(id)
+          })
+        }
+      } else {
+        if (status != '10') {
+          this.$message({
+            message: '请先完成课题计划',
+            type: 'warning',
+            duration: 1500
+          })
+        } else {
+          console.log('创')
+          this.resultTypeVisible = true
+          this.$nextTick(() => {
+            this.$refs.resultType.init(id)
+          })
+        }
+      }
     },
     // 获取顾问数据列表
     async getConsultantList() {
@@ -743,7 +1083,7 @@ export default {
           });
           console.log(resultList);
           // 分组
-          this.consultantList = []; // 清空 
+          this.consultantList = []; // 清空
           const map = {};
           resultList.forEach((item) => {
             if (item.parentId === null) {
@@ -788,6 +1128,16 @@ export default {
         this.dataListLoading = false;
       });
     },
+    // 课题新增 / 修改
+    subjectEditHandle(id) {
+      this.subjectEditVisible = true
+      this.$nextTick(() => {
+        this.$refs.subjectEdit.membersOptions = this.membersOptions;
+        this.$refs.subjectEdit.groupMemberList = this.groupMemberList
+        this.$refs.subjectEdit.updateOptions()
+        this.$refs.subjectEdit.init(id)
+      })
+    },
     //消息提示
     async handleTip() {
       let registerList = [];
@@ -821,15 +1171,64 @@ export default {
         }
       });
       let tipList = [];
+      let tipDepartmentList = [];
+      let tipRecognitionList = [];
+      let tipFirstList = [];
+      let tipSecondList = [];
+      let tipFinancialList = [];
       let tipSubjectList = [];
+
       examineList.forEach((item) => {
         if (item.qcExamineCurrent !== "完成") {
           if (item.qcExamineCurrent == "0" && this.isAuth("qcExamine:department:submit")) {
-            tipList.push(item);
-            this.showNotification("科室审核");
+            registerList.forEach((row) => {
+              if (row.qcsrId == item.qcExamineSubject) {
+                if (row.topicDepartment == '质量科' && this.isAuth('department:quality:leader')) {
+                  tipList.push(item);
+                  tipDepartmentList.push(item);
+                  this.showNotification("科室审核");
+                } else if (row.topicDepartment == '生产科' && this.isAuth('department:product:leader')) {
+                  tipList.push(item);
+                  tipDepartmentList.push(item);
+                  this.showNotification("科室审核");
+                } else if (row.topicDepartment == '财务科' && this.isAuth('department:financial:leader')) {
+                  tipList.push(item);
+                  tipDepartmentList.push(item);
+                  this.showNotification("科室审核");
+                } else if (row.topicDepartment == '市场科' && this.isAuth('department:market:leader')) {
+                  tipList.push(item);
+                  tipDepartmentList.push(item);
+                  this.showNotification("科室审核");
+                } else if (row.topicDepartment == '供应科' && this.isAuth('department:supply:leader')) {
+                  tipList.push(item);
+                  tipDepartmentList.push(item);
+                  this.showNotification("科室审核");
+                } else if (row.topicDepartment == '技术科' && this.isAuth('department:tech:leader')) {
+                  tipList.push(item);
+                  tipDepartmentList.push(item);
+                  this.showNotification("科室审核");
+                } else if (row.topicDepartment == '安环设备科' && this.isAuth('department:safety:leader')) {
+                  tipList.push(item);
+                  tipDepartmentList.push(item);
+                  this.showNotification("科室审核");
+                } else if (row.topicDepartment == '企业管理科' && this.isAuth('department:enterprise:leader')) {
+                  tipList.push(item);
+                  tipDepartmentList.push(item);
+                  this.showNotification("科室审核");
+                } else if (row.topicDepartment == '党群办公室' && this.isAuth('department:party:leader')) {
+                  tipList.push(item);
+                  tipDepartmentList.push(item);
+                  this.showNotification("科室审核");
+                }
+              }
+            });
+            // tipList.push(item);
+            // tipDepartmentList.push(item);
+            // this.showNotification("科室审核");
           }
           else if (item.qcExamineCurrent == "1" && this.isAuth("qcExamine:Achievement:recognition")) {
             tipList.push(item);
+            tipRecognitionList.push(item);
             this.showNotification("成果认定");
           } else if (item.qcExamineCurrent == "2") {
             registerList.forEach((row) => {
@@ -851,19 +1250,23 @@ export default {
                   this.showNotification("相关方审核");
                 } else if (row.resultType.includes("其他") && this.isAuth("qcExamine:first:comment")) {
                   tipList.push(item);
+                  tipFirstList.push(item);
                   this.showNotification("成果初评");
                 }
               }
             });
           } else if (item.qcExamineCurrent == "3" && this.isAuth("qcExamine:first:comment")) {
             tipList.push(item);
+            tipFirstList.push(item);
             this.showNotification("成果初评");
           } else if ((item.qcExamineCurrent == "4" || item.qcExamineCurrent == "4.2") && this.isAuth("qcExamine:second:comment")) {
             tipList.push(item);
-            console.log(item);
+            // console.log(item);
+            tipSecondList.push(item);
             this.showNotification("成果复评");
           } else if ((item.qcExamineCurrent == "4" || item.qcExamineCurrent == "4.1") && this.isAuth("qcExamine:second:comment")) {
             tipList.push(item);
+            tipFinancialList.push(item);
             this.showNotification("财务部审核");
           } else if (item.qcExamineCurrent == "5" && this.isAuth("qcExamine:final:submit")) {
             tipList.push(item);
@@ -878,6 +1281,55 @@ export default {
           }
         });
       });
+      console.log(tipDepartmentList)
+      if (tipDepartmentList.length) {
+        tipDepartmentList.forEach((t) => {
+          registerList.forEach((r) => {
+            if (t.qcExamineSubject == r.qcsrId) {
+              this.departmentExamineList.push(r);
+            }
+          });
+        });
+      }
+      if (tipRecognitionList.length) {
+        tipRecognitionList.forEach((t) => {
+          registerList.forEach((r) => {
+            if (t.qcExamineSubject == r.qcsrId) {
+              this.recognitionExamineList.push(r);
+            }
+          });
+        });
+      }
+      if (tipFirstList.length) {
+        tipFirstList.forEach((t) => {
+          registerList.forEach((r) => {
+            if (t.qcExamineSubject == r.qcsrId) {
+              this.firstExamineList.push(r);
+            }
+          });
+        });
+      }
+      if (tipSecondList.length) {
+        tipSecondList.forEach((t) => {
+          registerList.forEach((r) => {
+            if (t.qcExamineSubject == r.qcsrId) {
+              this.secondExamineList.push(r);
+            }
+          });
+        });
+      }
+
+      if (tipFinancialList.length) {
+        tipFinancialList.forEach((t) => {
+          registerList.forEach((r) => {
+            if (t.qcExamineSubject == r.qcsrId) {
+              this.financialExamineList.push(r);
+            }
+          });
+        });
+      }
+
+      console.log(this.departmentExamineList)
       this.superScriptNumber = tipList.length;
       this.messageList = tipSubjectList;
       console.log("++++++++++");
@@ -1164,22 +1616,29 @@ export default {
       });
     },
     //消息创建计划跳转
-    messagePlanHandle(id) {
-      this.dialogMessageVisible = false;
+    messagePlanHandle(id, row) {
+      let qcsrId = id;
+      // console.log("qcsrId======xht=======>"+qcsrId);
       let filteredArray = [];
       // 遍历原始数组
-      for (let i = 0; i < this.messageList.length; i++) {
-        if (this.messageList[i].qcsrId === id) {
-          // 如果满足条件，将对象添加到新数组中
-          filteredArray.push(this.messageList[i]);
-        }
-      }
-      this.$router.push({
-        name: "qcPlanNew",
-        query: {
-          data: JSON.stringify(filteredArray),
-        },
-      });
+      // console.log(row)
+      let tmpList = [];
+      // for (let i = 0; i < tmpList.length; i++) {
+      //   if (this.dataList[i].qcsrId === id) {
+      //     // 如果满足条件，将对象添加到新数组中
+      //     filteredArray.push(this.dataList[i]);
+      //     // console.log('1')
+      //   }
+      // }
+      // console.log(filteredArray)
+      this.$router.push(
+        {
+          name: 'qcPlanNew',
+          query: {
+            data: JSON.stringify(row),
+            qcsrId: qcsrId,
+          }
+        });
     },
     //计划审批跳转
     examineStatus(id, resultType) {

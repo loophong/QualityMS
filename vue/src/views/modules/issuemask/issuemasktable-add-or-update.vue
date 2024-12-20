@@ -617,10 +617,11 @@
                     url: this.$http.adornUrl(`/notice/save`),
                     method: 'post',
                     data: this.$http.adornData({
-                      'receiverId': receiverId, // 审核人ID
-                      'senderId': creatorId, // 发起人ID
-                      'content': `有新的任务需要审核`, // 消息内容
-                      'type': '任务审核' // 消息类型
+                      'receiverId': this.dataForm.reviewers, // 审核人ID
+                      'senderId': this.dataForm.creator, // 发起人ID
+                      'content': `任务内容：`+ subtask.name, // 消息内容
+                      'type': '任务审核通知', // 消息类型
+                      'jumpdepart': '2' // 跳转部门
                     })
                   });
                 } else {
@@ -782,6 +783,18 @@
                     this.$emit('refreshDataList')
                   }
                 })
+                // 发送消息通知给审核人
+                this.$http({
+                  url: this.$http.adornUrl(`/notice/save`),
+                  method: 'post',
+                  data: this.$http.adornData({
+                    'receiverId': this.dataForm.reviewers, // 审核人ID
+                    'senderId': this.dataForm.creator, // 发起人ID
+                    'content': '任务内容：'+ this.dataForm.maskcontent, // 消息内容
+                    'type': '任务审核通知', // 消息类型
+                    'jumpdepart': '2' // 跳转部门
+                  })
+                });
               } else {
                 this.$message.error(data.msg)
               }

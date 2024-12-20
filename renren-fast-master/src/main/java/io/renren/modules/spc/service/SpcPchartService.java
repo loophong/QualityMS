@@ -20,12 +20,14 @@ public interface SpcPchartService extends IService<SpcPchartEntity> {
 
     void importData(List<SpcPchartEntity> datalist);
 
-    List<List<Double>> getPChart();
+    List<List<Double>> getPChart(String tableName);
 
-    List<List<Double>> getNPChart();
+    List<List<Double>> getNPChart(String tableName);
 
-    List<List<Double>> getUChart();
+    List<List<Double>> getUChart(String tableName);
 
-    List<List<Double>> getCChart();
+    List<List<Double>> getCChart(String tableName);
+
+    List<String> getTableName();
 }
 

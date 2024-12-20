@@ -7,6 +7,7 @@ import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -50,21 +51,35 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
     Integer countSubmitted();
 
     //查询编号最大值
-    @Select({
-            "SELECT MAX(qcsr_id)",
-            "FROM qc_subject_registration",
-    })
-    Integer maxOfId();
+
+    @Select("SELECT COUNT(*) " +
+         "FROM qc_subject_registration " +
+         "WHERE topic_number LIKE CONCAT('PJHLQCKT-', #{currentYear}, '-%')")
+    Integer maxOfId(@Param("currentYear") String currentYear);
+
 
     //查询课题名称是否重复
-
     boolean ifExistSubjectName(String name);
 
     //查询当前用户是否是组长
     boolean ifGroupLead(String userName);
 
 
-    //计算课题活动状态
+//修改入库标识
+ @Update({
+         "<script>",
+         "UPDATE qc_subject_registration s",
+         "LEFT JOIN qc_examine_status e ON s.qcsr_id = e.qc_examine_subject",
+         "SET e.qc_storage_flag = 0",
+         "WHERE s.qcsr_id IN",
+         "<foreach item='id' index='index' collection='list' open='(' separator=',' close=')'>",
+         "#{id}",
+         "</foreach>",
+         "</script>"
+ })
+ void updateStorageFlagToZero(List<Long> qcsrIds);
+}
+ //计算课题活动状态
 //    @Select({
 //            "SELECT *",
 //            "FROM qc_subject_registration",
@@ -73,4 +88,4 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
 //    })
 //    List<QcSubjectRegistrationEntity>  getActivity(String charId,String type);
 
-}
+

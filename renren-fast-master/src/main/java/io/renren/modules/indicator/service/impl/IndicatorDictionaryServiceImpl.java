@@ -1,5 +1,6 @@
 package io.renren.modules.indicator.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.modules.indicator.entity.IndicatorResponseByClassificationEntity;
 import io.renren.modules.indicator.entity.IndicatorResponseByDepartmentEntity;
@@ -72,15 +73,38 @@ public class IndicatorDictionaryServiceImpl extends ServiceImpl<IndicatorDiction
                 e.printStackTrace();
             }
         }
+        // 获取数据库中所有记录
+        List<IndicatorDictionaryEntity> allResults = this.list(queryWrapper);
+        //获取前33条记录，正常排序
+        List<IndicatorDictionaryEntity> topResults = allResults.stream()
+                .limit(33)
+                .collect(Collectors.toList());
+        //获取后面的记录，按时间降序排列
+        List<IndicatorDictionaryEntity> remainingResults = allResults.stream()
+                .skip(33)
+                .sorted(Comparator.comparing(IndicatorDictionaryEntity::getIndicatorCreatTime).reversed())
+                .collect(Collectors.toList());
+        List<IndicatorDictionaryEntity> combinedList = new ArrayList<>();
+        //合并两个列表
+        combinedList.addAll(remainingResults);
+        combinedList.addAll(topResults);
 
-//        queryWrapper.orderByDesc("`indicator_creat_time`");
+        // 获取分页参数
+        int page = Integer.parseInt((String) params.getOrDefault("page", "1"));
+        int limit = Integer.parseInt((String) params.getOrDefault("limit", "10"));
 
-        IPage<IndicatorDictionaryEntity> page = this.page(
-                new Query<IndicatorDictionaryEntity>().getPage(params),
-                queryWrapper
-        );
+        // 计算分页结果
+        int offset = (page - 1) * limit;
+        int toIndex = Math.min(offset + limit, combinedList.size());
 
-        return new PageUtils(page);
+        List<IndicatorDictionaryEntity> pageList = combinedList.subList(offset, toIndex);
+
+        // 构建分页结果
+        IPage<IndicatorDictionaryEntity> pageResult = new Page<>(page, limit);
+        pageResult.setRecords(pageList);
+        pageResult.setTotal(combinedList.size());
+
+        return new PageUtils(pageResult);
     }
 
     @Override

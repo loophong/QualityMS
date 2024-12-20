@@ -80,4 +80,29 @@
         FROM task_management_plan
     </select>
 
+    <select id="exportKnowledgeBase" resultType="io.renren.modules.taskmanagement.vo.PlanExportVO">
+        SELECT plan_id                       as planId,
+               plan_name                     as name,
+               plan_content                  as content,
+               plan_start_date               as startDate,
+               plan_schedule_completion_date as scheduleCompletionDate,
+               plan_schedule_days            as scheduleDays,
+               plan_actual_completion_date   as actualCompletionDate,
+               plan_actual_days              as actualDays,
+               plan_schedule                 as schedule,
+               plan_principal                as principal,
+               plan_executor                 as executor,
+               plan_auditor                  as auditor,
+               plan_current_state            as currentState,
+               plan_is_completed             as isCompleted,
+               plan_is_overdue               as isOverdue,
+               plan_is_on_time               as isOnTime,
+               plan_early_completion_days    as earlyCompletionDays,
+               plan_lag_days                 as lagDays,
+               plan_lag_reasons              as lagReasons,
+               plan_associated_Indicators_id as associatedIndicatorsId
+        FROM task_management_plan
+        where add_base = 1
+    </select>
+
 </mapper>

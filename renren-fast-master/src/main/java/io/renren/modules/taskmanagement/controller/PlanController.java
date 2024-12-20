@@ -69,6 +69,23 @@ public class PlanController {
 
     }
 
+
+    /** 
+     * @description: 计划入库
+     * @param: tmPid 
+     * @return: io.renren.common.utils.R 
+     * @author: hong
+     * @date: 2024/12/19 15:10
+     */ 
+    @RequestMapping("/addBase/{tmPid}")
+    public R addBase(@PathVariable("tmPid") Long tmPid) {
+        log.info("计划入库：" + tmPid);
+        PlanEntity plan = planService.getById(tmPid);
+        plan.setAddBase(1);
+        planService.updateById(plan);
+        return R.ok();
+    }
+
     /** 
      * @description: 分页查询
      * @param: planQueryParamDTO 

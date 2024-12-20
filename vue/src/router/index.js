@@ -54,10 +54,10 @@ const mainRoutes = {
       meta: {title: '计划新建页', isDynamic: false, isTab: false}
     },
     {
-      path: '/plan-list',
+      path: '/plan-index',
       component: _import('modules/taskmanagement/plan/plan-index'),
-      name: 'plan-list',
-      meta: {title: '工作计划', isDynamic: true, isTab: true}
+      name: 'plan-index',
+      meta: {title: '工作计划', isDynamic: false, isTab: false}
     },
     // {
     //   path: 'publicmanagement/instrumenttestmethod',
@@ -79,7 +79,7 @@ const mainRoutes = {
     //   }
     // })
     {
-      path: '/my-tasks',
+      path: 'taskmanagement/task/my-tasks',
       component: _import('modules/taskmanagement/task/my-tasks'),
       name: 'task-list',
       meta: {title: '我的任务', isDynamic: true, isTab: true},
@@ -106,6 +106,13 @@ const mainRoutes = {
       meta: {title: '计划修改页', isDynamic: false, isTab: false},
       props: true
     },
+    {
+      path: '/plan-approval-page/:plabId',
+      component: _import('modules/taskmanagement/plan-approval/plan-approval-index'),
+      name: 'plan-approval-index',
+      meta: {title: '计划审批首页', isDynamic: false, isTab: false},
+      props: true
+    },
 
     {
       path: '/plan-approval-page/:plabId',
@@ -126,6 +133,13 @@ const mainRoutes = {
       component: _import('modules/taskmanagement/plan/plan-indicator-index'),
       name: 'plan-indicator-index',
       meta: { title: '计划-指标关联页', isDynamic: false, isTab: false },
+      props: true
+    },
+    {
+      path: '/approval-index',
+      component: _import('modules/taskmanagement/approval/approval-index'),
+      name: 'task_approval-index',
+      meta: { title: '任务审批首页', isDynamic: false, isTab: false },
       props: true
     },
 
@@ -198,12 +212,7 @@ const mainRoutes = {
       meta: {title: 'QC工具-关联图', isDynamic: true, isTab: false}
     },
 
-    {
-      path: '/issue-issuetable',
-      component: _import('modules/issueRectification/Rectificationissue'),
-      name: 'issue-issueRectification',
-      meta: {title: '任务详情', isDynamic: true, isTab: true}
-    },
+
 
     //仪器仪表
     {
@@ -213,11 +222,32 @@ const mainRoutes = {
       meta: {title: '关联检验方法', isDynamic: true, isTab: true}
     },
     //问题
+
+    // {
+    //   path: '/issue-issuetable',
+    //   component: _import('modules/issueRectification/Rectificationissue'),
+    //   name: 'issue-issueRectification',
+    //   meta: {title: '任务详情', isDynamic: true, isTab: true}
+    // },
+
+
     {
       path: '/issue-issuetable',
       component: _import('modules/issueRectification/Rectificationissue'),
       name: 'issue-issueRectification',
       meta: {title: '任务详情', isDynamic: true, isTab: true}
+    },
+    {
+      path: '/issue-issuetable',
+      component: _import('modules/issueexamine/issueExamine'),
+      name: 'issue-issueexamine',
+      meta: {title: '任务审核', isDynamic: true, isTab: true}
+    },
+    {
+      path: '/issue-issuemask',
+      component: _import('modules/issuemask/issuemasktable'),
+      name: 'issue-issuemasktable',
+      meta: {title: '任务执行', isDynamic: true, isTab: false}
     },
     {
       path: '/issue-issuemask',
@@ -247,7 +277,7 @@ const mainRoutes = {
       path: '/otherToIssue',
       component: _import('modules/issuefind/findissue'),
       name: 'otherToIssue',
-      meta: {title: '任务流程', isDynamic: true, isTab: true}
+      meta: {title: '问题操作', isDynamic: true, isTab: true}
     },
     {
       path: '/issue-issueView',
@@ -268,6 +298,12 @@ const mainRoutes = {
       component: _import('modules/indicator/keyControlIndicators/indicatorkeyindicators'),
       name: 'indicator-key-indicators',
       meta: {title: '重点管控指标', isTab: true}
+    },
+    {
+      path: '/indicator-indicatorOverview',
+      component: _import('modules/indicator/indicatorOverview'),
+      name: 'indicator-indicatorOverview',
+      meta: { title: '指标总览', isTab: true }
     },
     // {
     //   path: '/indicator-display-charts-indicatorchart/:indicatorName',

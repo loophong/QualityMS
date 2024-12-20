@@ -34,17 +34,17 @@ public class TaskScheduledTasks {
     @Scheduled(cron = "0,30 * * * * *")
     public void taskScheduledTasks() {
         log.info("定时任务执行了");
-//        checkPlanIsCanStart();
+        checkPlanIsCanStart();
         checkTaskIsCanStart();
 
-//        checkPlanIsOverdue();
-//        checkTaskIsOverdue();
+        checkPlanIsOverdue();
+        checkTaskIsOverdue();
 
-//        checkTaskIsCompleted();
-//        checkPlanIsCompleted();
+        checkTaskIsCompleted();
+        checkPlanIsCompleted();
 
-//        trackPlanProgress();
-//        trackTaskProgress();
+        trackPlanProgress();
+        trackTaskProgress();
     }
 
     /**

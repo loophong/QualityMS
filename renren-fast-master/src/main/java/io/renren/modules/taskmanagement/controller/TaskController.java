@@ -116,7 +116,7 @@ public class TaskController {
 
 
     /**
-     * @description: 小屏问题，任务进度，与任务关联的指标中，显示指标的已完成和未完成数
+     * @description: 小屏，任务进度，与任务关联的指标中，显示指标的已完成和未完成数
      * @return: io.renren.common.utils.R
      * @author: hong
      * @date: 2024/11/28 14:49
@@ -287,7 +287,7 @@ public class TaskController {
         // 发送消息
         messageService.sendMessages(new CreateNoticeParams(
                 ShiroUtils.getUserId(),
-                new Long[]{Long.parseLong(task.getTaskAuditor())},
+                new Long[]{Long.parseLong(taskSubmitApprovalDTO.getApprovalor())},
                 "您有一个任务需要审批，请及时审批！",
                 "任务审批通知",
                 "task_approval_page"));

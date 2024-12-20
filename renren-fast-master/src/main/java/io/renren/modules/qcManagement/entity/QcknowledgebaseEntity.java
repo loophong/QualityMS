@@ -68,11 +68,13 @@ public class QcknowledgebaseEntity implements Serializable {
 	 */
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date startDate;
+//	private String startDate;
 	/**
 	 * 结束日期
 	 */
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date endDate;
+//	private String endDate;
 	/**
 	 * 课题审核状态
 	 */

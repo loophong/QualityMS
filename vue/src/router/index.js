@@ -251,6 +251,12 @@ const mainRoutes = {
       name: 'indicator-key-indicators',
       meta: { title: '重点管控指标', isTab: true }
     },
+    {
+      path: '/indicator-indicatorOverview',
+      component: _import('modules/indicator/indicatorOverview'),
+      name: 'indicator-indicatorOverview',
+      meta: { title: '指标总览', isTab: true }
+    },
     // {
     //   path: '/indicator-display-charts-indicatorchart/:indicatorName',
     //   component: _import('modules/indicator/display/charts/indicatorchart'),

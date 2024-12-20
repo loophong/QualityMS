@@ -10,6 +10,34 @@
             <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
           </el-form-item>
           <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParam.topicLeader" placeholder="组长" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParam.topicConsultant" placeholder="顾问"
+              clearable></el-input>
+          </el-form-item>
+          <!-- <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParam.topicReviewStatus" placeholder="审核状态" clearable>
+              <el-option label="未开始" value="1"></el-option>
+              <el-option label="审核中" value="2"></el-option>
+              <el-option label="未通过" value="0"></el-option>
+              <el-option label="已通过" value="3"></el-option>
+            </el-select>
+          </el-form-item> -->
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParam.topicDepartment" placeholder="科室" clearable>
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
             <el-button @click="getDataList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:plan:submit')" type="primary"
           @click="newPlanHandle(dataListSelections[0].qcsrId)"
@@ -32,8 +60,11 @@
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" width="160" fixed>
           </el-table-column>
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室" sortable>
+          </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
+
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
             <template slot-scope="scope">
               {{ numberToName(scope.row.topicLeader) }}
@@ -110,6 +141,35 @@
             <el-input v-model="myQueryParamLead.keywords" placeholder="课题关键字" clearable></el-input>
           </el-form-item>
           <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParamLead.topicLeader" placeholder="组长"
+              clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParamLead.topicConsultant" placeholder="顾问"
+              clearable></el-input>
+          </el-form-item>
+          <!-- <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParamLead.topicReviewStatus" placeholder="审核状态" clearable>
+              <el-option label="未开始" value="1"></el-option>
+              <el-option label="审核中" value="2"></el-option>
+              <el-option label="未通过" value="0"></el-option>
+              <el-option label="已通过" value="3"></el-option>
+            </el-select>
+          </el-form-item> -->
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParamLead.topicDepartment" placeholder="科室" clearable>
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
@@ -128,6 +188,8 @@
           <el-table-column prop="qcsrId" header-align="center" align="center" label="课题ID" fixed sortable width="100">
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" width="160" fixed>
+          </el-table-column>
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室" sortable>
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
@@ -209,6 +271,35 @@
             <el-input v-model="myQueryParamJoin.keywords" placeholder="课题关键字" clearable></el-input>
           </el-form-item>
           <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParamJoin.topicLeader" placeholder="组长"
+              clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParamJoin.topicConsultant" placeholder="顾问"
+              clearable></el-input>
+          </el-form-item>
+          <!-- <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParamJoin.topicReviewStatus" placeholder="审核状态" clearable>
+              <el-option label="未开始" value="1"></el-option>
+              <el-option label="审核中" value="2"></el-option>
+              <el-option label="未通过" value="0"></el-option>
+              <el-option label="已通过" value="3"></el-option>
+            </el-select>
+          </el-form-item> -->
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParamJoin.topicDepartment" placeholder="科室" clearable>
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
             <el-button @click="getJoinList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
@@ -225,6 +316,8 @@
           <el-table-column prop="qcsrId" header-align="center" align="center" label="课题ID" fixed sortable width="100">
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" width="160" fixed>
+          </el-table-column>
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室" sortable>
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
@@ -343,14 +436,29 @@ export default {
       myQueryParam: {
         topicName: '',
         keywords: '',
+        topicLeader: '',
+        topicConsultant: '',
+        topicConsultant: '',
+        topicReviewStatus: '',
+        topicDepartment: '',
       },
       myQueryParamLead: {
         topicName: '',
         keywords: '',
+        topicLeader: '',
+        topicConsultant: '',
+        topicConsultant: '',
+        topicReviewStatus: '',
+        topicDepartment: '',
       },
       myQueryParamJoin: {
         topicName: '',
         keywords: '',
+        topicLeader: '',
+        topicConsultant: '',
+        topicConsultant: '',
+        topicReviewStatus: '',
+        topicDepartment: '',
       }
     }
   },
@@ -402,12 +510,26 @@ export default {
         return numbers
       }
     },
+    //用户名转昵称
     numberToName(number) {
       var result = ''
       this.membersOptions.forEach(o => {
         o.options.map(e => {
           if (e.name == number) {
             result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      return result
+    },
+    //昵称转用户名
+    nameToNumber(name) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.number == name) {
+            result = e.name
+            console.log(e.name)
           }
         })
       });
@@ -480,6 +602,14 @@ export default {
     },
     // 获取我参与课题数据列表
     async getJoinList() {
+      let trueLeader = this.myQueryParamJoin.topicLeader
+      let trueConsultant = this.myQueryParamJoin.consultant
+      if (this.nameToNumber(this.myQueryParamJoin.topicLeader)) {
+        this.myQueryParamJoin.topicLeader = this.nameToNumber(this.myQueryParamJoinJoin.topicLeader);
+      }
+      if (this.nameToNumber(this.myQueryParamJoin.consultant)) {
+        this.myQueryParamJoin.consultant = this.nameToNumber(this.myQueryParamJoin.consultant);
+      }
       this.dataListLoading = true;
       await this.$http({
         url: this.$http.adornUrl("/qcSubject/registration/myListFilter"),
@@ -496,6 +626,8 @@ export default {
             item.teamNumberIds = JSON.parse(item.teamNumberIds)
           });
           this.subjectJoinList = tmp;
+          this.myQueryParamJoin.topicLeader = trueLeader
+          this.myQueryParamJoin.consultant = trueConsultant
           // this.dataList = resultList
           this.totalPageJoin = data.page.totalCount;
         } else {
@@ -508,6 +640,14 @@ export default {
     },
     // 获取我创办课题数据列表
     async getLeadList() {
+      let trueLeader = this.myQueryParamLead.topicLeader
+      let trueConsultant = this.myQueryParamLead.consultant
+      if (this.nameToNumber(this.myQueryParamLead.topicLeader)) {
+        this.myQueryParamLead.topicLeader = this.nameToNumber(this.myQueryParamJoinJoin.topicLeader);
+      }
+      if (this.nameToNumber(this.myQueryParamLead.consultant)) {
+        this.myQueryParamLead.consultant = this.nameToNumber(this.myQueryParamLead.consultant);
+      }
       this.dataListLoading = true;
       await this.$http({
         url: this.$http.adornUrl("/qcSubject/registration/leadListFilter"),
@@ -525,6 +665,8 @@ export default {
             item.teamNumberIds = JSON.parse(item.teamNumberIds)
           });
           this.subjectLeadList = tmp;
+          this.myQueryParamLead.topicLeader = trueLeader
+          this.myQueryParamLead.consultant = trueConsultant
           // this.dataList = resultList
           this.totalPageLead = data.page.totalCount;
         } else {
@@ -624,6 +766,14 @@ export default {
     },
     // 获取数据列表
     getDataList() {
+      let trueLeader = this.myQueryParam.topicLeader
+      let trueConsultant = this.myQueryParam.consultant
+      if (this.nameToNumber(this.myQueryParam.topicLeader)) {
+        this.myQueryParam.topicLeader = this.nameToNumber(this.myQueryParamJoinJoin.topicLeader);
+      }
+      if (this.nameToNumber(this.myQueryParam.consultant)) {
+        this.myQueryParam.consultant = this.nameToNumber(this.myQueryParam.consultant);
+      }
       this.dataListLoading = true
       this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/listFilter'),
@@ -640,6 +790,8 @@ export default {
             item.teamNumberIds = JSON.parse(item.teamNumberIds)
           });
           this.dataList = tmp
+          this.myQueryParam.topicLeader = trueLeader
+          this.myQueryParam.consultant = trueConsultant
           this.totalPage = data.page.totalCount
         } else {
           this.dataList = []

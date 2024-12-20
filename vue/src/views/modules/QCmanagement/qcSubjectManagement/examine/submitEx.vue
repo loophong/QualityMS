@@ -12,20 +12,20 @@
       <el-form :model="form1" :rules="rule">
         <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
           <el-select v-model="form1.result" placeholder=""
-            :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B'">
+            :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B' || !ifDepartment">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form1.comment" autocomplete="off"
-            :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B'"></el-input>
+            :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B' || !ifDepartment"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog1 = false">取 消</el-button>
         <el-button type="primary" @click="dataFormSubmitEx(form1.id)"
-          :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B'">确 定</el-button>
+          :disabled="!isAuth('qcExamine:department:submit') || rootNode.status != 'B' || !ifDepartment">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog title="成果认定" :visible.sync="showDialog2">
@@ -352,6 +352,7 @@ export default {
   data() {
     return {
       ifSelected: false,
+      ifDepartment: false,
       tableData: [20, 40, 20, 20],
       tableDataCount: '',
       finalData: [20, 40, 20, 20],
@@ -511,6 +512,7 @@ export default {
         this.routerParam = this.$route.query.data ? JSON.parse(this.$route.query.data) : { qcsrId: '', topicName: '', topicType: '', resultType: '', examineId: '' };
         console.log(this.routerParam)
         this.ifSelected = this.ifSelectedPart()
+        this.ifDepartment = this.ifDepartmentEnsure()
       } catch (e) {
         console.log('处理跳转参数失败')
         console.log(e)
@@ -541,6 +543,30 @@ export default {
           console.log('获取评论表失败')
         }
       })
+    },
+    //是否是对应科室
+    ifDepartmentEnsure() {
+      if ((this.routerParam[0].topicDepartment == '质量科' && this.isAuth('department:quality:leader'))) {
+        return true
+      } else if ((this.routerParam[0].topicDepartment == '生产科' && this.isAuth('department:product:leader'))) {
+        return true
+      } else if ((this.routerParam[0].topicDepartment == '财务科' && this.isAuth('department:financial:leader'))) {
+        return true
+      } else if ((this.routerParam[0].topicDepartment == '市场科' && this.isAuth('department:market:leader'))) {
+        return true
+      } else if ((this.routerParam[0].topicDepartment == '供应科' && this.isAuth('department:supply:leader'))) {
+        return true
+      } else if ((this.routerParam[0].topicDepartment == '技术科' && this.isAuth('department:tech:leader'))) {
+        return true
+      } else if ((this.routerParam[0].topicDepartment == '安环设备科' && this.isAuth('department:safety:leader'))) {
+        return true
+      } else if ((this.routerParam[0].topicDepartment == '企业管理科' && this.isAuth('department:enterprise:leader'))) {
+        return true
+      } else if ((this.routerParam[0].topicDepartment == '党群办公室' && this.isAuth('department:party:leader'))) {
+        return true
+      } else {
+        return false
+      }
     },
     //是否是选择的相关方
     ifSelectedPart() {

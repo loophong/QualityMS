@@ -143,6 +143,10 @@ export default {
         deleteFlag: '',
         note: ''
       },
+      resultSubmit: {
+        leader: '',
+        consultant: '',
+      },
       dataList: [],
       //小组名称选择
       groupNameOptions: [],
@@ -216,9 +220,11 @@ export default {
         if (matchedItem) {
           console.log(matchedItem)
           //更新组长
-          this.dataForm.topicLeader = matchedItem.name
+          this.resultSubmit.leader = matchedItem.name
+          this.dataForm.topicLeader = this.numberToName(matchedItem.name)
           // 更新顾问
-          this.dataForm.topicConsultant = matchedItem.position
+          this.resultSubmit.consultant = matchedItem.position
+          this.dataForm.topicConsultant = this.numberToName(matchedItem.position)
           // this.consultantOptions = matchedItem.children.filter(member => member.roleInTopic === '顾问').map(member => ({
           //   value: member.name,
           //   label: member.name
@@ -265,8 +271,19 @@ export default {
       });
       return result
     },
+    nameToNumber(name) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.number == name) {
+            result = e.name
+            console.log(e.name)
+          }
+        })
+      });
+      return result
+    },
     init(id) {
-
       this.dataForm.qcsrId = id || 0
       this.visible = true
       this.$nextTick(() => {
@@ -280,8 +297,10 @@ export default {
             if (data && data.code === 0) {
               this.dataForm.topicName = data.qcSubjectRegistration.topicName
               this.dataForm.topicNumber = data.qcSubjectRegistration.topicNumber
-              this.dataForm.topicLeader = data.qcSubjectRegistration.topicLeader
-              this.dataForm.topicConsultant = data.qcSubjectRegistration.topicConsultant
+              this.dataForm.topicLeader = this.numberToName(data.qcSubjectRegistration.topicLeader)
+              this.resultSubmit.leader = data.qcSubjectRegistration.topicLeader
+              this.dataForm.topicConsultant = this.numberToName(data.qcSubjectRegistration.topicConsultant)
+              this.resultSubmit.consultant = data.qcSubjectRegistration.topicConsultant
               this.dataForm.teamNumberIds = JSON.parse(data.qcSubjectRegistration.teamNumberIds)
               this.dataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus
               this.dataForm.topicDescription = data.qcSubjectRegistration.topicDescription
@@ -484,8 +503,8 @@ export default {
                       'qcsrId': this.dataForm.qcsrId || undefined,
                       'topicName': this.dataForm.topicName,
                       'topicNumber': this.dataForm.topicNumber,
-                      'topicLeader': this.dataForm.topicLeader,
-                      'topicConsultant': `${this.dataForm.topicConsultant}`,
+                      'topicLeader': this.resultSubmit.leader,
+                      'topicConsultant': this.resultSubmit.consultant,
                       'teamNumberIds': JSON.stringify(this.dataForm.teamNumberIds),
                       'topicReviewStatus': this.dataForm.qcsrId ? this.dataForm.topicReviewStatus : 1,
                       'topicDescription': this.dataForm.topicDescription ? this.dataForm.topicDescription : '',

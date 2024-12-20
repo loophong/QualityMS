@@ -9,7 +9,9 @@
 package io.renren.modules.app.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.renren.common.exception.RRException;
 import io.renren.common.validator.Assert;
@@ -48,5 +50,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	@Override
 	public String getUsernameById(String id) {
 		return userDao.getUsernameById(id);
+	}
+
+	@Override
+	public Long getIdByUsername(String username) {
+		UserEntity user = this.getOne(new LambdaQueryWrapper<UserEntity>().eq(UserEntity::getUsername, username));
+		return user.getUserId();
 	}
 }

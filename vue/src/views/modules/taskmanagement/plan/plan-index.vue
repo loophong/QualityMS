@@ -392,8 +392,9 @@
               <!--              </el-button>-->
               <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
+              <el-button v-if="scope.row.addBase === 0" type="text" size="small" @click="addBase(scope.row.tmPid)">入库</el-button>
               <!--              <el-button type="text" size="small" @click="updatePlanPage(scope.row)">修改</el-button>-->
-              <el-button type="text" size="small" @click="deleteHandle(scope.row)">删除</el-button>
+<!--              <el-button type="text" size="small" @click="deleteHandle(scope.row)">删除</el-button>-->
             </template>
           </el-table-column>
         </el-table>
@@ -894,7 +895,43 @@ export default {
         // 释放 URL 对象
         window.URL.revokeObjectURL(url);
       })
-    }
+    },
+
+    addBase(tmPid) {
+      this.$confirm('是否将数据入库?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/taskmanagement/plan/addBase/' + tmPid),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            // 提示用户入库成功
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getFinishedPlanList()
+              }
+            })
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消入库'
+          });
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消入库'
+        });
+      });
+    },
 
 
   }

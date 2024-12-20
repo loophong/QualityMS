@@ -71,6 +71,7 @@
           format="yyyy-MM"
           value-format="yyyy-MM"
           :disabled="!!dataForm.indicatorId"
+          :picker-options="pickerOptions"
         ></el-date-picker>
       </el-form-item>
 
@@ -94,6 +95,12 @@
   export default {
     data () {
       return {
+        pickerOptions: {
+          disabledDate: time => {
+            const now = new Date();
+            return time.getTime() > now.getTime();
+          }
+        },
         indicatorDictionaryList: {},
         visible: false,
         // 查询参数列表

@@ -30,4 +30,5 @@ public interface UserService extends IService<UserEntity> {
 	long login(LoginForm form);
 
     String getUsernameById(String id);
+    Long getIdByUsername(String username);
 }

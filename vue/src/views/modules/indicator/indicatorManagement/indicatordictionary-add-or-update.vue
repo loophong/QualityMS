@@ -54,7 +54,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="上级指标" prop="indicatorParentNode">
-        <el-select v-model="dataForm.indicatorParentNode" clearable placeholder="请选择指标名称"  @change="calculateTotalWeight">
+        <el-select v-model="dataForm.indicatorParentNode" clearable  filterable placeholder="请选择指标名称"  @change="calculateTotalWeight">
           <el-option v-for="field in indicatorDictionaryList" :key="field.indicatorId" :value="field.indicatorName">
             {{ field.indicatorName }}
           </el-option>

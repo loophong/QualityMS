@@ -146,6 +146,27 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         return "0001"; // 如果理论上没有找到最大问题，返回默认值
     }
 
+    @Override
+    public String connectNumber(Integer id) {
+        // 步骤 1：根据 ID 查询数据库，获取 issueNumber
+        IssueTableEntity issue = issueTableDao.selectById(id);
+        if (issue == null) {
+            throw new RuntimeException("Issue not found");
+        }
+        // 步骤 3：处理查询结果
+        String issueNumber = issue.getParentQuestion();
+        if (issueNumber == null || issueNumber == "") {
+            return "1";  // 没有查询到记录，返回 1
+        }
+        else {
+        // 步骤 2：使用 MyBatis-Plus 查询所有记录，检查 parentQuestion 是否与 issueNumber 匹配
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("parent_Question", issueNumber);  // 使用 QueryWrapper 来查找 parentQuestion 等于 issueNumber 的记录
+        List<IssueTableEntity> matchingIssues = issueTableDao.selectList(queryWrapper);
+            return String.valueOf(matchingIssues.size()+1);  // 查询到记录，返回记录数
+        }
+    }
+
 
     /**
      * 获取按年份和月份统计的问题数
@@ -386,6 +407,50 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         statistics.put("验证未通过", count4);
 
         return statistics;
+    }
+
+    @Override
+    public boolean updateParentQuestion(String issueNumber) {
+
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+
+        if (issueNumber != null && !issueNumber.isEmpty()) {
+            queryWrapper.eq("issue_number", issueNumber)
+                    .or().eq("parent_question", issueNumber);
+        }
+
+        // 构建更新的内容
+        IssueTableEntity updateEntity = new IssueTableEntity();
+        updateEntity.setVerificationConclusion("结项");
+        updateEntity.setLevel("结项");
+
+        // 执行更新操作
+        int updatedRows = issueTableDao.update(updateEntity, queryWrapper);
+
+        if (updatedRows > 0) {
+            System.out.println("更新成功，更新的行数：" + updatedRows);
+            return true;
+        } else {
+            System.out.println("未找到符合条件的记录，更新失败");
+            return false;
+        }
+
+
+//        // 获取符合条件的记录
+//        List<IssueTableEntity> entities = issueTableDao.findByIssueNumber(issueNumber);
+//
+//        // 如果有记录需要更新
+//        if (!entities.isEmpty()) {
+//            for (IssueTableEntity entity : entities) {
+//                entity.setVerificationConclusion("结项");
+//                entity.setLevel("通过验证");
+//            }
+//
+//            // 批量更新
+//            int rowsAffected = issueTableDao.updateBatch(entities);
+//            return rowsAffected > 0;
+//        }
+
     }
 
     @Override

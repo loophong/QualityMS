@@ -55,6 +55,11 @@
         WHERE MONTH(datatime) = MONTH(#{datatime})
         AND YEAR(datatime) = YEAR(#{datatime})
     </delete>
+    <!-- 根据表名删除数据 -->
+    <delete id="deleteDataByTableName" parameterType="java.lang.String">
+        DELETE FROM spc_Pchart_standards
+        WHERE alternate_fields1 = #{tableName};
+    </delete>
 
     <!-- 批量插入数据 -->
     <insert id="batchInsertSpcPchartStandards" parameterType="java.util.List">
@@ -86,6 +91,12 @@
         FROM spc_Pchart_standards
         WHERE MONTH(datatime) = MONTH(#{datatime})
         AND YEAR(datatime) = YEAR(#{datatime});
+    </select>
+    <!-- 按照表名查询数据 -->
+    <select id="getSpcPchartStandardsEntityByTableName" parameterType="java.lang.String" resultMap="spcPchartStandardsMap">
+        SELECT *
+        FROM spc_Pchart_standards
+        WHERE alternate_fields1 = #{tableName};
     </select>
 
 </mapper>

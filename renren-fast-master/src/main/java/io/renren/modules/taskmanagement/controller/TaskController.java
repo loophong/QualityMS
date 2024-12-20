@@ -70,7 +70,7 @@ public class TaskController {
         TaskEntity task = taskService.query().eq("task_id", taskId).one();
         // 检查task状态，如果通过则查询审批文件
         if (task.getTaskCurrentState() != TaskStatus.COMPLETED) {
-            return R.ok().put("task", task).put("fileList", null);
+            return R.ok().put("task", task).put("approval", null).put("fileList", null);
         }
 
         // 查询审批编号
@@ -83,11 +83,11 @@ public class TaskController {
         // 检查是否有审批文件
         List<ApprovalFileEntity> fileList = approvalFileService.list(new QueryWrapper<ApprovalFileEntity>()
                 .eq("approval_id", approval.getApprovalId()));
-        if (fileList.size() > 0) {
-            return R.ok().put("task", task).put("fileList", fileList);
-        } else {
-            return R.ok().put("task", task).put("fileList", null);
-        }
+        log.info("approval" + approval);
+
+
+        return R.ok().put("task", task).put("approval", approval).put("fileList", fileList.size() > 0 ? fileList : null);
+
     }
 
     /**
@@ -284,8 +284,13 @@ public class TaskController {
 
 ////        taskService.updateById(taskEntity);
 //
-//        // 发送消息
-//        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()}, "您有一个任务需要审批，请及时审批！", "任务审批通知"));
+        // 发送消息
+        messageService.sendMessages(new CreateNoticeParams(
+                ShiroUtils.getUserId(),
+                new Long[]{Long.parseLong(task.getTaskAuditor())},
+                "您有一个任务需要审批，请及时审批！",
+                "任务审批通知",
+                "task_approval_page"));
 //
         return R.ok();
 

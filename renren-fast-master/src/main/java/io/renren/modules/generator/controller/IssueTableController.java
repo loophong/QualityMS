@@ -9,6 +9,8 @@ import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.entity.IssueUtils;
 import io.renren.modules.generator.service.IssueTableService;
 import io.renren.modules.generator.service.MinioService;
+import io.renren.modules.indicator.service.IndicatorKeyIndicatorsService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -39,6 +41,7 @@ import java.util.stream.Collectors;
  * @email sunlightcs@gmail.com
  * @date 2024-07-22 11:15:58
  */
+@Slf4j
 @RestController
 @RequestMapping("generator/issuetable")
 public class IssueTableController {
@@ -456,7 +459,32 @@ public class IssueTableController {
 //        System.out.println("=====获取问题列表----结束");
         return list;
     }
+    /**
+     * 删除功能   知识库模块
+     */
+    @PostMapping("/clearStorageFlag")
+//    @RequiresPermissions("generator:issuetable:clearStorageFlag")
+    public R clearStorageFlag(@RequestBody Integer[] issueIds) {
+        log.info("-------------1111");
+        if (issueIds == null || issueIds.length == 0) {
+            return R.error("Invalid input: issueTableIds cannot be null or empty");
+        }
 
+        try {
+            List<Integer> ids = Arrays.asList(issueIds);
+            System.out.println("ids===>"+ids);
+            boolean result = issueTableService.clearStorageFlag(ids);
+            if (result) {
+                return R.ok();
+            } else {
+                return R.error("Failed to clear storage_flag");
+            }
+        } catch (Exception e) {
+            // 记录日志
+            e.printStackTrace();
+            return R.error("An error occurred while clearing storage_flag: " + e.getMessage());
+        }
+    }
 
     /**
      * 获取用户信息

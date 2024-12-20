@@ -2,20 +2,47 @@
   <el-tabs v-model="activeName" type="border-card">
     <el-tab-pane label="管理员" name="1" v-if="isAuth('qcManagement:group:admin')">
       <div class="mod-config">
-        <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-          <!-- <el-form-item>
-            <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-          </el-form-item> -->
+        <el-form :inline="true" :model="dataListQueryAdmin">
           <el-form-item>
-            <!-- <el-button @click="getDataList()">查询</el-button> -->
+            <el-input v-model="dataListQueryAdmin.groupName" placeholder="小组名" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-select v-model="dataListQueryAdmin.examineStatus" placeholder="审核状态" clearable>
+              <el-option label="通过" value="通过"></el-option>
+              <el-option label="未通过" value="未通过"></el-option>
+              <el-option label="待审核" value="待审核"></el-option>
+              <el-option label="待审核(科室)" value="待审核(科室)"></el-option>
+              <el-option label="待审核(管理员)" value="待审核(管理员)"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-select v-model="dataListQueryAdmin.department" placeholder="科室" clearable>
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker v-model="dataListQueryAdmin.buildTime" type="daterange" range-separator="-"
+              start-placeholder="开始" end-placeholder="结束" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="upQueryAdmin()">查询</el-button>
             <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
             <el-button type="warning" @click="exportAll()">小组导出</el-button>
           </el-form-item>
         </el-form>
-        <el-table :data="tableData" stripe border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%;" row-key="id">
+        <el-table :data="tableDataAfterQueryAdmin" stripe border v-loading="dataListLoading"
+          @selection-change="selectionChangeHandle" style="width: 100%;" row-key="id">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="120">
@@ -23,8 +50,9 @@
               <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
               <el-tag
                 v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
-              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
-                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
+                type="danger">未通过(管理员)</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">未通过(科室)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
                 }}</el-tag>
               <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
@@ -52,7 +80,7 @@
           </el-table-column>
           <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="160">
           </el-table-column>
-          <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="180">
+          <el-table-column prop="date" header-align="center" align="center" label="创建小组时间" width="180">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作">
@@ -77,17 +105,47 @@
     </el-tab-pane>
     <el-tab-pane label="小组管理" name="2" v-else>
       <div class="mod-config">
-        <el-form :inline="true" :model="dataForm">
+        <el-form :inline="true" :model="dataListQuery">
           <el-form-item>
-            <!-- <el-button @click="getDataList()">查询</el-button> -->
+            <el-input v-model="dataListQuery.groupName" placeholder="小组名" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-select v-model="dataListQuery.examineStatus" placeholder="审核状态" clearable>
+              <el-option label="通过" value="通过"></el-option>
+              <el-option label="未通过" value="未通过"></el-option>
+              <el-option label="待审核" value="待审核"></el-option>
+              <el-option label="待审核(科室)" value="待审核(科室)"></el-option>
+              <el-option label="待审核(管理员)" value="待审核(管理员)"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-select v-model="dataListQuery.department" placeholder="科室" clearable>
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker v-model="dataListQuery.buildTime" type="daterange" range-separator="-"
+              start-placeholder="开始" end-placeholder="结束" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="upQuery()">查询</el-button>
             <el-button v-if="isAuth('qcMembers:qcGroupMember:save')" type="primary"
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
             <el-button type="warning" @click="exportAll('mine')">小组导出</el-button>
           </el-form-item>
         </el-form>
-        <el-table :data="dataList" stripe border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%;" row-key="id">
+        <el-table :data="dataListAfterQuery" stripe border v-loading="dataListLoading"
+          @selection-change="selectionChangeHandle" style="width: 100%;" row-key="id">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
@@ -97,8 +155,9 @@
               <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
               <el-tag
                 v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
-              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">{{ scope.row.examineStatus
-                }}</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
+                type="danger">未通过(管理员)</el-tag>
+              <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">未通过(科室)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
                 }}</el-tag>
               <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
@@ -132,7 +191,7 @@
               <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.admitEdit)"
                 type="text" size="small" @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
               <el-button
-                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus === '未通过')"
+                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus == '未通过')"
                 type="text" size="small" @click="handleReexamine(scope.row.id)">提交审核</el-button>
               <el-button type="text" size="small"
                 v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.admitEdit)"
@@ -206,7 +265,7 @@
                 @click="addMemberHandle(scope.row.id)">新增成员</el-button> -->
               <el-button type="text" size="small" v-if="!scope.row.parentId"
                 :disabled="!checkIfAdmit(scope.row.department, scope.row.examineStatus, scope.row.examineDepartment)"
-                @click="handleExamine(scope.row.id, scope.row.registrationNum, scope.row.examineDepartment)">处理审核</el-button>
+                @click="handleExamine(scope.row.id, scope.row.registrationNum, scope.row.examineDepartment, scope.row.firstComment, scope.row.secondComment)">处理审核</el-button>
               <!-- <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
                 @click="deleteHandle(scope.row.id)">删除</el-button> -->
             </template>
@@ -230,6 +289,13 @@
                 <el-option label="未通过" value="0"></el-option>
               </el-select>
             </el-form-item>
+            <el-form-item v-if="already == '1'" label="管理员审核意见" prop="comment">
+              <el-input v-model="examineFrom.secondComment" autosize type="textarea" placeholder="管理员审核意见"></el-input>
+            </el-form-item>
+            <el-form-item v-else label="科室审核意见" prop="comment">
+              <el-input v-model="examineFrom.firstComment" autosize type="textarea" placeholder="科室审核意见"></el-input>
+            </el-form-item>
+
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -253,13 +319,28 @@ import AddGroupDialog from './qcMembersManagement-add-group'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Loading } from "element-ui";
+import moment from "moment";
 import { group } from 'd3';
+import { first } from 'lodash';
+import { update } from 'lodash';
 export default {
   data() {
     return {
       activeName: '1',
       examineId: '',
       num: '',
+      dataListQuery: {
+        groupName: '',
+        department: '',
+        examineStatus: '',
+        buildTime: [],
+      },
+      dataListQueryAdmin: {
+        groupName: '',
+        department: '',
+        examineStatus: '',
+        buildTime: [],
+      },
       dataForm: {
         key: ''
       },
@@ -267,6 +348,8 @@ export default {
       examineFrom: {
         department: '',
         group: '',
+        firstComment: '',
+        secondComment: '',
         result: ''
       },
       dialogFormVisible: false,
@@ -293,7 +376,8 @@ export default {
 
       // 角色列表
       roleIdList: [],
-
+      dataListAfterQuery: [],
+      tableDataAfterQueryAdmin: [],
       exportList: [],
       exportListMine: [],
       examineRules: {
@@ -316,12 +400,10 @@ export default {
       await this.getDataList().then(groupList => {
         this.groupList = groupList;
       });
-      console.log(this.tableData)
-
-      console.log(this.tableData)
+      // console.log(this.tableData)
       this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
       this.totalPageExamine = this.examineList.length;
-      console.log(this.examineList.length)
+      // console.log(this.examineList.length)
     }
     if (!this.isAuth('qcManagement:group:admin')) {
       await this.getGroupList();
@@ -345,11 +427,7 @@ export default {
           })
         };
       });
-
     });
-    // console.log('+++++++++++++')
-    // console.log((this.checkIfAdmit('生产科') || (this.isAuth('qcManagement:group:admin'))))
-    // console.log((this.checkIfAdmit('质量科') || (this.isAuth('qcManagement:group:admin'))))
   },
   computed: {
 
@@ -362,6 +440,57 @@ export default {
     }
   },
   methods: {
+    upQuery() {
+      let tmpList = JSON.parse(JSON.stringify(this.dataList))
+      if (this.dataListQuery.groupName != '' && this.dataListQuery.groupName != null) {
+        tmpList = tmpList.filter(item => item.groupName.includes(this.dataListQuery.groupName))
+      }
+      if (this.dataListQuery.department != '' && this.dataListQuery.department != null) {
+        tmpList = tmpList.filter(item => item.department == this.dataListQuery.department)
+      }
+      if (this.dataListQuery.examineStatus != '' && this.dataListQuery.examineStatus != null) {
+        if (this.dataListQuery.examineStatus == '待审核(科室)') {
+          tmpList = tmpList.filter(item => item.examineStatus == '待审核' && item.examineDepartment != '1')
+        } else if (this.dataListQuery.examineStatus == '待审核(管理员)') {
+          tmpList = tmpList.filter(item => item.examineStatus == '待审核' && item.examineDepartment == '1')
+        } else {
+          tmpList = tmpList.filter(item => item.examineStatus == this.dataListQuery.examineStatus)
+        }
+      }
+      if (this.dataListQuery.buildTime) {
+        tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQuery.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQuery.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
+      }
+      this.dataListAfterQuery = tmpList
+    },
+    upQueryAdmin() {
+      console.log(this.tableData)
+      let tmpList = JSON.parse(JSON.stringify(this.tableData))
+      console.log(tmpList)
+      if (this.dataListQueryAdmin.groupName != '' && this.dataListQueryAdmin.groupName != null) {
+        tmpList = tmpList.filter(item => item.groupName.includes(this.dataListQueryAdmin.groupName))
+      }
+      if (this.dataListQueryAdmin.department != '' && this.dataListQueryAdmin.department != null) {
+        tmpList = tmpList.filter(item => item.department == this.dataListQueryAdmin.department)
+      }
+      console.log(tmpList)
+      if (this.dataListQueryAdmin.examineStatus != '' && this.dataListQueryAdmin.examineStatus != null) {
+        console.log('进入审核状态')
+        if (this.dataListQueryAdmin.examineStatus == '待审核(科室)') {
+          tmpList = tmpList.filter(item => item.examineStatus == '待审核' && item.examineDepartment != '1')
+        } else if (this.dataListQueryAdmin.examineStatus == '待审核(管理员)') {
+          tmpList = tmpList.filter(item => item.examineStatus == '待审核' && item.examineDepartment == '1')
+        } else {
+          tmpList = tmpList.filter(item => item.examineStatus == this.dataListQueryAdmin.examineStatus)
+        }
+      }
+      if (this.dataListQueryAdmin.buildTime) {
+        console.log('进入日期')
+        console.log(this.dataListQueryAdmin.buildTime)
+        tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQueryAdmin.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQueryAdmin.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
+      }
+      console.log(tmpList)
+      this.tableDataAfterQueryAdmin = tmpList
+    },
     checkIfAdmit(department, examineStatus, examineDepartment) {
       console.log(examineStatus + '/////' + examineDepartment);
 
@@ -479,6 +608,8 @@ export default {
                 examineDepartment: item.examineDepartment,
                 examineGroup: item.examineGroup,
                 position: item.position,
+                firstComment: item.firstComment,
+                secondComment: item.secondComment,
                 registrationNum: item.registrationNum,
                 children: []
               };
@@ -517,6 +648,7 @@ export default {
               return dateB - dateA;
             });
           });
+          this.dataListAfterQuery = this.dataList
           console.log(this.dataList)
           this.totalPageGroup = resultList.length
         } else {
@@ -748,6 +880,8 @@ export default {
                   examineStatus: item.examineStatus,
                   examineDepartment: item.examineDepartment,
                   examineGroup: item.examineGroup,
+                  firstComment: item.firstComment,
+                  secondComment: item.secondComment,
                   registrationNum: item.registrationNum,
                   children: []
                 };
@@ -782,6 +916,7 @@ export default {
                 return dateB - dateA;
               });
             });
+            this.tableDataAfterQueryAdmin = this.tableData
           } else {
             this.tmpList = [];
             this.totalPage = 0;
@@ -886,8 +1021,10 @@ export default {
         this.$refs.addOrUpdate.init(id)
       })
     },
-    handleExamine(id, num, department) {
+    handleExamine(id, num, department, first, second) {
       this.already = department
+      this.examineFrom.firstComment = first
+      this.examineFrom.secondComment = second
       console.log(department)
       // this.registrationNum = '';
       if (num) {
@@ -934,6 +1071,8 @@ export default {
           'examineGroup': this.examineFrom.group,
           'examineDepartment': this.examineFrom.group == '0' ? '' : this.examineFrom.department,
           'examineStatus': result,
+          'firstComment': this.examineFrom.firstComment,
+          'secondComment': this.examineFrom.secondComment,
           'registrationNum': (this.registrationNum == '' || this.registrationNum == null) ? this.num : this.registrationNum,
         })
       }).then(({ data }) => {

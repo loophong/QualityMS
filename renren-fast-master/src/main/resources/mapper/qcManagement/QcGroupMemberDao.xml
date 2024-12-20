@@ -23,6 +23,8 @@
         <result property="examineStatus" column="examine_status"/>
         <result property="examineDepartment" column="examine_department"/>
         <result property="examineGroup" column="examine_group"/>
+        <result property="firstComment" column="first_comment"/>
+        <result property="secondComment" column="second_comment"/>
     </resultMap>
 
     <!-- 查询与"我"相关的成员 -->

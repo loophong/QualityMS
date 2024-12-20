@@ -51,14 +51,14 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
     Integer countSubmitted();
 
     //查询编号最大值
-    @Select({
-            "SELECT MAX(qcsr_id)",
-            "FROM qc_subject_registration",
-    })
-    Integer maxOfId();
+
+    @Select("SELECT COUNT(*) " +
+         "FROM qc_subject_registration " +
+         "WHERE topic_number LIKE CONCAT('PJHLQCKT-', #{currentYear}, '-%')")
+    Integer maxOfId(@Param("currentYear") String currentYear);
+
 
     //查询课题名称是否重复
-
     boolean ifExistSubjectName(String name);
 
     //查询当前用户是否是组长

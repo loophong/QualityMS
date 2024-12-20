@@ -44,6 +44,7 @@
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
+      :span-method="arraySpanMethod"
       style="width: 100%;">
       <el-table-column
         type="selection"
@@ -62,18 +63,6 @@
           {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
         </template>
       </el-table-column>
-      <!-- <el-table-column
-        prop="keyIndicatorId"
-        header-align="center"
-        align="center"
-        label="重点指标ID（主键）">
-      </el-table-column> -->
-      <!-- <el-table-column
-        prop="indicatorId"
-        header-align="center"
-        align="center"
-        label="指标ID">
-      </el-table-column> -->
       <el-table-column
         prop="indicatorName"
         header-align="center"
@@ -192,12 +181,21 @@
         fixed="right"
         header-align="center"
         align="center"
+        width="100"
+        label="入库操作">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="storageHandle(scope.row.indicatorId)">入库</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column
+        fixed="right"
+        header-align="center"
+        align="center"
         width="150"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.keyIndicatorId)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.keyIndicatorId)">删除</el-button>
-          <el-button type="text" size="small" @click="storageHandle(scope.row.keyIndicatorId)">入库</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -220,6 +218,7 @@
   export default {
     data () {
       return {
+        mergedRowInfo: [], // 用于存储合并行的信息
         keyIndicatorList: [], //重点管控指标列表（不分页）
         // 查询参数
         queryParams: {
@@ -385,64 +384,67 @@
         })
       },
       //入知识库
-      storageHandle (id) {
-        console.log("id=====>",id)
+      storageHandle (indicatorId) {
+        console.log("indicatorId=====>",indicatorId);
+        const ids = this.keyIndicatorList.filter(item => item.indicatorId === indicatorId).map(item => item.keyIndicatorId);
+        console.log("ids=====>",ids);
         this.$confirm(`是否入库该指标？`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          if (id !== undefined) {
+          ids.forEach(id => {
+            // this.$http({
+            //   url: this.$http.adornUrl(`/indicator/indicatorkeyindicators/info/${this.dataForm.keyIndicatorId}`),
+            //   method: 'get',
+            //   params: this.$http.adornParams()
+            // }).then(({ data }) => {
+            //   if (data && data.code === 0) {
+            //     this.dataForm.indicatorId = data.indicatorKeyIndicators.indicatorId
+            //     this.dataForm.indicatorName = data.indicatorKeyIndicators.indicatorName
+            //     this.dataForm.indicatorClassification = data.indicatorKeyIndicators.indicatorClassification
+            //     this.dataForm.assessmentDepartment = data.indicatorKeyIndicators.assessmentDepartment
+            //     this.dataForm.sourceDepartment = data.indicatorKeyIndicators.sourceDepartment
+            //     this.dataForm.managementContent = data.indicatorKeyIndicators.managementContent
+            //     this.dataForm.isManagementOutOfControl = data.indicatorKeyIndicators.isManagementOutOfControl
+            //     this.dataForm.isNeedsControl = data.indicatorKeyIndicators.isNeedsControl
+            //     this.dataForm.keyElements = data.indicatorKeyIndicators.keyElements
+            //     this.dataForm.potentialFailureMode = data.indicatorKeyIndicators.potentialFailureMode
+            //     this.dataForm.potentialFailureConsequences = data.indicatorKeyIndicators.potentialFailureConsequences
+            //     this.dataForm.involvedProduct = data.indicatorKeyIndicators.involvedProduct
+            //     this.dataForm.processName = data.indicatorKeyIndicators.processName
+            //     this.dataForm.controlPosition = data.indicatorKeyIndicators.controlPosition
+            //     this.dataForm.controlPersonnel = data.indicatorKeyIndicators.controlPersonnel
+            //     this.dataForm.controlMethod = data.indicatorKeyIndicators.controlMethod
+            //     this.dataForm.evaluationMeasurementTechnique = data.indicatorKeyIndicators.evaluationMeasurementTechnique
+            //     this.dataForm.sampleSize = data.indicatorKeyIndicators.sampleSize
+            //     this.dataForm.samplingFrequency = data.indicatorKeyIndicators.samplingFrequency
+            //     this.dataForm.controlList = data.indicatorKeyIndicators.controlList
+            //     this.dataForm.storageFlag = data.indicatorKeyIndicators.storageFlag
+            //   }
+            // })
+
             this.$http({
-              url: this.$http.adornUrl(`/indicator/indicatorkeyindicators/info/${this.dataForm.keyIndicatorId}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({ data }) => {
+              url: this.$http.adornUrl('/indicator/indicatorkeyindicators/update'),
+              method: 'post',
+              data: this.$http.adornData({
+                'keyIndicatorId': id,
+                'storageFlag': 1
+              })
+            }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.indicatorId = data.indicatorKeyIndicators.indicatorId
-                this.dataForm.indicatorName = data.indicatorKeyIndicators.indicatorName
-                this.dataForm.indicatorClassification = data.indicatorKeyIndicators.indicatorClassification
-                this.dataForm.assessmentDepartment = data.indicatorKeyIndicators.assessmentDepartment
-                this.dataForm.sourceDepartment = data.indicatorKeyIndicators.sourceDepartment
-                this.dataForm.managementContent = data.indicatorKeyIndicators.managementContent
-                this.dataForm.isManagementOutOfControl = data.indicatorKeyIndicators.isManagementOutOfControl
-                this.dataForm.isNeedsControl = data.indicatorKeyIndicators.isNeedsControl
-                this.dataForm.keyElements = data.indicatorKeyIndicators.keyElements
-                this.dataForm.potentialFailureMode = data.indicatorKeyIndicators.potentialFailureMode
-                this.dataForm.potentialFailureConsequences = data.indicatorKeyIndicators.potentialFailureConsequences
-                this.dataForm.involvedProduct = data.indicatorKeyIndicators.involvedProduct
-                this.dataForm.processName = data.indicatorKeyIndicators.processName
-                this.dataForm.controlPosition = data.indicatorKeyIndicators.controlPosition
-                this.dataForm.controlPersonnel = data.indicatorKeyIndicators.controlPersonnel
-                this.dataForm.controlMethod = data.indicatorKeyIndicators.controlMethod
-                this.dataForm.evaluationMeasurementTechnique = data.indicatorKeyIndicators.evaluationMeasurementTechnique
-                this.dataForm.sampleSize = data.indicatorKeyIndicators.sampleSize
-                this.dataForm.samplingFrequency = data.indicatorKeyIndicators.samplingFrequency
-                this.dataForm.controlList = data.indicatorKeyIndicators.controlList
-                this.dataForm.storageFlag = data.indicatorKeyIndicators.storageFlag
+                this.$message({
+                  message: '入库成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.getDataList()
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
               }
             })
-          }
-          this.$http({
-            url: this.$http.adornUrl('/indicator/indicatorkeyindicators/update'),
-            method: 'post',
-            data: this.$http.adornData({
-              'keyIndicatorId': id,
-              'storageFlag': 1
-            })
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '入库成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
           })
         })
       },
@@ -456,7 +458,35 @@
       //问题模块跳转
       issueHandle() {
         this.$router.push({ name: 'otherToIssue' })
-      }
+      },
+      arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+        if (columnIndex >= 1 && columnIndex <= 8 || columnIndex === 21) { // 合并从序号到是否需要理攻关的列
+          if (rowIndex > 0 && row.indicatorId === this.dataList[rowIndex - 1].indicatorId && row.indicatorName === this.dataList[rowIndex - 1].indicatorName) {
+            return {
+              rowspan: 0,
+              colspan: 0
+            };
+          } else {
+            let rowspan = 1;
+            for (let i = rowIndex + 1; i < this.dataList.length; i++) {
+              if (row.indicatorId === this.dataList[i].indicatorId && row.indicatorName === this.dataList[i].indicatorName) {
+                rowspan++;
+              } else {
+                break;
+              }
+            }
+            // this.mergedRows.push(row.keyIndicatorId);
+            return {
+              rowspan: rowspan,
+              colspan: 1
+            };
+          }
+        }
+        return {
+          rowspan: 1,
+          colspan: 1
+        };
+      },
     }
   }
 </script>

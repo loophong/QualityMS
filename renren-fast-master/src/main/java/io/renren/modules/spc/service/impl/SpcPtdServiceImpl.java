@@ -1,7 +1,10 @@
 package io.renren.modules.spc.service.impl;
 
+import io.renren.modules.spc.dao.SpcPtdPvalueDao;
 import io.renren.modules.spc.dao.SpcXrchartDao;
+import io.renren.modules.spc.entity.SpcPtdPvalueEntity;
 import io.renren.modules.spc.entity.SpcXrchartEntity;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,6 +34,9 @@ public class SpcPtdServiceImpl extends ServiceImpl<SpcPtdDao, SpcPtdEntity> impl
 
     @Resource
     private SpcPtdDao spcPtdDao;
+
+    @Resource
+    private SpcPtdPvalueDao spcPtdPvalueDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -72,9 +78,60 @@ public class SpcPtdServiceImpl extends ServiceImpl<SpcPtdDao, SpcPtdEntity> impl
         return result;
     }
 
-    //获取数据
+    @Override
+    public Double getPTDPValue(){
+        List<SpcPtdPvalueEntity> datalist = getPValueDataByMonth();
+
+        //计算出B列数据的数量、平均值、标准差
+        //数量
+        int number = datalist.size();
+
+        //拆解出B列数据
+        List<Double> B_value = new ArrayList<>();
+        for(SpcPtdPvalueEntity spcPtdPvalueEntity : datalist){
+            B_value.add(spcPtdPvalueEntity.getBValue().doubleValue());
+        }
+
+        //平均值
+        double average = calculateAverage(B_value);
+        //标准差
+        double stdev = calculateStdev(B_value);
+
+        //计算E列值（正太分布值）
+        List<Double> E_value = new ArrayList<>();
+        for(Double b_value : B_value){
+            E_value.add(calculateNormDist(b_value, average, stdev, true));
+        }
+
+        //逆置E列值，获得F列值
+        List<Double> F_value = reverseToNewArrayList(E_value);
+
+        //计算G列值
+        List<Double> G_value = new ArrayList<>();
+        for(int i = 0; i < number; i++){
+            G_value.add(calculateGValue(datalist.get(i).getCValue(), E_value.get(i), F_value.get(i)));
+        }
+
+        double sum = calculateSum(G_value);
+        double step1 = calculateStep1(sum);
+        double step2 = calculateStep2(step1);
+
+        return calculateStep3(step2);
+    }
+    //按月份获取数据
     public List<SpcPtdEntity> getData(){
         return spcPtdDao.getSpcPtdEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+
+    //按表名获取数据
+
+    //按月份获取P值数据
+    public List<SpcPtdPvalueEntity> getPValueDataByMonth(){
+        return spcPtdPvalueDao.getSpcPtdPValueEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+    //按表名获取P值数据
+    public List<SpcPtdPvalueEntity> getPValueDataByTableName(String tableName){
+        return spcPtdPvalueDao.getSpcPtdPValueEntityByTableName(tableName);
     }
 
     //拆解数据，获取工时、接受区域、频率
@@ -140,8 +197,8 @@ public class SpcPtdServiceImpl extends ServiceImpl<SpcPtdDao, SpcPtdEntity> impl
         return result;
     }
 
-    //计算方法部分
-    //计算标准差
+    // 计算方法部分
+    // 计算标准差
     public double calculateStdev(List<Double> workTime) {
         if (workTime == null || workTime.size() < 2) {
             throw new IllegalArgumentException("List must contain at least two values.");
@@ -157,13 +214,42 @@ public class SpcPtdServiceImpl extends ServiceImpl<SpcPtdDao, SpcPtdEntity> impl
         return Math.sqrt(sumOfSquaredDiffs / (workTime.size() - 1)); // 样本标准差
     }
 
-    //计算平均值
+    // 计算平均值
     public double calculateAverage(List<Double> workTime) {
         double sum = 0.0;
         for (Double value : workTime) {
             sum += value;
         }
         return sum / workTime.size();
+    }
+
+    // 计算G列值
+    public double calculateGValue(double C, double E, double F) {
+        // 计算公式
+        return (2 * C - 1) / 25 * (Math.log(E) + Math.log(1 - F));
+    }
+
+    // 计算总和
+    public double calculateSum(List<Double> data){
+        double sum = 0.0;
+        for(Double value : data){
+            sum += value;
+        }
+        return sum;
+    }
+    //step1
+    public double calculateStep1(double sum){
+        return -25 - sum;
+    }
+    //step2
+    public double calculateStep2(double J8) {
+        // 计算公式
+        return J8 * (1 + 0.75 / 25 + 2.25 / 25 / 25);
+    }
+    //step3
+    public double calculateStep3(double J9) {
+        // 应用公式: EXP(1.2937 - 5.709 * J9 + 0.0186 * J9 * J9)
+        return Math.exp(1.2937 - 5.709 * J9 + 0.0186 * J9 * J9);
     }
 
     // 实现 NORM.DIST 函数  参数分别是：x：需要计算的接收区域，mean；均值，standardDev：标准差，cumulative：一个布尔值，决定函数返回 PDF 还是 CDF
@@ -201,4 +287,19 @@ public class SpcPtdServiceImpl extends ServiceImpl<SpcPtdDao, SpcPtdEntity> impl
 
         return sign * y; // 返回带符号的结果
     }
+
+    // 方法：将 E_value 列表倒转并生成新的 LinkedList
+    public List<Double> reverseToNewArrayList(List<Double> E_value) {
+        List<Double> F_value = new ArrayList<>(); // 新链表
+
+        // 从后向前添加元素
+        for (int i = E_value.size() - 1; i >= 0; i--) {
+            F_value.add(E_value.get(i)); // 添加到新链表的末尾
+        }
+
+        return F_value; // 返回新链表
+    }
+
+
+
 }

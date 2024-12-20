@@ -17,7 +17,7 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
               style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-<!--      <el-table-column prop="id" header-align="center" align="center" label="主键"></el-table-column>-->
+      <!--      <el-table-column prop="id" header-align="center" align="center" label="主键"></el-table-column>-->
       <el-table-column prop="receiverId" header-align="center" align="center" label="接收者"></el-table-column>
       <el-table-column prop="senderId" header-align="center" align="center" label="发送者"></el-table-column>
       <el-table-column prop="content" header-align="center" align="center" label="消息内容"></el-table-column>
@@ -37,7 +37,9 @@
         <template slot-scope="scope">
           <!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>-->
           <!--    如果状态为未读，则显示已读按钮      -->
-          <el-button v-if="scope.row.status === 'UNREAD'" type="text" size="small" @click="readNotice(scope.row.id, scope.row.jumpdepart)">执行</el-button>
+          <el-button v-if="scope.row.status === 'UNREAD'" type="text" size="small"
+                     @click="readNotice(scope.row.id, scope.row.jumpdepart)">执行
+          </el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -178,28 +180,47 @@ export default {
           this.$message.error(data.msg)
         }
       })
-      if(jumpdepart == 1){
+      if (jumpdepart == 1) {
         this.$router.push({
           name: 'otherToIssue',
-          params: {
-          }
+          params: {}
         })
-      }if(jumpdepart == 2){
+      }
+      if (jumpdepart == 2) {
         this.$router.push({
           name: 'issue-issueexamine',
-          params: {
-          }
+          params: {}
         })
-      }if(jumpdepart == 3){
+      }
+      if (jumpdepart == 3) {
         this.$router.push({
           name: 'issue-issuemasktable',
-          params: {
-          }
+          params: {}
         })
-      }if(jumpdepart == 4){
-
-      }if(jumpdepart == 5){
-
+      }
+      if (jumpdepart === 'plan_page') {
+        this.$router.push({
+          name: 'plan-index',
+          params: {}
+        })
+      }
+      if (jumpdepart === 'task_page') {
+        this.$router.push({
+          name: 'task-list',
+          params: {}
+        })
+      }
+      if (jumpdepart === 'plan_approval_page') {
+        this.$router.push({
+          name: 'plan-approval-index',
+          params: {}
+        })
+      }
+      if (jumpdepart === 'task_approval_page') {
+        this.$router.push({
+          name: 'task_approval-index',
+          params: {}
+        })
       }
     }
   }

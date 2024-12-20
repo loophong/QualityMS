@@ -49,16 +49,21 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
 
     @Override
     public void importData(List<SpcPchartEntity> datalist){
-        spcPchartDao.deleteDataByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        spcPchartDao.deleteDataByTableName(datalist.get(0).getAlternateFields1());
         spcPchartDao.batchInsertSpcPcharts(datalist);
     }
 
     @Override
-    public List<List<Double>> getPChart(){
+    public List<String> getTableName(){
+        return spcPchartDao.getTableName();
+    }
+
+    @Override
+    public List<List<Double>> getPChart(String tableName){
         List<List<Double>> result = new ArrayList<>();
 
         //获取数据
-        List<SpcPchartEntity> datalist = getData();
+        List<SpcPchartEntity> datalist = getDataByTableName(tableName);
         List<SpcPchartStandardsEntity> datalist_standards = getStandardsData();
 
         //转换标准数据和普通数据的类型
@@ -78,11 +83,11 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
     }
 
     @Override
-    public List<List<Double>> getNPChart(){
+    public List<List<Double>> getNPChart(String tableName){
         List<List<Double>> result = new ArrayList<>();
 
         //获取数据
-        List<SpcPchartEntity> datalist = getData();
+        List<SpcPchartEntity> datalist = getDataByTableName(tableName);
         List<SpcPchartStandardsEntity> datalist_standards = getStandardsData();
 
         //转换标准数据和普通数据的类型
@@ -104,11 +109,11 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
     }
 
     @Override
-    public List<List<Double>> getUChart(){
+    public List<List<Double>> getUChart(String tableName){
         List<List<Double>> result = new ArrayList<>();
 
         //获取数据
-        List<SpcPchartEntity> datalist = getData();
+        List<SpcPchartEntity> datalist = getDataByTableName(tableName);
         List<SpcPchartStandardsEntity> datalist_standards = getStandardsData();
 
         //转换标准数据和普通数据的类型
@@ -131,11 +136,11 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
     }
 
     @Override
-    public List<List<Double>> getCChart(){
+    public List<List<Double>> getCChart(String tableName){
         List<List<Double>> result = new ArrayList<>();
 
         //获取数据
-        List<SpcPchartEntity> datalist = getData();
+        List<SpcPchartEntity> datalist = getDataByTableName(tableName);
         List<SpcPchartStandardsEntity> datalist_standards = getStandardsData();
 
         //转换标准数据和普通数据的类型
@@ -161,10 +166,18 @@ public class SpcPchartServiceImpl extends ServiceImpl<SpcPchartDao, SpcPchartEnt
     public List<SpcPchartEntity> getData(){
         return spcPchartDao.getSpcPchartEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
     }
+    //根据表名获取数据
+    public List<SpcPchartEntity> getDataByTableName(String tableName){
+        return spcPchartDao.getSpcPchartEntityByTableName(tableName);
+    }
 
     //获取标准数据
     public List<SpcPchartStandardsEntity> getStandardsData(){
         return spcPchartStandardsDao.getSpcPchartStandardsEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }
+    //根据表名获取数据
+    public List<SpcPchartStandardsEntity> getStandardsDataByTableName(String tableName){
+        return spcPchartStandardsDao.getSpcPchartStandardsEntityByTableName(tableName);
     }
 
     //处理数据，分辨抽检数

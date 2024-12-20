@@ -61,7 +61,13 @@
     <delete id="deleteDataByMonth" parameterType="java.util.Date">
         DELETE FROM spc_XRchart
         WHERE MONTH(datatime) = MONTH(#{datatime})
-        AND YEAR(datatime) = YEAR(#{datatime})
+        AND YEAR(datatime) = YEAR(#{datatime});
+    </delete>
+
+    <!-- 根据表名删除数据 -->
+    <delete id="deleteDataByTableName" parameterType="java.lang.String">
+        DELETE FROM spc_XRchart
+        WHERE alternate_fields1 = #{tableName};
     </delete>
 
     <!-- 批量插入数据 -->
@@ -97,6 +103,13 @@
         FROM spc_XRchart
         WHERE MONTH(datatime) = MONTH(#{datatime})
         AND YEAR(datatime) = YEAR(#{datatime});
+    </select>
+
+    <!-- 按照表名查询数据 -->
+    <select id="getSpcXrchartEntityByTableName" parameterType="java.lang.String" resultMap="spcXrchartMap">
+        SELECT *
+        FROM spc_XRchart
+        WHERE alternate_fields1 = #{tableName};
     </select>
 
 
@@ -172,4 +185,7 @@
         WHERE subarray_capacity = #{subarray}
     </select>
 
+    <select id="getTableName" resultType="java.lang.String">
+        SELECT DISTINCT alternate_fields1 FROM spc_XRchart;
+    </select>
 </mapper>

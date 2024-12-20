@@ -54,10 +54,10 @@ const mainRoutes = {
       meta: {title: '计划新建页', isDynamic: false, isTab: false}
     },
     {
-      path: '/plan-list',
+      path: '/plan-index',
       component: _import('modules/taskmanagement/plan/plan-index'),
-      name: 'plan-list',
-      meta: {title: '工作计划', isDynamic: true, isTab: true}
+      name: 'plan-index',
+      meta: {title: '工作计划', isDynamic: false, isTab: false}
     },
     // {
     //   path: 'publicmanagement/instrumenttestmethod',
@@ -79,7 +79,7 @@ const mainRoutes = {
     //   }
     // })
     {
-      path: '/my-tasks',
+      path: 'taskmanagement/task/my-tasks',
       component: _import('modules/taskmanagement/task/my-tasks'),
       name: 'task-list',
       meta: {title: '我的任务', isDynamic: true, isTab: true},
@@ -106,6 +106,13 @@ const mainRoutes = {
       meta: {title: '计划修改页', isDynamic: false, isTab: false},
       props: true
     },
+    {
+      path: '/plan-approval-page/:plabId',
+      component: _import('modules/taskmanagement/plan-approval/plan-approval-index'),
+      name: 'plan-approval-index',
+      meta: {title: '计划审批首页', isDynamic: false, isTab: false},
+      props: true
+    },
 
     {
       path: '/plan-approval-page/:plabId',
@@ -126,6 +133,13 @@ const mainRoutes = {
       component: _import('modules/taskmanagement/plan/plan-indicator-index'),
       name: 'plan-indicator-index',
       meta: { title: '计划-指标关联页', isDynamic: false, isTab: false },
+      props: true
+    },
+    {
+      path: '/approval-index',
+      component: _import('modules/taskmanagement/approval/approval-index'),
+      name: 'task_approval-index',
+      meta: { title: '任务审批首页', isDynamic: false, isTab: false },
       props: true
     },
 

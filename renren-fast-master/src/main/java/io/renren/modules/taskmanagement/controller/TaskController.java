@@ -284,8 +284,13 @@ public class TaskController {
 
 ////        taskService.updateById(taskEntity);
 //
-//        // 发送消息
-//        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskApprovalor), new Long[]{ShiroUtils.getUserId()}, "您有一个任务需要审批，请及时审批！", "任务审批通知"));
+        // 发送消息
+        messageService.sendMessages(new CreateNoticeParams(
+                ShiroUtils.getUserId(),
+                new Long[]{Long.parseLong(task.getTaskAuditor())},
+                "您有一个任务需要审批，请及时审批！",
+                "任务审批通知",
+                "task_approval_page"));
 //
         return R.ok();
 

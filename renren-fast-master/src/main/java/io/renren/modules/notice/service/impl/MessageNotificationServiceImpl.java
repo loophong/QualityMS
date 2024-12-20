@@ -34,6 +34,7 @@ public class MessageNotificationServiceImpl extends ServiceImpl<MessageNotificat
         notification.setStatus(String.valueOf(NoticeStatus.UNREAD));
         notification.setContent(params.getContent());
         notification.setType(params.getType());
+        notification.setJumpdepart(params.getJumpdepart());
         for (Long recordId : params.getReceiverId()) {
             notification.setReceiverId(recordId);
             this.save(notification);

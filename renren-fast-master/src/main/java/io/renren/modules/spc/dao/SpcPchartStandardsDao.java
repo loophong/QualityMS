@@ -20,8 +20,12 @@ import java.util.List;
 public interface SpcPchartStandardsDao extends BaseMapper<SpcPchartStandardsEntity> {
     // 删除指定月份的数据
     void deleteDataByMonth(@Param("datatime") Date datatime);
+    // 删除指定表名的数据
+    void deleteDataByTableName(@Param("tableName") String tableName);
     // 批量插入数据
     void batchInsertSpcPchartStandards(@Param("list") List<SpcPchartStandardsEntity> list);
 
     List<SpcPchartStandardsEntity> getSpcPchartStandardsEntityByMonth(@Param("datatime") Date datatime);
+
+    List<SpcPchartStandardsEntity> getSpcPchartStandardsEntityByTableName(@Param("tableName") String tableName);
 }

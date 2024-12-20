@@ -256,9 +256,7 @@ public class ApprovalController {
 
         // 发送消息
         messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskManagementApprovalTable.getApprover()), new Long[]{Long.valueOf(taskManagementApprovalTable.getSubmitter())},
-                "您有一个任务审批结果，请及时查看！", "任务审批结果通知"));
-
-
+                "您有一个任务审批结果，请及时查看！", "任务审批结果通知","task_page"));
         return R.ok();
     }
 

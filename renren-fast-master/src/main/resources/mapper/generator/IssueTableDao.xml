@@ -51,18 +51,19 @@
     </resultMap>
 
     <select id="selectFinishedSubjectList" resultType="io.renren.modules.generator.entity.IssueTableEntity">
-    SELECT *
-    FROM issue_table
-    <where>
-        <if test="issueDescription != null and issueDescription != ''">
-            AND issue_description LIKE CONCAT('%', #{issueDescription}, '%')
-        </if>
-        <if test="creationTime != null and creationTime != ''">
-            AND DATE(creation_time) = DATE(STR_TO_DATE(#{creationTime}, '%Y-%m-%d %H:%i:%s'))
-        </if>
-        AND verification_conclusion='结项'
-    </where>
-</select>
+        SELECT issue_id, issue_description, creation_time, verification_conclusion, storage_flag
+        FROM issue_table
+        <where>
+            <if test="issueDescription != null and issueDescription != ''">
+                AND issue_description LIKE CONCAT('%', #{issueDescription}, '%')
+            </if>
+            <if test="creationTime != null and creationTime != ''">
+                AND DATE(creation_time) = #{creationTime}
+            </if>
+            AND verification_conclusion = '结项'
+            AND storage_flag != 0
+        </where>
+    </select>
     <select id="selectFinishedSubjectListByDescription"
             resultType="io.renren.modules.generator.entity.IssueTableEntity"></select>
     <!--    <select id="selectFinishedSubjectListByDescription"-->

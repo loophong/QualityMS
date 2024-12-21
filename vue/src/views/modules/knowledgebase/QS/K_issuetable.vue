@@ -54,7 +54,8 @@
         <el-button @click="downloadTemplate()">下载模板</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button @click="exportAll()">导出</el-button>        
+        <el-button @click="exportAll()">导出</el-button>     
+        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>   
       </el-form-item>
     </el-form>
     <el-dialog :visible.sync="taskDetailVisible" title="问题详情">
@@ -746,36 +747,35 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      // 删除
       deleteHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.issueId
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/generator/issuetable/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
+          var ids = id ? [id] : this.dataListSelections.map(item => {
+            return item.issueId
           })
-        })
-      },
+          this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.$http({
+              url: this.$http.adornUrl('/generator/issuetable/delete'),
+              method: 'post',
+              data: this.$http.adornData(ids, false)
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.getDataList()
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          })
+        },
       truncateDescription(description) {
         if (!description || typeof description !== 'string') return '';
         return description.length > 20 ? description.slice(0, 20) : description;
@@ -920,7 +920,66 @@
             loadingInstance.close();
           });
       },
+       // 删除
+  // 批量删除
+ deleteHandle() {
+  var ids = this.dataListSelections.map(item => {
+    return item.issueId;
+  });
+  console.log("ids:"+ids);
+
+  this.$confirm(`确定对[id=${ids.join(',')}]进行[批量删除]操作?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    this.$http({
+      url: this.$http.adornUrl('/generator/issuetable/clearStorageFlag'),
+      method: 'post',
+      data: this.$http.adornData(ids,false)
+    }).then(({ data }) => {
+      if (data && data.code === 0) {
+        this.getDataList()
+      }
+      console.log(data);
+    });
+
+
+  });
+},
+
+
+/* // 清除storageFlag
+async clearStorageFlag(ids) {
+  try {
+    const response = await this.$http({
+      url: this.$http.adornUrl('/generator/issuetable/clearStorageFlag'),
+      method: 'post',
+      data: this.$http.adornData(ids)
+    });
+
+    if (response.data && response.data.code === 0) {
+      this.$message({
+        message: '操作成功',
+        type: 'success',
+        duration: 1500,
+        onClose: () => {
+          // 刷新数据列表的操作已移至 deleteHandle 方法中
+        }
+      });
+      return true;
+    } else {
+      this.$message.error(response.data.msg);
+      return false;
     }
+  } catch (error) {
+    console.error('清除storageFlag失败:', error);
+    this.$message.error('操作失败，请重试');
+    return false;
+  }
+}, */
+    }
+    
   }
   
 </script>
@@ -959,6 +1018,3 @@
   font-size: 14px; /* 分页器字体大小 */
 }
 </style>
-
-
-

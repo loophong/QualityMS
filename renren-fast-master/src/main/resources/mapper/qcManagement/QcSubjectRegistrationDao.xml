@@ -82,7 +82,7 @@
         <result property="qcFirstLevel" column="qc_first_level"/>
         <result property="qcSecondTotal" column="qc_second_total"/>
         <result property="qcSecondLevel" column="qc_second_level"/>
-        <result property="storageflag" column="qc_storage_flag"/>
+        <result property="qcStorageFlag" column="qc_storage_flag"/>
 
     </resultMap>
 <!--    <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity">-->
@@ -108,27 +108,27 @@
 <!--            )-->
 <!--        </where>-->
 <!--    </select>-->
-   <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcknowledgebaseEntity">
-    SELECT *
-    FROM qc_subject_registration s
-    LEFT JOIN qc_examine_status e ON s.qcsr_id = e.qc_examine_subject
-    <where>
-        <if test="topicName != null and topicName != ''">
-            AND s.topic_name LIKE CONCAT('%', #{topicName}, '%')
-        </if>
-        <if test="keywords != null and keywords != ''">
-            AND s.keywords LIKE CONCAT('%', #{keywords}, '%')
-        </if>
-        <if test="startDate != null and startDate != ''">
-            AND s.start_date = STR_TO_DATE(#{startDate}, '%Y-%m-%d')
-        </if>
-        <if test="endDate != null and endDate != ''">
-            AND s.end_date = STR_TO_DATE(#{endDate}, '%Y-%m-%d')
-        </if>
+    <select id="selectFinishedSubjectList" resultType="io.renren.modules.qcManagement.entity.QcknowledgebaseEntity">
+        SELECT *
+        FROM qc_subject_registration s
+        LEFT JOIN qc_examine_status e ON s.qcsr_id = e.qc_examine_subject
+        <where>
+            <if test="topicName != null and topicName != ''">
+                AND s.topic_name LIKE CONCAT('%', #{topicName}, '%')
+            </if>
+            <if test="keywords != null and keywords != ''">
+                AND s.keywords LIKE CONCAT('%', #{keywords}, '%')
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE(s.start_date) = STR_TO_DATE(#{startDate}, '%Y-%m-%d')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(s.end_date) = STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+            </if>
             AND e.qc_status_seven = 1
             AND e.qc_storage_flag = 1
-       </where>
-</select>
+        </where>
+    </select>
 
     <select id="ifExistSubjectName" resultType="boolean">
         SELECT EXISTS (

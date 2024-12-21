@@ -1,5 +1,6 @@
 package io.renren.modules.generator.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -15,6 +16,7 @@ import io.renren.modules.generator.dao.IssueTableDao;
 import io.renren.modules.generator.entity.IssueMaskTableEntity;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
+import io.renren.modules.indicator.entity.IndicatorKeyIndicatorsEntity;
 import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -75,6 +77,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         try {
             // 执行分页查询
             List<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(creationTime,issueDescription);
+
             page.setRecords(result);
             page.setTotal(result.size());
 
@@ -116,35 +119,74 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
 //        }
 //    }
 
+//    @Override
+//    public String newIssueNumber() {
+//        // 查询所有的问题
+//        List<IssueTableEntity> issues = this.list();
+//
+//        // 如果数据库为空，返回默认值 "0001"
+//        if (issues.isEmpty()) {
+//            return "0001";
+//        }
+//
+//        // 找到 ID 最大的问题
+//        IssueTableEntity maxIssue = issues.stream()
+//                .max(Comparator.comparingLong(IssueTableEntity::getIssueId)) // 根据 ID 获取最大值
+//                .orElse(null); // 如果没有记录，返回 null
+//
+//        if (maxIssue != null) {
+//            // 获取最大问题的编号
+//            String currentIssueNumber = maxIssue.getIssueNumber(); // 假设有一个方法 getIssueNumber()
+//
+//            // 处理问题编号，取后四位并加1
+//            String lastFourDigits = currentIssueNumber.substring(currentIssueNumber.length() - 4);
+//            int newNumber = Integer.parseInt(lastFourDigits) + 1;
+//
+//            // 返回格式化的编号（例如补零）
+//            return String.format("%04d", newNumber); // 修改这里返回字符串
+//        }
+//
+//        return "0001"; // 如果理论上没有找到最大问题，返回默认值
+//    }
+
     @Override
     public String newIssueNumber() {
-        // 查询所有的问题
+        // 查询所有问题编号的后四位
         List<IssueTableEntity> issues = this.list();
-
-        // 如果数据库为空，返回默认值 "0001"
         if (issues.isEmpty()) {
-            return "0001";
+            return "0001"; // 如果没有记录，返回 "0001"
         }
 
-        // 找到 ID 最大的问题
-        IssueTableEntity maxIssue = issues.stream()
-                .max(Comparator.comparingLong(IssueTableEntity::getIssueId)) // 根据 ID 获取最大值
-                .orElse(null); // 如果没有记录，返回 null
+        // 获取所有的后四位编号，过滤掉非基础编号
+        List<String> lastFourDigitsList = issues.stream()
+                .map(IssueTableEntity::getIssueNumber)
+                .filter(issueNumber -> issueNumber.matches("ZL-IS-\\d{8}-\\d{4}")) // 只匹配基础编号
+                .map(issueNumber -> issueNumber.substring(issueNumber.lastIndexOf("-") + 1)) // 提取后四位
+                .collect(Collectors.toList());
 
-        if (maxIssue != null) {
-            // 获取最大问题的编号
-            String currentIssueNumber = maxIssue.getIssueNumber(); // 假设有一个方法 getIssueNumber()
-
-            // 处理问题编号，取后四位并加1
-            String lastFourDigits = currentIssueNumber.substring(currentIssueNumber.length() - 4);
-            int newNumber = Integer.parseInt(lastFourDigits) + 1;
-
-            // 返回格式化的编号（例如补零）
-            return String.format("%04d", newNumber); // 修改这里返回字符串
+        if (lastFourDigitsList.isEmpty()) {
+            return "0001"; // 如果没有有效的后四位，返回 "0001"
         }
 
-        return "0001"; // 如果理论上没有找到最大问题，返回默认值
+        // 找到后四位最大的编号
+        String maxLastFourDigits = lastFourDigitsList.stream()
+                .max(Comparator.comparingInt(Integer::parseInt)) // 获取最大值
+                .orElse(null);
+
+        if (maxLastFourDigits != null) {
+            // 递增最大值的后四位
+            int newNumber = Integer.parseInt(maxLastFourDigits) + 1;
+
+            // 返回新的后四位编号，确保编号是四位数
+            return String.format("%04d", newNumber);
+        }
+
+        // 如果没有有效编号，返回默认值
+        return "0001";
     }
+
+
+
 
     @Override
     public String connectNumber(Integer id) {
@@ -349,10 +391,14 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
             queryWrapper.like("issue_category_id", issueCategoryId);
         }
         // 执行分页查询并返回结果
+
+
         IPage<IssueTableEntity> page = this.page(
                 new Query<IssueTableEntity>().getPage(params),
                 queryWrapper
         );
+
+
         return new PageUtils(page);
     }
 
@@ -379,6 +425,16 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
             log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
             return new ArrayList<>(); // 返回空列表以避免调用方出错
         }
+    }
+
+    //问题知识库删除功能
+    public boolean clearStorageFlag(List<Integer> ids) {
+        List<IssueTableEntity> list = this.list(new LambdaQueryWrapper<IssueTableEntity>().in(IssueTableEntity::getIssueId, ids));
+        for (IssueTableEntity issueTableEntity : list) {
+            issueTableEntity.setStorageFlag(0);
+        }
+        this.saveOrUpdateBatch(list);
+        return true;
     }
 
     @Override

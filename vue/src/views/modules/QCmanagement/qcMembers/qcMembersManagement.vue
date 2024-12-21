@@ -7,7 +7,7 @@
             <el-input v-model="dataListQueryAdmin.groupName" placeholder="小组名" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="dataListQueryAdmin.examineStatus" placeholder="审核状态" clearable>
+            <el-select style="width: 120px;" v-model="dataListQueryAdmin.examineStatus" placeholder="审核状态" clearable>
               <el-option label="通过" value="通过"></el-option>
               <el-option label="未通过" value="未通过"></el-option>
               <el-option label="待审核" value="待审核"></el-option>
@@ -16,7 +16,7 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="dataListQueryAdmin.department" placeholder="科室" clearable>
+            <el-select style="width: 120px;" v-model="dataListQueryAdmin.department" placeholder="科室" clearable>
               <el-option label="生产科" value="生产科"></el-option>
               <el-option label="供应科" value="供应科"></el-option>
               <el-option label="市场科" value="市场科"></el-option>
@@ -27,6 +27,10 @@
               <el-option label="企业管理科" value="企业管理科"></el-option>
               <el-option label="党群办公室" value="党群办公室"></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 120px;" v-model="dataListQueryAdmin.consultant" placeholder="顾问"
+              clearable></el-input>
           </el-form-item>
           <el-form-item>
             <el-date-picker v-model="dataListQueryAdmin.buildTime" type="daterange" range-separator="-"
@@ -110,7 +114,7 @@
             <el-input v-model="dataListQuery.groupName" placeholder="小组名" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="dataListQuery.examineStatus" placeholder="审核状态" clearable>
+            <el-select style="width: 120px;" v-model="dataListQuery.examineStatus" placeholder="审核状态" clearable>
               <el-option label="通过" value="通过"></el-option>
               <el-option label="未通过" value="未通过"></el-option>
               <el-option label="待审核" value="待审核"></el-option>
@@ -119,7 +123,7 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="dataListQuery.department" placeholder="科室" clearable>
+            <el-select style="width: 120px;" v-model="dataListQuery.department" placeholder="科室" clearable>
               <el-option label="生产科" value="生产科"></el-option>
               <el-option label="供应科" value="供应科"></el-option>
               <el-option label="市场科" value="市场科"></el-option>
@@ -130,6 +134,9 @@
               <el-option label="企业管理科" value="企业管理科"></el-option>
               <el-option label="党群办公室" value="党群办公室"></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 120px;" v-model="dataListQuery.consultant" placeholder="顾问" clearable></el-input>
           </el-form-item>
           <el-form-item>
             <el-date-picker v-model="dataListQuery.buildTime" type="daterange" range-separator="-"
@@ -256,7 +263,7 @@
           </el-table-column>
           <!-- <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
           </el-table-column> -->
-          <el-table-column prop="date" header-align="center" align="center" label="加入小组时间">
+          <el-table-column prop="date" header-align="center" align="center" label="创建小组时间">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作" width="160">
@@ -334,12 +341,14 @@ export default {
         department: '',
         examineStatus: '',
         buildTime: [],
+        consultant: '',
       },
       dataListQueryAdmin: {
         groupName: '',
         department: '',
         examineStatus: '',
         buildTime: [],
+        consultant: '',
       },
       dataForm: {
         key: ''
@@ -420,13 +429,16 @@ export default {
           ...o, // 复制原对象属性
           options: o.options.map(e => {
             const match = e.label.match(/\(([^)]+)\)/);
+            const number = e.label.replace(`${match ? match[0] : ''}`, '');
             return {
               ...e, // 复制原选项属性
-              name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              name: match ? match[1] : e.name || '', // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              number: number ? number : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
             };
           })
         };
       });
+      console.log(this.membersOptions)
     });
   },
   computed: {
@@ -446,9 +458,27 @@ export default {
         tmpList = tmpList.filter(item => item.groupName.includes(this.dataListQuery.groupName))
       }
       if (this.dataListQuery.department != '' && this.dataListQuery.department != null) {
+        console.log('进入科室')
+        console.log(this.dataListQuery.department)
         tmpList = tmpList.filter(item => item.department == this.dataListQuery.department)
       }
+      if (this.dataListQuery.consultant != '' && this.dataListQuery.consultant != null) {
+        console.log('进入顾问')
+        console.log(this.dataListQuery.consultant)
+        console.log(this.nameToNumber(this.dataListQuery.consultant))
+        var trueConsultant = this.dataListQuery.consultant
+        console.log({ trueConsultant })
+        if (this.nameToNumber(this.dataListQuery.consultant)) {
+          console.log('进入顾问内部转换')
+          let tmp = this.nameToNumber(this.dataListQuery.consultant)
+          this.dataListQuery.consultant = this.nameToNumber(this.dataListQuery.consultant);
+          console.log({ tmp })
+        }
+        tmpList = tmpList.filter(item => item.position == this.dataListQuery.consultant)
+      }
       if (this.dataListQuery.examineStatus != '' && this.dataListQuery.examineStatus != null) {
+        console.log('进入审核')
+        console.log(this.dataListQuery.examineStatus)
         if (this.dataListQuery.examineStatus == '待审核(科室)') {
           tmpList = tmpList.filter(item => item.examineStatus == '待审核' && item.examineDepartment != '1')
         } else if (this.dataListQuery.examineStatus == '待审核(管理员)') {
@@ -457,12 +487,15 @@ export default {
           tmpList = tmpList.filter(item => item.examineStatus == this.dataListQuery.examineStatus)
         }
       }
-      if (this.dataListQuery.buildTime) {
+      if (Array.isArray(this.dataListQuery.buildTime) && this.dataListQuery.buildTime.length == 2) {
+        console.log('进入日期')
+        console.log(this.dataListQuery.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQuery.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQuery.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
       }
       this.dataListAfterQuery = tmpList
     },
     upQueryAdmin() {
+
       console.log(this.tableData)
       let tmpList = JSON.parse(JSON.stringify(this.tableData))
       console.log(tmpList)
@@ -472,7 +505,22 @@ export default {
       if (this.dataListQueryAdmin.department != '' && this.dataListQueryAdmin.department != null) {
         tmpList = tmpList.filter(item => item.department == this.dataListQueryAdmin.department)
       }
-      console.log(tmpList)
+      console.log('顾问前' + this.dataListQueryAdmin.consultant)
+      if (this.dataListQueryAdmin.consultant != '' && this.dataListQueryAdmin.consultant != null) {
+        console.log('进入顾问')
+        console.log(this.dataListQueryAdmin.consultant)
+        console.log(this.nameToNumber(this.dataListQueryAdmin.consultant))
+        var trueConsultant = this.dataListQueryAdmin.consultant
+        console.log({ trueConsultant })
+        if (this.nameToNumber(this.dataListQueryAdmin.consultant)) {
+          console.log('进入顾问内部转换')
+          let tmp = this.nameToNumber(this.dataListQueryAdmin.topicLeader)
+          this.dataListQueryAdmin.consultant = this.nameToNumber(this.dataListQueryAdmin.consultant);
+          console.log({ tmp })
+        }
+        tmpList = tmpList.filter(item => item.position == this.dataListQueryAdmin.consultant)
+      }
+      console.log({ tmpList })
       if (this.dataListQueryAdmin.examineStatus != '' && this.dataListQueryAdmin.examineStatus != null) {
         console.log('进入审核状态')
         if (this.dataListQueryAdmin.examineStatus == '待审核(科室)') {
@@ -483,13 +531,14 @@ export default {
           tmpList = tmpList.filter(item => item.examineStatus == this.dataListQueryAdmin.examineStatus)
         }
       }
-      if (this.dataListQueryAdmin.buildTime) {
+      if (Array.isArray(this.dataListQueryAdmin.buildTime) && this.dataListQueryAdmin.buildTime.length == 2) {
         console.log('进入日期')
         console.log(this.dataListQueryAdmin.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQueryAdmin.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQueryAdmin.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
       }
       console.log(tmpList)
       this.tableDataAfterQueryAdmin = tmpList
+      // this.dataListQueryAdmin.consultant = trueConsultant
     },
     checkIfAdmit(department, examineStatus, examineDepartment) {
       console.log(examineStatus + '/////' + examineDepartment);
@@ -526,6 +575,7 @@ export default {
         return false;
       }
     },
+    //用户名转昵称
     numberToName(number) {
       var result = ''
       this.membersOptions.forEach(o => {
@@ -535,10 +585,20 @@ export default {
           }
         })
       });
-      // console.log(result)
       return result
     },
-
+    //昵称转用户名
+    nameToNumber(name) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.number == name) {
+            result = e.name
+          }
+        })
+      });
+      return result
+    },
     // 获取我的小组数据列表
     async getGroupList() {
       this.dataListLoading = true

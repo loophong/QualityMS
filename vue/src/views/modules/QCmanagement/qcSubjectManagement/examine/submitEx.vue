@@ -1025,7 +1025,7 @@ export default {
             data: this.$http.adornData({
               'qcExamineId': this.routerParam[0].examineId || undefined,
               'qcExamineSubject': this.routerParam[0].qcsrId,
-              'qcExamineCurrent': '4',
+              'qcExamineCurrent': this.routerParam[0].resultType.includes('其他') ? '2' : '3',
               'qcStatusFive': this.form5.result,
               'qcStatusSix': '0',
               'qcSecondLevel': this.form5.level,
@@ -1116,6 +1116,7 @@ export default {
               'qcExamineCurrent': '完成',
               'qcStatusSeven': this.form7.result,
               'qcSevenContent': this.form7.comment,
+              'qcStorageFlag': '1',
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {

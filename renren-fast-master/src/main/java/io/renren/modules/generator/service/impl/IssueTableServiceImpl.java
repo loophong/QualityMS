@@ -35,7 +35,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -436,6 +439,21 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         this.saveOrUpdateBatch(list);
         return true;
     }
+
+    @Override
+    public int getallissue() {
+        // 获取当前日期和本月的第一天、最后一天
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).with(LocalTime.MIN);
+        LocalDateTime endOfMonth = LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
+
+        // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.between("creation_time", startOfMonth, endOfMonth);
+
+        // 执行查询返回记录总数
+        return this.count(queryWrapper);
+    }
+
 
     @Override
     public Map<String, Integer> gettruecurrentall() {

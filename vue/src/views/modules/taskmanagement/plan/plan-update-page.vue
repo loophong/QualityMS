@@ -529,7 +529,7 @@ export default {
         this.$refs['dataForm'].resetFields()
         if (routerPlanId) {
           this.$http({
-            url: this.$http.adornUrl(`/taskmanagement/plan/getPlanAllInfo?planId=${routerPlanId}`),
+            url: this.$http.adornUrl(`/taskmanagement/plan/getPlanAndChildTask?planId=${routerPlanId}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({data}) => {
@@ -587,7 +587,15 @@ export default {
     },
 
     cancel() {
-      this.$router.push({name: 'TasksList'}); // 假设你有一个名为TasksList的路由
+      //弹窗提示用户是否取消，取消将返回到任务列表页面，并且不保留数据
+      this.$confirm('确定取消吗？取消后数据不保留', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$router.back()
+      })
+
     },
 
     dataFormSubmit() {
@@ -688,9 +696,6 @@ export default {
                   type: 'success',
                   duration: 1500
                 });
-                // this.$router.push({
-                //   name: 'plan-list'
-                // });
                 this.$router.back();
               } else {
                 this.$message.error(data.msg);

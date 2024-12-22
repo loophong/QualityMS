@@ -38,6 +38,16 @@
             </el-select>
           </el-form-item>
           <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanAll" type="daterange" range-separator="-"
+              start-placeholder="计划开始日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanEndAll" type="daterange" range-separator="-"
+              start-placeholder="计划结束日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
             <el-button @click="getDataList()">查询</el-button>
             <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button>
@@ -175,6 +185,16 @@
               <el-option label="企业管理科" value="企业管理科"></el-option>
               <el-option label="党群办公室" value="党群办公室"></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanLead" type="daterange" range-separator="-"
+              start-placeholder="计划开始日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanEndLead" type="daterange" range-separator="-"
+              start-placeholder="计划结束日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
@@ -325,6 +345,16 @@
               <el-option label="企业管理科" value="企业管理科"></el-option>
               <el-option label="党群办公室" value="党群办公室"></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanJoin" type="daterange" range-separator="-"
+              start-placeholder="计划开始日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanEndJoin" type="daterange" range-separator="-"
+              start-placeholder="计划结束日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item>
             <el-button @click="getJoinList()">查询</el-button>
@@ -547,27 +577,36 @@ export default {
         keywords: '',
         topicLeader: '',
         topicConsultant: '',
-        topicConsultant: '',
         topicReviewStatus: '',
         topicDepartment: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       },
       myQueryParamLead: {
         topicName: '',
         keywords: '',
         topicLeader: '',
         topicConsultant: '',
-        topicConsultant: '',
         topicReviewStatus: '',
         topicDepartment: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       },
+      activityPlanLead: [],
+      activityPlanEndLead: [],
+      activityPlanJoin: [],
+      activityPlanEndJoin: [],
+      activityPlanAll: [],
+      activityPlanEndAll: [],
       myQueryParamJoin: {
         topicName: '',
         keywords: '',
         topicLeader: '',
         topicConsultant: '',
-        topicConsultant: '',
         topicReviewStatus: '',
         topicDepartment: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       },
       reuseStepId: ''
     }
@@ -678,14 +717,25 @@ export default {
     },
     // 获取我参与课题数据列表
     async getJoinList() {
+      this.myQueryParamJoin.activityPlan = ''
+      this.myQueryParamJoin.activityPlanEnd = ''
       let trueLeader = this.myQueryParamJoin.topicLeader
-      let trueConsultant = this.myQueryParamJoin.consultant
+      let trueConsultant = this.myQueryParamJoin.topicConsultant
       if (this.nameToNumber(this.myQueryParamJoin.topicLeader)) {
-        this.myQueryParamJoin.topicLeader = this.nameToNumber(this.myQueryParamJoinJoin.topicLeader);
+        this.myQueryParamJoin.topicLeader = this.nameToNumber(this.myQueryParamJoin.topicLeader);
       }
-      if (this.nameToNumber(this.myQueryParamJoin.consultant)) {
-        this.myQueryParamJoin.consultant = this.nameToNumber(this.myQueryParamJoin.consultant);
+      if (this.nameToNumber(this.myQueryParamJoin.topicConsultant)) {
+        this.myQueryParamJoin.topicConsultant = this.nameToNumber(this.myQueryParamJoin.topicConsultant);
       }
+      if (Array.isArray(this.activityPlanJoin) && this.activityPlanJoin.length == 2) {
+        console.log(this.activityPlanJoin[0])
+        this.myQueryParamJoin.activityPlan = `${this.activityPlanJoin[0]},${this.activityPlanJoin[1]}`
+      }
+      if (Array.isArray(this.activityPlanEndJoin) && this.activityPlanEndJoin.length == 2) {
+        this.myQueryParamJoin.activityPlanEnd = `${this.activityPlanEndJoin[0]},${this.activityPlanEndJoin[1]}`
+      }
+      // this.myQueryParamJoin.activityPlan = JSON.stringify(this.myQueryParamJoin.activityPlan)
+      // this.myQueryParamJoin.activityPlanEnd = JSON.stringify(this.myQueryParamJoin.activityPlanEnd)
       this.dataListLoading = true;
       await this.$http({
         url: this.$http.adornUrl("/qcSubject/registration/myList"),
@@ -704,7 +754,7 @@ export default {
           this.subjectJoinList = tmp;
           // this.dataList = resultList
           this.myQueryParamJoin.topicLeader = trueLeader
-          this.myQueryParamJoin.consultant = trueConsultant
+          this.myQueryParamJoin.topicConsultant = trueConsultant
           this.totalPageJoin = data.page.totalCount;
         } else {
           this.subjectJoinList = [];
@@ -716,14 +766,29 @@ export default {
     },
     // 获取我创办课题数据列表
     async getLeadList() {
+      this.myQueryParamLead.activityPlan = ''
+      this.myQueryParamLead.activityPlanEnd = ''
       let trueLeader = this.myQueryParamLead.topicLeader
-      let trueConsultant = this.myQueryParamLead.consultant
+      let trueConsultant = this.myQueryParamLead.topicConsultant
       if (this.nameToNumber(this.myQueryParamLead.topicLeader)) {
+        console.log('进入组长')
+        console.log(this.myQueryParamLead.topicLeader)
         this.myQueryParamLead.topicLeader = this.nameToNumber(this.myQueryParamLead.topicLeader);
       }
-      if (this.nameToNumber(this.myQueryParamLead.consultant)) {
-        this.myQueryParamLead.consultant = this.nameToNumber(this.myQueryParamLead.consultant);
+      console.log('顾问前' + this.myQueryParamLead.topicConsultant)
+      if (this.nameToNumber(this.myQueryParamLead.topicConsultant)) {
+        console.log('进入顾问')
+        console.log(this.myQueryParamLead.topicConsultant)
+        this.myQueryParamLead.topicConsultant = this.nameToNumber(this.myQueryParamLead.topicConsultant);
       }
+      if (Array.isArray(this.activityPlanLead) && this.activityPlanLead.length == 2) {
+        console.log(this.activityPlanLead[0])
+        this.myQueryParamLead.activityPlan = `${this.activityPlanLead[0]},${this.activityPlanLead[1]}`
+      }
+      if (Array.isArray(this.activityPlanEndLead) && this.activityPlanEndLead.length == 2) {
+        this.myQueryParamLead.activityPlanEnd = `${this.activityPlanEndLead[0]},${this.activityPlanEndLead[1]}`
+      }
+      // this.myQueryParamLead.activityPlanEnd = JSON.stringify(this.myQueryParamLead.activityPlanEnd)
       this.dataListLoading = true;
       await this.$http({
         url: this.$http.adornUrl("/qcSubject/registration/leadList"),
@@ -743,11 +808,11 @@ export default {
           // this.dataList = resultList
           this.totalPageLead = data.page.totalCount;
           this.myQueryParamLead.topicLeader = trueLeader
-          this.myQueryParamLead.consultant = trueConsultant
+          this.myQueryParamLead.topicConsultant = trueConsultant
         } else {
           this.subjectLeadList = [];
           this.myQueryParamLead.topicLeader = trueLeader
-          this.myQueryParamLead.consultant = trueConsultant
+          this.myQueryParamLead.topicConsultant = trueConsultant
           this.totalPageSubject = 0;
         }
 
@@ -757,13 +822,26 @@ export default {
 
     // 获取数据列表
     async getDataList(reuse) {
+      this.myQueryParam.activityPlan = ''
+      this.myQueryParam.activityPlanEnd = ''
       let trueLeader = this.myQueryParam.topicLeader
-      let trueConsultant = this.myQueryParam.consultant
+      let trueConsultant = this.myQueryParam.topicConsultant
       if (this.nameToNumber(this.myQueryParam.topicLeader)) {
+        console.log('进入组长')
+        console.log(this.myQueryParam.topicLeader)
         this.myQueryParam.topicLeader = this.nameToNumber(this.myQueryParamJoin.topicLeader);
       }
-      if (this.nameToNumber(this.myQueryParam.consultant)) {
-        this.myQueryParam.consultant = this.nameToNumber(this.myQueryParam.consultant);
+      if (this.nameToNumber(this.myQueryParam.topicConsultant)) {
+        console.log('进入顾问')
+        console.log(this.myQueryParam.topicConsultant)
+        this.myQueryParam.topicConsultant = this.nameToNumber(this.myQueryParam.topicConsultant);
+      }
+      if (Array.isArray(this.activityPlanAll) && this.activityPlanAll.length == 2) {
+        console.log(this.activityPlanAll[0])
+        this.myQueryParam.activityPlan = `${this.activityPlanAll[0]},${this.activityPlanAll[1]}`
+      }
+      if (Array.isArray(this.activityPlanEndAll) && this.activityPlanEndAll.length == 2) {
+        this.myQueryParam.activityPlanEnd = `${this.activityPlanEndAll[0]},${this.activityPlanEndAll[1]}`
       }
       this.dataListLoading = true
       await this.$http({
@@ -785,13 +863,13 @@ export default {
           this.totalPage = data.page.totalCount
           this.messageList = data.page.list
           this.myQueryParam.topicLeader = trueLeader
-          this.myQueryParam.consultant = trueConsultant
+          this.myQueryParam.topicConsultant = trueConsultant
           this.totalPageReuse = data.page.totalCount
         } else {
           this.dataList = []
           this.totalPage = 0
           this.myQueryParam.topicLeader = trueLeader
-          this.myQueryParam.consultant = trueConsultant
+          this.myQueryParam.topicConsultant = trueConsultant
         }
 
         this.dataListLoading = false

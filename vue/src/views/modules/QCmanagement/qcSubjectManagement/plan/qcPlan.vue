@@ -38,6 +38,16 @@
             </el-select>
           </el-form-item>
           <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanAll" type="daterange" range-separator="-"
+              start-placeholder="计划开始日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanEndAll" type="daterange" range-separator="-"
+              start-placeholder="计划结束日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
             <el-button @click="getDataList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:plan:submit')" type="primary"
           @click="newPlanHandle(dataListSelections[0].qcsrId)"
@@ -80,9 +90,9 @@
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
           </el-table-column>
-          <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
+          <el-table-column prop="activityPlan" header-align="center" align="center" label="计划开始日期" width="120">
           </el-table-column>
-          <el-table-column prop="endDate" header-align="center" align="center" label="结束日期" width="120">
+          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="计划结束日期" width="120">
           </el-table-column>
           <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述">
           </el-table-column>
@@ -170,6 +180,16 @@
             </el-select>
           </el-form-item>
           <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanLead" type="daterange" range-separator="-"
+              start-placeholder="计划开始日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanEndLead" type="daterange" range-separator="-"
+              start-placeholder="计划结束日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
@@ -208,9 +228,9 @@
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
           </el-table-column>
-          <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
+          <el-table-column prop="activityPlan" header-align="center" align="center" label="计划开始日期" width="120">
           </el-table-column>
-          <el-table-column prop="endDate" header-align="center" align="center" label="结束日期" width="120">
+          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="计划结束日期" width="120">
           </el-table-column>
           <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述">
           </el-table-column>
@@ -300,6 +320,16 @@
             </el-select>
           </el-form-item>
           <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanJoin" type="daterange" range-separator="-"
+              start-placeholder="计划开始日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanEndJoin" type="daterange" range-separator="-"
+              start-placeholder="计划结束日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
             <el-button @click="getJoinList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
@@ -336,9 +366,9 @@
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
           </el-table-column>
-          <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
+          <el-table-column prop="activityPlan" header-align="center" align="center" label="计划开始日期" width="120">
           </el-table-column>
-          <el-table-column prop="endDate" header-align="center" align="center" label="结束日期" width="120">
+          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="计划结束日期" width="120">
           </el-table-column>
           <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述">
           </el-table-column>
@@ -433,32 +463,41 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
+      activityPlanLead: [],
+      activityPlanEndLead: [],
+      activityPlanJoin: [],
+      activityPlanEndJoin: [],
+      activityPlanAll: [],
+      activityPlanEndAll: [],
       myQueryParam: {
         topicName: '',
         keywords: '',
         topicLeader: '',
         topicConsultant: '',
-        topicConsultant: '',
         topicReviewStatus: '',
         topicDepartment: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       },
       myQueryParamLead: {
         topicName: '',
         keywords: '',
         topicLeader: '',
         topicConsultant: '',
-        topicConsultant: '',
         topicReviewStatus: '',
         topicDepartment: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       },
       myQueryParamJoin: {
         topicName: '',
         keywords: '',
         topicLeader: '',
         topicConsultant: '',
-        topicConsultant: '',
         topicReviewStatus: '',
         topicDepartment: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       }
     }
   },
@@ -479,9 +518,11 @@ export default {
           ...o, // 复制原对象属性
           options: o.options.map(e => {
             const match = e.label.match(/\(([^)]+)\)/);
+            const number = e.label.replace(`${match ? match[0] : ''}`, '');
             return {
               ...e, // 复制原选项属性
-              name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              name: match ? match[1] : e.name || '',// 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              number: number ? number : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
             };
           })
         };
@@ -602,13 +643,22 @@ export default {
     },
     // 获取我参与课题数据列表
     async getJoinList() {
+      this.myQueryParamJoin.activityPlan = ''
+      this.myQueryParamJoin.activityPlanEnd = ''
       let trueLeader = this.myQueryParamJoin.topicLeader
-      let trueConsultant = this.myQueryParamJoin.consultant
+      let trueConsultant = this.myQueryParamJoin.topicConsultant
       if (this.nameToNumber(this.myQueryParamJoin.topicLeader)) {
-        this.myQueryParamJoin.topicLeader = this.nameToNumber(this.myQueryParamJoinJoin.topicLeader);
+        this.myQueryParamJoin.topicLeader = this.nameToNumber(this.myQueryParamJoin.topicLeader);
       }
-      if (this.nameToNumber(this.myQueryParamJoin.consultant)) {
-        this.myQueryParamJoin.consultant = this.nameToNumber(this.myQueryParamJoin.consultant);
+      if (this.nameToNumber(this.myQueryParamJoin.topicConsultant)) {
+        this.myQueryParamJoin.topicConsultant = this.nameToNumber(this.myQueryParamJoin.topicConsultant);
+      }
+      if (Array.isArray(this.activityPlanJoin) && this.activityPlanJoin.length == 2) {
+        console.log(this.activityPlanJoin[0])
+        this.myQueryParamJoin.activityPlan = `${this.activityPlanJoin[0]},${this.activityPlanJoin[1]}`
+      }
+      if (Array.isArray(this.activityPlanEndJoin) && this.activityPlanEndJoin.length == 2) {
+        this.myQueryParamJoin.activityPlanEnd = `${this.activityPlanEndJoin[0]},${this.activityPlanEndJoin[1]}`
       }
       this.dataListLoading = true;
       await this.$http({
@@ -627,7 +677,7 @@ export default {
           });
           this.subjectJoinList = tmp;
           this.myQueryParamJoin.topicLeader = trueLeader
-          this.myQueryParamJoin.consultant = trueConsultant
+          this.myQueryParamJoin.topicConsultant = trueConsultant
           // this.dataList = resultList
           this.totalPageJoin = data.page.totalCount;
         } else {
@@ -640,13 +690,22 @@ export default {
     },
     // 获取我创办课题数据列表
     async getLeadList() {
+      this.myQueryParamLead.activityPlan = ''
+      this.myQueryParamLead.activityPlanEnd = ''
       let trueLeader = this.myQueryParamLead.topicLeader
-      let trueConsultant = this.myQueryParamLead.consultant
+      let trueConsultant = this.myQueryParamLead.topicConsultant
       if (this.nameToNumber(this.myQueryParamLead.topicLeader)) {
-        this.myQueryParamLead.topicLeader = this.nameToNumber(this.myQueryParamJoinJoin.topicLeader);
+        this.myQueryParamLead.topicLeader = this.nameToNumber(this.myQueryParamLead.topicLeader);
       }
-      if (this.nameToNumber(this.myQueryParamLead.consultant)) {
-        this.myQueryParamLead.consultant = this.nameToNumber(this.myQueryParamLead.consultant);
+      if (this.nameToNumber(this.myQueryParamLead.topicConsultant)) {
+        this.myQueryParamLead.topicConsultant = this.nameToNumber(this.myQueryParamLead.topicConsultant);
+      }
+      if (Array.isArray(this.activityPlanLead) && this.activityPlanLead.length == 2) {
+        console.log(this.activityPlanLead[0])
+        this.myQueryParamLead.activityPlan = `${this.activityPlanLead[0]},${this.activityPlanLead[1]}`
+      }
+      if (Array.isArray(this.activityPlanEndLead) && this.activityPlanEndLead.length == 2) {
+        this.myQueryParamLead.activityPlanEnd = `${this.activityPlanEndLead[0]},${this.activityPlanEndLead[1]}`
       }
       this.dataListLoading = true;
       await this.$http({
@@ -666,7 +725,7 @@ export default {
           });
           this.subjectLeadList = tmp;
           this.myQueryParamLead.topicLeader = trueLeader
-          this.myQueryParamLead.consultant = trueConsultant
+          this.myQueryParamLead.topicConsultant = trueConsultant
           // this.dataList = resultList
           this.totalPageLead = data.page.totalCount;
         } else {
@@ -766,13 +825,22 @@ export default {
     },
     // 获取数据列表
     getDataList() {
+      this.myQueryParam.activityPlan = ''
+      this.myQueryParam.activityPlanEnd = ''
       let trueLeader = this.myQueryParam.topicLeader
-      let trueConsultant = this.myQueryParam.consultant
+      let trueConsultant = this.myQueryParam.topicConsultant
       if (this.nameToNumber(this.myQueryParam.topicLeader)) {
-        this.myQueryParam.topicLeader = this.nameToNumber(this.myQueryParamJoinJoin.topicLeader);
+        this.myQueryParam.topicLeader = this.nameToNumber(this.myQueryParamJoin.topicLeader);
       }
-      if (this.nameToNumber(this.myQueryParam.consultant)) {
-        this.myQueryParam.consultant = this.nameToNumber(this.myQueryParam.consultant);
+      if (this.nameToNumber(this.myQueryParam.topicConsultant)) {
+        this.myQueryParam.topicConsultant = this.nameToNumber(this.myQueryParam.topicConsultant);
+      }
+      if (Array.isArray(this.activityPlanAll) && this.activityPlanAll.length == 2) {
+        console.log(this.activityPlanAll[0])
+        this.myQueryParam.activityPlan = `${this.activityPlanAll[0]},${this.activityPlanAll[1]}`
+      }
+      if (Array.isArray(this.activityPlanEndAll && this.activityPlanEndAll.length == 2)) {
+        this.myQueryParam.activityPlanEnd = `${this.activityPlanEndAll[0]},${this.activityPlanEndAll[1]}`
       }
       this.dataListLoading = true
       this.$http({
@@ -791,7 +859,7 @@ export default {
           });
           this.dataList = tmp
           this.myQueryParam.topicLeader = trueLeader
-          this.myQueryParam.consultant = trueConsultant
+          this.myQueryParam.topicConsultant = trueConsultant
           this.totalPage = data.page.totalCount
         } else {
           this.dataList = []

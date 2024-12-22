@@ -1057,6 +1057,8 @@
         PtableNames: [],  // 存放从后端获取的表名  
         PselectedTable: null,  // 选中的表名  
 
+        //控制watch参数
+        chartInitialized: false,
 
         //警告弹窗参数
 
@@ -1065,34 +1067,38 @@
     },
 
     watch: {  
-      XRselectedTable(newValue, oldValue) {  
+      async XRselectedTable(newValue, oldValue) {  
         // 当 XRselectedTable 改变时调用更新图表的函数  
-        if (newValue !== oldValue) {  
-            //获取新数据
-            this.getXbarRchart();
-            this.getXbarSchart();
-            this.getMeRchart();
-            this.getIMRchart();
+        if (newValue !== oldValue && this.chartInitialized) {  
 
-            //更新图表
-            this.updateChartXbarR_Xbar();
-            this.updateChartXbarR_R();
+          //获取新数据
+          await this.getXbarRchart();
+          await this.getXbarSchart();
+          await this.getMeRchart();
+          await this.getIMRchart();
 
-            this.updateChartXbarS_Xbar();
-            this.updateChartXbarS_S();
+          console.log(this.XbarRChartData[0].length);
+          console.log("---"+ this.chartInitialized);
 
-            this.updateChartMeR_Me();
-            this.updateChartMeR_R();
+          //更新图表
+          this.updateChartXbarR_Xbar();
+          this.updateChartXbarR_R();
 
-            this.updateChartIMR_I();
-            this.updateChartIMR_MR();
+          this.updateChartXbarS_Xbar();
+          this.updateChartXbarS_S();
+
+          this.updateChartMeR_Me(); 
+          this.updateChartMeR_R();
+
+          this.updateChartIMR_I();
+          this.updateChartIMR_MR();
 
         }  
       },
 
       PselectedTable(newValue, oldValue) {  
         // 当 PselectedTable 改变时调用更新图表的函数  
-        if (newValue !== oldValue) {  
+        if (newValue !== oldValue && this.chartInitialized) {  
             //获取新数据
             this.getPchart();
             this.getNPchart();
@@ -1126,10 +1132,10 @@
           // 获取表名  
           await this.fetchOptionsXR();  
           await this.fetchOptionsP();
-          
+          this.chartInitialized = true; // 由于fetch完成，设置图表已初始化 
+
           // 加载 Xbar R Chart 数据  
           await this.getXbarRchart();  
-          console.log(this.XbarRChartData); 
           // 确保数据已加载  
           if (this.XbarRChartData.length === 8) {  
               this.initChartXbarR_Xbar();  
@@ -2059,7 +2065,6 @@
         const XbarRCharXbarUCL = this.XbarRChartData[1];
         const XbarRCharXbarCL = this.XbarRChartData[2];
         const XbarRCharXbarLCL = this.XbarRChartData[3];
-        console.log("XbarRCharXbar"+XbarRCharXbar.length);
         const xAxisData = Array.from({ length: XbarRCharXbar.length }, (_, index) => index + 1);
 
         const option = {
@@ -4104,11 +4109,8 @@
 
 
       //预警方法
-      //PTD图预警
-      closeAlert() {  
-        this.showAlert = false; // 关闭弹窗  
-      }, 
 
+      //PTD图预警
       PTDWarning(){
         if(this.PValue > 0.05){
           this.$message({

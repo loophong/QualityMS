@@ -240,8 +240,7 @@ export default {
       }
       if (jumpdepart === 'plan_approval_page') {
         this.$router.push({
-          name: 'plan-approval-index',
-          params: {}
+          name: 'plan-approval-index'
         })
       }
       if (jumpdepart === 'task_approval_page') {

@@ -3083,7 +3083,9 @@ export default {
       });
 
       console.log('----------------')
-      console.log(this.groupedData)
+      // console.log(this.groupedData)
+      // this.conplanProcess=this.active1
+      console.log(this.conplanProcess)
     },
 
     // click() {
@@ -3180,6 +3182,8 @@ export default {
       });
     },
     handleClickToStep(id) {
+      this.conplanProcess = id;
+      // console.log('++++' + this.conplanProcess)
       if (this.routerParam.topicType == "问题解决型") {
         this.active1 = id;
         this.findMatchingItem(this.active1);
@@ -3190,6 +3194,9 @@ export default {
         this.active3 = id;
         this.findMatchingItem(this.active3);
       }
+      console.log('active1' + this.active1)
+      console.log('active2' + this.active2)
+      console.log('active3' + this.active3)
     },
     //每步数据查询
     findMatchingItem(id) {

@@ -7,30 +7,20 @@
       <el-form-item>
         <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
       </el-form-item>
-       <!-- <el-form-item>
+      <!-- <el-form-item>
         <el-input v-model="myQueryParam.startDate" placeholder="开始日期" clearable></el-input>
       </el-form-item>
             <el-form-item>
         <el-input v-model="myQueryParam.endDate" placeholder="结束日期" clearable></el-input>
       </el-form-item> -->
-      <el-form-item label="开始日期" prop="startDate">
-        <el-date-picker
-          v-model="myQueryParam.startDate"
-          type="date"
-          placeholder="选择日期"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-        ></el-date-picker>
-      </el-form-item>
-        <el-form-item label="结束日期" prop="endDate">
-        <el-date-picker
-          v-model="myQueryParam.endDate"
-          type="date"
-          placeholder="选择日期"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-        ></el-date-picker>
-      </el-form-item>
+      <!-- <el-form-item label="开始日期" prop="startDate">
+        <el-date-picker v-model="myQueryParam.startDate" type="date" placeholder="选择日期" format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"></el-date-picker>
+      </el-form-item> -->
+      <!-- <el-form-item label="结束日期" prop="endDate">
+        <el-date-picker v-model="myQueryParam.endDate" type="date" placeholder="选择日期" format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"></el-date-picker>
+      </el-form-item> -->
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <!-- <el-button v-if="isAuth('qcSubject:plan:submit')" type="primary"
@@ -44,13 +34,14 @@
           :disabled="dataListSelections.length != 1">审核状态</el-button> -->
         <!-- <el-button type="danger" @click="toIssue()">问题添加</el-button> -->
       </el-form-item>
-     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button v-if="isAuth('qcSubject:registration:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-      </el-col>
-       <el-col :span="1.5">
-        <el-button v-if="isAuth('qcSubject:registration:list')"  type="primary" @click="exportAll()">导出</el-button>
-      </el-col>
+      <el-row :gutter="10" class="mb8">
+        <!-- <el-col :span="1.5">
+          <el-button v-if="isAuth('qcSubject:registration:delete')" type="danger" @click="deleteHandle()"
+            :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        </el-col> -->
+        <el-col :span="1.5">
+          <el-button v-if="isAuth('qcSubject:registration:list')" type="primary" @click="exportAll()">导出</el-button>
+        </el-col>
       </el-row>
     </el-form>
     <el-table :data="filteredDataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
@@ -64,14 +55,23 @@
       <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
       </el-table-column>
       <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
+        <template slot-scope="scope">
+          {{ numberToName(scope.row.topicLeader) }}
+        </template>
       </el-table-column>
       <el-table-column prop="topicConsultant" header-align="center" align="center" label="课题顾问">
+        <template slot-scope="scope">
+          {{ numberToName(scope.row.topicConsultant) }}
+        </template>
       </el-table-column>
       <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+        <template slot-scope="scope">
+          {{ numberToNameArray(scope.row.teamNumberIds) }}
+        </template>
       </el-table-column>
-      <el-table-column prop="startDate" header-align="center" align="center" label="开始日期" width="120">
+      <el-table-column prop="activityPlan" header-align="center" align="center" label="计划开始日期" width="120">
       </el-table-column>
-      <el-table-column prop="endDate" header-align="center" align="center" label="结束日期" width="120">
+      <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="计划结束日期" width="120">
       </el-table-column>
       <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述">
       </el-table-column>
@@ -84,7 +84,7 @@
       <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
         <template slot-scope="scope">
           <span>{{ toStatus(scope.row.topicActivityStatus,
-      scope.row.topicType) }}</span>
+            scope.row.topicType) }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -96,7 +96,7 @@
           <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
           <span v-else>--</span> <!-- 处理未知状态 -->
         </template>
-        </el-table-column>
+      </el-table-column>
       <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
       </el-table-column>
       <el-table-column prop="note" header-align="center" align="center" label="备注">
@@ -108,20 +108,20 @@
       </el-table-column>
       <el-table-column prop="qcFourContent" header-align="center" align="center" label="成果初评审核意见" width="180">
       </el-table-column>
-       <el-table-column prop="qcFirstScore" header-align="center" align="center" label="成果初评分数" width="120">
+      <el-table-column prop="qcFirstScore" header-align="center" align="center" label="成果初评分数" width="120">
       </el-table-column>
-       <el-table-column prop="qcSecondScore" header-align="center" align="center" label="成果复评分数" width="120">
+      <el-table-column prop="qcSecondScore" header-align="center" align="center" label="成果复评分数" width="120">
       </el-table-column>
-        <el-table-column prop="qcFiveContent" header-align="center" align="center" label="成果复评审核意见" width="180">
+      <el-table-column prop="qcFiveContent" header-align="center" align="center" label="成果复评审核意见" width="180">
       </el-table-column>
-         <el-table-column prop="qcSixContent" header-align="center" align="center" label="财务部审核意见" width="180">
+      <el-table-column prop="qcSixContent" header-align="center" align="center" label="财务部审核意见" width="180">
       </el-table-column>
-       <el-table-column prop="qcSevenContent" header-align="center" align="center" label="终评审核意见" width="180">
+      <el-table-column prop="qcSevenContent" header-align="center" align="center" label="终评审核意见" width="180">
       </el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
-            @click="newPlanHandle(scope.row.qcsrId)">关联计划</el-button>
+            @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
           <!-- <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
             @click="addOrUpdateHandle(scope.row.qcsrId)">提交计划</el-button>
           <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
@@ -142,20 +142,21 @@
 import AddOrUpdate from './K_qcPlan-add-or-update'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import {Loading} from "element-ui";
+import { Loading } from "element-ui";
 export default {
   data() {
     return {
       dataForm: {
         key: ''
       },
-       dataList: [],
+      dataList: [],
       dataList01: [], //列表数据(不分页)
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
       dataListLoading: false,
       dataListSelections: [],
+      membersOptions: [],
       addOrUpdateVisible: false,
       myQueryParam: {
         topicName: '',
@@ -168,8 +169,30 @@ export default {
   components: {
     AddOrUpdate
   },
-  activated() {
+  async activated() {
     this.getDataList()
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({ data }) => {
+      this.membersOptions = data.map(o => {
+        return {
+          ...o, // 复制原对象属性
+          options: o.options.map(e => {
+            const match = e.label.match(/\(([^)]+)\)/);
+            const number = e.label.replace(`${match ? match[0] : ''}`, '');
+            // console.log(number);
+            return {
+              ...e, // 复制原选项属性
+              name: match ? match[1] : e.name || '', // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              number: number ? number : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+            };
+          })
+        };
+      });
+      // console.log(this.membersOptions)
+    });
   },
   computed: {
     filteredDataList() {
@@ -178,20 +201,25 @@ export default {
   },
   methods: {
     //创建计划跳转
-    newPlanHandle(id) {
-      let filteredArray = [];
+    newPlanHandle(id, row) {
+      let qcsrId = id;
+      // console.log("qcsrId======xht=======>"+qcsrId);
       // 遍历原始数组
-      for (let i = 0; i < this.dataList.length; i++) {
-        if (this.dataList[i].qcsrId === id) {
-          // 如果满足条件，将对象添加到新数组中
-          filteredArray.push(this.dataList[i]);
-        }
-      }
+      console.log(row)
+      // for (let i = 0; i < tmpList.length; i++) {
+      //   if (this.dataList[i].qcsrId === id) {
+      //     // 如果满足条件，将对象添加到新数组中
+      //     filteredArray.push(this.dataList[i]);
+      //     // console.log('1')
+      //   }
+      // }
+      // console.log(filteredArray)
       this.$router.push(
         {
           name: 'qcPlanNew',
           query: {
-            data: JSON.stringify(filteredArray)
+            data: JSON.stringify(row),
+            qcsrId: qcsrId,
           }
         });
     },
@@ -227,7 +255,40 @@ export default {
           });
       }
     },
-
+    numberToNameArray(numbers) {
+      if (Array.isArray(numbers)) {
+        let result = numbers.map(number => this.numberToName(number));
+        return `${result}`
+        // return numbers
+      } else {
+        return numbers
+      }
+    },
+    //用户名转昵称
+    numberToName(number) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.name == number) {
+            result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      return result
+    },
+    //昵称转用户名
+    nameToNumber(name) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.number == name) {
+            result = e.name
+            console.log(e.name)
+          }
+        })
+      });
+      return result
+    },
     toIssue() {
       this.$router.push(
         {
@@ -329,7 +390,11 @@ export default {
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.dataList = data.page.list
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          })
+          this.dataList = tmp
           this.totalPage = data.page.totalCount
         } else {
           this.dataList = []
@@ -364,11 +429,11 @@ export default {
       })
     },
     // 删除
-     deleteHandle(id) {
+    deleteHandle(id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {
         return item.qcsrId
       })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+      this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -395,79 +460,83 @@ export default {
     },
 
     //导出excel
-    async exportAll(){
+    async exportAll() {
       await this.$http({
-          url: this.$http.adornUrl('/qcSubject/registration/finishedList01'),
-          method: 'get',
-          params: this.$http.adornParams({
+        url: this.$http.adornUrl('/qcSubject/registration/finishedList01'),
+        method: 'get',
+        params: this.$http.adornParams({
           'topicName': this.myQueryParam.topicName,
           'keywords': this.myQueryParam.keywords,
           'startDate': this.myQueryParam.startDate,
           'endDate': this.myQueryParam.endDate,
-          })
-        }).then(({data}) => {
-          if (data) {
-            this.dataList01 = data
-          } else {
-            this.dataList01 = []
-          }
         })
-        const loadingInstance = Loading.service({
-          lock: true,
-          text: "正在导出，请稍后...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)",
-        });
-
-        const promises = this.dataList01.map((tableRow, index) => {
-            return {
-              序号: index + 1,
-              课题ID:tableRow.qcsrId,
-              课题名称: tableRow.topicName,
-              课题编号:tableRow.topicNumber,
-              课题组长:tableRow.topicLeader,
-              课题顾问:tableRow.topicConsultant,
-              小组成员:tableRow.teamNumberIds,
-              开始日期:tableRow.startDate,
-              结束日期:tableRow.endDate,
-              课题描述:tableRow.topicDescription,
-              课题类型:tableRow.topicType,
-              活动特性:tableRow.activityCharacteristics,
-              课题关键字:tableRow.keywords,
-              课题活动评分结果:tableRow.topicActivityResult,
-              提交类型:tableRow.resultType,
-              成果认定审核意见:tableRow.qcTwoContent,
-              相关方审核意见:tableRow.qcThreeContent,
-              成果初评分数:tableRow.qcFirstScore,
-              成果复评分数:tableRow.qcSecondScore,
-              成果复评审核意见:tableRow.qcFiveContent,
-              财务部审核意见:tableRow.qcSixContent,
-              终评审核意见:tableRow.qcSixContent
-            };
-        });
-        Promise.all(promises)
-          .then((data) => {
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "项目列表");
-
-            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-            saveAs(
-              new Blob([wbout], { type: "application/octet-stream" }),
-              "QC知识库数据.xlsx"
-            );
-
-            // // 提交数据到Vuex Store
-            // this.updateExportedData(data);
+      }).then(({ data }) => {
+        if (data) {
+          let tmp = data
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
           })
-          .finally(() => {
-            loadingInstance.close();
-          })
-          .catch((error) => {
-            console.error("导出失败:", error);
-            loadingInstance.close();
-          });
-      },
-    }
+          this.dataList01 = tmp
+        } else {
+          this.dataList01 = []
+        }
+      })
+      const loadingInstance = Loading.service({
+        lock: true,
+        text: "正在导出，请稍后...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+
+      const promises = this.dataList01.map((tableRow, index) => {
+        return {
+          序号: index + 1,
+          课题ID: tableRow.qcsrId,
+          课题名称: tableRow.topicName,
+          课题编号: tableRow.topicNumber,
+          课题组长: this.numberToName(tableRow.topicLeader),
+          课题顾问: this.numberToName(tableRow.topicConsultant),
+          小组成员: this.numberToNameArray(tableRow.teamNumberIds),
+          开始日期: tableRow.startDate,
+          结束日期: tableRow.endDate,
+          课题描述: tableRow.topicDescription,
+          课题类型: tableRow.topicType,
+          活动特性: tableRow.activityCharacteristics,
+          课题关键字: tableRow.keywords,
+          课题活动评分结果: tableRow.topicActivityResult,
+          提交类型: tableRow.resultType,
+          成果认定审核意见: tableRow.qcTwoContent,
+          相关方审核意见: tableRow.qcThreeContent,
+          成果初评分数: tableRow.qcFirstScore,
+          成果复评分数: tableRow.qcSecondScore,
+          成果复评审核意见: tableRow.qcFiveContent,
+          财务部审核意见: tableRow.qcSixContent,
+          终评审核意见: tableRow.qcSixContent
+        };
+      });
+      Promise.all(promises)
+        .then((data) => {
+          const ws = XLSX.utils.json_to_sheet(data);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "项目列表");
+
+          const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+          saveAs(
+            new Blob([wbout], { type: "application/octet-stream" }),
+            "QC知识库数据.xlsx"
+          );
+
+          // // 提交数据到Vuex Store
+          // this.updateExportedData(data);
+        })
+        .finally(() => {
+          loadingInstance.close();
+        })
+        .catch((error) => {
+          console.error("导出失败:", error);
+          loadingInstance.close();
+        });
+    },
   }
-  </script>
+}
+</script>

@@ -83,11 +83,13 @@ public class TaskController {
                 .last("limit 1") // 限制结果为一条记录
                 .one();// 获取一条记录
         // 检查是否有审批文件
+        if(approval == null){
+            return R.ok().put("task", task).put("approval", null).put("fileList", null);
+        }
+
         List<ApprovalFileEntity> fileList = approvalFileService.list(new QueryWrapper<ApprovalFileEntity>()
                 .eq("approval_id", approval.getApprovalId()));
         log.info("approval" + approval);
-
-
         return R.ok().put("task", task).put("approval", approval).put("fileList", fileList.size() > 0 ? fileList : null);
 
     }

@@ -247,7 +247,7 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
 
-    <approval-dialog v-if="approvalDialogVisible" ref="approvalDialog" @refreshDataList="getDataList"></approval-dialog>
+    <approval-dialog v-if="approvalDialogVisible" ref="approvalDialog" @refreshDataList="reloadDataList"></approval-dialog>
   </div>
 </template>
 
@@ -321,6 +321,11 @@ export default {
   },
 
   methods: {
+    reloadDataList(){
+      this.getDataList()
+      this.getHistoryApprovalList()
+    },
+
     // 获取数据列表
     getDataList() {
       this.dataListLoading = true
@@ -348,9 +353,9 @@ export default {
     },
 
     // 获取历史审批列表
-    getHistoryApprovalList() {
+    async getHistoryApprovalList() {
       this.historyDataListLoading = true
-      this.$http({
+      await this.$http({
         // url: this.$http.adornUrl('/taskmanagement/approval/list'),
         url: this.$http.adornUrl('/taskmanagement/approval/historyApprovalList'),
 
@@ -410,7 +415,7 @@ export default {
     },
 
     // 审批弹窗
-    approvalDialogHandle(id) {
+     approvalDialogHandle(id) {
       this.approvalDialogVisible = true
       this.$nextTick(() => {
         this.$refs.approvalDialog.init(id)

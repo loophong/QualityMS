@@ -411,11 +411,13 @@ public class IssueTableController {
 
         // 计算重复问题的总数
         int total = stats.values().stream().mapToInt(Integer::intValue).sum();
+
+        int monthallissue = issueTableService.getallissue();
         // 打印返回给前端的数据
         System.out.println("返回前端的统计数据: " + total);
 
         // 返回响应
-        return R.ok().put("stats", stats).put("total", total);
+        return R.ok().put("stats", stats).put("total", total).put("monthallissue", monthallissue);
     }
 
 

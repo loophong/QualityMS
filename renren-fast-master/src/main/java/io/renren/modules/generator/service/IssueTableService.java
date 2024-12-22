@@ -87,5 +87,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     boolean updateParentQuestion(String issueNumber);
 
     boolean clearStorageFlag(List<Integer> ids);//删除功能
+
+    int getallissue();
 }
 

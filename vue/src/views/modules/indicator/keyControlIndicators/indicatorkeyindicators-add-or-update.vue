@@ -275,55 +275,6 @@
         })
       },
       // 表单提交
-      dataFormSubmit2 () {
-        this.$refs['dataForm'].validate((valid) => {
-          console.log("dataFormSubmit=====>",this.dataForm)
-          if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(`/indicator/indicatorkeyindicators/${!this.dataForm.keyIndicatorId ? 'save' : 'update'}`),
-              method: 'post',
-              data: this.$http.adornData({
-                'keyIndicatorId': this.dataForm.keyIndicatorId || undefined,
-                'indicatorId': this.dataForm.indicatorId,
-                'indicatorName': this.dataForm.indicatorName,
-                'indicatorClassification': this.dataForm.indicatorClassification,
-                'assessmentDepartment': this.dataForm.assessmentDepartment,
-                'sourceDepartment': this.dataForm.sourceDepartment,
-                'managementContent': this.dataForm.managementContent,
-                'isManagementOutOfControl': this.dataForm.isManagementOutOfControl,
-                'isNeedsControl': this.dataForm.isNeedsControl,
-                'keyElements': this.dataFormLists.keyElements.length > 1 ? this.dataFormLists.keyElements.join(',') : this.dataFormLists.keyElements[0],
-                'potentialFailureMode': this.dataFormLists.potentialFailureMode.length > 1 ? this.dataFormLists.potentialFailureMode.join(',') : this.dataFormLists.potentialFailureMode[0],
-                'potentialFailureConsequences': this.dataFormLists.potentialFailureConsequences.length > 1 ? this.dataFormLists.potentialFailureConsequences.join(',') : this.dataFormLists.potentialFailureConsequences[0],
-                'involvedProduct': this.dataFormLists.involvedProduct.length > 1 ? this.dataFormLists.involvedProduct.join(',') : this.dataFormLists.involvedProduct[0],
-                'processName': this.dataFormLists.processName.length > 1 ? this.dataFormLists.processName.join(',') : this.dataFormLists.processName[0],
-                'controlPosition': this.dataFormLists.controlPosition.length > 1 ? this.dataFormLists.controlPosition.join(',') : this.dataFormLists.controlPosition[0],
-                'controlPersonnel': this.dataFormLists.controlPersonnel.length > 1 ? this.dataFormLists.controlPersonnel.join(',') : this.dataFormLists.controlPersonnel[0],
-                'controlMethod': this.dataFormLists.controlMethod.length > 1 ? this.dataFormLists.controlMethod.join(',') : this.dataFormLists.controlMethod[0],
-                'evaluationMeasurementTechnique': this.dataFormLists.evaluationMeasurementTechnique.length > 1 ? this.dataFormLists.evaluationMeasurementTechnique.join(',') : this.dataFormLists.evaluationMeasurementTechnique[0],
-                'sampleSize': this.dataFormLists.sampleSize.length > 1 ? this.dataFormLists.sampleSize.join(',') : this.dataFormLists.sampleSize[0],
-                'samplingFrequency': this.dataFormLists.samplingFrequency.length > 1 ? this.dataFormLists.samplingFrequency.join(',') : this.dataFormLists.samplingFrequency[0],
-                'controlList': this.dataFormLists.controlList.length > 1 ? this.dataFormLists.controlList.join(',') : this.dataFormLists.controlList[0],
-              })
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          }
-        })
-      },
-      // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           console.log("dataFormSubmit=====>",this.dataForm)

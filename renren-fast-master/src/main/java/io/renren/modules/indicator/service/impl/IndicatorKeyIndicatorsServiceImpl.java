@@ -155,12 +155,30 @@ public class IndicatorKeyIndicatorsServiceImpl extends ServiceImpl<IndicatorKeyI
             }
         }
         queryWrapper.lambda().eq(IndicatorKeyIndicatorsEntity::getStorageFlag, 1);
+        List<IndicatorKeyIndicatorsEntity> list = this.list(queryWrapper);
+        // 使用流操作去重，确保 indicatorId 是唯一的
+        List<IndicatorKeyIndicatorsEntity> distinctList = list.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                                IndicatorKeyIndicatorsEntity::getIndicatorId,
+                                entity -> entity,
+                                (existing, replacement) -> existing
+                        ),
+                        map -> new ArrayList<>(map.values())
+                ));
+
+        int totalCount = distinctList.size();
+
         IPage<IndicatorKeyIndicatorsEntity> page = this.page(
                 new Query<IndicatorKeyIndicatorsEntity>().getPage(params),
                 queryWrapper
         );
 
-        return new PageUtils(page);
+        // 设置分组后的 totalCount 到 PageUtils
+        PageUtils pageUtils = new PageUtils(page);
+        pageUtils.setTotalCount(totalCount);
+
+        return pageUtils;
     }
     public List<IndicatorKeyIndicatorsEntity> queryList(Map<String, Object> params) {
         QueryWrapper<IndicatorKeyIndicatorsEntity> queryWrapper = new QueryWrapper<>();

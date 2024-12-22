@@ -288,6 +288,27 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         return new PageUtils(planList);
     }
 
+    @Override
+    public List<PlanExportVO> exportBase() {
+        List<PlanExportVO> planList = planDao.exportBase();
+        List<PlanExportVO> planExportVO = new ArrayList<>();
+        log.info("planExportVOS" + planList);
+        for (PlanExportVO plan : planList) {
+            planExportVO.add(plan);
+            List<PlanExportVO> taskList = taskDao.selectTaskByPlanId(plan.getPlanId());
+            log.info("taskList" + taskList);
+            planExportVO.addAll(taskList);
+        }
+
+        // 统一将VO中的用户ID转为名称
+        for (PlanExportVO plan : planExportVO) {
+            convert(plan);
+        }
+
+        log.info("转换后的vo：" + planExportVO);
+        return planExportVO;
+    }
+
     private void convert(PlanExportVO plan) {
 
         if (plan.getPrincipal() != null) {

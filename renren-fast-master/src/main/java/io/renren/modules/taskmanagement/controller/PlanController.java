@@ -55,9 +55,35 @@ public class PlanController {
     private ObjectMapper objectMapper;
     @Autowired
     private PlanApprovalTableService planApprovalTableService;
+    /**
+     * @description: 全部计划导出
+     * @param: response
+     * @return: void
+     * @author: hong
+     * @date: 2024/12/22 10:29
+     */
     @RequestMapping("/export")
     public void export(HttpServletResponse response) {
         List<PlanExportVO> planExportVO = planService.export();
+        String fileName = "任务表" + System.currentTimeMillis() + ".xlsx";
+        try {
+            EasyExcel.write(response.getOutputStream(), PlanExportVO.class).sheet("任务表").doWrite(planExportVO);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    /**
+     * @description: 知识库导出
+     * @param: response
+     * @return: void
+     * @author: hong
+     * @date: 2024/12/22 10:29
+     */
+    @RequestMapping("/exportBase")
+    public void exportBase(HttpServletResponse response) {
+        List<PlanExportVO> planExportVO = planService.exportBase();
         String fileName = "任务表" + System.currentTimeMillis() + ".xlsx";
         try {
             EasyExcel.write(response.getOutputStream(), PlanExportVO.class).sheet("任务表").doWrite(planExportVO);

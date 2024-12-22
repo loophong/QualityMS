@@ -406,7 +406,7 @@ export default {
 
     exportFile(){
       this.$http({
-        url: this.$http.adornUrl('/taskmanagement/plan/export'),
+        url: this.$http.adornUrl('/taskmanagement/plan/exportBase'),
         method: 'get',
         params: this.$http.adornParams(),
         responseType: 'blob'

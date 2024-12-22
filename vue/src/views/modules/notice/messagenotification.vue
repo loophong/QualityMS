@@ -18,8 +18,24 @@
               style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <!--      <el-table-column prop="id" header-align="center" align="center" label="主键"></el-table-column>-->
-      <el-table-column prop="receiverId" header-align="center" align="center" label="接收者"></el-table-column>
-      <el-table-column prop="senderId" header-align="center" align="center" label="发送者"></el-table-column>
+<!--      <el-table-column-->
+<!--        prop="creator"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="创建人">-->
+<!--        <template slot-scope="scope">-->
+<!--          {{ getUsernameByUserId(scope.row.creator) }}-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+      <el-table-column prop="receiverId" header-align="center" align="center" label="接收者">
+        <template slot-scope="scope">
+        {{ getUsernameByUserId(scope.row.receiverId) }}
+      </template></el-table-column>
+      <el-table-column prop="senderId" header-align="center" align="center" label="发送者">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.senderId) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="content" header-align="center" align="center" label="消息内容"></el-table-column>
       <el-table-column prop="type" header-align="center" align="center" label="消息类型"></el-table-column>
       <el-table-column prop="createdAt" header-align="center" align="center" label="创建时间"></el-table-column>
@@ -69,6 +85,8 @@ export default {
         key: ''
       },
       dataList: [],
+      //查询参数
+      options:[],
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
@@ -79,6 +97,16 @@ export default {
   },
   components: {
     AddOrUpdate
+  },
+  async created(){
+    // 获取分组后的员工数据
+    this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+      method: 'get',
+    }).then(({data}) => {
+      this.options = data;
+      console.log(this.options);
+    });
   },
   activated() {
     this.getDataList()
@@ -212,8 +240,7 @@ export default {
       }
       if (jumpdepart === 'plan_approval_page') {
         this.$router.push({
-          name: 'plan-approval-index',
-          params: {}
+          name: 'plan-approval-index'
         })
       }
       if (jumpdepart === 'task_approval_page') {
@@ -222,7 +249,19 @@ export default {
           params: {}
         })
       }
-    }
+    },
+    getUsernameByUserId(auditorId) {
+      console.log('获取的人员信息： ', auditorId);
+      console.log('获取的人员信息： ', this.options);
+      for (const category of this.options) {
+        for (const auditor of category.options) {
+          if (auditor.value == auditorId) {
+            return auditor.label;
+          }
+        }
+      }
+      return "-";
+    },
   }
 }
 </script>

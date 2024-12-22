@@ -92,21 +92,27 @@ public class SpcXrchartController {
 
     @RequestMapping("/chart/Xbar_R")
     public R getXbar_RChart(@RequestParam String tableName){
+        System.out.println(tableName);
+        System.out.println("======");
+        System.out.println(spcXrchartService.getXbar_RChart(tableName));
         return R.ok().put("Xbar-R_Info", spcXrchartService.getXbar_RChart(tableName));
     }
 
     @RequestMapping("/chart/Xbar_S")
     public R getXbar_SChart(@RequestParam String tableName){
+        System.out.println(tableName);
         return R.ok().put("Xbar-S_Info", spcXrchartService.getXbar_SChart(tableName));
     }
 
     @RequestMapping("/chart/Me_R")
     public R getMe_RChart(@RequestParam String tableName){
+        System.out.println(tableName);
         return R.ok().put("Me-R_Info", spcXrchartService.getMe_RChart(tableName));
     }
 
     @RequestMapping("/chart/I_MR")
     public R getI_MRChart(@RequestParam String tableName){
+        System.out.println(tableName);
         return R.ok().put("I-MR_Info", spcXrchartService.getI_MRChart(tableName));
     }
 

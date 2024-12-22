@@ -10,6 +10,44 @@
             <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
           </el-form-item>
           <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParam.topicLeader" placeholder="组长" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParam.topicConsultant" placeholder="顾问"
+              clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParam.topicReviewStatus" placeholder="审核状态" clearable>
+              <el-option label="未开始" value="1"></el-option>
+              <el-option label="审核中" value="2"></el-option>
+              <el-option label="未通过" value="0"></el-option>
+              <el-option label="已通过" value="3"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParam.topicDepartment" placeholder="请选择科室" clearable>
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanAll" type="daterange" range-separator="-"
+              start-placeholder="计划开始日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanEndAll" type="daterange" range-separator="-"
+              start-placeholder="计划结束日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
             <el-button @click="getDataList()">查询</el-button>
             <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button>
@@ -65,9 +103,11 @@
           </el-table-column>
           <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
           </el-table-column>
-          <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期">
+          <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="160"
+            sortable>
           </el-table-column>
-          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期">
+          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="160"
+            sortable>
           </el-table-column>
           <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
           </el-table-column>
@@ -83,7 +123,7 @@
               <span v-else>--</span>
             </template>
           </el-table-column>
-          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见">
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
           </el-table-column>
           <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见">
           </el-table-column>
@@ -111,12 +151,50 @@
     <el-tab-pane label="我创办的课题" name="2">
       <div class="mod-config">
         <el-form :inline="true" :model="myQueryParamLead" @keyup.enter.native="getLeadList()">
-
           <el-form-item>
             <el-input v-model="myQueryParamLead.topicName" placeholder="课题名称" clearable></el-input>
           </el-form-item>
           <el-form-item>
             <el-input v-model="myQueryParamLead.keywords" placeholder="课题关键字" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParamLead.topicLeader" placeholder="组长"
+              clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParamLead.topicConsultant" placeholder="顾问"
+              clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParamLead.topicReviewStatus" placeholder="审核状态" clearable>
+              <el-option label="未开始" value="1"></el-option>
+              <el-option label="审核中" value="2"></el-option>
+              <el-option label="未通过" value="0"></el-option>
+              <el-option label="已通过" value="3"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParamLead.topicDepartment" placeholder="请选择科室" clearable>
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanLead" type="daterange" range-separator="-"
+              start-placeholder="计划开始日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanEndLead" type="daterange" range-separator="-"
+              start-placeholder="计划结束日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
           </el-form-item>
           <el-form-item>
             <el-button @click="getLeadList()">查询</el-button>
@@ -135,13 +213,14 @@
           style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
           <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column> -->
-          <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed>
+          <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed width="90">
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
           </el-table-column>
-          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室">
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室" sortable>
           </el-table-column>
-          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="130"
+            sortable>
             <template slot-scope="scope">
               <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
               <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
@@ -171,24 +250,28 @@
           </el-table-column>
           <el-table-column prop="topicDescription" header-align="center" align="center" label="课题描述/摘要" width="150">
           </el-table-column>
-          <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160">
+          <el-table-column prop="topicType" header-align="center" align="center" label="课题类型" width="160" sortable>
           </el-table-column>
-          <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
+          <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性" sortable
+            width="110">
           </el-table-column>
-          <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+          <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="160"
+            sortable>
           </el-table-column>
-          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="160"
+            sortable>
           </el-table-column>
-          <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+          <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字" width="150">
           </el-table-column>
-          <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
+          <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="140"
+            sortable>
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
                 }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
+          <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果" sortable>
             <template slot-scope="scope">
               <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
@@ -200,7 +283,7 @@
           </el-table-column>
           <!-- <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
           </el-table-column> -->
-          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见">
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
           </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
@@ -235,6 +318,45 @@
             <el-input v-model="myQueryParamJoin.keywords" placeholder="课题关键字" clearable></el-input>
           </el-form-item>
           <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParamJoin.topicLeader" placeholder="组长"
+              clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 100px;" v-model="myQueryParamJoin.topicConsultant" placeholder="顾问"
+              clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParamJoin.topicReviewStatus" placeholder="审核状态" clearable>
+              <el-option label="未开始" value="1"></el-option>
+              <el-option label="审核中" value="2"></el-option>
+              <el-option label="未通过" value="0"></el-option>
+              <el-option label="已通过" value="3"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="myQueryParamJoin.topicDepartment" placeholder="请选择科室" clearable>
+              <el-option label="生产科" value="生产科"></el-option>
+              <el-option label="供应科" value="供应科"></el-option>
+              <el-option label="市场科" value="市场科"></el-option>
+              <el-option label="技术科" value="技术科"></el-option>
+              <el-option label="质量科" value="质量科"></el-option>
+              <el-option label="财务科" value="财务科"></el-option>
+              <el-option label="安环设备科" value="安环设备科"></el-option>
+              <el-option label="企业管理科" value="企业管理科"></el-option>
+              <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanJoin" type="daterange" range-separator="-"
+              start-placeholder="计划开始日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-date-picker style="width: 260px;" v-model="activityPlanEndJoin" type="daterange" range-separator="-"
+              start-placeholder="计划结束日期" end-placeholder="" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
             <el-button @click="getJoinList()">查询</el-button>
             <!-- <el-button v-if="isAuth('qcSubject:registration:save')" type="primary"
               @click="addOrUpdateHandle()">新增</el-button> -->
@@ -250,9 +372,10 @@
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
           </el-table-column>
-          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室">
+          <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室" sortable>
           </el-table-column>
-          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120">
+          <el-table-column prop="topicReviewStatus" label="课题审核状态" header-align="center" align="center" width="120"
+            sortable>
             <template slot-scope="scope">
               <el-tag v-if="scope.row.topicReviewStatus === 0" type="danger">未通过</el-tag>
               <el-tag v-else-if="scope.row.topicReviewStatus === 1" type="info">未开始</el-tag>
@@ -286,9 +409,11 @@
           </el-table-column>
           <el-table-column prop="activityCharacteristics" header-align="center" align="center" label="活动特性">
           </el-table-column>
-          <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100">
+          <el-table-column prop="activityPlan" header-align="center" align="center" label="活动计划开始日期" width="100"
+            sortable>
           </el-table-column>
-          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
+          <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100"
+            sortable>
           </el-table-column>
           <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
           </el-table-column>
@@ -299,7 +424,15 @@
                 }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
+          <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果" sortable>
+            <template slot-scope="scope">
+              <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
+              <span v-else>--</span> <!-- 处理未知状态 -->
+            </template>
           </el-table-column>
           <!-- <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
           </el-table-column> -->
@@ -438,17 +571,42 @@ export default {
       membersOptions: [],
       addOrUpdateVisible: false,
       groupMemberList: [],
+
       myQueryParam: {
         topicName: '',
         keywords: '',
+        topicLeader: '',
+        topicConsultant: '',
+        topicReviewStatus: '',
+        topicDepartment: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       },
       myQueryParamLead: {
         topicName: '',
         keywords: '',
+        topicLeader: '',
+        topicConsultant: '',
+        topicReviewStatus: '',
+        topicDepartment: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       },
+      activityPlanLead: [],
+      activityPlanEndLead: [],
+      activityPlanJoin: [],
+      activityPlanEndJoin: [],
+      activityPlanAll: [],
+      activityPlanEndAll: [],
       myQueryParamJoin: {
         topicName: '',
         keywords: '',
+        topicLeader: '',
+        topicConsultant: '',
+        topicReviewStatus: '',
+        topicDepartment: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       },
       reuseStepId: ''
     }
@@ -477,15 +635,21 @@ export default {
           ...o, // 复制原对象属性
           options: o.options.map(e => {
             const match = e.label.match(/\(([^)]+)\)/);
+            const number = e.label.replace(`${match ? match[0] : ''}`, '');
+            // console.log(number);
             return {
               ...e, // 复制原选项属性
-              name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              name: match ? match[1] : e.name || '', // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              number: number ? number : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
             };
           })
         };
       });
+      console.log(this.membersOptions)
     });
     this.ifGroupLead();
+
+    console.log(this.nameToNumber('QC账号的昵称'))
   },
   methods: {
     numberToNameArray(numbers) {
@@ -497,12 +661,26 @@ export default {
         return numbers
       }
     },
+    //用户名转昵称
     numberToName(number) {
       var result = ''
       this.membersOptions.forEach(o => {
         o.options.map(e => {
           if (e.name == number) {
             result = e.label.replace(/\(.*?\)/, '')
+          }
+        })
+      });
+      return result
+    },
+    //昵称转用户名
+    nameToNumber(name) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.number == name) {
+            result = e.name
+            console.log(e.name)
           }
         })
       });
@@ -539,6 +717,25 @@ export default {
     },
     // 获取我参与课题数据列表
     async getJoinList() {
+      this.myQueryParamJoin.activityPlan = ''
+      this.myQueryParamJoin.activityPlanEnd = ''
+      let trueLeader = this.myQueryParamJoin.topicLeader
+      let trueConsultant = this.myQueryParamJoin.topicConsultant
+      if (this.nameToNumber(this.myQueryParamJoin.topicLeader)) {
+        this.myQueryParamJoin.topicLeader = this.nameToNumber(this.myQueryParamJoin.topicLeader);
+      }
+      if (this.nameToNumber(this.myQueryParamJoin.topicConsultant)) {
+        this.myQueryParamJoin.topicConsultant = this.nameToNumber(this.myQueryParamJoin.topicConsultant);
+      }
+      if (Array.isArray(this.activityPlanJoin) && this.activityPlanJoin.length == 2) {
+        console.log(this.activityPlanJoin[0])
+        this.myQueryParamJoin.activityPlan = `${this.activityPlanJoin[0]},${this.activityPlanJoin[1]}`
+      }
+      if (Array.isArray(this.activityPlanEndJoin) && this.activityPlanEndJoin.length == 2) {
+        this.myQueryParamJoin.activityPlanEnd = `${this.activityPlanEndJoin[0]},${this.activityPlanEndJoin[1]}`
+      }
+      // this.myQueryParamJoin.activityPlan = JSON.stringify(this.myQueryParamJoin.activityPlan)
+      // this.myQueryParamJoin.activityPlanEnd = JSON.stringify(this.myQueryParamJoin.activityPlanEnd)
       this.dataListLoading = true;
       await this.$http({
         url: this.$http.adornUrl("/qcSubject/registration/myList"),
@@ -556,6 +753,8 @@ export default {
           });
           this.subjectJoinList = tmp;
           // this.dataList = resultList
+          this.myQueryParamJoin.topicLeader = trueLeader
+          this.myQueryParamJoin.topicConsultant = trueConsultant
           this.totalPageJoin = data.page.totalCount;
         } else {
           this.subjectJoinList = [];
@@ -567,6 +766,29 @@ export default {
     },
     // 获取我创办课题数据列表
     async getLeadList() {
+      this.myQueryParamLead.activityPlan = ''
+      this.myQueryParamLead.activityPlanEnd = ''
+      let trueLeader = this.myQueryParamLead.topicLeader
+      let trueConsultant = this.myQueryParamLead.topicConsultant
+      if (this.nameToNumber(this.myQueryParamLead.topicLeader)) {
+        console.log('进入组长')
+        console.log(this.myQueryParamLead.topicLeader)
+        this.myQueryParamLead.topicLeader = this.nameToNumber(this.myQueryParamLead.topicLeader);
+      }
+      console.log('顾问前' + this.myQueryParamLead.topicConsultant)
+      if (this.nameToNumber(this.myQueryParamLead.topicConsultant)) {
+        console.log('进入顾问')
+        console.log(this.myQueryParamLead.topicConsultant)
+        this.myQueryParamLead.topicConsultant = this.nameToNumber(this.myQueryParamLead.topicConsultant);
+      }
+      if (Array.isArray(this.activityPlanLead) && this.activityPlanLead.length == 2) {
+        console.log(this.activityPlanLead[0])
+        this.myQueryParamLead.activityPlan = `${this.activityPlanLead[0]},${this.activityPlanLead[1]}`
+      }
+      if (Array.isArray(this.activityPlanEndLead) && this.activityPlanEndLead.length == 2) {
+        this.myQueryParamLead.activityPlanEnd = `${this.activityPlanEndLead[0]},${this.activityPlanEndLead[1]}`
+      }
+      // this.myQueryParamLead.activityPlanEnd = JSON.stringify(this.myQueryParamLead.activityPlanEnd)
       this.dataListLoading = true;
       await this.$http({
         url: this.$http.adornUrl("/qcSubject/registration/leadList"),
@@ -585,8 +807,12 @@ export default {
           this.subjectLeadList = tmp;
           // this.dataList = resultList
           this.totalPageLead = data.page.totalCount;
+          this.myQueryParamLead.topicLeader = trueLeader
+          this.myQueryParamLead.topicConsultant = trueConsultant
         } else {
           this.subjectLeadList = [];
+          this.myQueryParamLead.topicLeader = trueLeader
+          this.myQueryParamLead.topicConsultant = trueConsultant
           this.totalPageSubject = 0;
         }
 
@@ -596,6 +822,27 @@ export default {
 
     // 获取数据列表
     async getDataList(reuse) {
+      this.myQueryParam.activityPlan = ''
+      this.myQueryParam.activityPlanEnd = ''
+      let trueLeader = this.myQueryParam.topicLeader
+      let trueConsultant = this.myQueryParam.topicConsultant
+      if (this.nameToNumber(this.myQueryParam.topicLeader)) {
+        console.log('进入组长')
+        console.log(this.myQueryParam.topicLeader)
+        this.myQueryParam.topicLeader = this.nameToNumber(this.myQueryParamJoin.topicLeader);
+      }
+      if (this.nameToNumber(this.myQueryParam.topicConsultant)) {
+        console.log('进入顾问')
+        console.log(this.myQueryParam.topicConsultant)
+        this.myQueryParam.topicConsultant = this.nameToNumber(this.myQueryParam.topicConsultant);
+      }
+      if (Array.isArray(this.activityPlanAll) && this.activityPlanAll.length == 2) {
+        console.log(this.activityPlanAll[0])
+        this.myQueryParam.activityPlan = `${this.activityPlanAll[0]},${this.activityPlanAll[1]}`
+      }
+      if (Array.isArray(this.activityPlanEndAll) && this.activityPlanEndAll.length == 2) {
+        this.myQueryParam.activityPlanEnd = `${this.activityPlanEndAll[0]},${this.activityPlanEndAll[1]}`
+      }
       this.dataListLoading = true
       await this.$http({
         url: this.$http.adornUrl('/qcSubject/registration/list'),
@@ -615,10 +862,14 @@ export default {
           this.dataList = tmp
           this.totalPage = data.page.totalCount
           this.messageList = data.page.list
+          this.myQueryParam.topicLeader = trueLeader
+          this.myQueryParam.topicConsultant = trueConsultant
           this.totalPageReuse = data.page.totalCount
         } else {
           this.dataList = []
           this.totalPage = 0
+          this.myQueryParam.topicLeader = trueLeader
+          this.myQueryParam.topicConsultant = trueConsultant
         }
 
         this.dataListLoading = false

@@ -1,5 +1,6 @@
 package io.renren.modules.generator.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
@@ -84,5 +85,9 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     Map<String, Integer> gettruecurrentall();
 
     boolean updateParentQuestion(String issueNumber);
+
+    boolean clearStorageFlag(List<Integer> ids);//删除功能
+
+    int getallissue();
 }
 

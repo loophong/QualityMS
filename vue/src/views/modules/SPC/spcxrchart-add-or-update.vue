@@ -133,8 +133,8 @@
     <el-form-item label="创建时间" prop="createTime">
       <el-input v-model="dataForm.createTime" placeholder="创建时间"></el-input>
     </el-form-item>
-    <el-form-item label="备用字段1" prop="alternateFields1">
-      <el-input v-model="dataForm.alternateFields1" placeholder="备用字段1"></el-input>
+    <el-form-item label="表名" prop="alternateFields1">
+      <el-input v-model="dataForm.alternateFields1" placeholder="表名"></el-input>
     </el-form-item>
     <el-form-item label="备用字段2" prop="alternateFields2">
       <el-input v-model="dataForm.alternateFields2" placeholder="备用字段2"></el-input>

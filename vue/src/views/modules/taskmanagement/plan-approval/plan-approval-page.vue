@@ -565,7 +565,7 @@ export default {
         this.$refs['dataForm'].resetFields()
         if (routerPlanId) {
           this.$http({
-            url: this.$http.adornUrl(`/taskmanagement/plan/getPlanAllInfo?planId=${routerPlanId}`),
+            url: this.$http.adornUrl(`/taskmanagement/plan/getPlanAndChildTask?planId=${routerPlanId}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({data}) => {

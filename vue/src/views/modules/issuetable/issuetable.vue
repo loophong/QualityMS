@@ -494,14 +494,14 @@
         issueCategoryOptions: [],
         vehicleTypeOptions: [],
         departmentOptions: [
-          { value: '财务科', label: '财务科' },
-          { value: '市场科', label: '市场科' },
-          { value: '安环科', label: '安环科' },
-          { value: '生产科', label: '生产科' },
-          { value: '供应科', label: '供应科' },
-          { value: '技术科', label: '技术科' },
-          { value: '企管科', label: '企管科' }
-          // 其他科室选项
+          // { value: '财务科', label: '财务科' },
+          // { value: '市场科', label: '市场科' },
+          // { value: '安环科', label: '安环科' },
+          // { value: '生产科', label: '生产科' },
+          // { value: '供应科', label: '供应科' },
+          // { value: '技术科', label: '技术科' },
+          // { value: '企管科', label: '企管科' }
+          // // 其他科室选项
         ],
         heightTable: 0,
         currentIssues: [],
@@ -555,6 +555,7 @@
       this.fetchIssueCategories()
       this.fetchVehicleTypes()
       this.getDataList()
+      this.fetchDepartments()
       // this.fetchData()
     },
     computed: {
@@ -683,6 +684,28 @@
           }
         });
       },
+      fetchDepartments () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/departmenttable/fetchDepartments'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
+            this.departmentOptions = data.departmentTableEntities.map(departmentTableEntities => ({
+              value: departmentTableEntities.departmentName,
+              label: departmentTableEntities.departmentName
+            }))
+          } else {
+
+            console.error('Failed to fetch issue categories:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the issue categories!', error)
+        })
+        // console.log('Successfully fetched departmentOptions:', this.departmentOptions)
+
+      },
       initECharts() {
         // 使用ECharts初始化环形图
         const chartDom = document.getElementById('task-chart');
@@ -725,8 +748,13 @@
       ,
       showAssociatedIssues(associatedRectificationRecords) {
         // 将数据库中的字符串分割成数组
+        if(associatedRectificationRecords === null || associatedRectificationRecords === undefined || associatedRectificationRecords === ''){
+          this.$message.error('没有关联问题！');
+        }
+        else {
         this.currentIssues = associatedRectificationRecords.split(',');
         this.dialogVisible3 = true; // 打开对话框
+        }
       },
       viewIssueDetails(associatedRectificationRecords) {
         // 将数据库中的字符串分割成数组
@@ -1024,6 +1052,18 @@
         this.fullRetStates = rectificationVerificationStatus; // 存储整改验证情况完整描述
         this.dialogVisible2 = true; // 显示对话框
       },
+      // 通用数组去重方法
+      removeDuplicates(array, key) {
+        const seen = new Set();
+        return array.filter(item => {
+          const val = key ? item[key] : item; // 如果有 key，按 key 去重，否则直接按值去重
+          if (seen.has(val)) {
+            return false;
+          }
+          seen.add(val);
+          return true;
+        });
+      },
       fetchIssueCategories () {
         this.$http({
           url: this.$http.adornUrl('/generator/issuetypetable/issuestype'),
@@ -1036,6 +1076,7 @@
               value: category.concreteIssueCategory,
               label: category.concreteIssueCategory
             }))
+            this.issueCategoryOptions = this.removeDuplicates( this.issueCategoryOptions ,'value')
           } else {
             console.error('Failed to fetch issue categories:', data.msg)
           }

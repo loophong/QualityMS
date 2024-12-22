@@ -229,7 +229,7 @@ export default {
       // 计算 "总数"
       const totalCount = this.issueStats['暂缓'] + this.issueStats['持续'] + this.issueStats['结项'];
       this.totalCount = totalCount;
-      // console.log('总数', this.totalCount);
+      // console.log('总数0', this.totalCount);
       const options = {
         title: {
           text: '当月问题统计'
@@ -390,7 +390,7 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.stateData = data.stats; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
-          console.log('数据转换中......', this.stateData);
+          // console.log('数据转换中......', this.stateData);
           this.nopassissue = this.stateData['验证未通过']; // 未通过问题数
           this.passissue = this.stateData['验证已通过']; // 通过问题数
           this.passRate = (this.passissue / (this.passissue + this.nopassissue) * 100).toFixed(2); // 通过率
@@ -449,12 +449,18 @@ export default {
           this.duplicateIssueTotal = data.total; // 获取总数
 
           this.duplicateIssueTotal = Number(this.duplicateIssueTotal);
-          this.totalCount = Number(this.totalCount);
+          // console.log('总数1:', this.duplicateIssueTotal);
+          // const totalCount = this.issueStats['暂缓'] + this.issueStats['持续'] + this.issueStats['结项'];
+          this.totalCount = data.monthallissue;
+          console.log('总数2:', this.totalCount);
+          // console.log('总数2类型', typeof this.totalCount);
 
           if (!isNaN(this.duplicateIssueTotal) && typeof this.totalCount === 'number' && this.totalCount > 0) {
             this.duplicateIssuePass = (this.duplicateIssueTotal / this.totalCount * 100).toFixed(2);
+            // console.log('重复问题占比:', this.duplicateIssuePass);
           } else {
             this.duplicateIssuePass = 0; // 或者设置为0等其他合适的默认值
+            // console.warn('Invalid data for calculating duplicate issue pass rate');
           }
 
           // console.log('重复问题总数:', this.duplicateIssueTotal);
@@ -532,14 +538,14 @@ export default {
         method: 'get',
         params: this.$http.adornParams({})
       }).then(({ data }) => {
-        console.log('返回的数据：', data); // 调试输出
+        // console.log('返回的数据：', data); // 调试输出
         if (data && data.code === 0) {
           // 排序统计数据，只显示数量最多的十种问题类别
           const sortedStats = Object.entries(data.stats)
             .sort(([, countA], [, countB]) => countB - countA)
             .slice(0, 10);
           this.issueCategoryStats = Object.fromEntries(sortedStats);  // 处理后的统计数据
-          console.log('处理后的统计数据：', this.issueCategoryStats); // 调试输出
+          // console.log('处理后的统计数据：', this.issueCategoryStats); // 调试输出
           this.renderIssueCategoryChart();  // 渲染图表
         } else {
           // 默认值
@@ -623,7 +629,7 @@ export default {
 
       // 确保数据存在且有效
       if (!this.issueCategoryStats || Object.keys(this.issueCategoryStats).length === 0) {
-        console.warn('No issue category data available');
+        // console.warn('No issue category data available');
         return;
       }
 

@@ -940,7 +940,10 @@ export default {
           // { required: true, message: '请输入验证时长', trigger: 'blur' },
           // { type: 'number', min: 1, message: '验证时长必须为正整数', trigger: 'blur' },
           { validator: this.validateVerificationDuration, trigger: 'blur' }
-        ]
+        ],
+        issueCategoryId: [
+          { required: true, message: '请选择问题类别', trigger: 'blur' },
+        ],
       },
       options: ''
     }
@@ -1419,7 +1422,7 @@ export default {
         params: this.$http.adornParams()
       }).then(({data}) => {
         if (data && data.code === 0) {
-          console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
+          // console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
           this.issuepeliminaryAnalysis = data.peliminaryAnalysisTableEntities.map(peliminaryAnalysisTableEntities => ({
             value: peliminaryAnalysisTableEntities.peliminaryAnalysis,
             label: peliminaryAnalysisTableEntities.peliminaryAnalysis
@@ -1582,7 +1585,7 @@ export default {
         params: this.$http.adornParams()
       }).then(({data}) => {
         if (data && data.code === 0) {
-          console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
+          // console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
           this.departmentOptions = data.departmentTableEntities.map(departmentTableEntities => ({
             value: departmentTableEntities.departmentName,
             label: departmentTableEntities.departmentName

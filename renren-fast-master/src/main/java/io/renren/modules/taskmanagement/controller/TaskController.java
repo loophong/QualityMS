@@ -7,6 +7,7 @@ import java.util.*;
 
 import com.alibaba.excel.util.DateUtils;
 import com.aliyun.oss.common.utils.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.org.apache.bcel.internal.generic.NEW;
@@ -16,6 +17,7 @@ import io.renren.modules.notice.service.MessageNotificationService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.taskmanagement.dto.TaskQueryParamDTO;
 import io.renren.modules.taskmanagement.dto.TaskSubmitApprovalDTO;
+import io.renren.modules.taskmanagement.dto.TaskUpdateDTO;
 import io.renren.modules.taskmanagement.entity.*;
 import io.renren.modules.taskmanagement.service.ApprovalFileService;
 import io.renren.modules.taskmanagement.service.ApprovalService;
@@ -81,11 +83,13 @@ public class TaskController {
                 .last("limit 1") // 限制结果为一条记录
                 .one();// 获取一条记录
         // 检查是否有审批文件
+        if(approval == null){
+            return R.ok().put("task", task).put("approval", null).put("fileList", null);
+        }
+
         List<ApprovalFileEntity> fileList = approvalFileService.list(new QueryWrapper<ApprovalFileEntity>()
                 .eq("approval_id", approval.getApprovalId()));
         log.info("approval" + approval);
-
-
         return R.ok().put("task", task).put("approval", approval).put("fileList", fileList.size() > 0 ? fileList : null);
 
     }
@@ -116,7 +120,7 @@ public class TaskController {
 
 
     /**
-     * @description: 小屏问题，任务进度，与任务关联的指标中，显示指标的已完成和未完成数
+     * @description: 小屏，任务进度，与任务关联的指标中，显示指标的已完成和未完成数
      * @return: io.renren.common.utils.R
      * @author: hong
      * @date: 2024/11/28 14:49
@@ -196,12 +200,22 @@ public class TaskController {
      */
     @PostMapping("/decomposition")
 //    @RequiresPermissions("taskmanagement:task:list")
-    public R decompositionTask(@RequestBody TaskDetailDTO taskDetailDTO) {
-        log.info("当前分解的任务详情为：" + taskDetailDTO);
-        int i = taskService.saveDecompositionTasks(taskDetailDTO.getTasks());
+    public R decompositionTask(@RequestBody TaskUpdateDTO taskUpdateDto) {
+        log.info("当前分解的任务详情为：" + taskUpdateDto);
+        if(taskUpdateDto.getChildTask() == null || taskUpdateDto.getChildTask().size() == 0){
+            taskService.remove(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskParentNode, taskUpdateDto.getParentTask().getTaskId()));
+        }
+        taskService.saveDecompositionTasks(taskUpdateDto.getChildTask());
         return R.ok();
-
     }
+//    @PostMapping("/decomposition")
+////    @RequiresPermissions("taskmanagement:task:list")
+//    public R decompositionTask(@RequestBody TaskDetailDTO taskDetailDTO) {
+//        log.info("当前分解的任务详情为：" + taskDetailDTO);
+//        int i = taskService.saveDecompositionTasks(taskDetailDTO.getTasks());
+//        return R.ok();
+//
+//    }
 
 
     /**
@@ -287,7 +301,7 @@ public class TaskController {
         // 发送消息
         messageService.sendMessages(new CreateNoticeParams(
                 ShiroUtils.getUserId(),
-                new Long[]{Long.parseLong(task.getTaskAuditor())},
+                new Long[]{Long.parseLong(taskSubmitApprovalDTO.getApprovalor())},
                 "您有一个任务需要审批，请及时审批！",
                 "任务审批通知",
                 "task_approval_page"));
@@ -497,13 +511,7 @@ public class TaskController {
 
 //    }
 
-    /**
-     * @description:
-     * @param: null
-     * @return:
-     * @author: hong
-     * @date: 2024/8/21 19:51
-     */
+
 
 
     /**

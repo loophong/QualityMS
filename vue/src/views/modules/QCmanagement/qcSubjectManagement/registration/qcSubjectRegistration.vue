@@ -123,12 +123,13 @@
               <span v-else>--</span>
             </template>
           </el-table-column>
-          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
-          </el-table-column>
-          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见">
-          </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见" width="180">
+          </el-table-column>
+
 
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
@@ -283,10 +284,13 @@
           </el-table-column>
           <!-- <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
           </el-table-column> -->
-          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
-          </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见" width="180">
+          </el-table-column>
+
 
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
@@ -436,10 +440,13 @@
           </el-table-column>
           <!-- <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
           </el-table-column> -->
-          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见">
-          </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见" width="180">
+          </el-table-column>
+
           <!-- <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
@@ -1260,7 +1267,11 @@ export default {
         })
       }).then(({ data }) => {
         if (data) {
-          this.exportList = data.page.list
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.exportList = tmp
         } else {
           this.exportList = []
         }
@@ -1278,9 +1289,9 @@ export default {
           课题ID: tableRow.qcsrId,
           科室: tableRow.topicDepartment,
           课题编号: tableRow.topicNumber,
-          课题组长: tableRow.topicLeader,
-          课题顾问: tableRow.topicConsultant,
-          课题成员: tableRow.teamNumberIds,
+          课题组长: this.numberToName(tableRow.topicLeader),
+          课题顾问: this.numberToName(tableRow.topicConsultant),
+          课题成员: this.numberToNameArray(tableRow.teamNumberIds),
           课题描述: tableRow.topicDescription,
           课题类型: tableRow.topicType,
           活动特性: tableRow.activityCharacteristics,

@@ -50,7 +50,7 @@
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
               <span class="el-dropdown-link">
-                <img src="~@/assets/img/avatar.png" :alt="userName">{{ userName }}
+                <img src="~@/assets/img/avatar.png" :alt="userName">{{userName}}
                   <template v-if="hasUnreadMessages">
                     <el-badge value="new">
 
@@ -119,7 +119,7 @@
       },
       userName: {
         get () { return this.$store.state.user.name }
-      }
+      },
     },
 
     created (){

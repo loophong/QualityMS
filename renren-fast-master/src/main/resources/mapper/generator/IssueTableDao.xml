@@ -51,7 +51,7 @@
     </resultMap>
 
     <select id="selectFinishedSubjectList" resultType="io.renren.modules.generator.entity.IssueTableEntity">
-        SELECT issue_id, issue_description, creation_time, verification_conclusion, storage_flag
+        SELECT *
         FROM issue_table
         <where>
             <if test="issueDescription != null and issueDescription != ''">

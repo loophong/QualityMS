@@ -319,23 +319,17 @@ export default {
       const rootNode = {
         id: this.rootData.planId,
         name: this.rootData.planName,
+        executor: this.getExecutorNameById(this.rootData.planExecutor),
         parentId: '',
         statusColor: this.rootData.planCurrentState
-        // parentName: '',
-        // url: '/some-url-based-on-indicator-id/1',
-        // classification: 'A'
       };
+      console.log('rootNode:', rootNode);
 
       // 格式化数据并插入根节点
       const formattedData = [rootNode, ...this.dataList.map(item => ({
-        // id: item.indicatorId,
-        // name: item.indicatorName,
-        // parentName: item.indicatorParentNode,
-        // url: '/some-url-based-on-indicator-id/' + item.indicatorId,
-        // url: 'indicatorchart',
-        // classification: item.indicatorClassification,
         id: item.taskId,
         name: item.taskName,
+        executor: this.getExecutorNameById(item.taskExecutor),
         parentId: item.taskParentNode,
         statusColor: item.taskCurrentState
       }))];
@@ -437,14 +431,41 @@ export default {
         });
 
       // 在矩形中添加文本
+      // nodes.append('text')
+      //   .attr('dy', '.9em')
+      //   .attr('x', 0)
+      //   .attr('y', 0)
+      //   .attr('text-anchor', 'middle')
+      //   .style('dominant-baseline', 'central')
+      //   .text(d => {
+      //     return d.data.name + '\n' + '123' + d.data.executor
+      //   })
+      //   .style('fill', 'white');
       nodes.append('text')
         .attr('dy', '.9em')
         .attr('x', 0)
         .attr('y', 0)
         .attr('text-anchor', 'middle')
         .style('dominant-baseline', 'central')
-        .text(d => d.data.name)
-        .style('fill', 'white');
+        .style('fill', 'white')
+        .each(function (d) {
+          const text = d3.select(this);
+          text.append('tspan')
+            .attr('x', 0)
+            .attr('dy', 0)
+            .text("名称：" + d.data.name);
+          // 添加间隔
+          text.append('tspan')
+            .attr('dy', '5') // 调整间隔宽度
+            .text(' ');
+
+          text.append('tspan')
+            .attr('x', 0)
+            .attr('dy', '1.2em') // 调整行间距
+            .text("执行人：" + d.data.executor);
+        });
+
+
       // // 在矩形中添加文本
       // nodes.append('text')
       //   .attr('dy', '.9em')
@@ -503,6 +524,7 @@ export default {
         .map(item => ({
           id: item.id,
           name: item.name,
+          executor: item.executor,
           // classification: item.classification,
           // url: item.url,
           statusColor: item.statusColor,
@@ -568,6 +590,33 @@ export default {
         console.log("获取计划文件:", this.planFiles);
         this.isPlanVisible = true;
       });
+    },
+
+    // 转换 执行人编号列表-->执行人名列表
+    getExecutorNameById(executorList) {
+      const executorNames = [];
+      for (const executorId of executorList) {
+        for (const category of this.options) {
+          for (const executor of category.options) {
+            if (executor.value === executorId) {
+              executorNames.push(executor.label);
+            }
+          }
+        }
+      }
+      return executorNames.join(', ');
+    },
+
+    // 获取用户编号
+    getUsernameByUserId(auditorId) {
+      for (const category of this.options) {
+        for (const auditor of category.options) {
+          if (auditor.value === auditorId) {
+            return auditor.label;
+          }
+        }
+      }
+      return "-";
     },
   }
 };

@@ -588,7 +588,8 @@ export default {
     },
 
     cancel() {
-      this.$router.push({name: 'TasksList'}); // 假设你有一个名为TasksList的路由
+      // this.$router.push({name: 'TasksList'}); // 假设你有一个名为TasksList的路由
+      this.$router.back()
     },
 
     dataFormSubmit() {

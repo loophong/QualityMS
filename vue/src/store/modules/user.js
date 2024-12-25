@@ -2,7 +2,8 @@ export default {
   namespaced: true,
   state: {
     id: 0,
-    name: ''
+    name: '',
+    nickname: ''
   },
   mutations: {
     updateId (state, id) {

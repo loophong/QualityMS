@@ -7,6 +7,7 @@ import io.renren.common.utils.R;
 import io.renren.modules.indicator.entity.IndicatorChart1Entity;
 import io.renren.modules.indicator.entity.IndicatorChart2Entity;
 import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
+import io.renren.modules.indicator.entity.IndicatorYearDataEntity;
 import io.renren.modules.indicator.listener.DataReadListener;
 
 import java.io.InputStream;
@@ -34,5 +35,7 @@ public interface IndicatorIndicatorSummaryService extends IService<IndicatorIndi
     public List<IndicatorChart1Entity> queryChart1List(IndicatorChart1Entity indicatorChart1Entity);
 
     public List<IndicatorChart2Entity> queryChart2List(IndicatorChart2Entity indicatorChart2Entity);
+
+    public List<IndicatorYearDataEntity> queryYearDataList(IndicatorIndicatorSummaryEntity indicatorIndicatorSummaryEntity);
 }
 

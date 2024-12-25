@@ -156,7 +156,7 @@
               <!--              <el-button v-if="scope.row.planFile !== null" type="text" size="small"-->
               <!--                         @click="downloadFile(scope.row.planFile)">下载附件-->
               <!--              </el-button>-->
-              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
+              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">计划附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
               <el-button v-if="scope.row.planCurrentState !== 'PREAPPROVAL_IN_PROGRESS'"
                          type="text" size="small" @click="updatePlanPage(scope.row)">修改

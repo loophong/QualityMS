@@ -473,20 +473,20 @@
                 this.dataForm.reviewers = data.issueMaskTable.reviewers
                 this.dataForm.recipients = data.issueMaskTable.recipients
                 this.dataForm.maskcontent = data.issueMaskTable.maskcontent
-                this.dataForm.creator = data.issueMaskTable.creator
+                this.dataForm.creator = data.issueMaskTable.recipients
                 this.dataForm.rectificationResponsiblePerson = data.issueMaskTable.rectificationResponsiblePerson
                 this.dataForm.issuecreators = data.issueMaskTable.issuecreator
                 this.dataForm.creationTime = this.formattedCreationTime // 初始化为当前时间
                 this.dataForm.requiredCompletionTime = data.issueMaskTable.requiredCompletionTime
                 this.dataForm.superiorMask = data.issueMaskTable.superiorMask
-                console.log('初始化弹窗，ID:', data.issueMaskTable.issueNumber)
+                // console.log('初始化弹窗，ID:', data.issueMaskTable.issueNumber)
               }
             })
           }
         })
-        console.log('初始化弹窗dataForm:', this.dataForm)
+        // console.log('初始化弹窗dataForm:', this.dataForm)
         this.newmasknumber = await this.generateSerialNumber(issueNumber);
-        console.log('初始化弹窗newmasknumber', this.newmasknumber)
+        // console.log('初始化弹窗newmasknumber', this.newmasknumber)
       },
       completeHandle (id) {
         this.dataForm.issuemaskId = id || 0

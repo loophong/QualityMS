@@ -80,7 +80,7 @@
               <el-tag v-else>-</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
+          <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" width="150">
           </el-table-column>
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
             <template slot-scope="scope">
@@ -92,7 +92,7 @@
               {{ numberToName(scope.row.topicConsultant) }}
             </template>
           </el-table-column>
-          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员" width="180">
             <template slot-scope="scope">
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
@@ -107,7 +107,7 @@
           </el-table-column>
           <el-table-column prop="activityPlanEnd" header-align="center" align="center" label="活动计划结束日期" width="100">
           </el-table-column>
-          <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字">
+          <el-table-column prop="keywords" header-align="center" align="center" label="课题关键字" width="200">
           </el-table-column>
           <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态" width="120">
             <template slot-scope="scope">
@@ -117,12 +117,23 @@
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
+            <template slot-scope="scope">
+              <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
+              <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
+              <span v-else>--</span> <!-- 处理未知状态 -->
+            </template>
           </el-table-column>
           <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
           </el-table-column>
-          <el-table-column prop="note" header-align="center" align="center" label="备注">
+          <el-table-column prop="note" header-align="center" align="center" label="备注" width="200">
           </el-table-column>
-
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见" width="180">
+          </el-table-column>
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <div v-if="scope.row.topicReviewStatus == '3'">
@@ -184,12 +195,26 @@
             </el-select>
           </el-form-item>
           <el-form-item>
+            <el-select style="width: 100px;" v-model="dataListQuery.groupType" placeholder="类型" clearable>
+              <el-option label="攻关" value="攻关"></el-option>
+              <el-option label="现场" value="现场"></el-option>
+              <el-option label="管理" value="管理"></el-option>
+              <el-option label="服务" value="服务"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
             <el-input style="width: 120px;" v-model="dataListQuery.consultant" placeholder="顾问" clearable></el-input>
           </el-form-item>
           <el-form-item>
             <el-date-picker v-model="dataListQuery.buildTime" type="daterange" range-separator="-"
               start-placeholder="开始" end-placeholder="结束" value-format="yyyy-MM-dd">
             </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="dataListQuery.aboutMe" placeholder="关于我" clearable>
+              <el-option label="我创办" value="我创办"></el-option>
+              <el-option label="我参与" value="我参与"></el-option>
+            </el-select>
           </el-form-item>
           <!-- <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
@@ -289,6 +314,14 @@
               <el-option label="安环设备科" value="安环设备科"></el-option>
               <el-option label="企业管理科" value="企业管理科"></el-option>
               <el-option label="党群办公室" value="党群办公室"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 100px;" v-model="dataListQueryConsultant.groupType" placeholder="类型" clearable>
+              <el-option label="攻关" value="攻关"></el-option>
+              <el-option label="现场" value="现场"></el-option>
+              <el-option label="管理" value="管理"></el-option>
+              <el-option label="服务" value="服务"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -844,6 +877,8 @@ export default {
         examineStatus: '',
         buildTime: [],
         consultant: '',
+        aboutMe: '',
+        groupType: '',
       },
       dataListQueryConsultant: {
         groupName: '',
@@ -852,6 +887,7 @@ export default {
         buildTime: [],
         consultant: '',
         memberName: '',
+        groupType: '',
       },
       dataListAfterQueryConsultant: [],
       subjectDataList: [], //标签页1，我的课题
@@ -890,6 +926,7 @@ export default {
         activityPlan: '',
         activityPlanEnd: '',
       },
+      currentUserName: '',
       reuseStepId: "",
       superScriptNumber: "", //消息详情角标
       messageList: [], //消息详情角标
@@ -936,7 +973,17 @@ export default {
       });
       // console.log(this.membersOptions)
     });
-
+    await this.$http({
+      url: this.$http.adornUrl("/qcSubject/registration/user"),
+      method: "get",
+      params: this.$http.adornParams({
+      }),
+    }).then(({ data }) => {
+      if (data && data.code === 0) {
+        this.currentUserName = data.userName;
+      } else {
+      }
+    });
   },
   methods: {
     async ifGroupLead() {
@@ -1188,6 +1235,11 @@ export default {
         console.log(this.dataListQuery.department)
         tmpList = tmpList.filter(item => item.department == this.dataListQuery.department)
       }
+      if (this.dataListQuery.groupType != '' && this.dataListQuery.groupType != null) {
+        console.log('进入类型')
+        console.log(this.dataListQuery.groupType)
+        tmpList = tmpList.filter(item => item.team == this.dataListQuery.groupType)
+      }
       if (this.dataListQuery.consultant != '' && this.dataListQuery.consultant != null) {
         console.log('进入顾问')
         console.log(this.dataListQuery.consultant)
@@ -1218,6 +1270,18 @@ export default {
         console.log(this.dataListQuery.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQuery.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQuery.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
       }
+      if (this.dataListQuery.aboutMe != '' && this.dataListQuery.aboutMe != null) {
+        console.log('进入关于我')
+        console.log(this.dataListQuery.aboutMe)
+        console.log(this.currentUserName)
+        if (this.dataListQuery.aboutMe == '我创办') {
+          console.log('我创办筛选')
+          tmpList = tmpList.filter(item => item.memberName == this.currentUserName)
+        } else if (this.dataListQuery.aboutMe == '我参与') {
+          console.log('我参与筛选')
+          tmpList = tmpList.filter(item => item.memberName != this.currentUserName)
+        }
+      }
       this.dataListAfterQuery = tmpList
     },
     upQueryConsultant() {
@@ -1229,6 +1293,11 @@ export default {
         console.log('进入科室')
         console.log(this.dataListQueryConsultant.department)
         tmpList = tmpList.filter(item => item.department == this.dataListQueryConsultant.department)
+      }
+      if (this.dataListQueryConsultant.groupType != '' && this.dataListQueryConsultant.groupType != null) {
+        console.log('进入类型')
+        console.log(this.dataListQueryConsultant.groupType)
+        tmpList = tmpList.filter(item => item.team == this.dataListQueryConsultant.groupType)
       }
       if (this.dataListQueryConsultant.memberName != '' && this.dataListQueryConsultant.memberName != null) {
         console.log('进入组长')

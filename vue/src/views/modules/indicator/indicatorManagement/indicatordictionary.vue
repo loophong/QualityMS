@@ -168,7 +168,6 @@
           <el-button type="text" size="small" @click="queryKeyControlHandle(scope.row.indicatorName)">查看重点管控措施</el-button>
           <el-button type="text" size="small" @click="addPlanHandle(scope.row.indicatorId)">新建计划</el-button>
           <el-button type="text" size="small" @click="queryPlanHandle(scope.row)">关联计划</el-button>
-          <el-button type="text" size="small" @click="queryTaskHandle(scope.row.indicatorId)">关联任务</el-button>
         </template>
       </el-table-column>
     </el-table>

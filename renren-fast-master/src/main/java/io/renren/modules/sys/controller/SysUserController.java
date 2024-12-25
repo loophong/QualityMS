@@ -102,6 +102,18 @@ public class SysUserController extends AbstractController {
 		
 		return R.ok().put("user", user);
 	}
+
+	/**
+	 * 用户信息
+	 * 无权限
+	 */
+	@GetMapping("/getUserInfoById/{userId}")
+	public R getUserInfoById(@PathVariable("userId") Long userId){
+		SysUserEntity user = sysUserService.getById(userId);
+		System.out.println("getUserInfoById");
+		return R.ok().put("user", user);
+	}
+
 	
 	/**
 	 * 保存用户

@@ -120,10 +120,10 @@
                 AND s.keywords LIKE CONCAT('%', #{keywords}, '%')
             </if>
             <if test="startDate != null and startDate != ''">
-                AND DATE(s.start_date) = STR_TO_DATE(#{startDate}, '%Y-%m-%d')
+                AND DATE(s.start_date) = STR_TO_DATE(#{activity_plan}, '%Y-%m-%d')
             </if>
             <if test="endDate != null and endDate != ''">
-                AND DATE(s.end_date) = STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+                AND DATE(s.end_date) = STR_TO_DATE(#{activity_plan_end}, '%Y-%m-%d')
             </if>
             AND e.qc_status_seven = 1
             AND e.qc_storage_flag = 1

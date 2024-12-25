@@ -206,7 +206,9 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         planApprovalTableEntity.setApprovalStatus(ApprovalStatus.PENDING);
         planApprovalTableEntity.setPlanPrincipal(plan.getPlanPrincipal());
         planApprovalTableEntity.setPlanExecutor(plan.getPlanExecutor().toString());
-        planApprovalTableEntity.setPlanAssociatedIndicatorsId(Integer.valueOf(plan.getPlanAssociatedIndicatorsId()));
+        if (plan.getPlanAssociatedIndicatorsId() != null && !plan.getPlanAssociatedIndicatorsId().equals("")) {
+            planApprovalTableEntity.setPlanAssociatedIndicatorsId(Integer.valueOf(plan.getPlanAssociatedIndicatorsId()));
+        }
         planApprovalTableEntity.setPlanSubmissionTime(new Date());
         planApprovalTableEntity.setApprover(plan.getPlanAuditor());
         planApprovalTableEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
@@ -224,7 +226,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         fileService.saveBatch(files);
 
         // 发送通知
-        messageService.sendMessages(new CreateNoticeParams(ShiroUtils.getUserId(), new Long[]{Long.valueOf(plan.getPlanAuditor())},"您有一个新建计划未审批", "新建计划审批通知","plan_approval_page"));
+        messageService.sendMessages(new CreateNoticeParams(ShiroUtils.getUserId(), new Long[]{Long.valueOf(plan.getPlanAuditor())}, "您有一个新建计划未审批", "新建计划审批通知", "plan_approval_page"));
     }
 
     @Transactional
@@ -258,7 +260,9 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         planApprovalTableEntity.setApprovalStatus(ApprovalStatus.PENDING);
         planApprovalTableEntity.setPlanPrincipal(plan.getPlanPrincipal());
         planApprovalTableEntity.setPlanExecutor(plan.getPlanExecutor().toString());
-        planApprovalTableEntity.setPlanAssociatedIndicatorsId(Integer.valueOf(plan.getPlanAssociatedIndicatorsId()));
+        if(plan.getPlanAssociatedIndicatorsId() != null && !plan.getPlanAssociatedIndicatorsId().equals("")){
+            planApprovalTableEntity.setPlanAssociatedIndicatorsId(Integer.valueOf(plan.getPlanAssociatedIndicatorsId()));
+        }
         planApprovalTableEntity.setPlanSubmissionTime(new Date());
         planApprovalTableEntity.setApprover(plan.getPlanAuditor());
         planApprovalTableEntity.setSubmitter(String.valueOf(ShiroUtils.getUserId()));
@@ -285,9 +289,9 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         IPage<PlanEntity> planList = planDao.selectPage(
                 page,
                 new LambdaQueryWrapper<PlanEntity>()
-                        .eq(plan.getPlanId() != null,PlanEntity::getPlanId, plan.getPlanId())
-                        .eq(plan.getPlanName() != null,PlanEntity::getPlanName, plan.getPlanName())
-                        .eq(plan.getPlanAssociatedIndicatorsId() != null,PlanEntity::getPlanAssociatedIndicatorsId, plan.getPlanAssociatedIndicatorsId())
+                        .eq(plan.getPlanId() != null, PlanEntity::getPlanId, plan.getPlanId())
+                        .eq(plan.getPlanName() != null, PlanEntity::getPlanName, plan.getPlanName())
+                        .eq(plan.getPlanAssociatedIndicatorsId() != null, PlanEntity::getPlanAssociatedIndicatorsId, plan.getPlanAssociatedIndicatorsId())
                         .orderByDesc(PlanEntity::getPlanStartDate)
         );
 
@@ -400,9 +404,9 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         IPage<PlanEntity> planList = planDao.selectPage(
                 page,
                 new LambdaQueryWrapper<PlanEntity>()
-                        .like(plan.getPlanId() != null && !"".equals(plan.getPlanId()),PlanEntity::getPlanId, plan.getPlanId())
-                        .like(plan.getPlanName() != null && !"".equals(plan.getPlanName()),PlanEntity::getPlanName, plan.getPlanName())
-                        .eq(plan.getPlanAssociatedIndicatorsId() != null && !"".equals(plan.getPlanAssociatedIndicatorsId()),PlanEntity::getPlanAssociatedIndicatorsId, plan.getPlanAssociatedIndicatorsId())
+                        .like(plan.getPlanId() != null && !"".equals(plan.getPlanId()), PlanEntity::getPlanId, plan.getPlanId())
+                        .like(plan.getPlanName() != null && !"".equals(plan.getPlanName()), PlanEntity::getPlanName, plan.getPlanName())
+                        .eq(plan.getPlanAssociatedIndicatorsId() != null && !"".equals(plan.getPlanAssociatedIndicatorsId()), PlanEntity::getPlanAssociatedIndicatorsId, plan.getPlanAssociatedIndicatorsId())
                         .eq(PlanEntity::getAddBase, 1)
                         .orderByDesc(PlanEntity::getPlanStartDate)
         );
@@ -469,7 +473,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
                 task.setTaskCurrentState(TaskStatus.NOT_STARTED);
                 newTaskList.add(task);
             }
-            log.info("父节点"+task.getTaskParentNode());
+            log.info("父节点" + task.getTaskParentNode());
         }
 //        for (TaskEntity task : tasks) {
 //            if(task.getTaskCurrentState() == null){

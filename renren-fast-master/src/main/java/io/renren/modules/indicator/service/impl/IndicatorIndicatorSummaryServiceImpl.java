@@ -4,18 +4,18 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.renren.common.utils.R;
-import io.renren.modules.indicator.entity.IndicatorChart1Entity;
-import io.renren.modules.indicator.entity.IndicatorChart2Entity;
-import io.renren.modules.indicator.entity.IndicatorDataReadEntity;
+import io.renren.modules.indicator.entity.*;
 import io.renren.modules.indicator.listener.DataReadListener;
 import io.renren.modules.indicator.listener.DataReadListener2;
 import io.renren.modules.indicator.service.IndicatorDictionaryService;
+import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -26,7 +26,6 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 
 import io.renren.modules.indicator.dao.IndicatorIndicatorSummaryDao;
-import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
 import io.renren.modules.indicator.service.IndicatorIndicatorSummaryService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -228,5 +227,108 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
     public List<IndicatorChart2Entity> queryChart2List(IndicatorChart2Entity indicatorChart2Entity) {
         return indicatorIndicatorSummaryDao.queryChart2List(indicatorChart2Entity);
     }
+
+    @Override
+    public List<IndicatorYearDataEntity> queryYearDataList(IndicatorIndicatorSummaryEntity indicatorIndicatorSummaryEntity) {
+        // 查询当前年份的数据
+        List<IndicatorIndicatorSummaryEntity> list = indicatorIndicatorSummaryDao.queryYearDataList(indicatorIndicatorSummaryEntity);
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        for (IndicatorIndicatorSummaryEntity entity : list) {
+            System.out.println(entity);
+        }
+
+        // 使用 Map 来存储每个指标的完成情况
+        Map<String, BigDecimal> yearDataMap = new HashMap<>();
+        Map<String, BigDecimal> targetValuesMap = new HashMap<>();
+        for (IndicatorIndicatorSummaryEntity entity : list) {
+            String indicatorName = entity.getIndicatorName();
+            Date yearMonth = entity.getYearMonth(); // 提取年份和月份
+            if (yearMonth != null) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(yearMonth);
+                int year = calendar.get(Calendar.YEAR); // 提取年份
+                // 构建 Map 的键
+                String key = year + "-" + indicatorName;
+                BigDecimal indicatorActualValue = entity.getIndicatorActualValue() != null ? entity.getIndicatorActualValue() : BigDecimal.ZERO;
+                BigDecimal indicatorValue = entity.getIndicatorValue() != null ? entity.getIndicatorValue() : BigDecimal.ZERO;
+                // 获取当前的累计值，如果没有则初始化为 BigDecimal.ZERO
+                BigDecimal indicatorYearActualValue = yearDataMap.getOrDefault(key, BigDecimal.ZERO);
+                // 累加月度完成值
+                indicatorYearActualValue = indicatorYearActualValue.add(indicatorActualValue);
+                // 获取当前的累计值，如果没有则初始化为 BigDecimal.ZERO
+                BigDecimal indicatorYearValue = targetValuesMap.getOrDefault(key, BigDecimal.ZERO);
+
+                // 累加月度完成值
+                indicatorYearValue = indicatorYearValue.add(indicatorValue);
+                // 更新 Map
+                yearDataMap.put(key, indicatorYearActualValue);
+                targetValuesMap.put(key, indicatorYearValue);
+            }
+        }
+
+        // 打印 yearDataMap
+        for (Map.Entry<String, BigDecimal> entry : yearDataMap.entrySet()) {
+            System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+        }
+        for (Map.Entry<String, BigDecimal> entry : targetValuesMap.entrySet()) {
+            System.out.println("Key: " + entry.getKey() + ", targetValue: " + entry.getValue());
+        }
+
+        // 创建一个 Map 来存储每个指标的 IndicatorYearDataEntity
+        Map<String, IndicatorYearDataEntity> yearDataEntitiesMap = new HashMap<>();
+        // 遍历 yearDataMap 进行比较
+        for (Map.Entry<String, BigDecimal> entry : yearDataMap.entrySet()) {
+            String key = entry.getKey();
+            System.out.println("Key: " + key);
+            BigDecimal actualValue = entry.getValue() != null ? entry.getValue() : BigDecimal.ZERO;
+            String[] parts = key.split("-");
+            int year = Integer.parseInt(parts[0]);
+            String indicatorName = parts[1];
+
+            BigDecimal targetValue = targetValuesMap.get(key);
+            System.out.println("targetValue: " + targetValue);
+            if (targetValue != null) {
+
+                // 获取或创建 IndicatorYearDataEntity
+                String entityKey = year + "-" + indicatorName;
+                IndicatorYearDataEntity yearDataEntity = yearDataEntitiesMap.getOrDefault(entityKey, new IndicatorYearDataEntity());
+                // 将 int 类型的 year 转换为 Date 类型
+                Calendar calendar = Calendar.getInstance();
+                calendar.clear();
+                calendar.set(year, Calendar.JANUARY, 1); // 设置为该年的1月1日
+                Date yearDate = calendar.getTime();
+
+                yearDataEntity.setYear(yearDate);
+
+                // 比较实际值和目标值
+                if (actualValue.compareTo(targetValue) >= 0) {
+                    yearDataEntity.setFinishedCounts(yearDataEntity.getFinishedCounts() + 1);
+                } else {
+                    yearDataEntity.setUnfinishedCounts(yearDataEntity.getUnfinishedCounts() + 1);
+                }
+
+                // 更新 Map
+                yearDataEntitiesMap.put(entityKey, yearDataEntity);
+            } else {
+                log.warn("No target value found for key: {}", key);
+            }
+        }
+
+        // 打印 yearDataEntitiesMap
+        for (Map.Entry<String, IndicatorYearDataEntity> entry : yearDataEntitiesMap.entrySet()) {
+            IndicatorYearDataEntity yearDataEntity = entry.getValue();
+            System.out.println("Year: " + yearDataEntity.getYear() +
+                    ", Finished Counts: " + yearDataEntity.getFinishedCounts() +
+                    ", Unfinished Counts: " + yearDataEntity.getUnfinishedCounts());
+        }
+
+        // 将 Map 中的值转换为 List 并返回
+        return new ArrayList<>(yearDataEntitiesMap.values());
+    }
+
+
+
 
 }

@@ -127,7 +127,6 @@ const mainRoutes = {
       props: true
     },
 
-
     //QC
     {
       path: '/qcPlanNew',
@@ -300,7 +299,7 @@ const mainRoutes = {
       path: '/toNotice',
       component: _import('modules/notice/messagenotification'),
       name: 'toNotice',
-      meta: {title: '消息通知', isDynamic: true, isTab: false}
+      meta: {title: '消息通知', isDynamic: false, isTab: true}
     },
 
   ],

@@ -128,6 +128,7 @@
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
                 @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
+                :disabled="scope.row.resultType"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
                 @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
@@ -267,6 +268,7 @@
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
                 @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
+                :disabled="scope.row.resultType"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
                 @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
@@ -405,6 +407,7 @@
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
                 @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
+                :disabled="scope.row.resultType"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
                 @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
@@ -542,6 +545,13 @@ export default {
     // }
   },
   methods: {
+    test(type) {
+      if (type) {
+        console.log(true)
+      } else {
+        console.log(false)
+      }
+    },
     numberToNameArray(numbers) {
       if (Array.isArray(numbers)) {
         let result = numbers.map(number => this.numberToName(number));
@@ -903,9 +913,11 @@ export default {
     },
     // 新增 / 修改
     addOrUpdateHandle(id, status, type) {
-      console.log(id)
-      console.log(status)
-      console.log(type)
+      // console.log(id)
+      // console.log(status)
+      if (type) {
+        console.log(type)
+      }
       if (type == '创新型') {
         if (status != '8') {
           this.$message({

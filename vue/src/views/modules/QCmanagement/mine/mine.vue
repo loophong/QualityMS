@@ -1616,11 +1616,11 @@ export default {
             // console.log(item);
             tipSecondList.push(item);
             this.showNotification("成果复评");
-          } else if ((item.qcExamineCurrent == "4" || item.qcExamineCurrent == "4.1") && this.isAuth("qcExamine:second:comment")) {
+          } else if ((item.qcExamineCurrent == "4" || item.qcExamineCurrent == "4.1") && this.isAuth("qcExamine:finance:department")) {
             tipList.push(item);
             tipFinancialList.push(item);
             this.showNotification("财务部审核");
-          } else if (item.qcExamineCurrent == "5" && this.isAuth("qcExamine:final:submit")) {
+          } else if (item.qcExamineCurrent == "5" && this.isAuth("qcManagement:group:admin")) {
             tipList.push(item);
             this.showNotification("终评提交");
           }

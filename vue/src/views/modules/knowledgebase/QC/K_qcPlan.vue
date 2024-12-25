@@ -8,19 +8,19 @@
         <el-input v-model="myQueryParam.keywords" placeholder="课题关键字" clearable></el-input>
       </el-form-item>
       <!-- <el-form-item>
-        <el-input v-model="myQueryParam.startDate" placeholder="开始日期" clearable></el-input>
+        <el-input v-model="myQueryParam.activityPlan" placeholder="开始日期" clearable></el-input>
       </el-form-item>
             <el-form-item>
-        <el-input v-model="myQueryParam.endDate" placeholder="结束日期" clearable></el-input>
+        <el-input v-model="myQueryParam.activityPlanEnd" placeholder="结束日期" clearable></el-input>
       </el-form-item> -->
-      <!-- <el-form-item label="开始日期" prop="startDate">
-        <el-date-picker v-model="myQueryParam.startDate" type="date" placeholder="选择日期" format="yyyy-MM-dd"
+      <el-form-item label="开始日期" prop="activityPlan">
+        <el-date-picker v-model="myQueryParam.activityPlan" type="date" placeholder="选择日期" format="yyyy-MM-dd"
           value-format="yyyy-MM-dd"></el-date-picker>
-      </el-form-item> -->
-      <!-- <el-form-item label="结束日期" prop="endDate">
-        <el-date-picker v-model="myQueryParam.endDate" type="date" placeholder="选择日期" format="yyyy-MM-dd"
+      </el-form-item>
+      <el-form-item label="结束日期" prop="activityPlanEnd">
+        <el-date-picker v-model="myQueryParam.activityPlanEnd" type="date" placeholder="选择日期" format="yyyy-MM-dd"
           value-format="yyyy-MM-dd"></el-date-picker>
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <!-- <el-button v-if="isAuth('qcSubject:plan:submit')" type="primary"
@@ -35,10 +35,10 @@
         <!-- <el-button type="danger" @click="toIssue()">问题添加</el-button> -->
       </el-form-item>
       <el-row :gutter="10" class="mb8">
-        <!-- <el-col :span="1.5">
+        <el-col :span="1.5">
           <el-button v-if="isAuth('qcSubject:registration:delete')" type="danger" @click="deleteHandle()"
             :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        </el-col> -->
+        </el-col>
         <el-col :span="1.5">
           <el-button v-if="isAuth('qcSubject:registration:list')" type="primary" @click="exportAll()">导出</el-button>
         </el-col>
@@ -161,8 +161,8 @@ export default {
       myQueryParam: {
         topicName: '',
         keywords: '',
-        startDate: '',
-        endDate: '',
+        activityPlan: '',
+        activityPlanEnd: '',
       }
     }
   },
@@ -220,6 +220,7 @@ export default {
           query: {
             data: JSON.stringify(row),
             qcsrId: qcsrId,
+            know:true,
           }
         });
     },
@@ -385,8 +386,8 @@ export default {
           'limit': this.pageSize,
           'topicName': this.myQueryParam.topicName,
           'keywords': this.myQueryParam.keywords,
-          'startDate': this.myQueryParam.startDate,
-          'endDate': this.myQueryParam.endDate,
+          'activityPlan': this.myQueryParam.activityPlan,
+          'activityPlanEnd': this.myQueryParam.activityPlanEnd,
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -467,8 +468,8 @@ export default {
         params: this.$http.adornParams({
           'topicName': this.myQueryParam.topicName,
           'keywords': this.myQueryParam.keywords,
-          'startDate': this.myQueryParam.startDate,
-          'endDate': this.myQueryParam.endDate,
+          'activityPlan': this.myQueryParam.activityPlan,
+          'activityPlanEnd': this.myQueryParam.activityPlanEnd,
         })
       }).then(({ data }) => {
         if (data) {
@@ -497,8 +498,8 @@ export default {
           课题组长: this.numberToName(tableRow.topicLeader),
           课题顾问: this.numberToName(tableRow.topicConsultant),
           小组成员: this.numberToNameArray(tableRow.teamNumberIds),
-          开始日期: tableRow.startDate,
-          结束日期: tableRow.endDate,
+          开始日期: tableRow.activityPlan,
+          结束日期: tableRow.activityPlanEnd,
           课题描述: tableRow.topicDescription,
           课题类型: tableRow.topicType,
           活动特性: tableRow.activityCharacteristics,

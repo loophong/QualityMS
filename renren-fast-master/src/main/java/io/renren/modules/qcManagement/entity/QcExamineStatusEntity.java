@@ -112,5 +112,9 @@ public class QcExamineStatusEntity implements Serializable {
 	 * 成果认定审核意见
 	 */
 	private String qcOneContent;
+	/**
+	 * 入库标识
+	 */
+	private String qcStorageFlag;
 
 }

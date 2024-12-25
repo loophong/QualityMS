@@ -117,7 +117,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
@@ -209,7 +209,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
@@ -301,7 +301,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
@@ -391,7 +391,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
@@ -482,7 +482,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -572,7 +572,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -662,7 +662,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -758,7 +758,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -848,7 +848,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -938,7 +938,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -1051,7 +1051,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1141,7 +1141,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1231,7 +1231,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1321,7 +1321,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1411,7 +1411,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1501,7 +1501,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1591,7 +1591,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1687,7 +1687,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1777,7 +1777,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1867,7 +1867,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1978,7 +1978,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2069,7 +2069,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2160,7 +2160,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2252,7 +2252,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2343,7 +2343,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2440,7 +2440,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2531,7 +2531,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2622,7 +2622,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active3)">确定</el-button>
+              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -3083,7 +3083,9 @@ export default {
       });
 
       console.log('----------------')
-      console.log(this.groupedData)
+      // console.log(this.groupedData)
+      // this.conplanProcess=this.active1
+      console.log(this.conplanProcess)
     },
 
     // click() {
@@ -3180,6 +3182,8 @@ export default {
       });
     },
     handleClickToStep(id) {
+      this.conplanProcess = id;
+      // console.log('++++' + this.conplanProcess)
       if (this.routerParam.topicType == "问题解决型") {
         this.active1 = id;
         this.findMatchingItem(this.active1);
@@ -3190,6 +3194,9 @@ export default {
         this.active3 = id;
         this.findMatchingItem(this.active3);
       }
+      console.log('active1' + this.active1)
+      console.log('active2' + this.active2)
+      console.log('active3' + this.active3)
     },
     //每步数据查询
     findMatchingItem(id) {

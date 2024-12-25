@@ -7,7 +7,7 @@
             <el-input v-model="dataListQueryAdmin.groupName" placeholder="小组名" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="dataListQueryAdmin.examineStatus" placeholder="审核状态" clearable>
+            <el-select style="width: 120px;" v-model="dataListQueryAdmin.examineStatus" placeholder="审核状态" clearable>
               <el-option label="通过" value="通过"></el-option>
               <el-option label="未通过" value="未通过"></el-option>
               <el-option label="待审核" value="待审核"></el-option>
@@ -16,7 +16,7 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="dataListQueryAdmin.department" placeholder="科室" clearable>
+            <el-select style="width: 120px;" v-model="dataListQueryAdmin.department" placeholder="科室" clearable>
               <el-option label="生产科" value="生产科"></el-option>
               <el-option label="供应科" value="供应科"></el-option>
               <el-option label="市场科" value="市场科"></el-option>
@@ -29,9 +29,27 @@
             </el-select>
           </el-form-item>
           <el-form-item>
+            <el-select style="width: 100px;" v-model="dataListQueryAdmin.groupType" placeholder="类型" clearable>
+              <el-option label="攻关" value="攻关"></el-option>
+              <el-option label="现场" value="现场"></el-option>
+              <el-option label="管理" value="管理"></el-option>
+              <el-option label="服务" value="服务"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 120px;" v-model="dataListQueryAdmin.consultant" placeholder="顾问"
+              clearable></el-input>
+          </el-form-item>
+          <el-form-item>
             <el-date-picker v-model="dataListQueryAdmin.buildTime" type="daterange" range-separator="-"
               start-placeholder="开始" end-placeholder="结束" value-format="yyyy-MM-dd">
             </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="dataListQueryAdmin.aboutMe" placeholder="关于我" clearable>
+              <el-option label="我创办" value="我创办"></el-option>
+              <el-option label="我参与" value="我参与"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item>
             <el-button @click="upQueryAdmin()">查询</el-button>
@@ -69,7 +87,7 @@
           </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="100">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="120">
+          <el-table-column prop="department" header-align="center" align="center" label="科室" width="120">
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="100">
           </el-table-column>
@@ -110,7 +128,7 @@
             <el-input v-model="dataListQuery.groupName" placeholder="小组名" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="dataListQuery.examineStatus" placeholder="审核状态" clearable>
+            <el-select style="width: 120px;" v-model="dataListQuery.examineStatus" placeholder="审核状态" clearable>
               <el-option label="通过" value="通过"></el-option>
               <el-option label="未通过" value="未通过"></el-option>
               <el-option label="待审核" value="待审核"></el-option>
@@ -119,7 +137,7 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="dataListQuery.department" placeholder="科室" clearable>
+            <el-select style="width: 120px;" v-model="dataListQuery.department" placeholder="科室" clearable>
               <el-option label="生产科" value="生产科"></el-option>
               <el-option label="供应科" value="供应科"></el-option>
               <el-option label="市场科" value="市场科"></el-option>
@@ -132,9 +150,26 @@
             </el-select>
           </el-form-item>
           <el-form-item>
+            <el-select style="width: 100px;" v-model="dataListQuery.groupType" placeholder="类型" clearable>
+              <el-option label="攻关" value="攻关"></el-option>
+              <el-option label="现场" value="现场"></el-option>
+              <el-option label="管理" value="管理"></el-option>
+              <el-option label="服务" value="服务"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-input style="width: 120px;" v-model="dataListQuery.consultant" placeholder="顾问" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
             <el-date-picker v-model="dataListQuery.buildTime" type="daterange" range-separator="-"
               start-placeholder="开始" end-placeholder="结束" value-format="yyyy-MM-dd">
             </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="dataListQuery.aboutMe" placeholder="关于我" clearable>
+              <el-option label="我创办" value="我创办"></el-option>
+              <el-option label="我参与" value="我参与"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item>
             <el-button @click="upQuery()">查询</el-button>
@@ -172,7 +207,7 @@
           </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="100">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="120">
+          <el-table-column prop="department" header-align="center" align="center" label="科室" width="120">
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="100">
           </el-table-column>
@@ -245,7 +280,7 @@
           </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="160">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="160" sortable>
+          <el-table-column prop="department" header-align="center" align="center" label="科室" width="160" sortable>
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
@@ -256,7 +291,7 @@
           </el-table-column>
           <!-- <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="140">
           </el-table-column> -->
-          <el-table-column prop="date" header-align="center" align="center" label="加入小组时间">
+          <el-table-column prop="date" header-align="center" align="center" label="创建小组时间">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作" width="160">
@@ -334,12 +369,18 @@ export default {
         department: '',
         examineStatus: '',
         buildTime: [],
+        consultant: '',
+        aboutMe: '',
+        groupType: '',
       },
       dataListQueryAdmin: {
         groupName: '',
         department: '',
         examineStatus: '',
         buildTime: [],
+        consultant: '',
+        aboutMe: '',
+        groupType: '',
       },
       dataForm: {
         key: ''
@@ -373,7 +414,7 @@ export default {
       map: {},
       GroupMemberList: [],
       membersOptions: [],
-
+      currentUserName: '',
       // 角色列表
       roleIdList: [],
       dataListAfterQuery: [],
@@ -408,7 +449,17 @@ export default {
     if (!this.isAuth('qcManagement:group:admin')) {
       await this.getGroupList();
     }
-
+    await this.$http({
+      url: this.$http.adornUrl("/qcSubject/registration/user"),
+      method: "get",
+      params: this.$http.adornParams({
+      }),
+    }).then(({ data }) => {
+      if (data && data.code === 0) {
+        this.currentUserName = data.userName;
+      } else {
+      }
+    });
 
     // 获取分组后的员工数据
     await this.$http({
@@ -420,13 +471,16 @@ export default {
           ...o, // 复制原对象属性
           options: o.options.map(e => {
             const match = e.label.match(/\(([^)]+)\)/);
+            const number = e.label.replace(`${match ? match[0] : ''}`, '');
             return {
               ...e, // 复制原选项属性
-              name: match ? match[1] : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              name: match ? match[1] : e.name || '', // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
+              number: number ? number : e.name || '' // 如果匹配到，使用匹配的结果；否则保持原名或为空字符串
             };
           })
         };
       });
+      console.log(this.membersOptions)
     });
   },
   computed: {
@@ -446,9 +500,32 @@ export default {
         tmpList = tmpList.filter(item => item.groupName.includes(this.dataListQuery.groupName))
       }
       if (this.dataListQuery.department != '' && this.dataListQuery.department != null) {
+        console.log('进入科室')
+        console.log(this.dataListQuery.department)
         tmpList = tmpList.filter(item => item.department == this.dataListQuery.department)
       }
+      if (this.dataListQuery.groupType != '' && this.dataListQuery.groupType != null) {
+        console.log('进入类型')
+        console.log(this.dataListQuery.groupType)
+        tmpList = tmpList.filter(item => item.team == this.dataListQuery.groupType)
+      }
+      if (this.dataListQuery.consultant != '' && this.dataListQuery.consultant != null) {
+        console.log('进入顾问')
+        console.log(this.dataListQuery.consultant)
+        console.log(this.nameToNumber(this.dataListQuery.consultant))
+        var trueConsultant = this.dataListQuery.consultant
+        console.log({ trueConsultant })
+        if (this.nameToNumber(this.dataListQuery.consultant)) {
+          console.log('进入顾问内部转换')
+          let tmp = this.nameToNumber(this.dataListQuery.consultant)
+          this.dataListQuery.consultant = this.nameToNumber(this.dataListQuery.consultant);
+          console.log({ tmp })
+        }
+        tmpList = tmpList.filter(item => item.position == this.dataListQuery.consultant)
+      }
       if (this.dataListQuery.examineStatus != '' && this.dataListQuery.examineStatus != null) {
+        console.log('进入审核')
+        console.log(this.dataListQuery.examineStatus)
         if (this.dataListQuery.examineStatus == '待审核(科室)') {
           tmpList = tmpList.filter(item => item.examineStatus == '待审核' && item.examineDepartment != '1')
         } else if (this.dataListQuery.examineStatus == '待审核(管理员)') {
@@ -457,12 +534,27 @@ export default {
           tmpList = tmpList.filter(item => item.examineStatus == this.dataListQuery.examineStatus)
         }
       }
-      if (this.dataListQuery.buildTime) {
+      if (Array.isArray(this.dataListQuery.buildTime) && this.dataListQuery.buildTime.length == 2) {
+        console.log('进入日期')
+        console.log(this.dataListQuery.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQuery.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQuery.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
+      }
+      if (this.dataListQuery.aboutMe != '' && this.dataListQuery.aboutMe != null) {
+        console.log('进入关于我')
+        console.log(this.dataListQuery.aboutMe)
+        console.log(this.currentUserName)
+        if (this.dataListQuery.aboutMe == '我创办') {
+          console.log('我创办筛选')
+          tmpList = tmpList.filter(item => item.memberName == this.currentUserName)
+        } else if (this.dataListQuery.aboutMe == '我参与') {
+          console.log('我参与筛选')
+          tmpList = tmpList.filter(item => item.memberName != this.currentUserName)
+        }
       }
       this.dataListAfterQuery = tmpList
     },
     upQueryAdmin() {
+
       console.log(this.tableData)
       let tmpList = JSON.parse(JSON.stringify(this.tableData))
       console.log(tmpList)
@@ -472,7 +564,27 @@ export default {
       if (this.dataListQueryAdmin.department != '' && this.dataListQueryAdmin.department != null) {
         tmpList = tmpList.filter(item => item.department == this.dataListQueryAdmin.department)
       }
-      console.log(tmpList)
+      if (this.dataListQueryAdmin.groupType != '' && this.dataListQueryAdmin.groupType != null) {
+        console.log('进入类型')
+        console.log(this.dataListQueryAdmin.groupType)
+        tmpList = tmpList.filter(item => item.team == this.dataListQueryAdmin.groupType)
+      }
+      console.log('顾问前' + this.dataListQueryAdmin.consultant)
+      if (this.dataListQueryAdmin.consultant != '' && this.dataListQueryAdmin.consultant != null) {
+        console.log('进入顾问')
+        console.log(this.dataListQueryAdmin.consultant)
+        console.log(this.nameToNumber(this.dataListQueryAdmin.consultant))
+        var trueConsultant = this.dataListQueryAdmin.consultant
+        console.log({ trueConsultant })
+        if (this.nameToNumber(this.dataListQueryAdmin.consultant)) {
+          console.log('进入顾问内部转换')
+          let tmp = this.nameToNumber(this.dataListQueryAdmin.topicLeader)
+          this.dataListQueryAdmin.consultant = this.nameToNumber(this.dataListQueryAdmin.consultant);
+          console.log({ tmp })
+        }
+        tmpList = tmpList.filter(item => item.position == this.dataListQueryAdmin.consultant)
+      }
+      console.log({ tmpList })
       if (this.dataListQueryAdmin.examineStatus != '' && this.dataListQueryAdmin.examineStatus != null) {
         console.log('进入审核状态')
         if (this.dataListQueryAdmin.examineStatus == '待审核(科室)') {
@@ -483,13 +595,33 @@ export default {
           tmpList = tmpList.filter(item => item.examineStatus == this.dataListQueryAdmin.examineStatus)
         }
       }
-      if (this.dataListQueryAdmin.buildTime) {
+      if (Array.isArray(this.dataListQueryAdmin.buildTime) && this.dataListQueryAdmin.buildTime.length == 2) {
         console.log('进入日期')
         console.log(this.dataListQueryAdmin.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQueryAdmin.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQueryAdmin.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
       }
+      if (this.dataListQueryAdmin.aboutMe != '' && this.dataListQueryAdmin.aboutMe != null) {
+        console.log('进入关于我')
+        console.log(this.dataListQueryAdmin.aboutMe)
+        console.log(this.currentUserName)
+        if (this.dataListQueryAdmin.aboutMe == '我创办') {
+          console.log('我创办筛选')
+          tmpList = tmpList.filter(item => item.memberName == this.currentUserName)
+        } else if (this.dataListQueryAdmin.aboutMe == '我参与') {
+          console.log('我参与筛选')
+          tmpList = tmpList.filter(item => item.memberName != this.currentUserName)
+          // 筛选 tmpList 中 children 数组包含 currentUserName 的项
+          tmpList = tmpList.filter(item => {
+            // 检查当前项是否包含在 children 中
+            const hasParticipation = item.children.some(child => child.memberName === this.currentUserName);
+            return hasParticipation;
+          });
+
+        }
+      }
       console.log(tmpList)
       this.tableDataAfterQueryAdmin = tmpList
+      // this.dataListQueryAdmin.consultant = trueConsultant
     },
     checkIfAdmit(department, examineStatus, examineDepartment) {
       console.log(examineStatus + '/////' + examineDepartment);
@@ -526,6 +658,7 @@ export default {
         return false;
       }
     },
+    //用户名转昵称
     numberToName(number) {
       var result = ''
       this.membersOptions.forEach(o => {
@@ -535,10 +668,20 @@ export default {
           }
         })
       });
-      // console.log(result)
       return result
     },
-
+    //昵称转用户名
+    nameToNumber(name) {
+      var result = ''
+      this.membersOptions.forEach(o => {
+        o.options.map(e => {
+          if (e.number == name) {
+            result = e.name
+          }
+        })
+      });
+      return result
+    },
     // 获取我的小组数据列表
     async getGroupList() {
       this.dataListLoading = true
@@ -694,17 +837,103 @@ export default {
             seen.forEach(s => {
               this.exportListMine = this.exportListMine.filter(e => e.parentId != s.qcgmId);
             })
+            const sameList = [];
+            // this.dataList = data.page.list
+            data.page.list.forEach(item => {
+              if (item.memberName == data.userName) {
+                item.admitEdit = 1 //标识当前角色可修改
+                sameList.push(item)
+              }
+            });
+            console.log(sameList)
+            const resultList = [];
+            const seen2 = new Set(); // 用于去重
+
+            sameList.forEach(item => {
+              if (!seen2.has(item.qcgmId)) {
+                resultList.push(item);
+                seen2.add(item.qcgmId);
+              }
+
+              if (item.parentId) {
+                data.page.list.forEach(row => {
+                  if ((row.parentId == item.parentId || row.qcgmId == item.parentId) && !seen2.has(row.qcgmId)) {
+                    resultList.push(row);
+                    seen2.add(row.qcgmId);
+                  }
+                });
+              } else {
+                data.page.list.forEach(row => {
+                  if (row.parentId == item.qcgmId && !seen2.has(row.qcgmId)) {
+                    row.management = 1 //标识当前角色为组长，可以移交组长
+                    row.admitEdit = 1 //标识当前角色可修改
+                    resultList.push(row);
+                    seen2.add(row.qcgmId);
+                  }
+                });
+              }
+            });
+            this.exportListMine = resultList
             console.log('----------before------------')
             console.log(this.exportListMine)
-
+            // 按 roleInTopic 是否为 "组长" 和 participationDate 降序排列
             this.exportListMine.sort((a, b) => {
-              if (a.groupName === b.groupName) {
-                // 如果groupName相同，则按roleInTopic是否为"组长"排序
-                return a.roleInTopic === "组长" ? -1 : (b.roleInTopic === "组长" ? 1 : 0);
+              const dateA = new Date(a.participationDate);
+              const dateB = new Date(b.participationDate);
+
+              if (isNaN(dateA) || isNaN(dateB)) {
+                console.warn('无效的参与日期:', a.participationDate, b.participationDate);
+                return 0; // 如果日期无效，保持原有顺序
               }
-              // 如果groupName不同，则按groupName字母顺序排序
-              return a.groupName.localeCompare(b.groupName);
+
+              if (a.roleInTopic === "组长" && b.roleInTopic !== "组长") {
+                return -1;
+              } else if (a.roleInTopic !== "组长" && b.roleInTopic === "组长") {
+                return 1;
+              } else {
+                // 如果都是组长或都不是组长，则按 participationDate 降序排列
+                return dateB - dateA;
+              }
+            });// 创建一个映射来存储每个组长后面的成员
+            const groupMap = new Map();
+
+            // 遍历排序后的列表，构建组映射
+            this.exportListMine.forEach(item => {
+              if (item.roleInTopic !== "组长") {
+                if (!groupMap.has(item.groupName)) {
+                  groupMap.set(item.groupName, []);
+                }
+                groupMap.get(item.groupName).push(item);
+              }
             });
+
+            // 创建新的有序列表
+            const orderedList = [];
+
+            // 再次遍历排序后的列表，构建最终的有序列表
+            this.exportListMine.forEach(item => {
+              if (item.roleInTopic === "组长") {
+                orderedList.push(item);
+                if (groupMap.has(item.groupName)) {
+                  // 将同组的成员插入到组长后面，并按 participationDate 降序排列
+                  orderedList.push(...groupMap.get(item.groupName).sort((a, b) => {
+                    const dateA = new Date(a.participationDate);
+                    const dateB = new Date(b.participationDate);
+
+                    if (isNaN(dateA) || isNaN(dateB)) {
+                      console.warn('无效的参与日期:', a.participationDate, b.participationDate);
+                      return 0; // 如果日期无效，保持原有顺序
+                    }
+
+                    return dateB - dateA;
+                  }));
+                  groupMap.delete(item.groupName); // 移除已经处理过的组
+                }
+              }
+            });
+
+            // 更新 exportListMine 为新的有序列表
+            this.exportListMine = orderedList;
             console.log('----------after------------')
             console.log(this.exportListMine)
 
@@ -718,20 +947,21 @@ export default {
           spinner: "el-icon-loading",
           background: "rgba(0, 0, 0, 0.7)",
         });
-        // console.log(this.exportList)
+        console.log(this.exportListMine)
         const promises = this.exportListMine.map((tableRow, index) => {
           return {
             序号: index + 1,
             小组名: tableRow.groupName,
             组内角色: tableRow.roleInTopic,
-            姓名: tableRow.memberName,
-            员工编号: tableRow.number,
-            单位: tableRow.department,
+            姓名: this.numberToName(tableRow.memberName),
+            科室: tableRow.department,
             小组类型: tableRow.team,
+            顾问: this.numberToName(tableRow.position),
             注册号: tableRow.registrationNum,
             创建小组时间: tableRow.participationDate,
           };
         });
+        console.log({ promises })
         Promise.all(promises)
           .then((data) => {
             const ws = XLSX.utils.json_to_sheet(data);
@@ -778,15 +1008,70 @@ export default {
             })
             console.log('----------before------------')
             console.log(this.exportList)
-
+            // this.exportList.sort(function (a, b) {
+            //   const dateA = new Date(a.participationDate);
+            //   const dateB = new Date(b.participationDate);
+            //   // 比较两个日期对象，降序排列
+            //   return dateB - dateA;
+            // })
+            // 按 roleInTopic 是否为 "组长" 和 participationDate 降序排列
             this.exportList.sort((a, b) => {
-              if (a.groupName === b.groupName) {
-                // 如果groupName相同，则按roleInTopic是否为"组长"排序
-                return a.roleInTopic === "组长" ? -1 : (b.roleInTopic === "组长" ? 1 : 0);
+              const dateA = new Date(a.participationDate);
+              const dateB = new Date(b.participationDate);
+
+              if (isNaN(dateA) || isNaN(dateB)) {
+                console.warn('无效的参与日期:', a.participationDate, b.participationDate);
+                return 0; // 如果日期无效，保持原有顺序
               }
-              // 如果groupName不同，则按groupName字母顺序排序
-              return a.groupName.localeCompare(b.groupName);
+
+              if (a.roleInTopic === "组长" && b.roleInTopic !== "组长") {
+                return -1;
+              } else if (a.roleInTopic !== "组长" && b.roleInTopic === "组长") {
+                return 1;
+              } else {
+                // 如果都是组长或都不是组长，则按 participationDate 降序排列
+                return dateB - dateA;
+              }
+            });// 创建一个映射来存储每个组长后面的成员
+            const groupMap = new Map();
+
+            // 遍历排序后的列表，构建组映射
+            this.exportList.forEach(item => {
+              if (item.roleInTopic !== "组长") {
+                if (!groupMap.has(item.groupName)) {
+                  groupMap.set(item.groupName, []);
+                }
+                groupMap.get(item.groupName).push(item);
+              }
             });
+
+            // 创建新的有序列表
+            const orderedList = [];
+
+            // 再次遍历排序后的列表，构建最终的有序列表
+            this.exportList.forEach(item => {
+              if (item.roleInTopic === "组长") {
+                orderedList.push(item);
+                if (groupMap.has(item.groupName)) {
+                  // 将同组的成员插入到组长后面，并按 participationDate 降序排列
+                  orderedList.push(...groupMap.get(item.groupName).sort((a, b) => {
+                    const dateA = new Date(a.participationDate);
+                    const dateB = new Date(b.participationDate);
+
+                    if (isNaN(dateA) || isNaN(dateB)) {
+                      console.warn('无效的参与日期:', a.participationDate, b.participationDate);
+                      return 0; // 如果日期无效，保持原有顺序
+                    }
+
+                    return dateB - dateA;
+                  }));
+                  groupMap.delete(item.groupName); // 移除已经处理过的组
+                }
+              }
+            });
+
+            // 更新 exportList 为新的有序列表
+            this.exportList = orderedList;
             console.log('----------after------------')
             console.log(this.exportList)
 
@@ -806,11 +1091,10 @@ export default {
             序号: index + 1,
             小组名: tableRow.groupName,
             组内角色: tableRow.roleInTopic,
-            姓名: tableRow.memberName,
-            员工编号: tableRow.number,
-            单位: tableRow.department,
+            姓名: this.numberToName(tableRow.memberName),
+            科室: tableRow.department,
             小组类型: tableRow.team,
-            顾问: tableRow.position,
+            顾问: this.numberToName(tableRow.position),
             注册号: tableRow.registrationNum,
             创建小组时间: tableRow.participationDate,
           };

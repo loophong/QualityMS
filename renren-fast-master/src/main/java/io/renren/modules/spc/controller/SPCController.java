@@ -11,9 +11,11 @@ import java.util.*;
 import com.aliyun.oss.ServiceException;
 import io.renren.modules.spc.entity.*;
 import io.renren.modules.spc.service.*;
+import javafx.scene.chart.Chart;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -172,6 +174,400 @@ public class SPCController {
         }
     }
 
+
+    /**
+     * 此接口用于图表预警，前端调用后，一个页签数据统一输入
+     * 返回结果按照八种准则的顺序以此填装，图表类型由前端判断
+     * */
+    @RequestMapping("/XR/warning")
+    public R XRwarning(@RequestBody List<List<Double>> ChartData) {
+        // 打印接收到的数据
+        System.out.println("接收到的 XRChartData: " + ChartData);
+
+        List<List<Double>> firstFour = new ArrayList<>();
+        List<List<Double>> lastFour = new ArrayList<>();
+        // 取前四个子列表
+        for (int i = 0; i < 4; i++) {
+            firstFour.add(ChartData.get(i));
+        }
+        // 取后四个子列表
+        for (int i = 8 - 4; i < 8; i++) {
+            lastFour.add(ChartData.get(i));
+        }
+
+        List<List<Boolean>> result = new ArrayList<>();
+        List<Boolean> result_firstFour = warning(firstFour);
+        List<Boolean> result_lastFour = warning(lastFour);
+
+        result.add(result_firstFour);
+        result.add(result_lastFour);
+
+        return R.ok().put("Warning", result);
+    }
+
+    @RequestMapping("/P/warning")
+    public R Pwarning(@RequestBody List<List<Double>> ChartData) {
+        // 打印接收到的数据
+        System.out.println("接收到的 PChartData: " + ChartData);
+
+        List<Boolean> result = warning(ChartData);
+
+        return R.ok().put("Warning", result);
+    }
+
+    //预警部分八条准则的判断
+
+    /**
+     *
+     * 计算过程中，首先需要使用三条控制限进行区域划分，从中心限到上限分别为C、B、A区域，从中心限到下限分别为C、B、A区域
+     * 这六个区域平均划分
+     *
+     */
+
+    public List<Boolean> warning(List<List<Double>> ChartData){
+        List<Boolean> result = new ArrayList<>();
+
+        result.add(Criterion1(ChartData));
+        result.add(Criterion2(ChartData));
+        result.add(Criterion3(ChartData));
+        result.add(Criterion4(ChartData));
+        result.add(Criterion5(ChartData));
+        result.add(Criterion6(ChartData));
+        result.add(Criterion7(ChartData));
+        result.add(Criterion8(ChartData));
+        
+        return result;
+    }
+
+    //准则1：数据中任意一点落在界限外  返回true为需要预警，返回false为不需预警
+    public boolean Criterion1(List<List<Double>> datalist){
+        List<Double> data = datalist.get(0);
+        List<Double> ucl = datalist.get(1);
+        List<Double> lcl = datalist.get(3);
+
+        for(int i = 0; i < data.size(); i++){
+            if(data.get(i) < lcl.get(i) || data.get(i) > ucl.get(i)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //准则2：数据中连续9点落在中心限同一侧  返回true为需要预警，返回false为不需预警
+    public boolean Criterion2(List<List<Double>> datalist){
+        List<Double> data = datalist.get(0);
+
+        List<Double> cl = datalist.get(2);
+
+        // 确保列表的长度足够以避免索引越界
+        if (data.size() < 9 || cl.size() < 9) {
+            return false;
+        }
+
+        // 遍历 data 列表，检查是否有连续的 9 个数大于或小于 cl 列表对应位置的数
+        int consecutiveCount; // 用于计算连续的数字数量
+
+        // 检查大于的情形
+        for (int i = 0; i <= data.size() - 9; i++) {
+            consecutiveCount = 0; // 重置连续计数器
+            for (int j = 0; j < 9; j++) {
+                if (data.get(i + j) > cl.get(i + j)) {
+                    consecutiveCount++;
+                } else {
+                    break;
+                }
+            }
+            if (consecutiveCount == 9) {
+                return true; // 找到连续的 9 个数大于 cl 中的对应数
+            }
+        }
+
+        // 检查小于的情形
+        for (int i = 0; i <= data.size() - 9; i++) {
+            consecutiveCount = 0; // 重置连续计数器
+            for (int j = 0; j < 9; j++) {
+                if (data.get(i + j) < cl.get(i + j)) {
+                    consecutiveCount++;
+                } else {
+                    break;
+                }
+            }
+            if (consecutiveCount == 9) {
+                return true; // 找到连续的 9 个数小于 cl 中的对应数
+            }
+        }
+
+        return false; // 未找到任何符合条件的连续数字
+    }
+
+    //准则3：连续6点递增或递减  返回true为需要预警，返回false为不需预警
+    public boolean Criterion3(List<List<Double>> datalist){
+        List<Double> data = datalist.get(0);
+        // 确保列表的长度足够以避免索引越界
+        if (data.size() < 6) {
+            return false;
+        }
+
+        int consecutiveCount = 1; // 用于计算连续的数字数量
+
+        // 遍历数据
+        for (int i = 1; i < data.size(); i++) {
+            // 检查当前元素与前一个元素的关系
+            if (data.get(i) > data.get(i - 1)) {
+                // 当前元素大于前一个元素，增加递增计数
+                consecutiveCount++;
+                if (consecutiveCount == 6) {
+                    return true; // 找到连续的 6 个递增数
+                }
+            } else if (data.get(i) < data.get(i - 1)) {
+                // 当前元素小于前一个元素，增加递减计数
+                consecutiveCount = -1; // 记录为递减状态
+                int decreaseCount = 1; // 重新计数递减的数量
+                while (i < data.size() && data.get(i) < data.get(i - 1)) {
+                    decreaseCount++;
+                    if (decreaseCount == 6) {
+                        return true; // 找到连续的 6 个递减数
+                    }
+                    i++;
+                }
+                i--; // 由于 while 循环会增加 i，需减回
+                consecutiveCount = 1; // 重置递增计数
+            } else {
+                // 当前元素与前一个元素相等，重置计数
+                consecutiveCount = 1;
+            }
+        }
+
+        return false; // 未找到符合条件的连续数字
+    }
+
+    //准则4：连续14点中相邻点升降交错  返回true为需要预警，返回false为不需预警
+    public boolean Criterion4(List<List<Double>> datalist){
+        List<Double> data = datalist.get(0);
+        // 确保列表的长度足够以避免索引越界
+        if (data.size() < 14) {
+            return false;
+        }
+        // 遍历数据，检查是否有交错序列
+        for (int i = 0; i <= data.size() - 14; i++) {
+            boolean alternates = true;
+
+            // 检查当前 14 个连续点是否交错
+            for (int j = 1; j < 14; j++) {
+                // 判断相邻点的升降关系
+                if ((data.get(i + j) > data.get(i + j - 1) && j % 2 == 0) ||
+                        (data.get(i + j) < data.get(i + j - 1) && j % 2 == 1)) {
+                    // 若不符合交错，设置标志为 false
+                    alternates = false;
+                    break;
+                }
+            }
+
+            // 若已存在符合条件的交错序列
+            if (alternates) {
+                return true;
+            }
+        }
+
+        return false; // 未找到符合条件的连续数字
+    }
+
+    //准则5：连续3点中有2点落在中心线同一侧的B区之外  返回true为需要预警，返回false为不需预警
+    public boolean Criterion5(List<List<Double>> datalist){
+        List<Double> data = datalist.get(0);
+        List<Double> ucl = datalist.get(1);
+        List<Double> cl = datalist.get(2);
+        List<Double> lcl = datalist.get(3);
+
+        int dataSize = data.size();
+
+        for (int i = 0; i < dataSize - 2; i++) {
+            // 取当前的中心线和控制限
+            double centerLine = cl.get(i);
+            double upperControlLimit = ucl.get(i);
+            double lowerControlLimit = lcl.get(i);
+
+            // 区域边界
+            double upperB = upperControlLimit - (upperControlLimit + centerLine) / 3;
+            double lowerB = lowerControlLimit + (centerLine - lowerControlLimit) / 3;
+
+            int count = 0;
+            boolean sameSide = true;
+            Boolean firstPointSide = null; // 用于记录第一点的侧
+
+            // 检查连续的 3 个点
+            for (int j = 0; j < 3; j++) {
+                double point = data.get(i + j);
+                boolean isOutsideB = (point > upperB) || (point < lowerB); // 判断是否在 B 区之外
+
+                if (isOutsideB) {
+                    count++;
+                    // 确定点的侧
+                    if (point > centerLine) {
+                        if (firstPointSide == null) {
+                            firstPointSide = true; // 方向上面
+                        } else if (!firstPointSide) {
+                            sameSide = false;
+                        }
+                    } else {
+                        if (firstPointSide == null) {
+                            firstPointSide = false; // 方向下面
+                        } else if (firstPointSide) {
+                            sameSide = false;
+                        }
+                    }
+                }
+            }
+            // 如果有 2 个点在同一侧且不在 B 区
+            if (count >= 2 && sameSide) {
+                return true; // 找到符合条件的点
+            }
+        }
+        return false; // 没找到符合条件的点
+    }
+
+    //准则6：连续5点中有4点落在中心线同一侧的C区之外  返回true为需要预警，返回false为不需预警
+    public boolean Criterion6(List<List<Double>> datalist){
+        List<Double> data = datalist.get(0);
+        List<Double> ucl = datalist.get(1);
+        List<Double> cl = datalist.get(2);
+        List<Double> lcl = datalist.get(3);
+
+        int dataSize = data.size();
+
+        for (int i = 0; i <= dataSize - 5; i++) {  // 允许检查连续 5 个点
+            // 取当前的中心线和控制限
+            double centerLine = cl.get(i);
+            double upperControlLimit = ucl.get(i);
+            double lowerControlLimit = lcl.get(i);
+
+            // 根据给定的公式计算 B 区边界，但现在用于判断 C 区
+            double upperC = upperControlLimit - 2 * (upperControlLimit - centerLine) / 3;
+            double lowerC = lowerControlLimit + 2 * (centerLine - lowerControlLimit) / 3;
+
+            int count = 0;
+            boolean sameSide = true;
+            Boolean firstPointSide = null; // 用于记录第一点的侧
+
+            // 检查连续的 5 个点
+            for (int j = 0; j < 5; j++) {
+                double point = data.get(i + j);
+                boolean isOutsideC = (point > upperC) || (point < lowerC); // 判断是否在 C 区之外
+
+                if (isOutsideC) {
+                    count++;
+                    // 确定点的侧
+                    if (point > centerLine) {
+                        if (firstPointSide == null) {
+                            firstPointSide = true; // 方向上面
+                        } else if (!firstPointSide) {
+                            sameSide = false;
+                        }
+                    } else {
+                        if (firstPointSide == null) {
+                            firstPointSide = false; // 方向下面
+                        } else if (firstPointSide) {
+                            sameSide = false;
+                        }
+                    }
+                }
+            }
+            // 如果有 4 个点在同一侧且不在 C 区
+            if (count >= 4 && sameSide) {
+                return true; // 找到符合条件的点
+            }
+        }
+        return false; // 没找到符合条件的点
+    }
+
+    //准则7：连续15个点落在c区之外  返回true为需要预警，返回false为不需预警
+    public boolean Criterion7(List<List<Double>> datalist){
+        List<Double> data = datalist.get(0);
+        List<Double> ucl = datalist.get(1);
+        List<Double> cl = datalist.get(2);
+        List<Double> lcl = datalist.get(3);
+
+        int dataSize = data.size();
+
+        for (int i = 0; i <= dataSize - 15; i++) {  // 允许检查连续 15 个点
+            // 取当前的中心线和控制限
+            double centerLine = cl.get(i);
+            double upperControlLimit = ucl.get(i);
+            double lowerControlLimit = lcl.get(i);
+
+            // 根据给定的公式计算 C 区的边界
+            double upperC = upperControlLimit - (upperControlLimit - centerLine) / 3;
+            double lowerC = lowerControlLimit + (centerLine - lowerControlLimit) / 3;
+
+            int outsideCount = 0; // 记录落在 C 区之外的点数量
+
+            // 检查连续的 15 个点
+            for (int j = 0; j < 15; j++) {
+                double point = data.get(i + j);
+                boolean isOutsideC = (point > upperC) || (point < lowerC); // 判断是否在 C 区之外
+
+                if (isOutsideC) {
+                    outsideCount++;
+                }
+            }
+
+            // 如果所有 15 个点都在 C 区之外
+            if (outsideCount == 15) {
+                return true; // 找到符合条件的点
+            }
+        }
+        return false; // 没找到符合条件的点
+    }
+
+    //准则8：连续8个点落在中心线两侧，但是无1点落在C区之内  返回true为需要预警，返回false为不需预警
+    public boolean Criterion8(List<List<Double>> datalist){
+        List<Double> data = datalist.get(0);
+        List<Double> ucl = datalist.get(1);
+        List<Double> cl = datalist.get(2);
+        List<Double> lcl = datalist.get(3);
+
+        int dataSize = data.size();
+
+        for (int i = 0; i <= dataSize - 8; i++) {  // 允许检查连续 8 个点
+            // 取当前的中心线和控制限
+            double centerLine = cl.get(i);
+            double upperControlLimit = ucl.get(i);
+            double lowerControlLimit = lcl.get(i);
+
+            // 根据给定的公式计算 C 区的边界
+            double upperC = upperControlLimit - (upperControlLimit - centerLine) / 3;
+            double lowerC = lowerControlLimit + (centerLine - lowerControlLimit) / 3;
+
+            boolean hasAbove = false;  // 是否存在大于中心线的点
+            boolean hasBelow = false;   // 是否存在小于中心线的点
+            boolean inCZone = false;    // 是否有点在 C 区内
+
+            // 检查连续的 8 个点
+            for (int j = 0; j < 8; j++) {
+                double point = data.get(i + j);
+                // 判断是否在 C 区内
+                if ((point > upperC) || (point < lowerC)) {
+                    // 点不在 C 区范围内，检查与中心线的关系
+                    if (point > centerLine) {
+                        hasAbove = true;   // 记录大于中心线的点
+                    }
+                    else {
+                        hasBelow = true;    // 记录小于中心线的点
+                    }
+                } else {
+                    inCZone = true; // 有点在 C 区内
+                    break; // 一旦确定有点在 C 区，直接退出循环
+                }
+            }
+
+            // 如果有点在 C 区内，则不满足条件
+            if (!inCZone && hasAbove && hasBelow) {
+                return true; // 找到符合条件的点
+            }
+        }
+        return false; // 没找到符合条件的点
+    }
+
     public List<SpcXrchartEntity> parseExcel2XRchart(MultipartFile file) throws IOException {
         List<SpcXrchartEntity> dataList = new ArrayList<>();
 
@@ -323,8 +719,6 @@ public class SPCController {
         }
 
 
-        System.out.println("========="+sum_sampling_Tests_Number);
-        System.out.println("========="+sum_defects_Number);
         //存入补充数据,合计、数据日期、数据内容（抽检数/不良数）
 
         //合计
@@ -373,8 +767,6 @@ public class SPCController {
         for (int i = 1; i < 1 + standards_arraySize; i++){
             sampling_Tests_Number[i-1] = getCellValueAsInt(row6.getCell(i));
             defects_Number[i-1] = getCellValueAsInt(row7.getCell(i));
-            System.out.println("--" + sampling_Tests_Number[i-1]);
-            System.out.println("--" + defects_Number[i-1]);
         }
 
         int sum_sampling_Tests_Number = 0;
@@ -399,9 +791,6 @@ public class SPCController {
             sum_defects_Number += defects_Number[i];
         }
 
-
-        System.out.println("========="+sum_sampling_Tests_Number);
-        System.out.println("========="+sum_defects_Number);
         //存入补充数据,合计、数据日期、数据内容（抽检数/不良数）
 
         //合计
@@ -486,225 +875,6 @@ public class SPCController {
             spcPtdPvalueEntity.setTableName(table_name);
             dataList.add(spcPtdPvalueEntity);
         }
-        return dataList;
-    }
-
-    public static List<List<Double>> parseExcel(MultipartFile file) throws IOException {
-        List<List<Double>> dataList = new ArrayList<>();
-
-        ZipSecureFile.setMinInflateRatio(0);
-        Workbook workbook = WorkbookFactory.create(file.getInputStream());
-
-        /*
-        *
-        X-R图
-        * */
-
-
-        Sheet sheet = workbook.getSheetAt(0);
-
-
-        //子组大小
-        int arrayLength = getCellValueAsInt(sheet.getRow(3).getCell(12));
-
-        int arraySize = getCellValueAsInt(sheet.getRow(5).getCell(12));
-
-        DecimalFormat df = new DecimalFormat("#.00");
-        //X图上限、中心限、下限
-        double X_ucl = getNumericCellValue(sheet.getRow(3).getCell(16));
-        double X_cl = getNumericCellValue(sheet.getRow(4).getCell(16));
-        double X_lcl = getNumericCellValue(sheet.getRow(5).getCell(16));
-
-        String formattedX_ucl = df.format(X_ucl);
-        String formattedX_cl = df.format(X_cl);
-        String formattedX_lcl = df.format(X_lcl);
-
-        double roundedX_ucl = Double.parseDouble(formattedX_ucl);
-        double roundedX_cl = Double.parseDouble(formattedX_cl);
-        double roundedX_lcl = Double.parseDouble(formattedX_lcl);
-
-        //R图上限、中心限、下限
-        double R_ucl = getNumericCellValue(sheet.getRow(3).getCell(18));
-        double R_cl = getNumericCellValue(sheet.getRow(4).getCell(18));
-        double R_lcl = getNumericCellValue(sheet.getRow(5).getCell(18));
-
-        String formattedR_ucl = df.format(R_ucl);
-        String formattedR_cl = df.format(R_cl);
-        String formattedR_lcl = df.format(R_lcl);
-
-        double roundedR_ucl = Double.parseDouble(formattedR_ucl);
-        double roundedR_cl = Double.parseDouble(formattedR_cl);
-        double roundedR_lcl = Double.parseDouble(formattedR_lcl);
-
-
-
-        double[][] date = new double[arrayLength][arraySize];
-        int n = 0;
-        for(int i = 8; i < 8 + arrayLength; i++ ){
-            Row row = sheet.getRow(i);
-            int m = 0;
-            for(int j = 2; j < 2 + arraySize; j++){
-                date[n][m] = getNumericCellValue(row.getCell(j));
-                m++;
-            }
-            n++;
-        }
-
-        //计算求和
-        List<Double> sumList = new ArrayList<>();
-
-        for(int i = 0; i < arraySize; i++){
-            BigDecimal sum = BigDecimal.ZERO;
-            for (int j = 0; j < arrayLength; j++){
-                sum = sum.add(BigDecimal.valueOf(date[j][i]));
-            }
-            sumList.add(sum.doubleValue());
-        }
-        dataList.add(sumList);
-
-        //计算平均值
-        List<Double> averageList = new ArrayList<>();
-        for (Double value : sumList) {
-            BigDecimal bigDecimalValue = BigDecimal.valueOf(value); // 将Double转换为BigDecimal
-            BigDecimal dividedValue = bigDecimalValue.divide(BigDecimal.valueOf(arrayLength)); // 除以5
-            averageList.add(dividedValue.doubleValue()); // 将结果转换回Double并添加到新列表中
-        }
-        dataList.add(averageList);
-
-        //存入X图的UCL上限
-        List<Double> X_UCL = new ArrayList<>();
-        for (int col = 0; col < arraySize; col++){
-            X_UCL.add(roundedX_ucl);
-        }
-        dataList.add(X_UCL);
-
-        //存入X图的CL中心限
-        List<Double> X_CL = new ArrayList<>();
-        for (int col = 0; col < arraySize; col++){
-            X_CL.add(roundedX_cl);
-        }
-        dataList.add(X_CL);
-
-        //存入X图的LCL下限
-        List<Double> X_LCL = new ArrayList<>();
-        for (int col = 0; col < arraySize; col++){
-            X_LCL.add(roundedX_lcl);
-        }
-        dataList.add(X_LCL);
-
-        //计算R
-        List<Double> R = new ArrayList<>();
-        for(int col = 0; col < arraySize; col++){
-            BigDecimal max = BigDecimal.valueOf(date[0][col]); // 假设第一行的元素是最大值
-            BigDecimal min = BigDecimal.valueOf(date[0][col]); // 假设第一行的元素是最小值
-
-
-            for (int row = 1; row < date.length; row++) { // 遍历该列的每一行
-                BigDecimal current = BigDecimal.valueOf(date[row][col]);
-                if (current.compareTo(max) > 0) {
-                    max = current; // 更新最大值
-                }
-                if (current.compareTo(min) < 0) {
-                    min = current; // 更新最小值
-                }
-            }
-            BigDecimal difference = max.subtract(min); // 计算最大值与最小值的差
-            R.add(difference.doubleValue()); // 将差值转换为Double并添加到列表R中
-        }
-        dataList.add(R);
-
-        //存入X图的UCL上限
-        List<Double> R_UCL = new ArrayList<>();
-        for (int col = 0; col < arraySize; col++){
-            R_UCL.add(roundedR_ucl);
-        }
-        dataList.add(R_UCL);
-
-        //存入X图的CL中心限
-        List<Double> R_CL = new ArrayList<>();
-        for (int col = 0; col < arraySize; col++){
-            R_CL.add(roundedR_cl);
-        }
-        dataList.add(R_CL);
-
-        //存入X图的LCL下限
-        List<Double> R_LCL = new ArrayList<>();
-        for (int col = 0; col < arraySize; col++){
-            R_LCL.add(roundedR_lcl);
-        }
-        dataList.add(R_LCL);
-
-
-        /*
-        *
-        P-Chart
-        * */
-
-        //获取数据
-        Sheet sheet2 = workbook.getSheetAt(1);
-
-        //抽检数
-//        List<Integer> sampling_Tests_Number = new ArrayList<>();
-//        List<Integer> defects_Number = new ArrayList<>();
-
-        int[] sampling_Tests_Number = new int[arraySize];
-        int[] defects_Number = new int[arraySize];
-
-        Row row6 = sheet2.getRow(5);   //抽检数一行
-        Row row7 = sheet2.getRow(6);   //不良数一行
-
-        for (int i = 1; i < 1 + arraySize; i++){
-            sampling_Tests_Number[i-1] = getCellValueAsInt(row6.getCell(i));
-            defects_Number[i-1] = getCellValueAsInt(row7.getCell(i));
-        }
-
-
-
-
-        //计算不良率
-        List<Double> defect_Rate = new ArrayList<>();
-
-        int sum_Sampling_Tests_Number = 0;
-        int sum_Defects_Number = 0;
-
-        for(int i = 0; i < arraySize; i++){
-            BigDecimal defectRate = BigDecimal.valueOf(defects_Number[i]).divide(BigDecimal.valueOf(sampling_Tests_Number[i]),4, RoundingMode.HALF_UP);
-            defect_Rate.add(defectRate.doubleValue());
-            sum_Sampling_Tests_Number += sampling_Tests_Number[i];
-            sum_Defects_Number += defects_Number[i];
-        }
-        dataList.add(defect_Rate);
-
-        //计算总体不良率（p）
-
-        BigDecimal p =  BigDecimal.valueOf(sum_Defects_Number).divide(BigDecimal.valueOf(sum_Sampling_Tests_Number),4, RoundingMode.HALF_UP);
-
-        List<Double> UCL = new ArrayList<>();
-
-        for (int i = 0; i < arraySize; i++){
-
-            //计算公式： UCL = p + 3 * sqrt(p * (1-p) / n) 其中n为抽检数
-            BigDecimal ucl = calculateUCL(p, sampling_Tests_Number[i]);
-            UCL.add(ucl.doubleValue());
-        }
-        dataList.add(UCL);
-
-        List<Double> CL = new ArrayList<>();
-        for(int i = 0; i < arraySize; i++){
-            CL.add(p.doubleValue());
-        }
-        dataList.add(CL);
-
-        List<Double> LCL = new ArrayList<>();
-        for (int i = 0; i < arraySize; i++){
-
-            //计算公式： LCL = p - 3 * sqrt(p * (1-p) / n) 其中n为抽检数
-            BigDecimal lcl = calculateLCL(p, sampling_Tests_Number[i]);
-            LCL.add(lcl.doubleValue());
-        }
-        dataList.add(LCL);
-
-        workbook.close();
         return dataList;
     }
 

@@ -599,10 +599,10 @@ export default {
                   type: 'success',
                   duration: 1500
                 });
-                this.$router.push({
-                  name: 'plan-list'
-                });
-                // this.$router.go(-1)
+                // this.$router.push({
+                //   name: 'plan-list'
+                // });
+                this.$router.go(-1)
               } else {
                 this.$message.error(data.msg);
               }

@@ -1,5 +1,6 @@
 package io.renren.modules.qcManagement.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,6 +11,7 @@ import io.renren.common.utils.Query;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.qcManagement.entity.QcExamineStatusEntity;
 import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.renren.modules.qcManagement.dao.QcGroupMemberDao;
@@ -19,10 +21,9 @@ import io.renren.modules.qcManagement.entity.QcSubjectRegistrationEntity;
 import io.renren.modules.qcManagement.service.QcSubjectRegistrationService;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Slf4j
 @Service("qcSubjectRegistrationService")
@@ -157,6 +158,60 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                             case "topicDepartment":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
                                 break;
+                            case "activityPlan":
+                                // 解析日期范围
+                                String[] dateRange = value.split(",");
+                                if (dateRange.length == 2) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdf.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDate = sdf.parse(dateRange[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDate = sdf.parse(dateRange[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlan, startDate, endDate);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
+                            case "activityPlanEnd":
+                                // 解析日期范围
+                                String[] dateRangeEnd = value.split(",");
+                                if (dateRangeEnd.length == 2) {
+                                    SimpleDateFormat sdfEnd = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdfEnd.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDateEnd = sdfEnd.parse(dateRangeEnd[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDateEnd = sdfEnd.parse(dateRangeEnd[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlanEnd, startDateEnd, endDateEnd);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
                         }
                     }
                 }
@@ -176,7 +231,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     public PageUtils queryPageFilter(Map<String, Object> params) {
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
+                .and(wrapper -> wrapper.eq(QcSubjectRegistrationEntity::getTopicReviewStatus, '3'));
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
             try {
@@ -212,6 +267,60 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                             case "topicDepartment":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
                                 break;
+                            case "activityPlan":
+                                // 解析日期范围
+                                String[] dateRange = value.split(",");
+                                if (dateRange.length == 2) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdf.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDate = sdf.parse(dateRange[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDate = sdf.parse(dateRange[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlan, startDate, endDate);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
+                            case "activityPlanEnd":
+                                // 解析日期范围
+                                String[] dateRangeEnd = value.split(",");
+                                if (dateRangeEnd.length == 2) {
+                                    SimpleDateFormat sdfEnd = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdfEnd.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDateEnd = sdfEnd.parse(dateRangeEnd[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDateEnd = sdfEnd.parse(dateRangeEnd[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlanEnd, startDateEnd, endDateEnd);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
                         }
                     }
                 }
@@ -233,9 +342,8 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
         String valueTwo = ShiroUtils.getUserEntity().getUsername();
         queryWrapper.lambda()
-                .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
-                .or()
-                .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo);
+                .and(wrapper -> wrapper.eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo)
+                        .or().like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo));
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
             try {
@@ -267,6 +375,60 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                                 break;
                             case "topicDepartment":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
+                                break;
+                            case "activityPlan":
+                                // 解析日期范围
+                                String[] dateRange = value.split(",");
+                                if (dateRange.length == 2) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdf.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDate = sdf.parse(dateRange[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDate = sdf.parse(dateRange[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlan, startDate, endDate);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
+                            case "activityPlanEnd":
+                                // 解析日期范围
+                                String[] dateRangeEnd = value.split(",");
+                                if (dateRangeEnd.length == 2) {
+                                    SimpleDateFormat sdfEnd = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdfEnd.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDateEnd = sdfEnd.parse(dateRangeEnd[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDateEnd = sdfEnd.parse(dateRangeEnd[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlanEnd, startDateEnd, endDateEnd);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
                                 break;
                         }
                     }
@@ -326,6 +488,60 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                             case "topicDepartment":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
                                 break;
+                            case "activityPlan":
+                                // 解析日期范围
+                                String[] dateRange = value.split(",");
+                                if (dateRange.length == 2) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdf.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDate = sdf.parse(dateRange[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDate = sdf.parse(dateRange[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlan, startDate, endDate);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
+                            case "activityPlanEnd":
+                                // 解析日期范围
+                                String[] dateRangeEnd = value.split(",");
+                                if (dateRangeEnd.length == 2) {
+                                    SimpleDateFormat sdfEnd = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdfEnd.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDateEnd = sdfEnd.parse(dateRangeEnd[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDateEnd = sdfEnd.parse(dateRangeEnd[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlanEnd, startDateEnd, endDateEnd);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
                         }
                     }
                 }
@@ -346,13 +562,22 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     public PageUtils queryPageAboutFilter(Map<String, Object> params) {
 
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
+
+//        queryWrapper.lambda()
+//                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
         String valueTwo = ShiroUtils.getUserEntity().getUsername();
+//        queryWrapper.lambda()
+//                .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
+//                .or()
+//                .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo);
         queryWrapper.lambda()
-                .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo)
-                .or()
-                .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo);
+                .and(wrapper -> wrapper
+                        .eq(QcSubjectRegistrationEntity::getTopicReviewStatus, "3") // 第一个条件
+                        .and(innerWrapper -> innerWrapper // 第二个条件的复合条件
+                                .eq(QcSubjectRegistrationEntity::getTopicConsultant, valueTwo)
+                                .or()
+                                .like(QcSubjectRegistrationEntity::getTeamNumberIds, valueTwo))
+                );
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
             try {
@@ -384,6 +609,60 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                                 break;
                             case "topicDepartment":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
+                                break;
+                            case "activityPlan":
+                                // 解析日期范围
+                                String[] dateRange = value.split(",");
+                                if (dateRange.length == 2) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdf.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDate = sdf.parse(dateRange[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDate = sdf.parse(dateRange[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlan, startDate, endDate);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
+                            case "activityPlanEnd":
+                                // 解析日期范围
+                                String[] dateRangeEnd = value.split(",");
+                                if (dateRangeEnd.length == 2) {
+                                    SimpleDateFormat sdfEnd = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdfEnd.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDateEnd = sdfEnd.parse(dateRangeEnd[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDateEnd = sdfEnd.parse(dateRangeEnd[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlanEnd, startDateEnd, endDateEnd);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
                                 break;
                         }
                     }
@@ -415,8 +694,10 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     public PageUtils queryPageLead(Map<String, Object> params) {
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
         String valueOne = ShiroUtils.getUserEntity().getUsername();
+//        queryWrapper.lambda()
+//                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
         queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
+                .and(wrapper -> wrapper.eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne));
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
             try {
@@ -448,6 +729,61 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                             case "topicDepartment":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
                                 break;
+                            case "activityPlan":
+                                // 解析日期范围
+                                String[] dateRange = value.split(",");
+                                if (dateRange.length == 2) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdf.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDate = sdf.parse(dateRange[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDate = sdf.parse(dateRange[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlan, startDate, endDate);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
+                            case "activityPlanEnd":
+                                // 解析日期范围
+                                String[] dateRangeEnd = value.split(",");
+                                if (dateRangeEnd.length == 2) {
+                                    SimpleDateFormat sdfEnd = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdfEnd.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDateEnd = sdfEnd.parse(dateRangeEnd[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDateEnd = sdfEnd.parse(dateRangeEnd[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlanEnd, startDateEnd, endDateEnd);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
+
                         }
                     }
                 }
@@ -468,11 +804,15 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
     public PageUtils queryPageLeadFilter(Map<String, Object> params) {
         QueryWrapper<QcSubjectRegistrationEntity> queryWrapper = new QueryWrapper<>();
         String valueOne = ShiroUtils.getUserEntity().getUsername();
+//        queryWrapper.lambda()
+//                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
+//        queryWrapper.lambda()
+//                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
         queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicReviewStatus,'3');
-        queryWrapper.lambda()
-                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne);
-
+                .and(wrapper -> wrapper
+                        .eq(QcSubjectRegistrationEntity::getTopicReviewStatus, "3") // 第一个条件
+                        .and(innerWrapper -> innerWrapper // 第二个条件的复合条件
+                                .eq(QcSubjectRegistrationEntity::getTopicLeader, valueOne)));
         String key = (String) params.get("key");
         if (key != null && !key.isEmpty()) {
             try {
@@ -503,6 +843,60 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
                                 break;
                             case "topicDepartment":
                                 queryWrapper.lambda().like(QcSubjectRegistrationEntity::getTopicDepartment, value);
+                                break;
+                            case "activityPlan":
+                                // 解析日期范围
+                                String[] dateRange = value.split(",");
+                                if (dateRange.length == 2) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdf.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDate = sdf.parse(dateRange[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDate = sdf.parse(dateRange[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlan, startDate, endDate);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                                break;
+                            case "activityPlanEnd":
+                                // 解析日期范围
+                                String[] dateRangeEnd = value.split(",");
+                                if (dateRangeEnd.length == 2) {
+                                    SimpleDateFormat sdfEnd = new SimpleDateFormat("yyyy-MM-dd");
+                                    sdfEnd.setLenient(false); // 设置为严格模式，防止日期解析错误
+
+                                    try {
+                                        Date startDateEnd = sdfEnd.parse(dateRangeEnd[0].trim());
+//                                        startDate = DateUtils.setHours(startDate, 0);
+//                                        startDate = DateUtils.setMinutes(startDate, 0);
+//                                        startDate = DateUtils.setSeconds(startDate, 0);
+
+                                        Date endDateEnd = sdfEnd.parse(dateRangeEnd[1].trim());
+//                                        endDate = DateUtils.setHours(endDate, 23);
+//                                        endDate = DateUtils.setMinutes(endDate, 59);
+//                                        endDate = DateUtils.setSeconds(endDate, 59);
+
+                                        // 添加 between 查询条件
+                                        queryWrapper.lambda()
+                                                .between(QcSubjectRegistrationEntity::getActivityPlanEnd, startDateEnd, endDateEnd);
+                                    } catch (ParseException e) {
+                                        log.error("日期解析失败: {}", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
                                 break;
                         }
                     }

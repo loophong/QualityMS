@@ -1,5 +1,6 @@
 package io.renren.modules.generator.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -15,6 +16,7 @@ import io.renren.modules.generator.dao.IssueTableDao;
 import io.renren.modules.generator.entity.IssueMaskTableEntity;
 import io.renren.modules.generator.entity.IssueTableEntity;
 import io.renren.modules.generator.service.IssueTableService;
+import io.renren.modules.indicator.entity.IndicatorKeyIndicatorsEntity;
 import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,6 +80,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         try {
             // 执行分页查询
             List<IssueTableEntity> result = issueTableDao.selectFinishedSubjectList(creationTime,issueDescription);
+
             page.setRecords(result);
             page.setTotal(result.size());
 
@@ -388,10 +394,14 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
             queryWrapper.like("issue_category_id", issueCategoryId);
         }
         // 执行分页查询并返回结果
+
+
         IPage<IssueTableEntity> page = this.page(
                 new Query<IssueTableEntity>().getPage(params),
                 queryWrapper
         );
+
+
         return new PageUtils(page);
     }
 
@@ -419,6 +429,31 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
             return new ArrayList<>(); // 返回空列表以避免调用方出错
         }
     }
+
+    //问题知识库删除功能
+    public boolean clearStorageFlag(List<Integer> ids) {
+        List<IssueTableEntity> list = this.list(new LambdaQueryWrapper<IssueTableEntity>().in(IssueTableEntity::getIssueId, ids));
+        for (IssueTableEntity issueTableEntity : list) {
+            issueTableEntity.setStorageFlag(0);
+        }
+        this.saveOrUpdateBatch(list);
+        return true;
+    }
+
+    @Override
+    public int getallissue() {
+        // 获取当前日期和本月的第一天、最后一天
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).with(LocalTime.MIN);
+        LocalDateTime endOfMonth = LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
+
+        // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.between("creation_time", startOfMonth, endOfMonth);
+
+        // 执行查询返回记录总数
+        return this.count(queryWrapper);
+    }
+
 
     @Override
     public Map<String, Integer> gettruecurrentall() {

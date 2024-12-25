@@ -60,7 +60,10 @@
         width="60"
       >
         <template slot-scope="scope">
-          {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
+          <!-- 使用v-if来判断是否显示序号 -->
+          <span v-if="scope.row.showIndex===1">
+       {{ scope.row.index }}
+    </span>
         </template>
       </el-table-column>
       <el-table-column
@@ -249,11 +252,12 @@
         },
         dataList: [],
         pageIndex: 1,
-        pageSize: 10,
+        pageSize: 100,
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        currentIndex: 0 // 新增 currentIndex 变量
       }
     },
     components: {
@@ -267,6 +271,8 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
+        this.currentIndex = (this.pageIndex - 1) * this.pageSize + 1; // 初始化当前索引
+        console.log("this.currentIndex=====>", this.currentIndex)
         this.$http({
           url: this.$http.adornUrl('/indicator/indicatorkeyindicators/list'),
           method: 'get',
@@ -275,17 +281,31 @@
             'limit': this.pageSize,
             'key': this.queryParams
           })
-        }).then(({data}) => {
+        }).then(({ data }) => {
           if (data && data.code === 0) {
-            this.dataList = data.page.list
-            console.log("data1====>",data)
-            this.totalPage = data.page.totalCount
+            let previousIndicatorId = null;
+            this.dataList = data.page.list.map((item, index) => {
+              let currentIndex = this.currentIndex;
+              if (item.indicatorId !== previousIndicatorId) {
+                this.currentIndex++;
+              }
+              previousIndicatorId = item.indicatorId;
+              return {
+                ...item,
+                index: currentIndex,
+                showIndex: item.indicatorId !== previousIndicatorId ? 1 : 0, // 设置 showIndex 属性
+              };
+            });
+            console.log("data1====>", data);
+            console.log("this.dataList====>", this.dataList);
+            this.totalPage = data.page.totalCount;
           } else {
-            this.dataList = []
-            this.totalPage = 0
+            this.dataList = [];
+            this.totalPage = 0;
           }
-          this.dataListLoading = false
-        })
+          this.dataListLoading = false;
+        });
+
 
         //获取重点管控指标列表（不分页）
         this.$http({
@@ -462,6 +482,7 @@
       arraySpanMethod({ row, column, rowIndex, columnIndex }) {
         if (columnIndex >= 1 && columnIndex <= 8 || columnIndex === 21) { // 合并从序号到是否需要理攻关的列
           if (rowIndex > 0 && row.indicatorId === this.dataList[rowIndex - 1].indicatorId && row.indicatorName === this.dataList[rowIndex - 1].indicatorName) {
+            row.showIndex = 0; // 当前行不需要显示序号
             return {
               rowspan: 0,
               colspan: 0
@@ -475,13 +496,14 @@
                 break;
               }
             }
-            // this.mergedRows.push(row.keyIndicatorId);
+            row.showIndex = 1; // 当前行需要显示序号
             return {
               rowspan: rowspan,
               colspan: 1
             };
           }
         }
+        // row.showIndex = 1; // 默认情况下显示序号
         return {
           rowspan: 1,
           colspan: 1

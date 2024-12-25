@@ -40,49 +40,6 @@
           <el-option label="否" value="否"></el-option>
         </el-select>
       </el-form-item>
-<!--      <el-form-item label="关键要素" prop="keyElements">-->
-<!--        <el-select v-model="keyElementsList" multiple placeholder="请选择">-->
-<!--          <el-option label="测" value="测"></el-option>-->
-<!--          <el-option label="法" value="法"></el-option>-->
-<!--          <el-option label="环" value="环"></el-option>-->
-<!--          <el-option label="机" value="机"></el-option>-->
-<!--          <el-option label="料" value="料"></el-option>-->
-<!--          <el-option label="人" value="人"></el-option>-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="潜在失效模式" prop="potentialFailureMode">-->
-<!--        <el-input v-model="dataForm.potentialFailureMode" placeholder="潜在失效模式"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="潜在失效后果" prop="potentialFailureConsequences">-->
-<!--        <el-input v-model="dataForm.potentialFailureConsequences" placeholder="潜在失效后果"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="涉及产品" prop="involvedProduct">-->
-<!--        <el-input v-model="dataForm.involvedProduct" placeholder="涉及产品"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="过程名称" prop="processName">-->
-<!--        <el-input v-model="dataForm.processName" placeholder="过程名称"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="控制位置" prop="controlPosition">-->
-<!--        <el-input v-model="dataForm.controlPosition" placeholder="控制位置"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="控制人员" prop="controlPersonnel">-->
-<!--        <el-input v-model="dataForm.controlPersonnel" placeholder="控制人员"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="控制方法" prop="controlMethod">-->
-<!--        <el-input v-model="dataForm.controlMethod" placeholder="控制方法"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="评价测量技术" prop="evaluationMeasurementTechnique">-->
-<!--        <el-input v-model="dataForm.evaluationMeasurementTechnique" placeholder="评价测量技术"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="样本大小" prop="sampleSize">-->
-<!--        <el-input v-model="dataForm.sampleSize" placeholder="样本大小"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="抽样频率" prop="samplingFrequency">-->
-<!--        <el-input v-model="dataForm.samplingFrequency" placeholder="抽样频率"></el-input>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="控制清单" prop="controlList">-->
-<!--        <el-input v-model="dataForm.controlList" placeholder="控制清单"></el-input>-->
-<!--      </el-form-item>-->
       <el-form-item v-for="(keyElement, index) in dataFormLists.keyElements" :key="`keyElement-${index}`" :label="'关键要素 ' + (index + 1)" :prop="'keyElements.' + index">
         <el-select v-model="dataFormLists.keyElements[index]" placeholder="请选择">
           <el-option label="测" value="测"></el-option>
@@ -189,9 +146,9 @@ export default {
         indicatorClassification: [
           { required: true, message: '指标分级不能为空', trigger: 'blur' }
         ],
-        assessmentDepartment: [
-          { required: true, message: '考核部门不能为空', trigger: 'blur' }
-        ],
+        // assessmentDepartment: [
+        //   { required: true, message: '考核部门不能为空', trigger: 'blur' }
+        // ],
         sourceDepartment: [
           { required: true, message: '管理部门不能为空', trigger: 'blur' }
         ],
@@ -303,54 +260,70 @@ export default {
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
+        console.log("dataFormSubmit=====>",this.dataForm)
         if (valid) {
-          this.$http({
-            url: this.$http.adornUrl(`/indicator/indicatorkeyindicators/save`),
-            method: 'post',
-            data: this.$http.adornData({
-              'keyIndicatorId': this.dataForm.keyIndicatorId || undefined,
-              'indicatorId': this.dataForm.indicatorId,
-              'indicatorName': this.dataForm.indicatorName,
-              'indicatorClassification': this.dataForm.indicatorClassification,
-              'assessmentDepartment': this.dataForm.assessmentDepartment,
-              'sourceDepartment': this.dataForm.sourceDepartment,
-              'managementContent': this.dataForm.managementContent,
-              'isManagementOutOfControl': this.dataForm.isManagementOutOfControl,
-              'isNeedsControl': this.dataForm.isNeedsControl,
-              'keyElements': this.dataFormLists.keyElements.length > 1 ? this.dataFormLists.keyElements.join(',') : this.dataFormLists.keyElements[0],
-              'potentialFailureMode': this.dataFormLists.potentialFailureMode.length > 1 ? this.dataFormLists.potentialFailureMode.join(',') : this.dataFormLists.potentialFailureMode[0],
-              'potentialFailureConsequences': this.dataFormLists.potentialFailureConsequences.length > 1 ? this.dataFormLists.potentialFailureConsequences.join(',') : this.dataFormLists.potentialFailureConsequences[0],
-              'involvedProduct': this.dataFormLists.involvedProduct.length > 1 ? this.dataFormLists.involvedProduct.join(',') : this.dataFormLists.involvedProduct[0],
-              'processName': this.dataFormLists.processName.length > 1 ? this.dataFormLists.processName.join(',') : this.dataFormLists.processName[0],
-              'controlPosition': this.dataFormLists.controlPosition.length > 1 ? this.dataFormLists.controlPosition.join(',') : this.dataFormLists.controlPosition[0],
-              'controlPersonnel': this.dataFormLists.controlPersonnel.length > 1 ? this.dataFormLists.controlPersonnel.join(',') : this.dataFormLists.controlPersonnel[0],
-              'controlMethod': this.dataFormLists.controlMethod.length > 1 ? this.dataFormLists.controlMethod.join(',') : this.dataFormLists.controlMethod[0],
-              'evaluationMeasurementTechnique': this.dataFormLists.evaluationMeasurementTechnique.length > 1 ? this.dataFormLists.evaluationMeasurementTechnique.join(',') : this.dataFormLists.evaluationMeasurementTechnique[0],
-              'sampleSize': this.dataFormLists.sampleSize.length > 1 ? this.dataFormLists.sampleSize.join(',') : this.dataFormLists.sampleSize[0],
-              'samplingFrequency': this.dataFormLists.samplingFrequency.length > 1 ? this.dataFormLists.samplingFrequency.join(',') : this.dataFormLists.samplingFrequency[0],
-              'controlList': this.dataFormLists.controlList.length > 1 ? this.dataFormLists.controlList.join(',') : this.dataFormLists.controlList[0],
-            })
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.visible = false
-                  this.$emit('refreshDataList')
-                }
+          for (let i = 0; i < this.dataFormLists.keyElements.length; i++) {
+            this.$http({
+              url: this.$http.adornUrl(`/indicator/indicatorkeyindicators/${!this.dataForm.keyIndicatorId ? 'save' : 'update'}`),
+              method: 'post',
+              data: this.$http.adornData({
+                'keyIndicatorId': this.dataForm.keyIndicatorId || undefined,
+                'indicatorId': this.dataForm.indicatorId,
+                'indicatorName': this.dataForm.indicatorName,
+                'indicatorClassification': this.dataForm.indicatorClassification,
+                'assessmentDepartment': this.dataForm.assessmentDepartment,
+                'sourceDepartment': this.dataForm.sourceDepartment,
+                'managementContent': this.dataForm.managementContent,
+                'isManagementOutOfControl': this.dataForm.isManagementOutOfControl,
+                'isNeedsControl': this.dataForm.isNeedsControl,
+                'keyElements': this.dataFormLists.keyElements[i],
+                'potentialFailureMode': this.dataFormLists.potentialFailureMode[i] || '',
+                'potentialFailureConsequences': this.dataFormLists.potentialFailureConsequences[i] || '',
+                'involvedProduct': this.dataFormLists.involvedProduct[i] || '',
+                'processName': this.dataFormLists.processName[i] || '',
+                'controlPosition': this.dataFormLists.controlPosition[i] || '',
+                'controlPersonnel': this.dataFormLists.controlPersonnel[i] || '',
+                'controlMethod': this.dataFormLists.controlMethod[i] || '',
+                'evaluationMeasurementTechnique': this.dataFormLists.evaluationMeasurementTechnique[i] || '',
+                'sampleSize': this.dataFormLists.sampleSize[i] || '',
+                'samplingFrequency': this.dataFormLists.samplingFrequency[i] || '',
+                'controlList': this.dataFormLists.controlList[i] || ''
               })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
         }
       })
     },
     handleClose() {
       this.visible = false;
-      this.dataFormLists = {}
+      this.dataFormLists = {
+        keyElements: [],
+        potentialFailureMode: [],
+        potentialFailureConsequences: [],
+        involvedProduct: [],
+        processName: [],
+        controlPosition: [],
+        controlPersonnel: [],
+        controlMethod: [],
+        evaluationMeasurementTechnique: [],
+        sampleSize: [],
+        samplingFrequency: [],
+        controlList: [],
+      };
     },
     addKeyControl() {
       this.dataFormLists.keyElements.push('');

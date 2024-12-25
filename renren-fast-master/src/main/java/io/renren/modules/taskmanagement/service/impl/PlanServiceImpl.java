@@ -266,7 +266,13 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         planApprovalTableService.save(planApprovalTableEntity);
 
         // 发送通知
-        messageService.sendMessages(new CreateNoticeParams(ShiroUtils.getUserId(), new Long[]{Long.valueOf(plan.getPlanAuditor())},"您有一个新建计划未审批", "新建计划审批通知","plan_approval_page"));
+        messageService.sendMessages(
+                new CreateNoticeParams(
+                        ShiroUtils.getUserId(),
+                        new Long[]{Long.valueOf(plan.getPlanAuditor())},
+                        "您有一个新建计划未审批",
+                        "新建计划审批通知",
+                        "plan_approval_page"));
     }
 
     @Override
@@ -286,6 +292,27 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         );
 
         return new PageUtils(planList);
+    }
+
+    @Override
+    public List<PlanExportVO> exportBase() {
+        List<PlanExportVO> planList = planDao.exportBase();
+        List<PlanExportVO> planExportVO = new ArrayList<>();
+        log.info("planExportVOS" + planList);
+        for (PlanExportVO plan : planList) {
+            planExportVO.add(plan);
+            List<PlanExportVO> taskList = taskDao.selectTaskByPlanId(plan.getPlanId());
+            log.info("taskList" + taskList);
+            planExportVO.addAll(taskList);
+        }
+
+        // 统一将VO中的用户ID转为名称
+        for (PlanExportVO plan : planExportVO) {
+            convert(plan);
+        }
+
+        log.info("转换后的vo：" + planExportVO);
+        return planExportVO;
     }
 
     private void convert(PlanExportVO plan) {
@@ -425,15 +452,32 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         planDao.updateById(plan);
 
         // 更新任务信息
+        ArrayList<TaskEntity> newTaskList = new ArrayList<>();
         List<TaskEntity> tasks = planDTO.getTasks();
         log.info("tasks: " + tasks);
-        taskService.remove(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, plan.getPlanId()));
         for (TaskEntity task : tasks) {
-            if(task.getTaskCurrentState() == null){
+            TaskEntity isExit = taskDao.selectById(task.getTmTid());
+            log.info("当前task为" + task.getTaskId());
+            log.info("当前task是否存在" + isExit);
+            if (isExit != null) {
+                // 更新
+                taskDao.updateById(task);
+                TaskEntity newTask = taskDao.selectById(task.getTmTid());
+                newTaskList.add(newTask);
+            } else {
+                // 插入
                 task.setTaskCurrentState(TaskStatus.NOT_STARTED);
+                newTaskList.add(task);
             }
+            log.info("父节点"+task.getTaskParentNode());
         }
-        taskService.saveBatch(tasks);
+//        for (TaskEntity task : tasks) {
+//            if(task.getTaskCurrentState() == null){
+//                task.setTaskCurrentState(TaskStatus.NOT_STARTED);
+//            }
+//        }
+        taskService.remove(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, plan.getPlanId()));
+        taskService.saveBatch(newTaskList);
 
         // 更新附件信息
         List<FileEntity> files = planDTO.getFiles();

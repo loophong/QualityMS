@@ -57,32 +57,28 @@ const mainRoutes = {
       path: '/plan-index',
       component: _import('modules/taskmanagement/plan/plan-index'),
       name: 'plan-index',
-      meta: {title: '工作计划', isDynamic: false, isTab: false}
+      meta: {title: '工作计划', isDynamic: true, isTab: true}
     },
-    // {
-    //   path: 'publicmanagement/instrumenttestmethod',
-    //   component: _import('modules/publicmanagement/instrumenttestmethod.vue'),
-    //   name: 'publicmanagement/instrumenttestmethod',
-    //   meta: { title: '检验方法', isDynamic: true, isTab: true }
-    // },
-    // {
-    //   path: '/plan-update-page',
-    //   component: _import('modules/taskmanagement/plan/plan-detail-page'),
-    //   name: 'plan-update-page',
-    //   meta: { title: '计划修改页', isDynamic: false, isTab: true },
-    // },
+    {
+      path: '/plan-approval-index',
+      component: _import('modules/taskmanagement/plan-approval/plan-approval-index'),
+      name: 'plan-approval-index',
+      meta: {title: '计划审批', isDynamic: true, isTab: true}
+    },
 
-    // this.$router.push({
-    //   path: '/taskmanagement/plan/plan-detail-page',
-    //   query: {
-    //     taskId: taskId
-    //   }
-    // })
+    {
+      path: '/plan-approval-page/:plabId',
+      component: _import('modules/taskmanagement/plan-approval/plan-approval-page'),
+      name: 'plan-approval-page',
+      meta: {title: '计划审批页', isDynamic: false, isTab: false},
+      props: true
+    },
+
     {
       path: 'taskmanagement/task/my-tasks',
       component: _import('modules/taskmanagement/task/my-tasks'),
       name: 'task-list',
-      meta: {title: '我的任务', isDynamic: true, isTab: true},
+      meta: {title: '我的任务', isDynamic: false, isTab: false},
     },
     {
       path: '/task-update-page',
@@ -106,21 +102,9 @@ const mainRoutes = {
       meta: {title: '计划修改页', isDynamic: false, isTab: false},
       props: true
     },
-    {
-      path: '/plan-approval-page/:plabId',
-      component: _import('modules/taskmanagement/plan-approval/plan-approval-index'),
-      name: 'plan-approval-index',
-      meta: {title: '计划审批首页', isDynamic: false, isTab: false},
-      props: true
-    },
 
-    {
-      path: '/plan-approval-page/:plabId',
-      component: _import('modules/taskmanagement/plan-approval/plan-approval-page'),
-      name: 'plan-approval-page',
-      meta: {title: '计划审批页', isDynamic: false, isTab: false},
-      props: true
-    },
+
+
     {
       path: '/plan-reject-reapproval-page/:plabId',
       component: _import('modules/taskmanagement/plan/plan-reject-reapproval-page'),
@@ -241,7 +225,7 @@ const mainRoutes = {
       path: '/issue-issuetable',
       component: _import('modules/issueexamine/issueExamine'),
       name: 'issue-issueexamine',
-      meta: {title: '任务审核', isDynamic: true, isTab: true}
+      meta: {title: '任务审核', isTab: true}
     },
     {
       path: '/issue-issuemask',
@@ -277,7 +261,7 @@ const mainRoutes = {
       path: '/otherToIssue',
       component: _import('modules/issuefind/findissue'),
       name: 'otherToIssue',
-      meta: {title: '问题操作', isDynamic: true, isTab: true}
+      meta: {title: '问题操作', isTab: true}
     },
     {
       path: '/issue-issueView',

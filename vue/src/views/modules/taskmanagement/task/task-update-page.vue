@@ -441,30 +441,8 @@ export default {
             method: 'post',
             data: this.$http.adornData({
               // 'rootTask': '',
-              // 'plan': {
-              //     'tmTid': this.rootTask.tmTid || undefined,
-              //     'taskId': this.rootTask.taskId,
-              //     'taskName': this.rootTask.taskName,
-              //     'taskContent': this.rootTask.taskContent,
-              //     'taskStartDate': this.rootTask.taskStartDate,
-              //     'taskScheduleCompletionDate': this.rootTask.taskScheduleCompletionDate,
-              //     // 'planScheduleDays': this.planScheduleDays,
-              //     'taskScheduleDays': this.rootTask.taskScheduleDays,
-              //     // 'planActualCompletionDate': this.rootTask.planActualCompletionDate,
-              //     // 'planActualDays': this.rootTask.planActualDays,
-              //     'planTasksAssignment': this.rootTask.planTasksAssignment,
-              //     'planAssociatedTasksId': this.rootTask.planAssociatedTasksId,
-              //     'planSchedule': this.rootTask.planSchedule,
-              //     'taskPrincipal': this.rootTask.taskPrincipal,
-              //     'taskExecutor': this.rootTask.taskExecutor,
-              //     'taskAuditor': this.rootTask.taskAuditor,
-              //     'planCurrentState': 0,
-              //     'planIsCompleted': 0,
-              //     'planIsOverdue': 0,
-              //     'planIsOnTime': 0,
-              //     'planAssociatedIndicatorsId': this.dataForm.planAssociatedIndicatorsId,
-              // },
-              'tasks': tasksData
+              'parentTask': this.rootTask,
+              'childTask': tasksData
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
@@ -521,7 +499,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.deleteTaskByTaskId(this.tasks[index].tmTid);
+        // this.deleteTaskByTaskId(this.tasks[index].tmTid);
 
         this.tasks.splice(index, 1);
         this.$message({

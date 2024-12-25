@@ -34,17 +34,17 @@ public class TaskScheduledTasks {
     @Scheduled(cron = "0,30 * * * * *")
     public void taskScheduledTasks() {
         log.info("定时任务执行了");
-//        checkPlanIsCanStart();
+        checkPlanIsCanStart();
         checkTaskIsCanStart();
 
-//        checkPlanIsOverdue();
-//        checkTaskIsOverdue();
+        checkPlanIsOverdue();
+        checkTaskIsOverdue();
 
-//        checkTaskIsCompleted();
-//        checkPlanIsCompleted();
+        checkTaskIsCompleted();
+        checkPlanIsCompleted();
 
-//        trackPlanProgress();
-//        trackTaskProgress();
+        trackPlanProgress();
+        trackTaskProgress();
     }
 
     /**
@@ -182,7 +182,39 @@ public class TaskScheduledTasks {
                         return;
                     }
                 }
+
+
                 task.setTaskCurrentState(TaskStatus.COMPLETED);
+                task.setTaskIsCompleted(1L);
+                // 项目实际完成时间
+                Date now = DateUtils.getNow();
+                task.setTaskActualCompletionDate(now);
+                // 项目实际完成天数
+                long completionDays = (DateUtils.getZeroTime().getTime() - task.getTaskStartDate().getTime()) / (1000 * 60 * 60 * 24);
+                task.setTaskActualDays(completionDays);
+
+                // 任务是否超期,设置超期时间
+                if (DateUtils.getZeroTime().getTime() - task.getTaskScheduleCompletionDate().getTime() > 0) {
+                    task.setTaskIsOverdue(1L);
+                    task.setTaskLagDays((DateUtils.getZeroTime().getTime() - task.getTaskScheduleCompletionDate().getTime()) / (1000 * 60 * 60 * 24));
+                } else {
+                    task.setTaskIsOverdue(0L);
+                    task.setTaskLagDays(0L);
+                }
+
+                // 任务是否按时完工
+                if (DateUtils.getZeroTime().getTime() == task.getTaskScheduleCompletionDate().getTime()) {
+                    task.setTaskIsOnTime(0L);
+                } else {
+                    task.setTaskIsOnTime(1L);
+                }
+
+                // 任务是否提前完工
+                if (DateUtils.getZeroTime().getTime() - task.getTaskScheduleCompletionDate().getTime() < 0) {
+                    task.setTaskEarlyCompletionDays((task.getTaskScheduleCompletionDate().getTime() - DateUtils.getZeroTime().getTime()) / (1000 * 60 * 60 * 24));
+                } else {
+                    task.setTaskEarlyCompletionDays(0L);
+                }
                 taskService.updateById(task);
             }
 

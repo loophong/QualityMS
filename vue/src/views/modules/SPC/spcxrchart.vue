@@ -1033,6 +1033,7 @@
         //I-MR图相关参数
         IMRChartData: [],
 
+
         //P图相关参数
         PChartData: [],
 
@@ -1057,6 +1058,8 @@
         PtableNames: [],  // 存放从后端获取的表名  
         PselectedTable: null,  // 选中的表名  
 
+        //控制watch参数
+        chartInitialized: false,
 
         //警告弹窗参数
 
@@ -1065,39 +1068,42 @@
     },
 
     watch: {  
-      XRselectedTable(newValue, oldValue) {  
+      async XRselectedTable(newValue, oldValue) {  
         // 当 XRselectedTable 改变时调用更新图表的函数  
-        if (newValue !== oldValue) {  
-            //获取新数据
-            this.getXbarRchart();
-            this.getXbarSchart();
-            this.getMeRchart();
-            this.getIMRchart();
+        if (newValue !== oldValue && this.chartInitialized) {  
 
-            //更新图表
-            this.updateChartXbarR_Xbar();
-            this.updateChartXbarR_R();
+          //获取新数据
+          await this.getXbarRchart();
+          await this.getXbarSchart();
+          await this.getMeRchart();
+          await this.getIMRchart();
 
-            this.updateChartXbarS_Xbar();
-            this.updateChartXbarS_S();
+          console.log(this.XbarRChartData);
 
-            this.updateChartMeR_Me();
-            this.updateChartMeR_R();
+          //更新图表
+          this.updateChartXbarR_Xbar();
+          this.updateChartXbarR_R();
 
-            this.updateChartIMR_I();
-            this.updateChartIMR_MR();
+          this.updateChartXbarS_Xbar();
+          this.updateChartXbarS_S();
+
+          this.updateChartMeR_Me(); 
+          this.updateChartMeR_R();
+
+          this.updateChartIMR_I();
+          this.updateChartIMR_MR();
 
         }  
       },
 
-      PselectedTable(newValue, oldValue) {  
+      async PselectedTable(newValue, oldValue) {  
         // 当 PselectedTable 改变时调用更新图表的函数  
-        if (newValue !== oldValue) {  
+        if (newValue !== oldValue && this.chartInitialized) {  
             //获取新数据
-            this.getPchart();
-            this.getNPchart();
-            this.getUchart();
-            this.getCchart();
+            await this.getPchart();
+            await this.getNPchart();
+            await this.getUchart();
+            await this.getCchart();
 
             //更新图表
             this.updateChartP();
@@ -1126,10 +1132,10 @@
           // 获取表名  
           await this.fetchOptionsXR();  
           await this.fetchOptionsP();
-          
+          this.chartInitialized = true; // 由于fetch完成，设置图表已初始化 
+
           // 加载 Xbar R Chart 数据  
           await this.getXbarRchart();  
-          console.log(this.XbarRChartData); 
           // 确保数据已加载  
           if (this.XbarRChartData.length === 8) {  
               this.initChartXbarR_Xbar();  
@@ -1216,10 +1222,20 @@
           } else {  
               console.error("PTDChartData length is less than 3");  
           }   
-        
         } catch (error) {  
             console.error("Error loading data:", error);  
         }   
+
+        //对图表数据进行预警
+        await this.XRWarning(this.XbarRChartData, "Xbar图", "R图");
+        await this.XRWarning(this.XbarSChartData, "Xbar图", "S图");
+        await this.XRWarning(this.MeRChartData, "Me图", "R图");
+        await this.XRWarning(this.IMRChartData, "I图", "MR图");
+
+        await this.PWarning(this.PChartData, "P图");
+        await this.PWarning(this.NPChartData, "NP图");
+        await this.PWarning(this.UChartData, "U图");
+        await this.PWarning(this.CChartData, "C图");
     },
 
     methods: {
@@ -2059,7 +2075,6 @@
         const XbarRCharXbarUCL = this.XbarRChartData[1];
         const XbarRCharXbarCL = this.XbarRChartData[2];
         const XbarRCharXbarLCL = this.XbarRChartData[3];
-        console.log("XbarRCharXbar"+XbarRCharXbar.length);
         const xAxisData = Array.from({ length: XbarRCharXbar.length }, (_, index) => index + 1);
 
         const option = {
@@ -4104,11 +4119,109 @@
 
 
       //预警方法
-      //PTD图预警
-      closeAlert() {  
-        this.showAlert = false; // 关闭弹窗  
-      }, 
+      async XRWarning(ChartData, tableName1, tableName2){
 
+        // 定义一个延迟函数  
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms)); 
+
+        try {  
+            const { data } = await this.$http({  
+                url: this.$http.adornUrl('/SPC/spc/XR/warning'), // 根据需要调整接口地址  
+                method: 'post', // 使用 POST 方法发送数据  
+                data: ChartData, // 将图表数据放入请求体中  
+                headers: {  
+                    'Content-Type': 'application/json' // 如果发送 JSON 格式的数据，设置内容类型为 JSON  
+                }  
+            });  
+
+            // 处理后端的响应
+            if (data) {  
+                if (data.Warning) {  
+                    const resultsGroup1 = data.Warning[0]; // 第一组布尔结果  
+                    const resultsGroup2 = data.Warning[1]; // 第二组布尔结果  
+                    // console.log(resultsGroup1);
+                    // console.log(resultsGroup2);
+
+                    // 检查第一组数据  
+                    for (let index = 0; index < resultsGroup1.length; index++) {  
+                        const result = resultsGroup1[index];  
+                        if (result) {  
+                            this.$message({  
+                                message: `请注意` + tableName1 + `第 ${index + 1} 条准则`,  
+                                type: 'warning',  
+                            });  
+                            await delay(1000); // 延迟  
+                        }  
+                    }  
+
+                    // 检查第二组数据  
+                    for (let index = 0; index < resultsGroup2.length; index++) {  
+                        const result = resultsGroup2[index];  
+                        if (result) {  
+                            this.$message({  
+                              message: `请注意` + tableName2 + `第 ${index + 1} 条准则`,  
+                                type: 'warning',  
+                            });  
+                            await delay(1000); // 延迟  
+                        }  
+                    } 
+                } else {  
+                    console.error("发送数据失败:", data.message || "未知错误");  
+                }  
+            } else {  
+                console.error("未收到有效的响应数据");  
+            }  
+        } catch (error) {  
+            // 处理任何网络或其他错误  
+            console.error('错误:', error);  
+        }  
+      },
+
+      async PWarning(ChartData, tableName){
+
+        // 定义一个延迟函数  
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms)); 
+
+        try {  
+            const { data } = await this.$http({  
+                url: this.$http.adornUrl('/SPC/spc/P/warning'), // 根据需要调整接口地址  
+                method: 'post', // 使用 POST 方法发送数据  
+                data: ChartData, // 将图表数据放入请求体中  
+                headers: {  
+                    'Content-Type': 'application/json' // 如果发送 JSON 格式的数据，设置内容类型为 JSON  
+                }  
+            });  
+
+            // 处理后端的响应
+            if (data) {  
+                if (data.Warning) {  
+                    const resultsGroup1 = data.Warning; // 第一组布尔结果  
+                    console.log(resultsGroup1);
+
+                    // 检查第一组数据  
+                    for (let index = 0; index < resultsGroup1.length; index++) {  
+                        const result = resultsGroup1[index];  
+                        if (result) {  
+                            this.$message({  
+                                message: `请注意` + tableName + `第 ${index + 1} 条准则`,  
+                                type: 'warning',  
+                            });  
+                            await delay(1000); // 延迟  
+                        }  
+                    }  
+                } else {  
+                    console.error("发送数据失败:", data.message || "未知错误");  
+                }  
+            } else {  
+                console.error("未收到有效的响应数据");  
+            }  
+        } catch (error) {  
+            // 处理任何网络或其他错误  
+            console.error('错误:', error);  
+        }  
+      },
+
+      //PTD图预警
       PTDWarning(){
         if(this.PValue > 0.05){
           this.$message({

@@ -196,5 +196,10 @@ public class IssueTableEntity implements Serializable {
 	 * 公式
 	 */
 	private String formula;
+	/**
+	 * 问题知识库删除功能
+	 */
 
+
+	private Integer StorageFlag;
 }

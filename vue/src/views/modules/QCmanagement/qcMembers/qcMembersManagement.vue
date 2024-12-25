@@ -311,31 +311,30 @@
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination> -->
         <el-dialog :title="'处理审核'" :close-on-click-modal="false" :visible.sync="dialogFormVisible">
-          <el-form :model="examineFrom" :rules="examineRules">
-            <el-form-item v-if="already == '1'" label="管理员审核结果" prop="result">
+          <el-form :model="examineFrom" ref="examineFrom" :rules="handleExamineRules">
+            <el-form-item v-if="already == '1'" label="管理员审核结果" prop="group">
               <el-select v-model="examineFrom.group" placeholder="请选择">
                 <el-option label="通过" value="1"></el-option>
                 <el-option label="未通过" value="0"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item v-else label="科室审核结果" prop="result">
+            <el-form-item v-else label="科室审核结果" prop="department">
               <el-select v-model="examineFrom.department" placeholder="请选择">
                 <el-option label="通过" value="1"></el-option>
                 <el-option label="未通过" value="0"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item v-if="already == '1'" label="管理员审核意见" prop="comment">
+            <el-form-item v-if="already == '1'" label="管理员审核意见" prop="secondComment">
               <el-input v-model="examineFrom.secondComment" autosize type="textarea" placeholder="管理员审核意见"></el-input>
             </el-form-item>
-            <el-form-item v-else label="科室审核意见" prop="comment">
+            <el-form-item v-else label="科室审核意见" prop="firstComment">
               <el-input v-model="examineFrom.firstComment" autosize type="textarea" placeholder="科室审核意见"></el-input>
             </el-form-item>
-
           </el-form>
-          <div slot="footer" class="dialog-footer">
+          <span slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
             <el-button type="primary" @click="examineSubmit()">确 定</el-button>
-          </div>
+          </span>
         </el-dialog>
       </div>
     </el-tab-pane>
@@ -421,8 +420,11 @@ export default {
       tableDataAfterQueryAdmin: [],
       exportList: [],
       exportListMine: [],
-      examineRules: {
-        result: [
+      handleExamineRules: {
+        department: [
+          { required: true, message: '请选择审核结果', trigger: 'blur' }
+        ],
+        group: [
           { required: true, message: '请选择审核结果', trigger: 'blur' }
         ]
       }
@@ -1317,68 +1319,76 @@ export default {
         this.registrationNum = null;
       }
       this.dialogFormVisible = true;
+      this.examineFrom.group = '';
+      this.examineFrom.department = '';
       this.examineId = id;
     },
     //提交审核结果
     async examineSubmit() {
-      this.num = null;
-      var result = ''
-      if (this.examineFrom.department == '0' || this.examineFrom.group == '0') {
-        result = '未通过'
-      } else if (this.examineFrom.department == '1' && (this.examineFrom.group == '' || this.examineFrom.group == 'null' || this.examineFrom.group == 'undefined')) {
-        result = '待审核'
-      } else if (this.already == '1' && this.examineFrom.group == '1') {
-        result = '通过'
-        //生成注册号
-        await this.$http({
-          url: this.$http.adornUrl(`/qcMembers/qcGroupMember/registration`),
-          method: 'get',
-        }).then(({ data }) => {
-          this.num = data.result.registrationNum + 1
-        })
-        if (this.num !== '') {
-          const year = new Date().getFullYear();
-          if (this.num < 10) {
-            this.num = `PJHLQC-${year}-00${this.num}`;
-          } else if (this.num < 100) {
-            this.num = `PJHLQC-${year}-0${this.num}`;
-          } else {
-            this.num = `PJHLQC-${year}-${this.num}`;
+      this.$refs['examineFrom'].validate(async (valid) => {
+        if (valid) {
+          this.num = null;
+          var result = ''
+          if (this.examineFrom.department == '0' || this.examineFrom.group == '0') {
+            result = '未通过'
+          } else if (this.examineFrom.department == '1' && (this.examineFrom.group == '' || this.examineFrom.group == 'null' || this.examineFrom.group == 'undefined')) {
+            result = '待审核'
+          } else if (this.already == '1' && this.examineFrom.group == '1') {
+            result = '通过'
+            //生成注册号
+            await this.$http({
+              url: this.$http.adornUrl(`/qcMembers/qcGroupMember/registration`),
+              method: 'get',
+            }).then(({ data }) => {
+              this.num = data.result.registrationNum + 1
+            })
+            if (this.num !== '') {
+              const year = new Date().getFullYear();
+              if (this.num < 10) {
+                this.num = `PJHLQC-${year}-00${this.num}`;
+              } else if (this.num < 100) {
+                this.num = `PJHLQC-${year}-0${this.num}`;
+              } else {
+                this.num = `PJHLQC-${year}-${this.num}`;
+              }
+            }
           }
-        }
-      }
-      await this.$http({
-        url: this.$http.adornUrl(`/qcMembers/qcGroupMember/update`),
-        method: 'post',
-        data: this.$http.adornData({
-          'qcgmId': this.examineId,
-          'examineGroup': this.examineFrom.group,
-          'examineDepartment': this.examineFrom.group == '0' ? '' : this.examineFrom.department,
-          'examineStatus': result,
-          'firstComment': this.examineFrom.firstComment,
-          'secondComment': this.examineFrom.secondComment,
-          'registrationNum': (this.registrationNum == '' || this.registrationNum == null) ? this.num : this.registrationNum,
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.$message({
-            message: '审核成功',
-            type: 'success',
-            duration: 1500,
-            onClose: () => {
-              this.examineFrom.department = ''
-              this.examineFrom.group = ''
-              this.dialogFormVisible = false;
-              this.getGroupList();
-              this.getDataList();
-              this.examineList = this.tableData.filter(item => item.examineStatus === '待审核');
-              this.totalPageExamine = this.examineList.length;
+          await this.$http({
+            url: this.$http.adornUrl(`/qcMembers/qcGroupMember/update`),
+            method: 'post',
+            data: this.$http.adornData({
+              'qcgmId': this.examineId,
+              'examineGroup': this.examineFrom.group,
+              'examineDepartment': this.examineFrom.group == '0' ? '' : this.examineFrom.department,
+              'examineStatus': result,
+              'firstComment': this.examineFrom.firstComment,
+              'secondComment': this.examineFrom.secondComment,
+              'registrationNum': (this.registrationNum == '' || this.registrationNum == null) ? this.num : this.registrationNum,
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '审核成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.examineFrom.department = ''
+                  this.examineFrom.group = ''
+                  this.dialogFormVisible = false;
+                  this.getGroupList();
+                  this.getDataList();
+                  this.examineList = this.tableData.filter(item => item.examineStatus === '待审核');
+                  this.totalPageExamine = this.examineList.length;
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
             }
           })
-        } else {
-          this.$message.error(data.msg)
+
         }
       })
+
     },
     // 提交审核按钮
     handleReexamine(id) {

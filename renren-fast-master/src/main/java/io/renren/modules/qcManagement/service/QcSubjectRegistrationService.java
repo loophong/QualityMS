@@ -27,8 +27,8 @@ public interface QcSubjectRegistrationService extends IService<QcSubjectRegistra
     PageUtils queryPageAboutFilter(Map<String, Object> params);
     PageUtils queryPageLead(Map<String, Object> params);
     PageUtils queryPageLeadFilter(Map<String, Object> params);
-    PageUtils queryPageFinishedList(Map<String, Object> params) ;
 
+    PageUtils queryPageFinishedList(Map<String, Object> params);
     PageUtils queryPageAll(Map<String, Object> params);
 
     List<QcknowledgebaseEntity>queryFinishedList1(Map<String, Object> params);

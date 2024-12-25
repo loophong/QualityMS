@@ -23,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import io.renren.common.utils.PageUtils;
@@ -304,6 +305,7 @@ public class PlanController {
      * @author: hong
      * @date: 2024/11/10 17:20
      */
+    @Transactional
     @PostMapping("/save")
     @RequiresPermissions("taskmanagement:plan:save")
     public R save(@RequestBody PlanDTO planDTO) {
@@ -319,6 +321,7 @@ public class PlanController {
      * @author: hong
      * @date: 2024/12/15 13:18
      */
+    @Transactional
     @PostMapping("/saveAndApproval")
     @RequiresPermissions("taskmanagement:plan:save")
     public R saveAndApproval(@RequestBody PlanDTO planDTO) {
@@ -334,6 +337,7 @@ public class PlanController {
      * @author: hong
      * @date: 2024/12/20 13:13
      */
+    @Transactional
     @RequestMapping("/reApproval")
     @RequiresPermissions("taskmanagement:plan:update")
     public R reApproval(@RequestBody PlanDTO planDTO) {
@@ -370,6 +374,7 @@ public class PlanController {
 //
 //        return R.ok();
 //    }
+    @Transactional
     @RequestMapping("/update")
     @RequiresPermissions("taskmanagement:plan:update")
     public R update(@RequestBody PlanDTO planDTO) {
@@ -384,6 +389,7 @@ public class PlanController {
      * @date: 2024/8/30 15:51
      * @version: 1.0
      */
+    @Transactional
     @RequestMapping("/delete/{planId}")
     @RequiresPermissions("taskmanagement:plan:delete")
     public R delete(@PathVariable String planId) {

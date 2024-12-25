@@ -50,7 +50,8 @@
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
               <span class="el-dropdown-link">
-                <img src="~@/assets/img/avatar.png" :alt="userName">{{userName+nickName}}
+                <!-- 新增 将原来的 'username' 显示 改为 'username+nickname' -->
+                <img src="~@/assets/img/avatar.png" :alt="userName">{{ userName + "(" + nickName + ")"}}
                   <template v-if="hasUnreadMessages">
                     <el-badge value="new">
 
@@ -91,7 +92,6 @@
 </template>
 
 
-
 <script>
   import UpdatePassword from './main-navbar-update-password'
   import { clearLoginInfo } from '@/utils'
@@ -100,6 +100,7 @@
       return {
         updatePassowrdVisible: false,
         hasUnreadMessages: '', // 存储未读消息列表
+        nickName: ''
       }
     },
     components: {
@@ -120,16 +121,33 @@
       userName: {
         get () { return this.$store.state.user.name }
       },
+      // 获取 @TableName("sys_user") 的属性 'nickname'
       nickName: {
         get () { return this.$store.state.user.nickname }
       }
+
     },
 
     created (){
       this.messageReport()
       this.fetchUnreadNotices()
+      //新增 获取用户nickname
+      this.getNicknameById(this.$store.state.user.id)
     },
     methods: {
+
+      getNicknameById(id){
+        this.$http({
+          url: this.$http.adornUrl(`/sys/user/getUserInfoById/${id}`),
+          method: 'get',
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+              this.nickName = data.user.nickname;
+          }
+          // console.log("this.nickName == >" + this.nickName)
+        });
+
+      },
       openNotice() {
         this.$router.push({
           name: 'toNotice',

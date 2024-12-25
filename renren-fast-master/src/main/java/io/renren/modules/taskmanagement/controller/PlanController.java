@@ -11,6 +11,7 @@ import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.renren.modules.app.service.UserService;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
 import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
@@ -55,6 +56,8 @@ public class PlanController {
     private ObjectMapper objectMapper;
     @Autowired
     private PlanApprovalTableService planApprovalTableService;
+    @Autowired
+    private UserService userService;
     /**
      * @description: 全部计划导出
      * @param: response
@@ -457,6 +460,34 @@ public class PlanController {
 
         return planDTO;
     }
+
+
+    /**
+     * @description: 树状图展示计划的结构
+     * @param: planId
+     * @return: io.renren.modules.taskmanagement.dto.PlanDTO
+     * @author: hong
+     * @date: 2024/12/25 9:56
+     */
+    @GetMapping("/planTreeDisplay")
+    public PlanDTO planTreeDisplay(@RequestParam String planId) {
+        log.info("planId:{}", planId);
+
+        PlanDTO planDTO = new PlanDTO();
+
+        PlanEntity plan = planService.getOne(new LambdaQueryWrapper<PlanEntity>().eq(PlanEntity::getPlanId, planId));
+        List<TaskEntity> taskList = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, planId));
+        List<FileEntity> fileList = fileService.list(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
+
+        planDTO.setPlan(plan);
+        planDTO.setTasks(taskList);
+        planDTO.setFiles(fileList);
+
+        return planDTO;
+    }
+
+
+
 
     /**
      * @description: 查询计划的全部信息、直属任务、文件

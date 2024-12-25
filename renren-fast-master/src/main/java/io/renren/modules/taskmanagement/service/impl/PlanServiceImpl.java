@@ -266,7 +266,13 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
         planApprovalTableService.save(planApprovalTableEntity);
 
         // 发送通知
-        messageService.sendMessages(new CreateNoticeParams(ShiroUtils.getUserId(), new Long[]{Long.valueOf(plan.getPlanAuditor())},"您有一个新建计划未审批", "新建计划审批通知","plan_approval_page"));
+        messageService.sendMessages(
+                new CreateNoticeParams(
+                        ShiroUtils.getUserId(),
+                        new Long[]{Long.valueOf(plan.getPlanAuditor())},
+                        "您有一个新建计划未审批",
+                        "新建计划审批通知",
+                        "plan_approval_page"));
     }
 
     @Override

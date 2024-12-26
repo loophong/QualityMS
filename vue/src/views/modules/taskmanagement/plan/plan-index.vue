@@ -148,7 +148,7 @@
               <!--              <el-button v-if="scope.row.planFile !== null" type="text" size="small"-->
               <!--                         @click="downloadFile(scope.row.planFile)">下载附件-->
               <!--              </el-button>-->
-              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
+              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">计划附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
               <el-button v-if="scope.row.planCurrentState !== 'PREAPPROVAL_IN_PROGRESS'"
                          type="text" size="small" @click="updatePlanPage(scope.row)">修改
@@ -223,7 +223,7 @@
 
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
+              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">计划附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
             </template>
           </el-table-column>
@@ -390,7 +390,7 @@
               <!--              <el-button v-if="scope.row.planFile !== null" type="text" size="small"-->
               <!--                         @click="downloadFile(scope.row.planFile)">下载附件-->
               <!--              </el-button>-->
-              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
+              <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">计划附件</el-button>
               <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
               <el-button v-if="scope.row.addBase === 0" type="text" size="small" @click="addBase(scope.row.tmPid)">入库</el-button>
               <!--              <el-button type="text" size="small" @click="updatePlanPage(scope.row)">修改</el-button>-->

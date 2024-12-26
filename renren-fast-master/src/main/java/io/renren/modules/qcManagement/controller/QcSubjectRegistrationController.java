@@ -261,6 +261,7 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/finishedList")
     @RequiresPermissions("qcSubject:registration:list")
     public R finishedList(@RequestParam Map<String, Object> params){
+//        log.info("QC知识库："+params);
         PageUtils page =  qcSubjectRegistrationService.queryPageFinishedList(params);
         return R.ok().put("page", page);
     }

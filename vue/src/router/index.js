@@ -127,7 +127,6 @@ const mainRoutes = {
       props: true
     },
 
-
     //QC
     {
       path: '/qcPlanNew',

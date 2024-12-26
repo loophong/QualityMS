@@ -122,9 +122,9 @@
         get () { return this.$store.state.user.name }
       },
       // 获取 @TableName("sys_user") 的属性 'nickname'
-      nickName: {
-        get () { return this.$store.state.user.nickname }
-      }
+      // nickName: {
+      //   get () { return this.$store.state.user.nickname }
+      // }
 
     },
 

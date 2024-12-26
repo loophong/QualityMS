@@ -4,6 +4,7 @@ import io.renren.modules.indicator.entity.IndicatorChart1Entity;
 import io.renren.modules.indicator.entity.IndicatorChart2Entity;
 import io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.renren.modules.indicator.entity.IndicatorYearDataEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -21,4 +22,6 @@ public interface IndicatorIndicatorSummaryDao extends BaseMapper<IndicatorIndica
    public List<IndicatorChart1Entity> queryChart1List(IndicatorChart1Entity indicatorChart1Entity);
 
    public List<IndicatorChart2Entity> queryChart2List(IndicatorChart2Entity indicatorChart2Entity);
+
+   public List<IndicatorIndicatorSummaryEntity> queryYearDataList(IndicatorIndicatorSummaryEntity indicatorIndicatorSummaryEntity);
 }

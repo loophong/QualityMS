@@ -13,6 +13,7 @@ import io.renren.modules.qcManagement.entity.QcExamineStatusEntity;
 import io.renren.modules.qcManagement.entity.QcknowledgebaseEntity;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.renren.modules.qcManagement.dao.QcGroupMemberDao;
 import io.renren.modules.qcManagement.dao.QcSubjectRegistrationDao;
@@ -29,7 +30,7 @@ import java.util.*;
 @Service("qcSubjectRegistrationService")
 public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegistrationDao, QcSubjectRegistrationEntity> implements QcSubjectRegistrationService {
     @Autowired
-    private QcSubjectRegistrationDao  qcSubjectRegistrationDao;
+    private QcSubjectRegistrationDao qcSubjectRegistrationDao;
 
     @Override
     public List<QcGroupMemberEntity> getMembersOfGroup(String groupName) {
@@ -37,46 +38,110 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
         return baseMapper.getMembersOfGroup(groupName);
     }
 
-    @Override
-    public PageUtils queryPageFinishedList(Map<String, Object> params) {
-        log.info("param" + params.get("page") + "------" + params.get("limit"));
+  @Override
+        public PageUtils queryPageFinishedList(Map<String, Object> params) {
+            log.info("param" + params.get("page") + "------" + params.get("limit"));
 
-        long p = Long.parseLong((String) params.get("page"));
-        long l = Long.parseLong((String) params.get("limit"));
-        Page<QcknowledgebaseEntity> page = new Page<>(p, l);
+            long p = Long.parseLong((String) params.get("page"));
+            long l = Long.parseLong((String) params.get("limit"));
+            Page<QcknowledgebaseEntity> page = new Page<>(p, l);
 
-        // 提取模糊查询参数
-        String topicName = (String) params.get("topicName");
-        String keywords = (String) params.get("keywords");
-        String startDate = (String) params.get("startDate");
-        String endDate = (String) params.get("endDate");
+            // 提取模糊查询参数
+            String topicName = (String) params.get("topicName");
+            String keywords = (String) params.get("keywords");
+            String activityPlan = (String) params.get("activityPlan");
+            String activityPlanEnd = (String) params.get("activityPlanEnd");
 
-        try {
-            // 执行分页查询
-            List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,startDate,endDate);
-            page.setRecords(result);
-            page.setTotal(result.size());
-            log.info("result" + page);
-            return new PageUtils(page);
-        } catch (Exception e) {
-            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
-            page.setTotal(0);
-            return new PageUtils(page);
+            try {
+                // 执行分页查询
+                List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,activityPlan,activityPlanEnd);
+                page.setRecords(result);
+                page.setTotal(result.size());
+                log.info("result" + page);
+                return new PageUtils(page);
+            } catch (Exception e) {
+                log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+                page.setTotal(0);
+                return new PageUtils(page);
+            }
         }
-    }
+//    @Override
+//    public PageUtils queryPageFinishedList(Map<String, Object> params) {
+//        log.info("param" + params.get("page") + "------" + params.get("limit"));
+//
+//        long p = Long.parseLong((String) params.get("page"));
+//        long l = Long.parseLong((String) params.get("limit"));
+//        Page<QcknowledgebaseEntity> page = new Page<>(p, l);
+//
+//        // 提取模糊查询参数
+//        String topicName = (String) params.get("topicName");
+//        String keywords = (String) params.get("keywords");
+//
+//
+//        Date activityPlan = null;
+//        Date activityPlanEnd =null;
+//        /*yyyy-MM-dd格式一定要与stringDate的格式一致*/
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//        try {
+//            String start = (String) params.get("activityPlan");
+//            String end = (String) params.get("activityPlan");
+//            if (!start.isEmpty()){
+//                activityPlan = sdf.parse(start);
+//            }
+//            if (!end.isEmpty()){
+//                activityPlanEnd = sdf.parse(end);
+//            }
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//
+//        try {
+//            // 执行分页查询
+//            List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords, activityPlan, activityPlanEnd);
+//            page.setRecords(result);
+//            page.setTotal(result.size());
+//            log.info("result" + page);
+//            return new PageUtils(page);
+//        } catch (Exception e) {
+//            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+//            page.setTotal(0);
+//            return new PageUtils(page);
+//        }
+//    }
 
-    public List<QcknowledgebaseEntity> queryFinishedList1(Map<String, Object> params) {
+//    public List<QcknowledgebaseEntity> queryFinishedList1(Map<String, Object> params) {
+//        log.info("param" + params.get("page") + "------" + params.get("limit"));
+//
+//        // 提取模糊查询参数
+//        String topicName = (String) params.get("topicName");
+//        String keywords = (String) params.get("keywords");
+//        Date activityPlan = (Date) params.get("activityPlan");
+//        Date activityPlanEnd = (Date) params.get("activityPlanEnd");
+//
+//        try {
+//            // 执行查询
+//            List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords, activityPlan, activityPlanEnd);
+//            log.info("result" + result);
+//            return result;
+//        } catch (Exception e) {
+//            log.error("查询出错: " + e.getMessage() + ", params: " + params, e);
+//            return Collections.emptyList(); // 返回空列表
+//        }
+//    }
+public List<QcknowledgebaseEntity> queryFinishedList1(Map<String, Object> params) {
     log.info("param" + params.get("page") + "------" + params.get("limit"));
 
     // 提取模糊查询参数
     String topicName = (String) params.get("topicName");
     String keywords = (String) params.get("keywords");
-    String startDate = (String) params.get("startDate");
-    String endDate = (String) params.get("endDate");
+    String activityPlan = (String) params.get("activityPlan");
+    String activityPlanEnd = (String) params.get("activityPlanEnd");
 
     try {
         // 执行查询
-        List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords, startDate, endDate);
+        List<QcknowledgebaseEntity> result = qcSubjectRegistrationDao.selectFinishedSubjectList(topicName, keywords,activityPlan, activityPlanEnd);
         log.info("result" + result);
         return result;
     } catch (Exception e) {
@@ -86,7 +151,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
 }
     @Override
     public void updateStorageFlagToZero(Long[] qcsrIds) {
-            qcSubjectRegistrationDao.updateStorageFlagToZero(Arrays.asList(qcsrIds));
+        qcSubjectRegistrationDao.updateStorageFlagToZero(Arrays.asList(qcsrIds));
     }
 
 
@@ -336,6 +401,7 @@ public class QcSubjectRegistrationServiceImpl extends ServiceImpl<QcSubjectRegis
         );
         return new PageUtils(page);
     }
+
     @Override
     public PageUtils queryPageAbout(Map<String, Object> params) {
 

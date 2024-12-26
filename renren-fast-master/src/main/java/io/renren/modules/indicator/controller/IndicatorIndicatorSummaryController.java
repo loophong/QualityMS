@@ -9,6 +9,7 @@ import java.util.Map;
 import com.aliyun.oss.ServiceException;
 import io.renren.modules.indicator.entity.IndicatorChart1Entity;
 import io.renren.modules.indicator.entity.IndicatorChart2Entity;
+import io.renren.modules.indicator.entity.IndicatorYearDataEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -151,6 +152,16 @@ public class IndicatorIndicatorSummaryController {
         List<IndicatorChart2Entity> list = indicatorIndicatorSummaryService.queryChart2List(indicatorChart2Entity);
         // 打印 list 中的每个元素
         for (IndicatorChart2Entity entity : list) {
+            System.out.println(entity);
+        }
+        return list;
+    }
+
+    @RequestMapping("/homeChart1")
+    public List<IndicatorYearDataEntity> queryYearData(IndicatorIndicatorSummaryEntity indicatorIndicatorSummaryEntity){
+        List<IndicatorYearDataEntity> list = indicatorIndicatorSummaryService.queryYearDataList(indicatorIndicatorSummaryEntity);
+        // 打印 list 中的每个元素
+        for (IndicatorYearDataEntity entity : list) {
             System.out.println(entity);
         }
         return list;

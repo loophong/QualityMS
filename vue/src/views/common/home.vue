@@ -45,7 +45,7 @@
     <section class="mainbox">
       <div class="column">
         <div class="panel indicator1">
-          <h2>月度指标完成情况</h2>
+          <h2>年度指标完成情况</h2>
           <div id="indicatorChart1" ref="indicatorChart1" @click="toIndicatorOverview"></div>
           <div class="panel-footer"></div>
         </div>

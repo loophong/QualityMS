@@ -1,32 +1,33 @@
 <template>
     <el-container>
       <el-container>
-        <el-aside width="15%" style="font-size: 20px;">
-          <el-card class="box-card" style="margin-top: 100px;">
+        <el-aside width="15%" style="font-size: 20px; height: 60vh; display: flex; flex-direction: column;">
+          <el-card class="box-card" style="margin-top: 1px; flex-grow: 1;">
             <div slot="header" class="clearfix">
               <span>当月指标总数</span>
             </div>
             <div class="text item">{{ controlledDataCounts }}</div>
           </el-card>
-          <el-card class="box-card">
+          <el-card class="box-card" style="flex-grow: 1;">
             <div slot="header" class="clearfix">
               <span>未达成数</span>
             </div>
             <div class="text item">{{ dataList3.unfinishedCounts }}</div>
           </el-card>
-          <el-card class="box-card">
+          <el-card class="box-card" style="flex-grow: 1;">
             <div slot="header" class="clearfix">
               <span>已发任务指标数</span>
             </div>
             <div class="text item">{{ indicatorRelatedTaskNum }}</div>
           </el-card>
-          <el-card class="box-card">
+          <el-card class="box-card" style="flex-grow: 1;">
             <div slot="header" class="clearfix">
               <span>月度任务完成率</span>
             </div>
-            <div class="text item">{{ finishedNum/ indicatorRelatedTaskNum *100}}%</div>
+            <div class="text item">{{ (finishedNum / indicatorRelatedTaskNum * 100).toFixed(2) }}%</div>
           </el-card>
         </el-aside>
+
         <el-main>
           <div class="chart-column left-column">
             <div id="indicatorCharts1" ref="indicatorCharts1" class="box1"></div>
@@ -40,9 +41,9 @@
         </el-main>
 
       </el-container>
-      <el-footer height="200px" style="display: flex; flex-direction: row; font-size: 20px;">
+      <el-footer style="display: flex; flex-direction: row; font-size: 20px;  height: 15vh; padding: 0;">
         <el-card class="box-card" style="flex: 1;">
-          <i class="el-icon-s-data" style="font-size: 30px;"></i> <!-- 添加信息图标 -->
+          <img :src="require('@/assets//indicator.png')" style="width: 100px; height: 100px;">
         </el-card>
         <el-card class="box-card" style="flex: 1;">
           <div slot="header" class="clearfix">
@@ -241,7 +242,7 @@ export default {
       const chart = echarts.init(this.$refs.indicatorCharts1);
       const option = {
         title: {
-          text: "当月指标完成情况",
+          text: "月度指标完成情况",
           left: 'center',
         },
         tooltip: {
@@ -262,8 +263,8 @@ export default {
         },
         xAxis: {
           type: 'category',
-          // data: this.dataList1.map(item => item.yearMonth),
-          data: [this.dataList3.yearMonth],
+          data: this.dataList1.map(item => item.yearMonth),
+          // data: [this.dataList3.yearMonth],
         },
         yAxis: {
           type: 'value',
@@ -272,14 +273,14 @@ export default {
           {
             name: '达标',
             type: 'bar',
-            // data: this.dataList1.map(item => item.finishedCounts),
-            data: [this.dataList3.finishedCounts],
+            data: this.dataList1.map(item => item.finishedCounts),
+            // data: [this.dataList3.finishedCounts],
           },
           {
             name: '未达标',
             type: 'bar',
-            // data: this.dataList1.map(item => item.unfinishedCounts),
-            data: [this.dataList3.unfinishedCounts],
+            data: this.dataList1.map(item => item.unfinishedCounts),
+            // data: [this.dataList3.unfinishedCounts],
           }
         ],
       };
@@ -448,11 +449,12 @@ export default {
 .mod {
   display: flex;
   flex-wrap: wrap; /* 自动换行 */
-  gap: 20px; /* 每个区域之间的间距 */
+  gap: 10px; /* 每个区域之间的间距 */
 }
 .el-main {
   display: flex;
   justify-content: space-between; /* 使列之间有间距 */
+  height: 70vh; /* 设置 el-main 的高度为视口高度的 70% */
 }
 .chart-column {
   display: flex;
@@ -468,13 +470,13 @@ export default {
   justify-content: flex-start; /* 上对齐 */
 }
 .box {
-  flex: 0 1 auto; /* 每个区域占 30% 宽度 */
+  flex: 0 1 50%; /* 每个区域占 30% 宽度 */
   //background-color: #f2f2f2;
   text-align: center;
   padding: 20px;
   border-radius: 4px;
   min-width: 200px; /* 设置最小宽度，防止过小 */
-  height: 400px; /* 设置每个容器的高度为父容器的百分比 */
+  height: 300px; /* 设置每个容器的高度为父容器的百分比 */
 }
 .box1 {
   flex: 1 1 50%; /* 每个区域占 50% 宽度，第一个0表示 .box1 不会增长以填充剩余空间，第二个1表示 .box1 可以收缩以适应较小的空间 */
@@ -483,7 +485,7 @@ export default {
   padding: 20px; /* 调整内边距 */
   border-radius: 4px;
   min-width: 200px; /* 设置最小宽度，防止过小 */
-  height: 50%; /* 设置高度占父容器的一半 */
+  height: 45%; /* 设置高度占父容器的一半 */
 }
 .box:last-child {
   margin-bottom: 0; /* 最后一个图表不需要底部间距 */
@@ -503,6 +505,5 @@ export default {
   align-items: center; /* 水平居中 */
   justify-content: center; /* 垂直居中 */
   text-align: center; /* 文本居中 */
-  padding: 20px; /* 添加一些内边距 */
 }
 </style>

@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="renren-fast" />
         <module name="QualityMS" />
+        <module name="renren-generator" />
       </profile>
     </annotationProcessing>
   </component>

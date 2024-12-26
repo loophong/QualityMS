@@ -326,20 +326,20 @@
       <el-form :rules="rule" :model="form7">
         <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
           <el-select v-model="form7.result" placeholder=""
-            :disabled="!isAuth('qcExamine:final:submit') || dataList[5].status != 'B'">
+            :disabled="!isAuth('qcManagement:group:admin') || dataList[5].status != 'B'">
             <el-option label="通过" value="1"></el-option>
             <el-option label="不通过" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form7.comment" autocomplete="off"
-            :disabled="!isAuth('qcExamine:final:submit') || dataList[5].status != 'B'"></el-input>
+            :disabled="!isAuth('qcManagement:group:admin') || dataList[5].status != 'B'"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog7 = false">取 消</el-button>
         <el-button type="primary" @click="dataFormSubmitEx(form7.id)"
-          :disabled="!isAuth('qcExamine:final:submit') || dataList[5].status != 'B'">确 定</el-button>
+          :disabled="!isAuth('qcManagement:group:admin') || dataList[5].status != 'B'">确 定</el-button>
       </div>
     </el-dialog>
   </div>

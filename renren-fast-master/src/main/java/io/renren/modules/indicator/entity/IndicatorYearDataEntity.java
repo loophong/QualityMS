@@ -7,8 +7,7 @@ import java.util.Date;
 
 @Data
 public class IndicatorYearDataEntity {
-    @JsonFormat(pattern = "yyyy-MM")
-    private Date year;
+    private Integer year;
 
     /**
      * 达成的指标数量
@@ -19,4 +18,10 @@ public class IndicatorYearDataEntity {
      * 未达成的指标数量
      * */
     private Integer unfinishedCounts;
+
+    public IndicatorYearDataEntity() {
+        this.finishedCounts = 0;
+        this.unfinishedCounts = 0;
+    }
+
 }

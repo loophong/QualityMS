@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -230,42 +231,46 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
 
     @Override
     public List<IndicatorYearDataEntity> queryYearDataList(IndicatorIndicatorSummaryEntity indicatorIndicatorSummaryEntity) {
-        // 查询当前年份的数据
+        // 查询当前年份的数据列表
         List<IndicatorIndicatorSummaryEntity> list = indicatorIndicatorSummaryDao.queryYearDataList(indicatorIndicatorSummaryEntity);
         if (list == null) {
             list = new ArrayList<>();
         }
-        for (IndicatorIndicatorSummaryEntity entity : list) {
-            System.out.println(entity);
+
+        // 指标完成值map
+        Map<String, BigDecimal> yearDataMap = new HashMap<>();
+        //指标目标值map
+        Map<String, BigDecimal> targetValuesMap = new HashMap<>();
+        //指标上下界map
+        Map<String, Integer> indicatorMap = new HashMap<>();
+
+        //获取全部指标列表
+        QueryWrapper<IndicatorDictionaryEntity> queryWrapper = new QueryWrapper<>();
+        List<IndicatorDictionaryEntity> indicatorDictionaryList = indicatorDictionaryService.list(queryWrapper);
+        //生成指标上下界map
+        for (IndicatorDictionaryEntity indicatorDictionaryEntity : indicatorDictionaryList) {
+            String indicatorName = indicatorDictionaryEntity.getIndicatorName();
+            int indicatorBoundFlag = indicatorDictionaryEntity.getIndicatorBoundFlag() != null ? indicatorDictionaryEntity.getIndicatorBoundFlag() : 2;
+            indicatorMap.put(indicatorName, indicatorBoundFlag);
         }
 
-        // 使用 Map 来存储每个指标的完成情况
-        Map<String, BigDecimal> yearDataMap = new HashMap<>();
-        Map<String, BigDecimal> targetValuesMap = new HashMap<>();
+        //生成指标完成值和目标值map
         for (IndicatorIndicatorSummaryEntity entity : list) {
             String indicatorName = entity.getIndicatorName();
-            Date yearMonth = entity.getYearMonth(); // 提取年份和月份
-            if (yearMonth != null) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(yearMonth);
-                int year = calendar.get(Calendar.YEAR); // 提取年份
-                // 构建 Map 的键
-                String key = year + "-" + indicatorName;
-                BigDecimal indicatorActualValue = entity.getIndicatorActualValue() != null ? entity.getIndicatorActualValue() : BigDecimal.ZERO;
-                BigDecimal indicatorValue = entity.getIndicatorValue() != null ? entity.getIndicatorValue() : BigDecimal.ZERO;
-                // 获取当前的累计值，如果没有则初始化为 BigDecimal.ZERO
-                BigDecimal indicatorYearActualValue = yearDataMap.getOrDefault(key, BigDecimal.ZERO);
-                // 累加月度完成值
-                indicatorYearActualValue = indicatorYearActualValue.add(indicatorActualValue);
-                // 获取当前的累计值，如果没有则初始化为 BigDecimal.ZERO
-                BigDecimal indicatorYearValue = targetValuesMap.getOrDefault(key, BigDecimal.ZERO);
+            BigDecimal indicatorActualValue = entity.getIndicatorActualValue() != null ? entity.getIndicatorActualValue() : BigDecimal.ZERO;
+            BigDecimal indicatorValue = entity.getIndicatorValue() != null ? entity.getIndicatorValue() : BigDecimal.ZERO;
+            // 获取当前的月度完成累计值，如果没有则初始化为 BigDecimal.ZERO
+            BigDecimal indicatorYearActualValue = yearDataMap.getOrDefault(indicatorName, BigDecimal.ZERO);
+            // 累加月度完成值
+            indicatorYearActualValue = indicatorYearActualValue.add(indicatorActualValue);
+            // 获取当前的月度计划完成累计值，如果没有则初始化为 BigDecimal.ZERO
+            BigDecimal indicatorYearValue = targetValuesMap.getOrDefault(indicatorName, BigDecimal.ZERO);
 
-                // 累加月度完成值
-                indicatorYearValue = indicatorYearValue.add(indicatorValue);
-                // 更新 Map
-                yearDataMap.put(key, indicatorYearActualValue);
-                targetValuesMap.put(key, indicatorYearValue);
-            }
+            // 累加月度完成值
+            indicatorYearValue = indicatorYearValue.add(indicatorValue);
+            // 更新 Map
+            yearDataMap.put(indicatorName, indicatorYearActualValue);
+            targetValuesMap.put(indicatorName, indicatorYearValue);
         }
 
         // 打印 yearDataMap
@@ -276,56 +281,36 @@ public class IndicatorIndicatorSummaryServiceImpl extends ServiceImpl<IndicatorI
             System.out.println("Key: " + entry.getKey() + ", targetValue: " + entry.getValue());
         }
 
-        // 创建一个 Map 来存储每个指标的 IndicatorYearDataEntity
-        Map<String, IndicatorYearDataEntity> yearDataEntitiesMap = new HashMap<>();
+        IndicatorYearDataEntity yearDataEntity = new IndicatorYearDataEntity();
         // 遍历 yearDataMap 进行比较
         for (Map.Entry<String, BigDecimal> entry : yearDataMap.entrySet()) {
             String key = entry.getKey();
             System.out.println("Key: " + key);
             BigDecimal actualValue = entry.getValue() != null ? entry.getValue() : BigDecimal.ZERO;
-            String[] parts = key.split("-");
-            int year = Integer.parseInt(parts[0]);
-            String indicatorName = parts[1];
 
             BigDecimal targetValue = targetValuesMap.get(key);
+            int indicatorBoundFlag = indicatorMap.get(key);
             System.out.println("targetValue: " + targetValue);
-            if (targetValue != null) {
-
-                // 获取或创建 IndicatorYearDataEntity
-                String entityKey = year + "-" + indicatorName;
-                IndicatorYearDataEntity yearDataEntity = yearDataEntitiesMap.getOrDefault(entityKey, new IndicatorYearDataEntity());
-                // 将 int 类型的 year 转换为 Date 类型
-                Calendar calendar = Calendar.getInstance();
-                calendar.clear();
-                calendar.set(year, Calendar.JANUARY, 1); // 设置为该年的1月1日
-                Date yearDate = calendar.getTime();
-
-                yearDataEntity.setYear(yearDate);
-
-                // 比较实际值和目标值
+            if(indicatorBoundFlag == 0){
                 if (actualValue.compareTo(targetValue) >= 0) {
                     yearDataEntity.setFinishedCounts(yearDataEntity.getFinishedCounts() + 1);
                 } else {
                     yearDataEntity.setUnfinishedCounts(yearDataEntity.getUnfinishedCounts() + 1);
                 }
-
-                // 更新 Map
-                yearDataEntitiesMap.put(entityKey, yearDataEntity);
-            } else {
-                log.warn("No target value found for key: {}", key);
+            } else if(indicatorBoundFlag == 1){
+                if (actualValue.compareTo(targetValue) <= 0) {
+                    yearDataEntity.setFinishedCounts(yearDataEntity.getFinishedCounts() + 1);
+                } else {
+                    yearDataEntity.setUnfinishedCounts(yearDataEntity.getUnfinishedCounts() + 1);
+                }
             }
         }
 
-        // 打印 yearDataEntitiesMap
-        for (Map.Entry<String, IndicatorYearDataEntity> entry : yearDataEntitiesMap.entrySet()) {
-            IndicatorYearDataEntity yearDataEntity = entry.getValue();
-            System.out.println("Year: " + yearDataEntity.getYear() +
-                    ", Finished Counts: " + yearDataEntity.getFinishedCounts() +
-                    ", Unfinished Counts: " + yearDataEntity.getUnfinishedCounts());
-        }
+        // 设置年份为当年
+        yearDataEntity.setYear(LocalDate.now().getYear());
 
         // 将 Map 中的值转换为 List 并返回
-        return new ArrayList<>(yearDataEntitiesMap.values());
+        return new ArrayList<>(Collections.singletonList(yearDataEntity));
     }
 
 

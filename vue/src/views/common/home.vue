@@ -207,7 +207,7 @@ export default {
 
       //月度指标完成情况
       this.$http({
-        url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/chart1'),
+        url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/homeChart1'),
         method: 'get',
       }).then(({data}) => {
         this.dataList1 = data;
@@ -224,14 +224,15 @@ export default {
       const chart = echarts.init(this.$refs.indicatorChart1);
       const option = {
         tooltip: {
-          trigger: 'axis',
+          trigger: 'item',
           axisPointer: {
             type: 'shadow'
           }
         },
         legend: {
-          data: ['达标', '未达标'],
+          data: ['达标', '未达标', '总指标'],
           top: '10%',
+          left: 'center',
           textStyle: {
             color: 'white'
           }
@@ -244,8 +245,9 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: this.dataList1.map(item => item.yearMonth),
+          data: this.dataList1.map(item => item.year),
           axisLabel: {
+            show:false,
             color: "rgba(255,255,255,.6)",
             fontSize: 12,
           },
@@ -282,6 +284,16 @@ export default {
             name: '未达标',
             type: 'bar',
             data: this.dataList1.map(item => item.unfinishedCounts),
+          },
+          {
+            name: '总指标',
+            type: 'bar',
+            data: [this.indicatorCounts],
+            itemStyle: {
+              normal: {
+                color: '#67c23a',
+              },
+            },
           }
         ],
       };

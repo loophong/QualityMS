@@ -58,18 +58,19 @@
           style="flex: 0 0 30%; display: flex; flex-direction: column; justify-content: space-around; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;"
         >
           <div style="display: flex; align-items: center; gap: 5px;">
-            <span>当月问题总数：</span>
-            <span>{{ totalCount || 0 }}</span>
+            <span style="font-weight: bold; font-size: 16px;">当月问题总数：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ totalCount || 0 }}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <span>同比：</span>
-            <span>{{ formattedYearlyGrowth}}</span>
+            <span style="font-weight: bold; font-size: 16px;">同比：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ formattedYearlyGrowth }}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <span>环比：</span>
-            <span>{{ formattedMonthlyGrowth}}</span>
+            <span style="font-weight: bold; font-size: 16px;">环比：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ formattedMonthlyGrowth }}</span>
           </div>
         </div>
+
 
 
 
@@ -85,14 +86,15 @@
         <!-- Additional Stats -->
         <div style="display: flex; align-items: center; justify-content: flex-start; gap: 150px; margin-top: 10px; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
           <div style="display: flex; align-items: center;">
-            <span>当前问题验证未通过数：</span>
-            <span>{{ nopassissue }}</span>
+            <span style="font-weight: bold; font-size: 16px;">当前问题验证未通过数：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ nopassissue }}</span>
           </div>
           <div style="display: flex; align-items: center;">
-            <span>通过率：</span>
-            <span>{{ passRate + '%' }}</span>
+            <span style="font-weight: bold; font-size: 16px;">通过率：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ passRate + '%' }}</span>
           </div>
         </div>
+
       </div>
 
 
@@ -268,7 +270,11 @@ export default {
               this.issueStats['结项'],
               this.issueStats['关闭']
             ],
-            type: 'bar'
+            type: 'bar',
+            label: {
+              show: true,
+              position: 'top'
+            }
           }
         ]
       };

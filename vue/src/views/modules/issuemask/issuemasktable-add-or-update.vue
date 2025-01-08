@@ -109,6 +109,15 @@
       :visible.sync="visible1"
       :width="'400px'">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+        <el-form-item label="审核人" prop="reviewers">
+          <el-select v-model="dataForm.reviewers" filterable placeholder="请选择审核人">
+            <el-option-group v-for="group in options" :key="group.value" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.value">
+              </el-option>
+            </el-option-group>
+          </el-select>
+        </el-form-item>
         <el-form-item label="接收人" prop="recipients">
                     <el-select v-model="dataForm.recipients" filterable placeholder="请选择接收人">
                       <el-option-group v-for="group in options" :key="group.value" :label="group.label">
@@ -478,8 +487,8 @@
                 this.dataForm.issuecreators = data.issueMaskTable.issuecreator
                 this.dataForm.creationTime = this.formattedCreationTime // 初始化为当前时间
                 this.dataForm.requiredCompletionTime = data.issueMaskTable.requiredCompletionTime
-                this.dataForm.superiorMask = data.issueMaskTable.superiorMask
-                // console.log('初始化弹窗，ID:', data.issueMaskTable.issueNumber)
+                this.dataForm.superiorMask = data.issueMaskTable.serialNumber
+                console.log('初始化弹窗，ID:', this.dataForm.superiorMask)
               }
             })
           }
@@ -738,6 +747,7 @@
       // 表单提交
       datanewSubmit () {
         // const serialNumber = this.generateSerialNumber(this.dataForm.issueNumber);
+        console.log('初始化弹窗:', this.dataForm.superiorMask)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({

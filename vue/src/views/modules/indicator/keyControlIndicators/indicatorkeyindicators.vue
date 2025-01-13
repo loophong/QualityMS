@@ -39,169 +39,173 @@
       </el-col>
     </el-row>
 
-    <el-table
-      :data="dataList"
-      border
-      v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
-      :span-method="arraySpanMethod"
-      style="width: 100%;">
-      <el-table-column
-        type="selection"
-        header-align="center"
-        align="center"
-        width="50">
-      </el-table-column>
-      <!-- 序号列 -->
-      <el-table-column
-        header-align="center"
-        align="center"
-        label="序号"
-        width="60"
-      >
-        <template slot-scope="scope">
-          <!-- 使用v-if来判断是否显示序号 -->
-          <span v-if="scope.row.showIndex===1">
+    <div class="table-container">
+      <el-table
+        :data="dataList"
+        border
+        v-loading="dataListLoading"
+        @selection-change="selectionChangeHandle"
+        :span-method="arraySpanMethod"
+        style="width: 100%;"
+        height="1000">
+        <el-table-column
+          type="selection"
+          header-align="center"
+          align="center"
+          width="50">
+        </el-table-column>
+        <!-- 序号列 -->
+        <el-table-column
+          header-align="center"
+          align="center"
+          label="序号"
+          width="60"
+        >
+          <template slot-scope="scope">
+            <!-- 使用v-if来判断是否显示序号 -->
+            <span v-if="scope.row.showIndex===1">
        {{ scope.row.index }}
     </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="indicatorName"
-        header-align="center"
-        align="center"
-        label="指标名称">
-      </el-table-column>
-      <el-table-column
-        prop="indicatorClassification"
-        header-align="center"
-        align="center"
-        label="指标分级">
-      </el-table-column>
-      <el-table-column
-        prop="sourceDepartment"
-        header-align="center"
-        align="center"
-        label="管理部门">
-      </el-table-column>
-      <el-table-column
-        prop="assessmentDepartment"
-        header-align="center"
-        align="center"
-        label="考核部门">
-      </el-table-column>
-      <el-table-column
-        prop="managementContent"
-        header-align="center"
-        align="center"
-        label="管理内容">
-      </el-table-column>
-      <el-table-column
-        prop="isManagementOutOfControl"
-        header-align="center"
-        align="center"
-        label="是否管理失控">
-      </el-table-column>
-      <el-table-column
-        prop="isNeedsControl"
-        header-align="center"
-        align="center"
-        label="是否需要理攻关">
-      </el-table-column>
-      <el-table-column
-        prop="keyElements"
-        header-align="center"
-        align="center"
-        label="关键要素">
-      </el-table-column>
-      <el-table-column
-        prop="potentialFailureMode"
-        header-align="center"
-        align="center"
-        label="潜在失效模式">
-      </el-table-column>
-      <el-table-column
-        prop="potentialFailureConsequences"
-        header-align="center"
-        align="center"
-        label="潜在失效后果">
-      </el-table-column>
-      <el-table-column
-        prop="involvedProduct"
-        header-align="center"
-        align="center"
-        label="涉及产品">
-      </el-table-column>
-      <el-table-column
-        prop="processName"
-        header-align="center"
-        align="center"
-        label="过程名称">
-      </el-table-column>
-      <el-table-column
-        prop="controlPosition"
-        header-align="center"
-        align="center"
-        label="控制位置">
-      </el-table-column>
-      <el-table-column
-        prop="controlPersonnel"
-        header-align="center"
-        align="center"
-        label="控制人员">
-      </el-table-column>
-      <el-table-column
-        prop="controlMethod"
-        header-align="center"
-        align="center"
-        label="控制方法">
-      </el-table-column>
-      <el-table-column
-        prop="evaluationMeasurementTechnique"
-        header-align="center"
-        align="center"
-        label="评价测量技术">
-      </el-table-column>
-      <el-table-column
-        prop="sampleSize"
-        header-align="center"
-        align="center"
-        label="样本大小">
-      </el-table-column>
-      <el-table-column
-        prop="samplingFrequency"
-        header-align="center"
-        align="center"
-        label="抽样频率">
-      </el-table-column>
-      <el-table-column
-        prop="controlList"
-        header-align="center"
-        align="center"
-        label="控制清单">
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="100"
-        label="入库操作">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="storageHandle(scope.row.indicatorId)">入库</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="150"
-        label="操作">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.keyIndicatorId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.keyIndicatorId)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="indicatorName"
+          header-align="center"
+          align="center"
+          label="指标名称">
+        </el-table-column>
+        <el-table-column
+          prop="indicatorClassification"
+          header-align="center"
+          align="center"
+          label="指标分级">
+        </el-table-column>
+        <el-table-column
+          prop="sourceDepartment"
+          header-align="center"
+          align="center"
+          label="管理部门">
+        </el-table-column>
+        <el-table-column
+          prop="assessmentDepartment"
+          header-align="center"
+          align="center"
+          label="考核部门">
+        </el-table-column>
+        <el-table-column
+          prop="managementContent"
+          header-align="center"
+          align="center"
+          label="管理内容">
+        </el-table-column>
+        <el-table-column
+          prop="isManagementOutOfControl"
+          header-align="center"
+          align="center"
+          label="是否管理失控">
+        </el-table-column>
+        <el-table-column
+          prop="isNeedsControl"
+          header-align="center"
+          align="center"
+          label="是否需要理攻关">
+        </el-table-column>
+        <el-table-column
+          prop="keyElements"
+          header-align="center"
+          align="center"
+          label="关键要素">
+        </el-table-column>
+        <el-table-column
+          prop="potentialFailureMode"
+          header-align="center"
+          align="center"
+          label="潜在失效模式">
+        </el-table-column>
+        <el-table-column
+          prop="potentialFailureConsequences"
+          header-align="center"
+          align="center"
+          label="潜在失效后果">
+        </el-table-column>
+        <el-table-column
+          prop="involvedProduct"
+          header-align="center"
+          align="center"
+          label="涉及产品">
+        </el-table-column>
+        <el-table-column
+          prop="processName"
+          header-align="center"
+          align="center"
+          label="过程名称">
+        </el-table-column>
+        <el-table-column
+          prop="controlPosition"
+          header-align="center"
+          align="center"
+          label="控制位置">
+        </el-table-column>
+        <el-table-column
+          prop="controlPersonnel"
+          header-align="center"
+          align="center"
+          label="控制人员">
+        </el-table-column>
+        <el-table-column
+          prop="controlMethod"
+          header-align="center"
+          align="center"
+          label="控制方法">
+        </el-table-column>
+        <el-table-column
+          prop="evaluationMeasurementTechnique"
+          header-align="center"
+          align="center"
+          label="评价测量技术">
+        </el-table-column>
+        <el-table-column
+          prop="sampleSize"
+          header-align="center"
+          align="center"
+          label="样本大小">
+        </el-table-column>
+        <el-table-column
+          prop="samplingFrequency"
+          header-align="center"
+          align="center"
+          label="抽样频率">
+        </el-table-column>
+        <el-table-column
+          prop="controlList"
+          header-align="center"
+          align="center"
+          label="控制清单">
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          header-align="center"
+          align="center"
+          width="100"
+          label="入库操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="storageHandle(scope.row.indicatorId)">入库</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          header-align="center"
+          align="center"
+          width="150"
+          label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.keyIndicatorId)">修改</el-button>
+            <el-button type="text" size="small" @click="deleteHandle(scope.row.keyIndicatorId)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -512,3 +516,9 @@
     }
   }
 </script>
+
+<style scoped>
+.table-container .el-table {
+  max-height: calc(100vh - 300px );
+}
+</style>

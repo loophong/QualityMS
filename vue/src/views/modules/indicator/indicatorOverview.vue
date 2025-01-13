@@ -95,6 +95,8 @@ export default {
       unfinishedKeyIndicatorsCounts: 0, //管控指标未达成数
       indicatorANum: 0, //A类指标数
       unfinishedIndicatorANum: 0, //A类未达成数
+      unfinishedIndicatorAList: [], //A类未达成指标列表
+      finishedIndicatorAList: [], //A类已完成指标列表
       recentMonthIndicatorNum: 0, //最近一个月指标数
       recentMonthUnfinishedIndicatorNum: 0, //最近一个月未达成指标数
     };
@@ -123,7 +125,6 @@ export default {
         method: 'get',
       }).then(({data}) => {
         this.dataList2 = data;
-        this.renderChart2();
       })
 
       //图4
@@ -181,34 +182,37 @@ export default {
         } else {
           this.keyIndicatorList = []
         }
-      })
-      //获取指标数据列表（不分页）
-      this.$http({
-        url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
-        method: 'get',
-        params: this.$http.adornParams({
-          'limit': 10000,
-        })
-      }).then(({data}) => {
-        if (data && data.code === 0) {
-          console.log("indicatorSummaryList====>",data)
-          this.indicatorSummaryList = data.page.list;
-          // 提取 keyIndicatorList 中的指标名称列表
-          const keyIndicatorIds = this.keyIndicatorList.map(item => item.indicatorName);
-          // 筛选出 indicatorSummaryList 中存在于 keyIndicatorList 中的记录
-          const filteredList = this.indicatorSummaryList.filter(item => keyIndicatorIds.includes(item.indicatorName));
-          const recentYearMonth  = filteredList[0].yearMonth;
-          // 筛选出 recentMonthFilteredList 中最新一个月未达成的指标数据
-          const recentMonthFilteredList = filteredList.filter(item => item.yearMonth === recentYearMonth && item.finishedFlag === 0);
-          console.log("recentMonthFilteredList====>",recentMonthFilteredList);
-          this.unfinishedKeyIndicatorsCounts = recentMonthFilteredList.length;
-          console.log("unfinishedKeyIndicatorsCounts====>",this.unfinishedKeyIndicatorsCounts);
-          this.getIndicatorA();
-          this.getRecentMonthIndicator();
+      }).then(() => {
+        //获取指标数据列表（不分页）
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'limit': 10000,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log("indicatorSummaryList====>",data)
+            this.indicatorSummaryList = data.page.list;
+            // 提取 keyIndicatorList 中的指标名称列表
+            const keyIndicatorNames = this.keyIndicatorList.map(item => item.indicatorName);
+            console.log("keyIndicatorNames====>",keyIndicatorNames);
+            // 筛选出 indicatorSummaryList 中存在于 keyIndicatorList 中的记录
+            const filteredList = this.indicatorSummaryList.filter(item => keyIndicatorNames.includes(item.indicatorName));
+            console.log("filteredList====>",filteredList);
+            const recentYearMonth  = filteredList[0].yearMonth;
+            // 筛选出 recentMonthFilteredList 中最新一个月未达成的指标数据
+            const recentMonthFilteredList = filteredList.filter(item => item.yearMonth === recentYearMonth && item.finishedFlag === 0);
+            console.log("recentMonthFilteredList====>",recentMonthFilteredList);
+            this.unfinishedKeyIndicatorsCounts = recentMonthFilteredList.length;
+            console.log("unfinishedKeyIndicatorsCounts====>",this.unfinishedKeyIndicatorsCounts);
+            this.getIndicatorA();
+            this.getRecentMonthIndicator();
 
-        } else {
-          console.log("indicatorSummaryList====>",data);
-        }
+          } else {
+            console.log("indicatorSummaryList====>",data);
+          }
+        })
       })
     },
     // 获取A类指标数/未达成数
@@ -228,8 +232,18 @@ export default {
         console.log("this.indicatorANum====>",this.indicatorANum);
         console.log("indicatorSummaryList====>",this.indicatorSummaryList);
         const recentYearMonth  = this.indicatorSummaryList[0].yearMonth;
-        this.unfinishedIndicatorANum = this.indicatorSummaryList.filter(item => item.indicatorClassification === 'A' && item.finishedFlag === 0 && item.yearMonth === recentYearMonth).length;
+        // 填充 finishedIndicatorAList 和 unfinishedIndicatorAList
+        this.finishedIndicatorAList = this.indicatorSummaryList
+          .filter(item => item.indicatorClassification === 'A' && item.finishedFlag === 1 && item.yearMonth === recentYearMonth)
+          .map(item => item.indicatorName);
+        this.unfinishedIndicatorAList = this.indicatorSummaryList
+          .filter(item => item.indicatorClassification === 'A' && item.finishedFlag === 0 && item.yearMonth === recentYearMonth)
+          .map(item => item.indicatorName);
+        this.unfinishedIndicatorANum = this.unfinishedIndicatorAList.length;
+        console.log("this.unfinishedIndicatorAList====>",this.unfinishedIndicatorAList);
         console.log("this.unfinishedIndicatorANum====>",this.unfinishedIndicatorANum);
+      }).then(() => {
+        this.renderChart2();
       })
     },
     // 最近一个月指标数/未达成指标数
@@ -297,7 +311,23 @@ export default {
           left: 'center',
         },
         tooltip: {
-          trigger: 'item'
+          trigger: 'item',
+          formatter: (params) => {
+            let tooltipContent = `总数: ${params.value}<br>`;
+            // tooltipContent += `<strong>${params.seriesName}</strong><br>`;
+
+            if (params.name === '达成') {
+              this.finishedIndicatorAList.forEach((name, index) => {
+                tooltipContent += `${index + 1}. ${name}<br>`;
+              });
+            } else if (params.name === '未达成') {
+              this.unfinishedIndicatorAList.forEach((name, index) => {
+                tooltipContent += `${index + 1}. ${name}<br>`;
+              });
+            }
+
+            return tooltipContent;
+          }
         },
         series: [
           {

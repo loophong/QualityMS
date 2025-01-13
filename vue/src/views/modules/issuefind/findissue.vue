@@ -100,16 +100,26 @@
         </el-table-column>
 <!--        <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--        </el-table-column>-->
-        <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+        <el-table-column prop="level" header-align="center" align="center" width="150" label="问题状态" fixed="right">
           <template slot-scope="scope">
             <div>
       <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
-        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
-      </span>
+  <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '已完成'" type="success" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else class="bold-large-text">
+    {{ state }}
+  </el-tag> <!-- 处理未定义的状态 -->
+    </span>
             </div>
           </template>
         </el-table-column>
@@ -323,16 +333,26 @@
           </el-table-column>
 <!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--          </el-table-column>-->
-          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+          <el-table-column prop="level" header-align="center" align="center" width="150" label="问题状态" fixed="right">
             <template slot-scope="scope">
               <div>
-      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
-        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
-      </span>
+     <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+  <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '已完成'" type="success" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else class="bold-large-text">
+    {{ state }}
+  </el-tag> <!-- 处理未定义的状态 -->
+    </span>
               </div>
             </template>
           </el-table-column>
@@ -601,16 +621,26 @@
           </el-table-column>
 <!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--          </el-table-column>-->
-          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+          <el-table-column prop="level" header-align="center" align="center" width="150" label="问题状态" fixed="right">
             <template slot-scope="scope">
               <div>
-                <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
-                  <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
-                  <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
-                  <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
-                  <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-                  <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
-                </span>
+                           <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions class="bold-large-text">
+          {{ state }}
+        </el-tag>
+        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions class="bold-large-text">
+          {{ state }}
+        </el-tag>
+        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions class="bold-large-text">
+          {{ state }}
+        </el-tag>
+        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions class="bold-large-text">
+          {{ state }}
+        </el-tag>
+        <el-tag v-else class="bold-large-text">
+          {{ state }}
+        </el-tag> <!-- 处理未定义的状态 -->
+          </span>
               </div>
             </template>
           </el-table-column>
@@ -1242,4 +1272,10 @@ export default {
   margin-top: 10px;
   font-size: 14px; /* 分页器字体大小 */
 }
+
+ .bold-large-text {
+   font-weight: bold;
+   font-size: 14px;
+ }
+
 </style>

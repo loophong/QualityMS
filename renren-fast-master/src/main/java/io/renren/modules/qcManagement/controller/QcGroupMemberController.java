@@ -137,7 +137,6 @@ public class QcGroupMemberController {
     public R myList(@RequestParam Map<String, Object> params) {
 //        PageUtils page = qcGroupMemberService.queryPage(params);
         String userName = ShiroUtils.getUserEntity().getUsername();
-
         PageUtils page = qcGroupMemberService.queryPage(params);
 //        PageUtils page2 = qcGroupMemberService.myQueryPage(params,userName);
         //获取delete_flag不为1的数据

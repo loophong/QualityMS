@@ -57,5 +57,13 @@
         GROUP BY `year_month`
     </select>
 
+    <select id="queryYearDataList" resultType="io.renren.modules.indicator.entity.IndicatorIndicatorSummaryEntity">
+        SELECT *
+        FROM
+            indicator_indicator_summary
+        where
+            DATE_FORMAT(`year_month`, '%Y') = DATE_FORMAT(CURDATE(), '%Y')
+    </select>
+
 
 </mapper>

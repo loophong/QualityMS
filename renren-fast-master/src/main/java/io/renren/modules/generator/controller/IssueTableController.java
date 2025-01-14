@@ -372,8 +372,9 @@ public class IssueTableController {
      */
     @RequestMapping("/currentMonthInProgressCategoryStats")
     @RequiresPermissions("generator:issuetable:list") // 权限控制
-    public R getcurrentMonthInProgressCategoryStats() {
-        Map<String, Integer> stats = issueTableService.getcurrentMonthInProgressCategoryStats();
+    public R getcurrentMonthInProgressCategoryStats(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+        System.out.println("开始获取问题统计数据"+startDate+endDate);
+        Map<String, Integer> stats = issueTableService.getcurrentMonthInProgressCategoryStats(startDate, endDate);
         // 打印返回给前端的数据
 //        System.out.println("返回前端的统计数据: " + stats);
 

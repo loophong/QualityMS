@@ -34,16 +34,16 @@
   </el-form>
 
 
-  <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
+  <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" :span-method="arraySpanMethod"
     style="width: 100%;">
     <el-table-column type="selection" header-align="center" align="center" width="50">
     </el-table-column>
     <!-- 序号列 -->
-    <el-table-column header-align="center" align="center" label="序号" width="60">
-      <template slot-scope="scope">
-        {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
-      </template>
-    </el-table-column>
+<!--    <el-table-column header-align="center" align="center" label="序号" width="60">-->
+<!--      <template slot-scope="scope">-->
+<!--        {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}-->
+<!--      </template>-->
+<!--    </el-table-column>-->
     <!-- <el-table-column
       prop="keyIndicatorId"
       header-align="center"
@@ -155,7 +155,7 @@ data() {
     dataList: [],
     dataList01: [],
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 100,
     totalPage: 0,
     dataListLoading: false,
     dataListSelections: [],
@@ -458,6 +458,36 @@ async clearStorageFlag(ids) {
         console.error("导出失败:", error);
         loadingInstance.close();
       });
+  },
+  arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+    if (columnIndex >= 1 && columnIndex <= 7) { // 合并从序号到是否需要理攻关的列
+      if (rowIndex > 0 && row.indicatorId === this.dataList[rowIndex - 1].indicatorId && row.indicatorName === this.dataList[rowIndex - 1].indicatorName) {
+        row.showIndex = 0; // 当前行不需要显示序号
+        return {
+          rowspan: 0,
+          colspan: 0
+        };
+      } else {
+        let rowspan = 1;
+        for (let i = rowIndex + 1; i < this.dataList.length; i++) {
+          if (row.indicatorId === this.dataList[i].indicatorId && row.indicatorName === this.dataList[i].indicatorName) {
+            rowspan++;
+          } else {
+            break;
+          }
+        }
+        row.showIndex = 1; // 当前行需要显示序号
+        return {
+          rowspan: rowspan,
+          colspan: 1
+        };
+      }
+    }
+    // row.showIndex = 1; // 默认情况下显示序号
+    return {
+      rowspan: 1,
+      colspan: 1
+    };
   },
 }
 }

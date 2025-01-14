@@ -222,20 +222,20 @@ public class IssueMaskTableServiceImpl extends ServiceImpl<IssueMaskTableDao, Is
         // 遍历所有任务，将其中issueNumber为传入的issueNumber的serialNumber修改为null（原任务的上级任务改为1，原问题状态改为已派发）
         for (IssueMaskTableEntity task : list1) {
             if (task.getSerialNumber().equals(issueNumber)) {
-                task.setSuperiorMask(String.valueOf(1));
+//                task.setSuperiorMask(String.valueOf(1));
                 task.setState("已派发");
 //                System.out.println("派发任务前置数节点修改成功++++++++++++++++++");
                 this.updateById(task); // 更新数据库中的记录
             }
         }
         // 遍历所有任务，将所有serialNumber为传入的issueNumber的任务的serialNumber改为传入的newSerialNumber（将现任务的上级任务改为原任务的上级任务）
-        for (IssueMaskTableEntity task : list1) {
-            if (task.getSuperiorMask() != null && task.getSuperiorMask().equals(issueNumber)) {
-                task.setSuperiorMask(serialNumber);
-                this.updateById(task); // 更新数据库中的记录
-//                System.out.println("派发任务后续子树节点修改成功++++++++++++++++++");
-            }
-        }
+//        for (IssueMaskTableEntity task : list1) {
+//            if (task.getSuperiorMask() != null && task.getSuperiorMask().equals(issueNumber)) {
+//                task.setSuperiorMask(serialNumber);
+//                this.updateById(task); // 更新数据库中的记录
+////                System.out.println("派发任务后续子树节点修改成功++++++++++++++++++");
+//            }
+//        }
         return null;
     }
 

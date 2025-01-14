@@ -1,32 +1,33 @@
 <template>
     <el-container>
       <el-container>
-        <el-aside width="15%" style="font-size: 20px;">
-          <el-card class="box-card" style="margin-top: 100px;">
+        <el-aside width="15%" style="font-size: 20px; height: 60vh; display: flex; flex-direction: column;">
+          <el-card class="box-card" style="margin-top: 1px; flex-grow: 1;">
             <div slot="header" class="clearfix">
               <span>当月指标总数</span>
             </div>
             <div class="text item">{{ controlledDataCounts }}</div>
           </el-card>
-          <el-card class="box-card">
+          <el-card class="box-card" style="flex-grow: 1;">
             <div slot="header" class="clearfix">
               <span>未达成数</span>
             </div>
             <div class="text item">{{ dataList3.unfinishedCounts }}</div>
           </el-card>
-          <el-card class="box-card">
+          <el-card class="box-card" style="flex-grow: 1;">
             <div slot="header" class="clearfix">
               <span>已发任务指标数</span>
             </div>
             <div class="text item">{{ indicatorRelatedTaskNum }}</div>
           </el-card>
-          <el-card class="box-card">
+          <el-card class="box-card" style="flex-grow: 1;">
             <div slot="header" class="clearfix">
               <span>月度任务完成率</span>
             </div>
-            <div class="text item">{{ finishedNum/ indicatorRelatedTaskNum *100}}%</div>
+            <div class="text item">{{ (finishedNum / indicatorRelatedTaskNum * 100).toFixed(2) }}%</div>
           </el-card>
         </el-aside>
+
         <el-main>
           <div class="chart-column left-column">
             <div id="indicatorCharts1" ref="indicatorCharts1" class="box1"></div>
@@ -40,9 +41,9 @@
         </el-main>
 
       </el-container>
-      <el-footer height="200px" style="display: flex; flex-direction: row; font-size: 20px;">
+      <el-footer style="display: flex; flex-direction: row; font-size: 20px;  height: 15vh; padding: 0;">
         <el-card class="box-card" style="flex: 1;">
-          <i class="el-icon-s-data" style="font-size: 30px;"></i> <!-- 添加信息图标 -->
+          <img :src="require('@/assets//indicator.png')" style="width: 100px; height: 100px;">
         </el-card>
         <el-card class="box-card" style="flex: 1;">
           <div slot="header" class="clearfix">
@@ -94,6 +95,8 @@ export default {
       unfinishedKeyIndicatorsCounts: 0, //管控指标未达成数
       indicatorANum: 0, //A类指标数
       unfinishedIndicatorANum: 0, //A类未达成数
+      unfinishedIndicatorAList: [], //A类未达成指标列表
+      finishedIndicatorAList: [], //A类已完成指标列表
       recentMonthIndicatorNum: 0, //最近一个月指标数
       recentMonthUnfinishedIndicatorNum: 0, //最近一个月未达成指标数
     };
@@ -122,7 +125,6 @@ export default {
         method: 'get',
       }).then(({data}) => {
         this.dataList2 = data;
-        this.renderChart2();
       })
 
       //图4
@@ -180,34 +182,37 @@ export default {
         } else {
           this.keyIndicatorList = []
         }
-      })
-      //获取指标数据列表（不分页）
-      this.$http({
-        url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
-        method: 'get',
-        params: this.$http.adornParams({
-          'limit': 10000,
-        })
-      }).then(({data}) => {
-        if (data && data.code === 0) {
-          console.log("indicatorSummaryList====>",data)
-          this.indicatorSummaryList = data.page.list;
-          // 提取 keyIndicatorList 中的指标名称列表
-          const keyIndicatorIds = this.keyIndicatorList.map(item => item.indicatorName);
-          // 筛选出 indicatorSummaryList 中存在于 keyIndicatorList 中的记录
-          const filteredList = this.indicatorSummaryList.filter(item => keyIndicatorIds.includes(item.indicatorName));
-          const recentYearMonth  = filteredList[0].yearMonth;
-          // 筛选出 recentMonthFilteredList 中最新一个月未达成的指标数据
-          const recentMonthFilteredList = filteredList.filter(item => item.yearMonth === recentYearMonth && item.finishedFlag === 0);
-          console.log("recentMonthFilteredList====>",recentMonthFilteredList);
-          this.unfinishedKeyIndicatorsCounts = recentMonthFilteredList.length;
-          console.log("unfinishedKeyIndicatorsCounts====>",this.unfinishedKeyIndicatorsCounts);
-          this.getIndicatorA();
-          this.getRecentMonthIndicator();
+      }).then(() => {
+        //获取指标数据列表（不分页）
+        this.$http({
+          url: this.$http.adornUrl('/indicator/indicatorindicatorsummary/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'limit': 10000,
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log("indicatorSummaryList====>",data)
+            this.indicatorSummaryList = data.page.list;
+            // 提取 keyIndicatorList 中的指标名称列表
+            const keyIndicatorNames = this.keyIndicatorList.map(item => item.indicatorName);
+            console.log("keyIndicatorNames====>",keyIndicatorNames);
+            // 筛选出 indicatorSummaryList 中存在于 keyIndicatorList 中的记录
+            const filteredList = this.indicatorSummaryList.filter(item => keyIndicatorNames.includes(item.indicatorName));
+            console.log("filteredList====>",filteredList);
+            const recentYearMonth  = filteredList[0].yearMonth;
+            // 筛选出 recentMonthFilteredList 中最新一个月未达成的指标数据
+            const recentMonthFilteredList = filteredList.filter(item => item.yearMonth === recentYearMonth && item.finishedFlag === 0);
+            console.log("recentMonthFilteredList====>",recentMonthFilteredList);
+            this.unfinishedKeyIndicatorsCounts = recentMonthFilteredList.length;
+            console.log("unfinishedKeyIndicatorsCounts====>",this.unfinishedKeyIndicatorsCounts);
+            this.getIndicatorA();
+            this.getRecentMonthIndicator();
 
-        } else {
-          console.log("indicatorSummaryList====>",data);
-        }
+          } else {
+            console.log("indicatorSummaryList====>",data);
+          }
+        })
       })
     },
     // 获取A类指标数/未达成数
@@ -227,8 +232,18 @@ export default {
         console.log("this.indicatorANum====>",this.indicatorANum);
         console.log("indicatorSummaryList====>",this.indicatorSummaryList);
         const recentYearMonth  = this.indicatorSummaryList[0].yearMonth;
-        this.unfinishedIndicatorANum = this.indicatorSummaryList.filter(item => item.indicatorClassification === 'A' && item.finishedFlag === 0 && item.yearMonth === recentYearMonth).length;
+        // 填充 finishedIndicatorAList 和 unfinishedIndicatorAList
+        this.finishedIndicatorAList = this.indicatorSummaryList
+          .filter(item => item.indicatorClassification === 'A' && item.finishedFlag === 1 && item.yearMonth === recentYearMonth)
+          .map(item => item.indicatorName);
+        this.unfinishedIndicatorAList = this.indicatorSummaryList
+          .filter(item => item.indicatorClassification === 'A' && item.finishedFlag === 0 && item.yearMonth === recentYearMonth)
+          .map(item => item.indicatorName);
+        this.unfinishedIndicatorANum = this.unfinishedIndicatorAList.length;
+        console.log("this.unfinishedIndicatorAList====>",this.unfinishedIndicatorAList);
         console.log("this.unfinishedIndicatorANum====>",this.unfinishedIndicatorANum);
+      }).then(() => {
+        this.renderChart2();
       })
     },
     // 最近一个月指标数/未达成指标数
@@ -241,7 +256,7 @@ export default {
       const chart = echarts.init(this.$refs.indicatorCharts1);
       const option = {
         title: {
-          text: "当月指标完成情况",
+          text: "月度指标完成情况",
           left: 'center',
         },
         tooltip: {
@@ -262,8 +277,8 @@ export default {
         },
         xAxis: {
           type: 'category',
-          // data: this.dataList1.map(item => item.yearMonth),
-          data: [this.dataList3.yearMonth],
+          data: this.dataList1.map(item => item.yearMonth),
+          // data: [this.dataList3.yearMonth],
         },
         yAxis: {
           type: 'value',
@@ -272,14 +287,14 @@ export default {
           {
             name: '达标',
             type: 'bar',
-            // data: this.dataList1.map(item => item.finishedCounts),
-            data: [this.dataList3.finishedCounts],
+            data: this.dataList1.map(item => item.finishedCounts),
+            // data: [this.dataList3.finishedCounts],
           },
           {
             name: '未达标',
             type: 'bar',
-            // data: this.dataList1.map(item => item.unfinishedCounts),
-            data: [this.dataList3.unfinishedCounts],
+            data: this.dataList1.map(item => item.unfinishedCounts),
+            // data: [this.dataList3.unfinishedCounts],
           }
         ],
       };
@@ -296,7 +311,23 @@ export default {
           left: 'center',
         },
         tooltip: {
-          trigger: 'item'
+          trigger: 'item',
+          formatter: (params) => {
+            let tooltipContent = `总数: ${params.value}<br>`;
+            // tooltipContent += `<strong>${params.seriesName}</strong><br>`;
+
+            if (params.name === '达成') {
+              this.finishedIndicatorAList.forEach((name, index) => {
+                tooltipContent += `${index + 1}. ${name}<br>`;
+              });
+            } else if (params.name === '未达成') {
+              this.unfinishedIndicatorAList.forEach((name, index) => {
+                tooltipContent += `${index + 1}. ${name}<br>`;
+              });
+            }
+
+            return tooltipContent;
+          }
         },
         series: [
           {
@@ -448,11 +479,12 @@ export default {
 .mod {
   display: flex;
   flex-wrap: wrap; /* 自动换行 */
-  gap: 20px; /* 每个区域之间的间距 */
+  gap: 10px; /* 每个区域之间的间距 */
 }
 .el-main {
   display: flex;
   justify-content: space-between; /* 使列之间有间距 */
+  height: 70vh; /* 设置 el-main 的高度为视口高度的 70% */
 }
 .chart-column {
   display: flex;
@@ -468,13 +500,13 @@ export default {
   justify-content: flex-start; /* 上对齐 */
 }
 .box {
-  flex: 0 1 auto; /* 每个区域占 30% 宽度 */
+  flex: 0 1 50%; /* 每个区域占 30% 宽度 */
   //background-color: #f2f2f2;
   text-align: center;
   padding: 20px;
   border-radius: 4px;
   min-width: 200px; /* 设置最小宽度，防止过小 */
-  height: 400px; /* 设置每个容器的高度为父容器的百分比 */
+  height: 300px; /* 设置每个容器的高度为父容器的百分比 */
 }
 .box1 {
   flex: 1 1 50%; /* 每个区域占 50% 宽度，第一个0表示 .box1 不会增长以填充剩余空间，第二个1表示 .box1 可以收缩以适应较小的空间 */
@@ -483,7 +515,7 @@ export default {
   padding: 20px; /* 调整内边距 */
   border-radius: 4px;
   min-width: 200px; /* 设置最小宽度，防止过小 */
-  height: 50%; /* 设置高度占父容器的一半 */
+  height: 45%; /* 设置高度占父容器的一半 */
 }
 .box:last-child {
   margin-bottom: 0; /* 最后一个图表不需要底部间距 */
@@ -503,6 +535,5 @@ export default {
   align-items: center; /* 水平居中 */
   justify-content: center; /* 垂直居中 */
   text-align: center; /* 文本居中 */
-  padding: 20px; /* 添加一些内边距 */
 }
 </style>

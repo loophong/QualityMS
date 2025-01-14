@@ -58,18 +58,19 @@
           style="flex: 0 0 30%; display: flex; flex-direction: column; justify-content: space-around; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;"
         >
           <div style="display: flex; align-items: center; gap: 5px;">
-            <span>当月问题总数：</span>
-            <span>{{ totalCount || 0 }}</span>
+            <span style="font-weight: bold; font-size: 16px;">当月问题总数：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ totalCount || 0 }}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <span>同比：</span>
-            <span>{{ formattedYearlyGrowth}}</span>
+            <span style="font-weight: bold; font-size: 16px;">同比：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ formattedYearlyGrowth }}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 5px;">
-            <span>环比：</span>
-            <span>{{ formattedMonthlyGrowth}}</span>
+            <span style="font-weight: bold; font-size: 16px;">环比：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ formattedMonthlyGrowth }}</span>
           </div>
         </div>
+
 
 
 
@@ -85,14 +86,15 @@
         <!-- Additional Stats -->
         <div style="display: flex; align-items: center; justify-content: flex-start; gap: 150px; margin-top: 10px; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
           <div style="display: flex; align-items: center;">
-            <span>当前问题验证未通过数：</span>
-            <span>{{ nopassissue }}</span>
+            <span style="font-weight: bold; font-size: 16px;">当前问题验证未通过数：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ nopassissue }}</span>
           </div>
           <div style="display: flex; align-items: center;">
-            <span>通过率：</span>
-            <span>{{ passRate + '%' }}</span>
+            <span style="font-weight: bold; font-size: 16px;">通过率：</span>
+            <span style="font-weight: bold; font-size: 16px;">{{ passRate + '%' }}</span>
           </div>
         </div>
+
       </div>
 
 
@@ -118,11 +120,28 @@
       </div>
 
       <!-- Bar Chart 4 -->
-      <div style="flex: 0 0 48%; height: 300px;" id="barChart4" ref="barChart4">
-<!--        <div style="text-align: center; margin-bottom: 10px; font-weight: bold;">-->
-<!--          图表 4 标题-->
-<!--        </div>-->
+<!--      <div style="flex: 0 0 48%; height: 300px;" id="barChart4" ref="barChart4">-->
+<!--&lt;!&ndash;        <div style="text-align: center; margin-bottom: 10px; font-weight: bold;">&ndash;&gt;-->
+<!--&lt;!&ndash;          图表 4 标题&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--      </div>-->
+      <!-- Bar Chart 4 -->
+      <!-- Bar Chart 4 -->
+      <div style="flex: 0 0 48%; height: 300px;">
+        <div style="margin-bottom: 10px; text-align: center;">
+          <!-- 月份选择器 -->
+          <el-date-picker
+            v-model="selectedMonthChart4"
+            type="month"
+            placeholder="选择月份"
+            @change="onMonthChangeChart4"
+            style="width: 150px; margin: 0 auto;"
+          ></el-date-picker>
+        </div>
+        <div id="barChart4" ref="barChart4" style="height: 250px;"></div>
       </div>
+
+
     </div>
 
 
@@ -161,6 +180,7 @@ export default {
       duplicateIssuePass: 0, // 重复问题占比
       // 图四
       issueCategoryStats: {}, // 当前月进行中问题的类别数据
+      selectedMonthChart4: new Date().toISOString().slice(0, 7), // 默认是当前月份
 
     };
   },
@@ -188,7 +208,7 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.issueStats = data.stats; // 假设返回的数据格式为 { 提出: 10, 暂停: 12, ... }
-          // console.log('数据转换中......', this.issueStats);
+          console.log('数据转换中......', this.issueStats);
           this.renderIssueChart(); // 渲染图表
         } else {
           // 默认值
@@ -250,7 +270,11 @@ export default {
               this.issueStats['结项'],
               this.issueStats['关闭']
             ],
-            type: 'bar'
+            type: 'bar',
+            label: {
+              show: true,
+              position: 'top'
+            }
           }
         ]
       };
@@ -532,15 +556,42 @@ export default {
     //     }
     //   });
     // },
+    // getInProgressIssueCategoryStats() {
+    //   const startDate = `${this.selectedMonthChart4}-01`;
+    //   const endDate = `${this.selectedMonthChart4}-${new Date(this.selectedMonthChart4.split('-')[0], this.selectedMonthChart4.split('-')[1], 0).getDate()}`;
+    //   console.log('日期范围：', startDate, endDate);
+    //   this.$http({
+    //     url: this.$http.adornUrl('/generator/issuetable/currentMonthInProgressCategoryStats'),
+    //     method: 'get',
+    //     params: this.$http.adornParams({startDate, endDate})
+    //   }).then(({ data }) => {
+    //     // console.log('返回的数据：', data); // 调试输出
+    //     if (data && data.code === 0) {
+    //       // 排序统计数据，只显示数量最多的十种问题类别
+    //       const sortedStats = Object.entries(data.stats)
+    //         .sort(([, countA], [, countB]) => countB - countA)
+    //         .slice(0, 10);
+    //       this.issueCategoryStats = Object.fromEntries(sortedStats);  // 处理后的统计数据
+    //       // console.log('处理后的统计数据：', this.issueCategoryStats); // 调试输出
+    //       this.renderIssueCategoryChart();  // 渲染图表
+    //     } else {
+    //       // 默认值
+    //       this.issueCategoryStats = {};
+    //       this.renderIssueCategoryChart();
+    //     }
+    //   });
+    // },
+    // 获取数据
     getInProgressIssueCategoryStats() {
+      const startDate = `${this.selectedMonthChart4}-01`;
+      const endDate = `${this.selectedMonthChart4}-${new Date(this.selectedMonthChart4.split('-')[0], this.selectedMonthChart4.split('-')[1], 0).getDate()}`;
+
       this.$http({
         url: this.$http.adornUrl('/generator/issuetable/currentMonthInProgressCategoryStats'),
         method: 'get',
-        params: this.$http.adornParams({})
+        params: this.$http.adornParams({ startDate, endDate })  // 传递开始和结束日期
       }).then(({ data }) => {
-        // console.log('返回的数据：', data); // 调试输出
         if (data && data.code === 0) {
-          // 排序统计数据，只显示数量最多的十种问题类别
           const sortedStats = Object.entries(data.stats)
             .sort(([, countA], [, countB]) => countB - countA)
             .slice(0, 10);
@@ -548,9 +599,8 @@ export default {
           // console.log('处理后的统计数据：', this.issueCategoryStats); // 调试输出
           this.renderIssueCategoryChart();  // 渲染图表
         } else {
-          // 默认值
-          this.issueCategoryStats = {};
-          this.renderIssueCategoryChart();
+          this.issueCategoryStats = {};  // 默认值
+          this.renderIssueCategoryChart();  // 渲染空图表
         }
       });
     },
@@ -624,14 +674,28 @@ export default {
 //       chart4.setOption(options);  // 渲染图表
 //     }
 // ,
+    // 处理月份选择变化
+    onMonthChangeChart4(value) {
+      // 如果 value 是 Date 对象，转换为 'YYYY-MM' 格式的字符串
+      if (value instanceof Date) {
+        const year = value.getFullYear();
+        const month = (value.getMonth() + 1).toString().padStart(2, '0');  // 获取月份，确保是两位数
+        this.selectedMonthChart4 = `${year}-${month}`;  // 格式化为 'YYYY-MM'
+      } else {
+        // 如果是字符串，则直接使用它
+        this.selectedMonthChart4 = value;
+      }
+      // console.log("Selected month:", this.selectedMonthChart4);  // 确认输出正确的日期格式
+      this.getInProgressIssueCategoryStats();  // 根据选择的月份重新获取数据
+    },
     renderIssueCategoryChart() {
       const chart4 = echarts.init(this.$refs.barChart4);
 
       // 确保数据存在且有效
-      if (!this.issueCategoryStats || Object.keys(this.issueCategoryStats).length === 0) {
-        // console.warn('No issue category data available');
-        return;
-      }
+      // if (!this.issueCategoryStats || Object.keys(this.issueCategoryStats).length === 0) {
+      //   // console.warn('No issue category data available');
+      //   return;
+      // }
 
       // 获取问题类别和问题数
       const categories = Object.keys(this.issueCategoryStats).filter(category => this.issueCategoryStats[category] > 0);  // 过滤无效问题类别

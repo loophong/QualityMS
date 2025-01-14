@@ -25,6 +25,12 @@
         AND YEAR(data_import_time) = YEAR(#{datatime})
     </delete>
 
+    <!-- 根据表名删除数据 -->
+    <delete id="deleteDataByTableName" parameterType="java.lang.String">
+        DELETE FROM spc_PTD
+        WHERE spare = #{tableName};
+    </delete>
+
     <!-- 批量插入数据 -->
     <insert id="batchInsertSpcPtdcharts" parameterType="java.util.List">
         INSERT INTO spc_PTD (
@@ -45,6 +51,18 @@
         FROM spc_PTD
         WHERE MONTH(data_import_time) = MONTH(#{datatime})
         AND YEAR(data_import_time) = YEAR(#{datatime});
+    </select>
+
+    <!-- 按照表名查询数据 -->
+    <select id="getSpcPtdEntityByTableName" parameterType="java.lang.String" resultMap="spcPtdMap">
+        SELECT *
+        FROM spc_PTD
+        WHERE spare = #{tableName};
+    </select>
+
+    <!-- 获取全部表名 -->
+    <select id="getTableName" resultType="java.lang.String">
+        SELECT DISTINCT spare FROM spc_PTD;
     </select>
 
 </mapper>

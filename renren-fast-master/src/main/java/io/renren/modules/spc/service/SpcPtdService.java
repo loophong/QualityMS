@@ -21,8 +21,10 @@ public interface SpcPtdService extends IService<SpcPtdEntity> {
 
     void importData(List<SpcPtdEntity> datalist);
 
-    List<List<Double>> getPTDChart();
+    List<List<Double>> getPTDChart(String tableName);
 
-    Double getPTDPValue();
+    Double getPTDPValue(String tableName);
+
+    List<String> getTableName();
 }
 

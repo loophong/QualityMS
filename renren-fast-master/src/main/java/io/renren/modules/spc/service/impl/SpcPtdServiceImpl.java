@@ -50,17 +50,20 @@ public class SpcPtdServiceImpl extends ServiceImpl<SpcPtdDao, SpcPtdEntity> impl
 
     @Override
     public void importData(List<SpcPtdEntity> datalist){
-        spcPtdDao.deleteDataByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+//        spcPtdDao.deleteDataByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        spcPtdDao.deleteDataByTableName(datalist.get(0).getSpare());
         spcPtdDao.batchInsertSpcPtdcharts(datalist);
     }
 
     @Override
-    public List<List<Double>> getPTDChart(){
+    public List<List<Double>> getPTDChart(String tableName){
 
         List<List<Double>> result = new ArrayList<>();
 
         //获取数据
-        List<SpcPtdEntity> datalist = getData();
+//        List<SpcPtdEntity> datalist = getData();
+        List<SpcPtdEntity> datalist = getDataByTableName(tableName);
+
         List<Double> acceptance_region = getAcceptanceRegion(datalist);
         List<Double> frequency = getFrequency(datalist);
 
@@ -79,8 +82,9 @@ public class SpcPtdServiceImpl extends ServiceImpl<SpcPtdDao, SpcPtdEntity> impl
     }
 
     @Override
-    public Double getPTDPValue(){
-        List<SpcPtdPvalueEntity> datalist = getPValueDataByMonth();
+    public Double getPTDPValue(String tableName){
+//        List<SpcPtdPvalueEntity> datalist = getPValueDataByMonth();
+        List<SpcPtdPvalueEntity> datalist = getPValueDataByTableName(tableName);
 
         //计算出B列数据的数量、平均值、标准差
         //数量
@@ -118,12 +122,21 @@ public class SpcPtdServiceImpl extends ServiceImpl<SpcPtdDao, SpcPtdEntity> impl
 
         return calculateStep3(step2);
     }
+
+    @Override
+    public List<String> getTableName(){
+        return spcPtdDao.getTableName();
+    }
+
     //按月份获取数据
     public List<SpcPtdEntity> getData(){
         return spcPtdDao.getSpcPtdEntityByMonth(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
     }
 
     //按表名获取数据
+    public List<SpcPtdEntity> getDataByTableName(String tableName){
+        return spcPtdDao.getSpcPtdEntityByTableName(tableName);
+    }
 
     //按月份获取P值数据
     public List<SpcPtdPvalueEntity> getPValueDataByMonth(){

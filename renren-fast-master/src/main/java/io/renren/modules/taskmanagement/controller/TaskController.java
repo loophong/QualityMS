@@ -220,6 +220,13 @@ public class TaskController {
 
                     log.info("任务存在，发生改变，更新任务");
                     taskEntity.setTaskCurrentState(TaskStatus.UPDATE_APPROVAL_IN_PROGRESS);
+                    // 检查修改前任务是否有正在审批的记录，如果有则改为取消
+                    approvalService.update(new LambdaUpdateWrapper<ApprovalEntity>()
+                            .eq(ApprovalEntity::getTaskId, taskEntity.getTaskId())
+                            .eq(ApprovalEntity::getApprovalStatus, ApprovalStatus.PENDING)
+                            .set(ApprovalEntity::getApprovalStatus, ApprovalStatus.CANCEL));
+
+
                     approvalService.createTaskApproval(taskEntity, "UPDATE");
 
                 } else {
@@ -237,6 +244,22 @@ public class TaskController {
             taskService.remove(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskParentNode, taskUpdateDto.getParentTask().getTaskId()));
         }
         taskService.saveDecompositionTasks(taskUpdateDto.getChildTask());
+
+        // 以下操作是将当前计划的未审批任务，如果不在任务表中，则取消审批
+        // 获取当前计划的 未审批 列表
+        List<ApprovalEntity> unApprovalList = approvalService.list(
+                new LambdaQueryWrapper<ApprovalEntity>()
+                        .eq(ApprovalEntity::getTaskAssociatedPlanId, parentTask.getTaskAssociatedPlanId())
+                        .eq(ApprovalEntity::getApprovalStatus, ApprovalStatus.PENDING));
+        for (ApprovalEntity approval : unApprovalList) {
+            // 查询审批的任务 是否在任务表中
+            int size = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskId, approval.getTaskId())).size();
+            if (size == 0) {
+                approval.setApprovalStatus(ApprovalStatus.CANCEL);
+                approvalService.updateById(approval);
+            }
+        }
+
 
         return R.ok();
     }

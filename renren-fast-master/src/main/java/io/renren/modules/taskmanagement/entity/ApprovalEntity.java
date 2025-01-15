@@ -1,10 +1,15 @@
 package io.renren.modules.taskmanagement.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
@@ -88,5 +93,35 @@ public class ApprovalEntity implements Serializable {
 	 * 备注
 	 */
 	private String remarks;
+	/**
+	 * 审批类型
+	 */
+	private String approvalType;
+	/**
+	 * 现状
+	 */
+	private String currentStatus;
+	/**
+	 * 目标
+	 */
+	private String objectiveGoal;
+	/**
+	 * 主要措施
+	 */
+	private String keyMeasuresActions;
+	/**
+	 * 实施人
+	 */
+	private String implementerResponsiblePerson;
+	/**
+	 * 开始时间
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date implementationStartTime;
+	/**
+	 * 结束时间
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date implementationEndTime;
 
 }

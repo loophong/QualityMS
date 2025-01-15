@@ -3,6 +3,7 @@ package io.renren.modules.taskmanagement.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.taskmanagement.entity.ApprovalEntity;
+import io.renren.modules.taskmanagement.entity.TaskEntity;
 
 import java.util.Map;
 
@@ -25,5 +26,8 @@ public interface ApprovalService extends IService<ApprovalEntity> {
     PageUtils queryPageHistoryApprovalList(Map<String, Object> params, Long userId);
 
     PageUtils queryPageGetMySubmitApprovalList(Map<String, Object> params, Long userId);
+
+    // 任务审批接口
+    void createTaskApproval(TaskEntity task, String approvalType);
 }
 

@@ -74,13 +74,38 @@
         </el-form-item>
 
         <div v-if="approvalInfo !== null && approvalInfo !== ''">
-          <el-form-item v-if="approvalInfo !== '' && approvalInfo !== null" label="审批内容" prop="approvalContent">
+          <h3>审批信息：</h3>
+          <el-form-item label="现状">
             <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }"
-                      v-model="approvalInfo.approvalContent" disabled maxlength="1000">
+                      v-model="approvalInfo.currentStatus" disabled maxlength="1000">
             </el-input>
           </el-form-item>
+          <el-form-item label="目标">
+            <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }"
+                      v-model="approvalInfo.objectiveGoal" disabled maxlength="1000">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="主要措施">
+            <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }"
+                      v-model="approvalInfo.keyMeasuresActions" disabled maxlength="1000">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="实施人">
+            <el-select v-model="approvalInfo.implementerResponsiblePerson" disabled multiple filterable placeholder="实施人">
+              <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+                <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                           :value="item.value">
+                </el-option>
+              </el-option-group>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="开展时间">
+            <el-date-picker v-model="implementationStartTime" readonly value-format="yyyy-MM-dd"
+                            type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+            </el-date-picker>
+          </el-form-item>
           <el-form-item label="审批附件">
-            <el-row v-for="file in taskFiles" :key="file.name" style="margin-bottom: 4px">
+            <el-row v-if="taskFiles !== null && taskFiles.length > 0" v-for="file in taskFiles" :key="file.name" style="margin-bottom: 4px">
               <el-col :span="12">
                 {{ file.name }}
               </el-col>
@@ -223,6 +248,9 @@ export default {
       options: [],
 
       indicatorOptions: [],
+
+      // 开展时间
+      implementationStartTime: [new Date(), new Date()],
     };
   },
   async created() {
@@ -546,6 +574,12 @@ export default {
         this.taskInfo = data.task
         this.taskFiles = data.fileList
         this.approvalInfo = data.approval
+        this.approvalInfo.implementerResponsiblePerson = data.approval.implementerResponsiblePerson
+          .split(',');
+
+        this.implementationStartTime[0] = data.approval.implementationStartTime
+        this.implementationStartTime[1] = data.approval.implementationEndTime
+
         console.log("获取任务信息:", this.taskInfo);
         console.log("获取任务审批信息:", this.taskFiles);
         console.log("获取任务审核文件:", this.approvalInfo);

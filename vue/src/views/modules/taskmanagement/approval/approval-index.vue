@@ -20,6 +20,17 @@
           </el-table-column>
           <el-table-column prop="taskContent" header-align="center" align="center" label="任务内容">
           </el-table-column>
+          <el-table-column prop="approvalType" label="审批类型" header-align="center" align="center">
+            <template slot-scope="scope">
+              <span v-if="scope.row.approvalType === 'FINISH'">
+                <el-tag type="success" disable-transitions>完成</el-tag></span>
+              <span v-else-if="scope.row.approvalType === 'NEW'">
+                <el-tag type="info" disable-transitions>新建</el-tag></span>
+              <span v-else-if="scope.row.approvalType === 'UPDATE'">
+                <el-tag type="warning" disable-transitions>修改</el-tag></span>
+              <span v-else>-</span> <!-- 处理未知状态 -->
+            </template>
+          </el-table-column>
           <!-- <el-table-column prop="taskStartDate" header-align="center" align="center" label="开始日期">
       </el-table-column> -->
           <el-table-column prop="taskAssociatedPlanId" header-align="center" align="center" label="相关计划编号">
@@ -99,6 +110,17 @@
           <el-table-column prop="taskName" header-align="center" align="center" label="任务名">
           </el-table-column>
           <el-table-column prop="taskContent" header-align="center" align="center" label="任务内容">
+          </el-table-column>
+          <el-table-column prop="approvalType" label="审批类型" header-align="center" align="center">
+            <template slot-scope="scope">
+              <span v-if="scope.row.approvalType === 'FINISH'">
+                <el-tag type="success" disable-transitions>完成</el-tag></span>
+              <span v-else-if="scope.row.approvalType === 'NEW'">
+                <el-tag type="info" disable-transitions>新建</el-tag></span>
+              <span v-else-if="scope.row.approvalType === 'UPDATE'">
+                <el-tag type="warning" disable-transitions>修改</el-tag></span>
+              <span v-else>-</span> <!-- 处理未知状态 -->
+            </template>
           </el-table-column>
           <!-- <el-table-column prop="taskStartDate" header-align="center" align="center" label="开始日期">
       </el-table-column> -->

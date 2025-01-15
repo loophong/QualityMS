@@ -91,7 +91,8 @@
             </el-input>
           </el-form-item>
           <el-form-item label="实施人">
-            <el-select v-model="approvalInfo.implementerResponsiblePerson" disabled multiple filterable placeholder="实施人">
+            <el-select v-model="approvalInfo.implementerResponsiblePerson" disabled multiple filterable
+                       placeholder="实施人">
               <el-option-group v-for="group in options" :key="group.label" :label="group.label">
                 <el-option v-for="item in group.options" :key="item.value" :label="item.label"
                            :value="item.value">
@@ -101,11 +102,13 @@
           </el-form-item>
           <el-form-item label="开展时间">
             <el-date-picker v-model="implementationStartTime" readonly value-format="yyyy-MM-dd"
-                            type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+                            type="daterange" range-separator="至" start-placeholder="开始日期"
+                            end-placeholder="结束日期">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="审批附件">
-            <el-row v-if="taskFiles !== null && taskFiles.length > 0" v-for="file in taskFiles" :key="file.name" style="margin-bottom: 4px">
+            <el-row v-if="taskFiles !== null && taskFiles.length > 0" v-for="file in taskFiles" :key="file.name"
+                    style="margin-bottom: 4px">
               <el-col :span="12">
                 {{ file.name }}
               </el-col>
@@ -458,6 +461,21 @@ export default {
           }
         });
 
+      nodes.append('text')
+        .attr('x', 0)
+        .attr('y', 5)
+        .attr('text-anchor', 'middle')
+        .on('click', (event, d) => {
+          if (d.parent === null) {
+            console.log('根节点', d);
+            this.getPlanInfo(d.data.id);
+          } else {
+            console.log('非根节点', d);
+            // 获取task信息和审批信息
+            this.getTaskInfo(d.data.id);
+          }
+        });
+
       // 在矩形中添加文本
       // nodes.append('text')
       //   .attr('dy', '.9em')
@@ -487,10 +505,43 @@ export default {
             .attr('dy', '5') // 调整间隔宽度
             .text(' ');
 
-          text.append('tspan')
-            .attr('x', 0)
-            .attr('dy', '1.2em') // 调整行间距
-            .text("执行人：" + d.data.executor);
+          // 初始化一个空数组来存储分割后的子字符串
+          let executorArray = [];
+          // 按每 10 个字符分割字符串
+          let str = d.data.executor;
+          for (let i = 0; i < str.length; i += 13) {
+            executorArray.push(str.slice(i, i + 13));
+          }
+
+          // 将分割后的子字符串添加到 SVG 中
+          executorArray.forEach((part, index) => {
+            if(index === 0){
+              text.append('tspan')
+                .attr('x', 0)
+                .attr('dy', '1em') // 调整行间距
+                .text("执行人："+part);
+            }else {
+              text.append('tspan')
+                .attr('x', 0)
+                .attr('dy', '1em') // 调整行间距
+                .text(part);
+            }
+          });
+
+          // text.append('tspan')
+          //   .attr('x', 0)
+          //   .attr('dy', '1.2em') // 调整行间距
+          //   .text("执行人：" + d.data.executor);
+        })
+        .on('click', (event, d) => {
+          if (d.parent === null) {
+            console.log('根节点', d);
+            this.getPlanInfo(d.data.id);
+          } else {
+            console.log('非根节点', d);
+            // 获取task信息和审批信息
+            this.getTaskInfo(d.data.id);
+          }
         });
 
 
@@ -534,6 +585,7 @@ export default {
     },
 
 
+
     // buildTree(data, parentName = '') {
     //     return data
     //         .filter(item => item.parentName === parentName)  // 使用parentName来过滤
@@ -573,16 +625,20 @@ export default {
         console.log("获取任务的全部信息 和 审核文件:", data);
         this.taskInfo = data.task
         this.taskFiles = data.fileList
-        this.approvalInfo = data.approval
-        this.approvalInfo.implementerResponsiblePerson = data.approval.implementerResponsiblePerson
-          .split(',');
 
-        this.implementationStartTime[0] = data.approval.implementationStartTime
-        this.implementationStartTime[1] = data.approval.implementationEndTime
+        if (data.approval !== null) {
+          this.approvalInfo = data.approval
+          this.approvalInfo.implementerResponsiblePerson = data.approval.implementerResponsiblePerson !== null ? data.approval.implementerResponsiblePerson.split(',') : '';
 
-        console.log("获取任务信息:", this.taskInfo);
-        console.log("获取任务审批信息:", this.taskFiles);
-        console.log("获取任务审核文件:", this.approvalInfo);
+          this.implementationStartTime = [
+            data.approval.implementationStartTime !== null ? data.approval.implementationStartTime : '',
+            data.approval.implementationEndTime !== null ? data.approval.implementationEndTime : ''
+          ];
+        }
+
+        // console.log("获取任务信息:", this.taskInfo);
+        // console.log("获取任务审批信息:", this.taskFiles);
+        // console.log("获取任务审核文件:", this.approvalInfo);
         this.isTaskVisible = true;
       });
     },

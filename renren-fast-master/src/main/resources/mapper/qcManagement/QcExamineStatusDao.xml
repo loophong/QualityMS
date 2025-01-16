@@ -28,7 +28,11 @@
         <result property="qcFirstLevel" column="qc_first_level"/>
         <result property="qcSecondTotal" column="qc_second_total"/>
         <result property="qcSecondLevel" column="qc_second_level"/>
+        <result property="qcSevenAvg" column="qc_seven_avg"/>
+        <result property="qcSevenLevel" column="qc_seven_level"/>
         <result property="qcStorageFlag" column="qc_storage_flag"/>
+        <result property="qcFirstAll" column="qc_first_all"/>
+        <result property="qcSecondAll" column="qc_second_all"/>
     </resultMap>
 
     <select id="existsBySubject" resultType="boolean">

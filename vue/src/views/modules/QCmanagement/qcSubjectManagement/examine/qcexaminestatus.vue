@@ -69,8 +69,8 @@
           </el-table-column>
           <el-table-column prop="qcFourContent" header-align="center" align="center" label="成果初评审核意见" width="180">
           </el-table-column>
-          <el-table-column prop="qcFirstScore" header-align="center" align="center" label="成果初评分数" width="120">
-          </el-table-column>
+          <!-- <el-table-column prop="qcFirstScore" header-align="center" align="center" label="成果初评分数" width="120">
+          </el-table-column> -->
           <el-table-column prop="qcStatusFive" header-align="center" align="center" label="成果复评状态">
             <template slot-scope="scope">
               <span v-if="scope.row.qcStatusFive === '0'" style="color: #f43628;">未通过</span>
@@ -78,8 +78,8 @@
               <span v-else>-</span> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
-          <el-table-column prop="qcSecondScore" header-align="center" align="center" label="成果复评分数" width="120">
-          </el-table-column>
+          <!-- <el-table-column prop="qcSecondScore" header-align="center" align="center" label="成果复评分数" width="120">
+          </el-table-column> -->
           <el-table-column prop="qcFiveContent" header-align="center" align="center" label="成果复评审核意见" width="180">
           </el-table-column>
           <el-table-column prop="qcStatusSix" header-align="center" align="center" label="财务部审核状态">
@@ -110,10 +110,10 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+        <!-- <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
           :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
           layout="total, sizes, prev, pager, next, jumper">
-        </el-pagination>
+        </el-pagination> -->
         <!-- 弹窗, 新增 / 修改 -->
         <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
       </div>

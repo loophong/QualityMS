@@ -59,9 +59,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="选择课题描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -97,7 +97,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -117,7 +117,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
@@ -153,9 +153,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="现状调查描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -189,7 +189,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -209,7 +209,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
@@ -245,9 +245,9 @@
               <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -281,7 +281,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -301,7 +301,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
@@ -336,9 +336,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="原因分析描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -372,7 +372,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -391,7 +391,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <!-- <el-button>取消</el-button> -->
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
@@ -426,9 +426,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="要因确定描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -462,7 +462,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -482,7 +482,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -516,9 +516,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="制定对策描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -552,7 +552,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -572,7 +572,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -606,9 +606,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="对策实施描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -642,7 +642,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -662,7 +662,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -701,10 +701,16 @@
             <el-form-item label="效果检查描述" prop="stageDescribe">
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="效果检查描述"></el-input>
             </el-form-item>
+            <el-form-item label="经济效益分析" prop="stageEconomy">
+              <el-input v-model="form.stageEconomy" placeholder="经济效益分析"></el-input>
+            </el-form-item>
+            <el-form-item label="经济效益分析金额" prop="stageEconomyCount">
+              <el-input v-model="form.stageEconomyCount" placeholder="经济效益分析金额"></el-input>
+            </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -738,7 +744,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -758,7 +764,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -792,9 +798,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="巩固措施描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -828,7 +834,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -848,7 +854,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -882,9 +888,9 @@
               <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -918,7 +924,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -938,7 +944,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active1)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled1" @click="lastStep1">上一步</el-button>
               <el-button :disabled="nextDisabled1" @click="nextStep1">下一步</el-button>
             </el-form-item>
@@ -995,9 +1001,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="选择课题描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1031,7 +1037,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1051,7 +1057,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1085,9 +1091,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="设定目标描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1121,7 +1127,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1141,7 +1147,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1175,9 +1181,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="可靠性分析描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1211,7 +1217,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1231,7 +1237,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1265,9 +1271,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="原因分析描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1301,7 +1307,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1321,7 +1327,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1355,9 +1361,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="要因确定描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1391,7 +1397,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1411,7 +1417,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1445,9 +1451,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="制定对策描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1481,7 +1487,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1501,7 +1507,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1535,9 +1541,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="对策实施描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1571,7 +1577,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1591,7 +1597,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1628,12 +1634,18 @@
               <el-input v-model="form.stageAfter" placeholder="活动后现状"></el-input>
             </el-form-item>
             <el-form-item label="效果检查描述" prop="stageDescribe">
-              <el-input v-model="form.stageDescribe" placeholder="课题名称"></el-input>
+              <el-input v-model="form.stageDescribe" placeholder="效果检查描述"></el-input>
+            </el-form-item>
+            <el-form-item label="经济效益分析" prop="stageEconomy">
+              <el-input v-model="form.stageEconomy" placeholder="经济效益分析"></el-input>
+            </el-form-item>
+            <el-form-item label="经济效益分析金额" prop="stageEconomyCount">
+              <el-input v-model="form.stageEconomyCount" placeholder="经济效益分析金额"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1667,7 +1679,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1687,7 +1699,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1721,9 +1733,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="巩固措施描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1757,7 +1769,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1777,7 +1789,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1811,9 +1823,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder="总结和下一步打算描述"></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1847,7 +1859,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1867,7 +1879,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
+              <el-button type="primary" v-if="!know" @click="dataFormSubmit(active2)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled2" @click="lastStep2">上一步</el-button>
               <el-button :disabled="nextDisabled2" @click="nextStep2">下一步</el-button>
             </el-form-item>
@@ -1922,9 +1934,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -1958,7 +1970,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -1978,7 +1990,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
+              <el-button v-if="!know" type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2012,9 +2024,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -2048,7 +2060,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -2069,7 +2081,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
+              <el-button v-if="!know" type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2104,9 +2116,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -2140,7 +2152,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -2160,7 +2172,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
+              <el-button v-if="!know" type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2195,9 +2207,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -2231,7 +2243,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -2252,7 +2264,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
+              <el-button v-if="!know" type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2286,9 +2298,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -2322,7 +2334,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -2343,7 +2355,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
+              <el-button v-if="!know" type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2374,18 +2386,23 @@
               </el-select>
             </el-form-item>
             <el-form-item label="活动前现状" prop="stageBefore">
-              <el-input type="textarea" autosize v-model="form.stageBefore" placeholder=""></el-input>
+              <el-input type="textarea" autosize v-model="form.stageBefore" placeholder="活动前现状"></el-input>
             </el-form-item>
             <el-form-item label="活动后现状" prop="stageAfter">
-              <el-input type="textarea" autosize v-model="form.stageAfter" placeholder=""></el-input>
+              <el-input type="textarea" autosize v-model="form.stageAfter" placeholder="活动后现状"></el-input>
             </el-form-item>
             <el-form-item label="效果检查描述" prop="stageDescribe">
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
-
-            <el-form-item>
+            <el-form-item label="经济效益分析" prop="stageEconomy">
+              <el-input v-model="form.stageEconomy" placeholder="经济效益分析"></el-input>
+            </el-form-item>
+            <el-form-item label="经济效益分析金额" prop="stageEconomyCount">
+              <el-input v-model="form.stageEconomyCount" placeholder="经济效益分析金额"></el-input>
+            </el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -2419,7 +2436,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -2440,7 +2457,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
+              <el-button v-if="!know" type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2474,9 +2491,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -2510,7 +2527,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -2531,7 +2548,7 @@
             </el-form-item>
             <el-form-item>
               <!-- <el-button type="primary" @click="onSubmit">提交</el-button> -->
-              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
+              <el-button v-if="!know" type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2565,9 +2582,9 @@
               <el-input type="textarea" autosize v-model="form.stageDescribe" placeholder=""></el-input>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item v-if="!know">
               <span>添加QC工具实例： </span>
-              <el-button size="small" type="primary" @click="toggleLineAndBar">折柱混合图</el-button>
+              <el-button size="small" type="primary" @click="toggleLineAndBar">排列图</el-button>
               <el-button size="small" type="primary" @click="toggleControl">控制图</el-button>
               <el-button size="small" type="primary" @click="fishBonetoggleLineAndBar">鱼骨图</el-button>
               <el-button size="small" type="primary" @click="toggleSystem">系统图</el-button>
@@ -2601,7 +2618,7 @@
             <el-form-item label="上传附件">
               <el-upload ref="file" class="upload-btn-group" :file-list="fileList" :action="uploadUrl"
                 :on-change="handleFileChange" :auto-upload="false">
-                <el-button size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
+                <el-button v-if="!know" size="middle" type="primary" icon="el-icon-upload">点击上传</el-button>
               </el-upload>
               <el-button class="upload-preview-btn" type="primary" size="middle"
                 @click="uploadAllListVisible = true">附件预览</el-button>
@@ -2622,7 +2639,7 @@
               <el-input type="textarea" autosize v-model="form.stageExtra"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
+              <el-button v-if="!know" type="primary" @click="dataFormSubmit(active3)">保存当前步骤</el-button>
               <el-button :disabled="lastDisabled3" @click="lastStep3">上一步</el-button>
               <el-button :disabled="nextDisabled3" @click="nextStep3">下一步</el-button>
             </el-form-item>
@@ -2632,8 +2649,8 @@
     </div>
 
     <!-- 引用的组件s -->
-    <el-dialog title="折柱混合图" :close-on-click-modal="false" :visible.sync="dialogVisible" width="80%"
-      v-if="dialogVisible" @close="handleDialogClose">
+    <el-dialog title="排列图" :close-on-click-modal="false" :visible.sync="dialogVisible" width="80%" v-if="dialogVisible"
+      @close="handleDialogClose">
       <div style="width: 100%; height: 100%">
         <!-- <line-and-bar ref="qcChart"></line-and-bar> -->
         <line-and-bar ref="qcChart" :conplanSubject="conplanSubject" :conplanProcess="conplanProcess"></line-and-bar>
@@ -2743,13 +2760,13 @@
     <!-- Deliver over -->
 
     <el-dialog title="附件预览" :visible.sync="uploadAllListVisible">
-
       <el-table :data="uploadAllList" border style="width: 100%">
         <el-table-column prop="name" label="文件名"> </el-table-column>
         <el-table-column prop="url" label="操作" width="300px">
           <template slot-scope="scope">
             <el-button v-if="scope.row.url" @click="previewDoc(scope.row.url)" type="primary">下载</el-button>
-            <el-button v-if="scope.row.name" @click="previewDocRemove(scope.row.name)" type="warning">移除</el-button>
+            <el-button v-if="scope.row.name && !know" @click="previewDocRemove(scope.row.name)"
+              type="warning">移除</el-button>
             <span v-else>--</span>
           </template>
         </el-table-column>
@@ -2862,6 +2879,8 @@ export default {
         stageBefore: "",
         stageAfter: "",
         stageExtra: "",
+        stageEconomy: "",
+        stageEconomyCount: "",
         stageConsolidate: "",
         stepFile: "",
         stageAttachment: [],
@@ -2884,7 +2903,7 @@ export default {
         topicLeader: "",
         topicType: "",
       },
-
+      know: false,//是否是知识库跳转
       //ref 传递参数
       conplanSubject: 0, // 示例默认数据
       conplanProcess: 0, // 示例默认数据
@@ -3117,6 +3136,7 @@ export default {
     },
 
     async initRouterParam() {
+      this.know = this.$route.query.know ? this.$route.query.know : false;
       const res = this.$route.query.data ? JSON.parse(this.$route.query.data) : {
         qcsrId: "",
         topicName: "",
@@ -3234,6 +3254,12 @@ export default {
           }
           if (item.stageAfter) {
             this.form.stageAfter = item.stageAfter;
+          }
+          if (item.stageEconomy) {
+            this.form.stageEconomy = item.stageEconomy;
+          }
+          if (item.stageEconomyCount) {
+            this.form.stageEconomyCount = item.stageEconomyCount;
           }
           if (item.stageConsolidate) {
             this.form.stageConsolidate = item.stageConsolidate;
@@ -3498,6 +3524,8 @@ export default {
         stageExtra: "",
         stageConsolidate: "",
         stageConsultant: "",
+        stageEconomy: "",
+        stageEconomyCount: "",
         stageReview: "",
         stageAttachment: [],
       };
@@ -3569,6 +3597,8 @@ export default {
           stageConsultant: this.form.stageConsultant || "",
           stageConsolidate: this.form.stageConsolidate || "",
           stageReview: this.form.stageReview || "",
+          stageEconomy: this.form.stageEconomy || "",
+          stageEconomyCount: this.form.stageEconomyCount || "",
           // stageAttachment: tmpListString,
           // stageAttachment: this.uploadAllList.length ? tmpListString : this.form.stepAttachment,
           stageAttachment: JSON.stringify(this.form.stageAttachment),

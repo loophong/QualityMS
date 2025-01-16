@@ -33,6 +33,8 @@
         <result property="topicReviewDepartment" column="topic_review_department"/>
         <result property="topicReviewGroup" column="topic_review_group"/>
         <result property="topicDepartment" column="topic_department"/>
+        <result property="firstExaminePeople" column="first_examine_people"/>
+        <result property="secondExaminePeople" column="second_examine_people"/>
     </resultMap>
     <resultMap type="io.renren.modules.qcManagement.entity.QcknowledgebaseEntity" id="qcSubjectRegistrationMap1">
         <result property="qcsrId" column="qcsr_id"/>

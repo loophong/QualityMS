@@ -54,7 +54,7 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
 
     //查询编号最大值
 
-    @Select("SELECT COUNT(*) " +
+ @Select("SELECT MAX(CAST(SUBSTRING_INDEX(topic_number, '-', -1) AS UNSIGNED)) AS max_id " +
             "FROM qc_subject_registration " +
             "WHERE topic_number LIKE CONCAT('PJHLQCKT-', #{currentYear}, '-%')")
     Integer maxOfId(@Param("currentYear") String currentYear);

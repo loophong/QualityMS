@@ -65,6 +65,10 @@ public interface QcGroupMemberDao extends BaseMapper<QcGroupMemberEntity> {
     @Select("SELECT * FROM qc_group_members WHERE delete_flag != 1")
     List<QcGroupMemberEntity> myAllGroupMemberList();
 
+    //查询所有的小组
+    @Select("SELECT * FROM qc_group_members")
+    List<QcGroupMemberEntity> allGroupMemberList();
+
 //    @Select("SELECT * FROM qc_group_members WHERE delete_flag != 1 AND examine_status = '未通过'")
 //    List<QcGroupMemberEntity> examineGroupMemberList();
 

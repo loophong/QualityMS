@@ -1,66 +1,47 @@
 <template>
   <el-dialog :title="!dataForm.qcExamineId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
-      label-width="100px">
-      <!-- <el-form-item label="审核关联课题" prop="qcExamineSubject">
-        <el-input v-model="dataForm.qcExamineSubject" placeholder="审核关联课题"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="当前待审核步骤" prop="qcExamineCurrent">
-        <el-input v-model="dataForm.qcExamineCurrent" placeholder="当前待审核步骤"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="课题提交状态" prop="qcStatusOne">
-        <el-input v-model="dataForm.qcStatusOne" placeholder="课题提交状态"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="成果认定状态" prop="qcStatusTwo">
-        <el-input v-model="dataForm.qcStatusTwo" placeholder="成果认定状态"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="相关方审核状态" prop="qcStatusThree">
-        <el-input v-model="dataForm.qcStatusThree" placeholder="相关方审核状态"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="成果初评状态" prop="qcStatusFour">
-        <el-input v-model="dataForm.qcStatusFour" placeholder="成果初评状态"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="成果复评状态" prop="qcStatusFive">
-        <el-input v-model="dataForm.qcStatusFive" placeholder="成果复评状态"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="财务部审核状态" prop="qcStatusSix">
-        <el-input v-model="dataForm.qcStatusSix" placeholder="财务部审核状态"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="终评提交状态" prop="qcStatusSeven">
-        <el-input v-model="dataForm.qcStatusSeven" placeholder="终评提交状态"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="终评审核意见" prop="qcSevenContent">
-        <el-input v-model="dataForm.qcSevenContent" placeholder="终评审核意见"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="财务部审核意见" prop="qcSixContent">
-        <el-input v-model="dataForm.qcSixContent" placeholder="财务部审核意见"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="成果复评审核意见" prop="qcFiveContent">
-        <el-input v-model="dataForm.qcFiveContent" placeholder="成果复评审核意见"></el-input>
-      </el-form-item> -->
-      <div style="color:#ce9178;">
-        请直接修改数字，不要修改格式
-      </div>
-      <br>
-      <el-form-item label="成果初评分数" prop="qcFirstScore">
-        <el-input v-model="dataForm.qcFirstScore" placeholder="成果初评分数"></el-input>
-      </el-form-item>
-      <!-- <el-form-item label="成果初评审核意见" prop="qcFourContent">
-        <el-input v-model="dataForm.qcFourContent" placeholder="成果初评审核意见"></el-input>
-      </el-form-item> -->
-      <el-form-item label="成果复评分数" prop="qcSecondScore">
-        <el-input v-model="dataForm.qcSecondScore" placeholder="成果复评分数"></el-input>
-      </el-form-item>
+      label-width="120px">
 
-      <!-- <el-form-item label="相关方审核意见" prop="qcThreeContent">
-        <el-input v-model="dataForm.qcThreeContent" placeholder="相关方审核意见"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="成果认定审核意见" prop="qcTwoContent">
-        <el-input v-model="dataForm.qcTwoContent" placeholder="成果初评审核意见"></el-input>
-      </el-form-item> -->
-      <!-- <el-form-item label="成果认定审核意见" prop="qcOneContent">
-        <el-input v-model="dataForm.qcOneContent" placeholder="成果认定审核意见"></el-input>
-      </el-form-item> -->
+      <!-- <div style="color:#ce9178;">
+        请直接修改数字，不要修改格式
+      </div> -->
+      <h3>初评</h3>
+      <div v-for="(item) in dataForm.qcFirstAll" :key="item.name" style="margin-bottom: 20px;">
+
+
+        <!-- name 字段只读显示 -->
+        <el-form-item label="用户名">
+          <el-input v-model="item.name" disabled></el-input>
+        </el-form-item>
+
+        <!-- score 字段 -->
+        <el-form-item label="分数">
+          <el-row :gutter="20">
+            <el-col :span="5" v-for="(score, idx) in item.score" :key="idx">
+              <el-input-number v-model="item.score[idx]" :min="0" :max="100"></el-input-number>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </div>
+      <h3>复评</h3>
+      <div v-for="(item, index2) in dataForm.qcSecondAll" :key="index2" style="margin-bottom: 20px;">
+        <!-- <h3>{{ item.name }}</h3> -->
+
+        <!-- name 字段只读显示 -->
+        <el-form-item label="用户名">
+          <el-input v-model="item.name" disabled></el-input>
+        </el-form-item>
+
+        <!-- score 字段 -->
+        <el-form-item label="分数">
+          <el-row :gutter="20">
+            <el-col :span="5" v-for="(score, idx) in item.score" :key="idx">
+              <el-input-number v-model="item.score[idx]" :min="0" :max="100"></el-input-number>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </div>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -74,6 +55,8 @@ export default {
   data() {
     return {
       visible: false,
+      qcFirstAll: [],
+      qcSecondAll: [],
       dataForm: {
         qcExamineId: 0,
         qcExamineSubject: '',
@@ -93,7 +76,9 @@ export default {
         qcFirstScore: '',
         qcThreeContent: '',
         qcTwoContent: '',
-        qcOneContent: ''
+        qcOneContent: '',
+        qcFirstAll: [],
+        qcSecondAll: [],
       },
       dataRule: {
 
@@ -131,6 +116,10 @@ export default {
               this.dataForm.qcThreeContent = data.qcExamineStatus.qcThreeContent
               this.dataForm.qcTwoContent = data.qcExamineStatus.qcTwoContent
               this.dataForm.qcOneContent = data.qcExamineStatus.qcOneContent
+              this.dataForm.qcFirstAll = JSON.parse(data.qcExamineStatus.qcFirstAll)
+              this.dataForm.qcSecondAll = JSON.parse(data.qcExamineStatus.qcSecondAll)
+              this.qcFirstAll = JSON.parse(data.qcExamineStatus.qcFirstAll)
+              this.qcSecondAll = JSON.parse(data.qcExamineStatus.qcSecondAll)
             }
           })
         }
@@ -139,6 +128,8 @@ export default {
     // 表单提交
     dataFormSubmit() {
       this.$refs['dataForm'].validate((valid) => {
+        console.log(this.dataForm.qcFirstAll)
+        console.log(this.dataForm.qcSecondAll)
         if (valid) {
           this.$http({
             url: this.$http.adornUrl(`/qcManagement/examineStatus/${!this.dataForm.qcExamineId ? 'save' : 'update'}`),
@@ -146,23 +137,8 @@ export default {
             data: this.$http.adornData({
               'qcExamineId': this.dataForm.qcExamineId || undefined,
               'qcExamineSubject': this.dataForm.qcExamineSubject,
-              'qcExamineCurrent': this.dataForm.qcExamineCurrent,
-              'qcStatusOne': this.dataForm.qcStatusOne,
-              'qcStatusTwo': this.dataForm.qcStatusTwo,
-              'qcStatusThree': this.dataForm.qcStatusThree,
-              'qcStatusFour': this.dataForm.qcStatusFour,
-              'qcStatusFive': this.dataForm.qcStatusFive,
-              'qcStatusSix': this.dataForm.qcStatusSix,
-              'qcStatusSeven': this.dataForm.qcStatusSeven,
-              'qcSevenContent': this.dataForm.qcSevenContent,
-              'qcSixContent': this.dataForm.qcSixContent,
-              'qcFiveContent': this.dataForm.qcFiveContent,
-              'qcSecondScore': this.dataForm.qcSecondScore,
-              'qcFourContent': this.dataForm.qcFourContent,
-              'qcFirstScore': this.dataForm.qcFirstScore,
-              'qcThreeContent': this.dataForm.qcThreeContent,
-              'qcTwoContent': this.dataForm.qcTwoContent,
-              'qcOneContent': this.dataForm.qcOneContent
+              'qcFirstAll': JSON.stringify(this.dataForm.qcFirstAll),
+              'qcSecondAll': JSON.stringify(this.dataForm.qcSecondAll),
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {

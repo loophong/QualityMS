@@ -103,5 +103,13 @@ public class QcStepEntity implements Serializable {
 	 * 评审意见
 	 */
 	private String stageReview;
+	/**
+	 * 经济效益分析
+	 */
+	private String stageEconomy;
+	/**
+	 * 经济效益分析金额
+	 */
+	private String stageEconomyCount;
 
 }

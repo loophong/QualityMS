@@ -7,6 +7,7 @@ import java.util.Map;
 import io.renren.common.utils.ShiroUtils;
 import io.renren.modules.notice.entity.CreateNoticeParams;
 import io.renren.modules.notice.service.MessageNotificationService;
+import io.renren.modules.qcManagement.dao.QcExamineStatusDao;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ public class QcExamineStatusController {
     @Autowired
     private QcExamineStatusService qcExamineStatusService;
     @Autowired
+    private QcExamineStatusDao qcExamineStatusDao;
+    @Autowired
     private MessageNotificationService messageService;
 
 
@@ -50,7 +53,6 @@ public class QcExamineStatusController {
         return R.ok().put("page", page);
     }
 
-
     /**
      * 信息
      */
@@ -62,6 +64,15 @@ public class QcExamineStatusController {
         return R.ok().put("qcExamineStatus", qcExamineStatus);
     }
 
+    /**
+     * 根据课题id判断审核步骤是否存在
+     */
+    @RequestMapping("/subjectInfo/{qcExamineSubject}")
+    @RequiresPermissions("qcManagement:examineStatus:info")
+    public R infoSubject(@PathVariable("qcExamineSubject") Integer qcExamineSubject){
+        Boolean ifExist = qcExamineStatusDao.existsBySubject(qcExamineSubject);
+        return R.ok().put("ifExist", ifExist);
+    }
 
     /**
      * 保存

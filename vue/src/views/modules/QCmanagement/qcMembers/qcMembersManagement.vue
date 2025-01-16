@@ -65,7 +65,10 @@
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="120">
             <template slot-scope="scope">
-              <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
+              <el-tag v-if="scope.row.deleteFlag === 1 && scope.row.parentId" type="info">/</el-tag>
+              <el-tag v-else-if="scope.row.deleteFlag === 1" type="info">已注销</el-tag>
+              <el-tag
+                v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
               <el-tag
                 v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
@@ -73,7 +76,7 @@
               <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">未通过(科室)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
                 }}</el-tag>
-              <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
+              <el-tag v-else type="info">--</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
@@ -103,11 +106,14 @@
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作">
             <template slot-scope="scope">
-              <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
-                @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:update')"
+              <el-button
+                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.deleteFlag != 1)"
+                type="text" size="small" @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
+              <el-button type="text" size="small"
+                v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.deleteFlag != 1)"
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
+              <el-button type="text" size="small"
+                v-if="(isAuth('qcMembers:qcGroupMember:delete') && scope.row.deleteFlag != 1)"
                 @click="deleteHandle(scope.row.id)">删除</el-button>
               <!-- <el-button type="text" size="small" v-if="scope.row.parentId&&isAuth('qcMembers:leader:change')"
                 @click="leaderChangeHandle(scope.row.id, scope.row.parentId)">移交组长</el-button> -->
@@ -180,14 +186,17 @@
           </el-form-item>
         </el-form>
         <el-table :data="dataListAfterQuery" stripe border v-loading="dataListLoading"
-          @selection-change="selectionChangeHandle" style="width: 100%;" row-key="id">
+          @selection-change="selectionChangeHandle" style="width: 100%;" height="600" row-key="id">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
             <template slot-scope="scope">
-              <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
+              <el-tag v-if="scope.row.deleteFlag === 1 && scope.row.parentId" type="info">/</el-tag>
+              <el-tag v-else-if="scope.row.deleteFlag === 1" type="info">已注销</el-tag>
+              <el-tag
+                v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
               <el-tag
                 v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
@@ -223,18 +232,20 @@
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作">
             <template slot-scope="scope">
-              <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.admitEdit)"
+              <el-button
+                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.admitEdit && scope.row.deleteFlag != 1)"
                 type="text" size="small" @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
               <el-button
-                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus == '未通过')"
+                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus == '未通过' && scope.row.deleteFlag != 1)"
                 type="text" size="small" @click="handleReexamine(scope.row.id)">提交审核</el-button>
               <el-button type="text" size="small"
-                v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.admitEdit)"
+                v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.admitEdit && scope.row.deleteFlag != 1)"
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
               <el-button type="text" size="small"
-                v-if="(isAuth('qcMembers:qcGroupMember:delete') && scope.row.admitEdit)"
+                v-if="(isAuth('qcMembers:qcGroupMember:delete') && scope.row.admitEdit && scope.row.deleteFlag != 1)"
                 @click="deleteHandle(scope.row.id)">删除</el-button>
-              <el-button type="text" size="small" v-if="scope.row.parentId && scope.row.management"
+              <el-button type="text" size="small"
+                v-if="(scope.row.parentId && scope.row.management && scope.row.deleteFlag != 1)"
                 @click="changeHandle(scope.row.id, scope.row.parentId)">移交组长</el-button>
               <!-- <el-button type="text" size="small" @click="ad(scope.row)">移交组长</el-button> -->
             </template>
@@ -254,7 +265,7 @@
         </el-form> -->
         <el-table :data="examineList" stripe border v-loading="dataListLoading"
           :default-sort="{ prop: 'department', order: 'descending' }" @selection-change="selectionChangeHandle"
-          style="width: 100%;" row-key="id">
+          style="width: 100%;" row-key="id" height="1000">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
@@ -360,6 +371,7 @@ import { update } from 'lodash';
 export default {
   data() {
     return {
+      tableHeightGroup: '1000',
       activeName: '1',
       examineId: '',
       num: '',
@@ -444,7 +456,7 @@ export default {
         this.groupList = groupList;
       });
       // console.log(this.tableData)
-      this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
+      this.examineList = this.tableData.filter(item => item.examineStatus == '待审核' && item.deleteFlag != 1);
       this.totalPageExamine = this.examineList.length;
       // console.log(this.examineList.length)
     }
@@ -493,6 +505,20 @@ export default {
       } else {
         return false;
       }
+    },
+    dynamicTableHeight() {
+      // 计算行高，假设每行固定高度为 40px（包括边距和内边距）
+      const rowHeight = 40;
+      // 固定表头高度，假设为 50px
+      const headerHeight = 50;
+      // 计算总高度，确保最小高度，例如 200px
+      const minHeight = 600;
+
+      // 根据数据量计算表格高度，并加上表头高度
+      const calculatedHeight = this.dataListAfterQuery.length * rowHeight + headerHeight;
+
+      // 返回最大值，以保证表格至少有最小高度
+      return Math.max(calculatedHeight, minHeight);
     }
   },
   methods: {
@@ -688,7 +714,7 @@ export default {
     async getGroupList() {
       this.dataListLoading = true
       await this.$http({
-        url: this.$http.adornUrl('/qcMembers/qcGroupMember/myList'),
+        url: this.$http.adornUrl('/qcMembers/qcGroupMember/allMyList'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
@@ -756,6 +782,7 @@ export default {
                 firstComment: item.firstComment,
                 secondComment: item.secondComment,
                 registrationNum: item.registrationNum,
+                deleteFlag: item.deleteFlag,
                 children: []
               };
             }
@@ -772,6 +799,7 @@ export default {
                 department: item.department,
                 roleInTopic: item.roleInTopic,
                 parentId: item.parentId,
+                deleteFlag: item.deleteFlag,
               });
             }
           });
@@ -1133,7 +1161,7 @@ export default {
         let groupList = [];
         this.dataListLoading = true;
         this.$http({
-          url: this.$http.adornUrl('/qcMembers/qcGroupMember/list'),
+          url: this.$http.adornUrl('/qcMembers/qcGroupMember/allList'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -1144,9 +1172,10 @@ export default {
           if (data && data.code === 0) {
             this.tmpList = data.page.list;
             this.totalPage = data.page.totalCount;
-            groupList = this.tmpList.filter(function (item) {
-              return item.deleteFlag !== 1;
-            });
+            // groupList = this.tmpList.filter(function (item) {
+            //   return item.deleteFlag !== 1;
+            // });
+            groupList = this.tmpList;
             console.log(groupList);
             // 分组
             this.tableData = []; // 清空 tableData
@@ -1169,6 +1198,7 @@ export default {
                   firstComment: item.firstComment,
                   secondComment: item.secondComment,
                   registrationNum: item.registrationNum,
+                  deleteFlag: item.deleteFlag,
                   children: []
                 };
               }
@@ -1183,6 +1213,7 @@ export default {
                   roleInTopic: item.roleInTopic,
                   department: item.department,
                   parentId: item.parentId,
+                  deleteFlag: item.deleteFlag,
                 });
               }
             });
@@ -1207,7 +1238,7 @@ export default {
             this.tmpList = [];
             this.totalPage = 0;
           }
-          this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
+          this.examineList = this.tableData.filter(item => item.examineStatus == '待审核' && item.deleteFlag != 1);
           this.dataListLoading = false;
           resolve(groupList);
         }).catch(error => {
@@ -1377,7 +1408,7 @@ export default {
                   this.dialogFormVisible = false;
                   this.getGroupList();
                   this.getDataList();
-                  this.examineList = this.tableData.filter(item => item.examineStatus === '待审核');
+                  this.examineList = this.tableData.filter(item => item.examineStatus === '待审核' && item.deleteFlag != 1);
                   this.totalPageExamine = this.examineList.length;
                 }
               })
@@ -1478,6 +1509,7 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
+                this.getGroupList();
                 this.getDataList()
               }
             })

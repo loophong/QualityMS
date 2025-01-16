@@ -62,7 +62,7 @@
             </el-badge>
           </el-form-item>
         </el-form>
-        <el-table :data="subjectDataList" border v-loading="dataListLoading" style="width: 100%" stripe>
+        <el-table :data="subjectDataList" border v-loading="dataListLoading" style="width: 100%" stripe height="800">
           <el-table-column prop="qcsrId" header-align="center" align="center" label="课题ID" fixed>
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
@@ -113,7 +113,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-              }}</span>
+                }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -142,7 +142,7 @@
                 <el-button type="text" size="small" v-if="(isAuth('qcSubject:plan:submit'))"
                   @click="handleSubmitPlan(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
                 <el-button type="text" size="small" v-if="(isAuth('qcManagement:examineStatus:list'))"
-                  @click="examineStatus(scope.row.qcsrId, scope.row.resultType)">审核状态</el-button>
+                  @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
               </div>
               <div v-else>
                 <el-button type="text" size="small" @click="subjectEditHandle(scope.row.qcsrId)"
@@ -227,14 +227,17 @@
           </el-form-item>
         </el-form>
         <el-table :data="dataListAfterQuery" stripe border v-loading="dataListLoading"
-          @selection-change="selectionChangeHandle" style="width: 100%" row-key="id">
+          @selection-change="selectionChangeHandle" style="width: 100%" row-key="id" height="610">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名">
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
             <template slot-scope="scope">
-              <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
+              <el-tag v-if="scope.row.deleteFlag === 1 && scope.row.parentId" type="info">/</el-tag>
+              <el-tag v-else-if="scope.row.deleteFlag === 1" type="info">已注销</el-tag>
+              <el-tag
+                v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
               <el-tag
                 v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
@@ -344,7 +347,7 @@
           </el-form-item>
         </el-form>
         <el-table :data="dataListAfterQueryConsultant" stripe border v-loading="dataListLoading"
-          @selection-change="selectionChangeHandle" style="width: 100%" row-key="id">
+          @selection-change="selectionChangeHandle" style="width: 100%" row-key="id" height="610">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名">
@@ -405,7 +408,8 @@
       </div>
     </el-tab-pane>
     <el-tab-pane label="我的审核" name="4">
-      <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
+      <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id"
+        height="610">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
         </el-table-column>
         <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
@@ -447,7 +451,7 @@
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
               @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
             <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
-              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              messageExamineStatus(scope.row, scope.row.resultType)
               ">审核状态</el-button>
           </template>
         </el-table-column>
@@ -469,7 +473,7 @@
           </el-form-item>
         </el-form>
         <el-table :data="filteredDataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%;">
+          style="width: 100%;" height="610">
           <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column>
           <el-table-column prop="qcsrId" header-align="center" align="center" label="id" width="60">
@@ -551,7 +555,7 @@
     </el-tab-pane>
     <el-tab-pane label="成果科室批准" name="6" v-if="isAuth('qcExamine:department:submit')">
       <el-table :data="departmentExamineList" stripe border v-loading="messageListLoading" style="width: 100%"
-        row-key="id">
+        row-key="id" height="610">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
         </el-table-column>
         <el-table-column prop="topicDepartment" header-align="center" align="center" label="科室" fixed>
@@ -595,7 +599,7 @@
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
               @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
             <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
-              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              messageExamineStatus(scope.row, scope.row.resultType)
               ">审核状态</el-button>
           </template>
         </el-table-column>
@@ -603,7 +607,7 @@
     </el-tab-pane>
     <el-tab-pane label="成果确认" name="7" v-if="isAuth('qcExamine:Achievement:recognition')">
       <el-table :data="recognitionExamineList" stripe border v-loading="messageListLoading" style="width: 100%"
-        row-key="id">
+        row-key="id" height="610">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
         </el-table-column>
         <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
@@ -645,14 +649,15 @@
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
               @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
             <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
-              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              messageExamineStatus(scope.row, scope.row.resultType)
               ">审核状态</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-tab-pane>
     <el-tab-pane label="初评课题" name="8" v-if="isAuth('qcExamine:first:comment')">
-      <el-table :data="firstExamineList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
+      <el-table :data="firstExamineList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id"
+        height="610">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
         </el-table-column>
         <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
@@ -694,7 +699,7 @@
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
               @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
             <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
-              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              messageExamineStatus(scope.row, scope.row.resultType)
               ">审核状态</el-button>
           </template>
         </el-table-column>
@@ -702,7 +707,7 @@
     </el-tab-pane>
     <el-tab-pane label="经济效果确认" name="9" v-if="isAuth('qcExamine:finance:department')">
       <el-table :data="financialExamineList" stripe border v-loading="messageListLoading" style="width: 100%"
-        row-key="id">
+        row-key="id" height="610">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
         </el-table-column>
         <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
@@ -744,14 +749,15 @@
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
               @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
             <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
-              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              messageExamineStatus(scope.row, scope.row.resultType)
               ">审核状态</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-tab-pane>
     <el-tab-pane label="成果复评" name="10" v-if="isAuth('qcExamine:second:comment')">
-      <el-table :data="secondExamineList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
+      <el-table :data="secondExamineList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id"
+        height="610">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
         </el-table-column>
         <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
@@ -793,14 +799,15 @@
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
               @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
             <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
-              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              messageExamineStatus(scope.row, scope.row.resultType)
               ">审核状态</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-tab-pane>
     <el-dialog title="消息详情" :visible.sync="dialogMessageVisible">
-      <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id">
+      <el-table :data="messageList" stripe border v-loading="messageListLoading" style="width: 100%" row-key="id"
+        height="610">
         <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
         </el-table-column>
         <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号" fixed>
@@ -821,7 +828,7 @@
           <template slot-scope="scope">
             <span>{{
               toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-            }}</span>
+              }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
@@ -842,7 +849,7 @@
             <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
               @click="messagePlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
             <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')" @click="
-              messageExamineStatus(scope.row.qcsrId, scope.row.resultType)
+              messageExamineStatus(scope.row, scope.row.resultType)
               ">审核状态</el-button>
           </template>
         </el-table-column>
@@ -1116,7 +1123,7 @@ export default {
     async getGroupList() {
       this.dataListLoading = true;
       await this.$http({
-        url: this.$http.adornUrl("/qcMembers/qcGroupMember/myList"),
+        url: this.$http.adornUrl("/qcMembers/qcGroupMember/allMyList"),
         method: "get",
         params: this.$http.adornParams({
           page: this.pageIndex,
@@ -1180,6 +1187,7 @@ export default {
                 examineDepartment: item.examineDepartment,
                 examineGroup: item.examineGroup,
                 registrationNum: item.registrationNum,
+                deleteFlag: item.deleteFlag,
                 children: [],
               };
             }
@@ -1194,6 +1202,7 @@ export default {
                 department: item.department,
                 roleInTopic: item.roleInTopic,
                 parentId: item.parentId,
+                deleteFlag: item.deleteFlag,
               });
             }
           });
@@ -1534,7 +1543,7 @@ export default {
         if (item.qcExamineCurrent !== "完成") {
           if (item.qcExamineCurrent == "0" && this.isAuth("qcExamine:department:submit")) {
             registerList.forEach((row) => {
-              if (row.qcsrId == item.qcExamineSubject) {
+              if (row.qcsrId == item.qcExamineSubject && row.resultType != '') {
                 if (row.topicDepartment == '质量科' && this.isAuth('department:quality:leader')) {
                   tipList.push(item);
                   tipDepartmentList.push(item);
@@ -1608,14 +1617,33 @@ export default {
               }
             });
           } else if (item.qcExamineCurrent == "3" && this.isAuth("qcExamine:first:comment")) {
-            tipList.push(item);
-            tipFirstList.push(item);
-            this.showNotification("成果初评");
+            registerList.forEach((row) => {
+              if (row.qcsrId == item.qcExamineSubject) {
+                const tmp = JSON.parse(row.firstExaminePeople)
+                if (Array.isArray(tmp) && tmp.some(item => item.includes(this.currentUserName))) {
+                  tipList.push(item);
+                  tipFirstList.push(item);
+                  this.showNotification("成果初评");
+                }
+              }
+            })
+            // tipList.push(item);
+            // tipFirstList.push(item);
+            // this.showNotification("成果初评");
           } else if ((item.qcExamineCurrent == "4" || item.qcExamineCurrent == "4.2") && this.isAuth("qcExamine:second:comment")) {
-            tipList.push(item);
-            // console.log(item);
-            tipSecondList.push(item);
-            this.showNotification("成果复评");
+            registerList.forEach((row) => {
+              if (row.qcsrId == item.qcExamineSubject) {
+                const tmp = JSON.parse(row.secondExaminePeople)
+                if (Array.isArray(tmp) && tmp.some(item => item.includes(this.currentUserName))) {
+                  tipList.push(item);
+                  tipSecondList.push(item);
+                  this.showNotification("成果复评");
+                }
+              }
+            })
+            // tipList.push(item);
+            // tipSecondList.push(item);
+            // this.showNotification("成果复评");
           } else if ((item.qcExamineCurrent == "4" || item.qcExamineCurrent == "4.1") && this.isAuth("qcExamine:finance:department")) {
             tipList.push(item);
             tipFinancialList.push(item);
@@ -1908,54 +1936,55 @@ export default {
       return new Promise((resolve, reject) => {
         let groupList = [];
         this.$http({
-          url: this.$http.adornUrl("/qcMembers/qcGroupMember/list"),
+          url: this.$http.adornUrl("/qcMembers/qcGroupMember/allMyList"),
           method: "get",
           params: this.$http.adornParams({
             page: 1,
             limit: 1000000,
             key: "",
           }),
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.groupMemberList = data.page.list;
+            // this.totalPage = data.page.totalCount;
+            groupList = this.groupMemberList;
+            // 分组
+            const map = {};
+            groupList.forEach((item) => {
+              if (item.parentId === null) {
+                map[item.qcgmId] = {
+                  id: item.qcgmId,
+                  date: item.participationDate,
+                  name: item.name,
+                  number: item.number,
+                  groupName: item.groupName,
+                  roleInTopic: "组长",
+                  deleteFlag: item.deleteFlag,
+                  children: [],
+                };
+              }
+            });
+            groupList.forEach((item) => {
+              if (item.parentId !== null && map[item.parentId]) {
+                map[item.parentId].children.push({
+                  id: item.qcgmId,
+                  date: item.participationDate,
+                  name: item.name,
+                  number: item.number,
+                  roleInTopic: item.roleInTopic,
+                  parentId: item.parentId,
+                  deleteFlag: item.deleteFlag,
+                });
+              }
+            });
+            groupList = map;
+            this.groupMemberList = groupList;
+          } else {
+            this.groupMemberList = [];
+            this.totalPage = 0;
+          }
+          resolve(groupList);
         })
-          .then(({ data }) => {
-            if (data && data.code === 0) {
-              this.groupMemberList = data.page.list;
-              // this.totalPage = data.page.totalCount;
-              groupList = this.groupMemberList;
-              // 分组
-              const map = {};
-              groupList.forEach((item) => {
-                if (item.parentId === null) {
-                  map[item.qcgmId] = {
-                    id: item.qcgmId,
-                    date: item.participationDate,
-                    name: item.name,
-                    number: item.number,
-                    groupName: item.groupName,
-                    roleInTopic: "组长",
-                    children: [],
-                  };
-                }
-              });
-              groupList.forEach((item) => {
-                if (item.parentId !== null && map[item.parentId]) {
-                  map[item.parentId].children.push({
-                    id: item.qcgmId,
-                    date: item.participationDate,
-                    name: item.name,
-                    number: item.number,
-                    roleInTopic: item.roleInTopic,
-                    parentId: item.parentId,
-                  });
-                }
-              });
-              groupList = map;
-              this.groupMemberList = groupList;
-            } else {
-              this.groupMemberList = [];
-              this.totalPage = 0;
-            }
-            resolve(groupList);
-          })
           .catch((error) => {
             console.error("Error fetching data:", error);
             // this.dataList = [];
@@ -2053,62 +2082,68 @@ export default {
         });
     },
     //计划审批跳转
-    examineStatus(id, resultType) {
+    examineStatus(row, resultType) {
       console.log(resultType);
-      console.log(id);
-      if (resultType === null || resultType === "") {
-        this.$message({
-          message: "课题计划尚未提交",
-          type: "warning",
-          duration: 1500,
-        });
-      } else {
-        this.dialogMessageVisible = false;
-        let filteredArray = [];
-        // 遍历原始数组
-        for (let i = 0; i < this.subjectDataList.length; i++) {
-          if (this.subjectDataList[i].qcsrId === id) {
-            // 如果满足条件，将对象添加到新数组中
-            filteredArray.push(this.subjectDataList[i]);
-            console.log(filteredArray);
-          }
+      console.log(row);
+      this.$http({
+        url: this.$http.adornUrl(`/qcManagement/examineStatus/subjectInfo/${row.qcsrId}`),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 0 && data.ifExist == true) {
+          let filteredArray = [];
+          // for (let i = 0; i < this.dataList.length; i++) {
+          //   if (this.dataList[i].qcsrId === id) {
+          //     // 如果满足条件，将对象添加到新数组中
+          filteredArray.push(row);
+          this.$router.push(
+            {
+              name: 'qcExamineStatus',
+              query: {
+                data: JSON.stringify(filteredArray)
+              }
+            });
+          //     console.log(filteredArray)
+          //   }
+        } else {
+          this.$message({
+            message: '课题计划尚未提交',
+            type: 'warning',
+            duration: 1500
+          })
         }
-        this.$router.push({
-          name: "qcExamineStatus",
-          query: {
-            data: JSON.stringify(filteredArray),
-          },
-        });
-      }
+      })
     },
     //消息计划审批跳转
-    messageExamineStatus(id, resultType) {
-      console.log(resultType);
-      console.log(id);
-      if (resultType === null || resultType === "") {
-        this.$message({
-          message: "课题计划尚未提交",
-          type: "warning",
-          duration: 1500,
-        });
-      } else {
-        this.dialogMessageVisible = false;
-        let filteredArray = [];
-        // 遍历原始数组
-        for (let i = 0; i < this.messageList.length; i++) {
-          if (this.messageList[i].qcsrId === id) {
-            // 如果满足条件，将对象添加到新数组中
-            filteredArray.push(this.messageList[i]);
-            console.log(filteredArray);
-          }
+    messageExamineStatus(row, resultType) {
+      this.$http({
+        url: this.$http.adornUrl(`/qcManagement/examineStatus/subjectInfo/${row.qcsrId}`),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 0 && data.ifExist == true) {
+          let filteredArray = [];
+          // for (let i = 0; i < this.dataList.length; i++) {
+          //   if (this.dataList[i].qcsrId === id) {
+          //     // 如果满足条件，将对象添加到新数组中
+          filteredArray.push(row);
+          this.$router.push(
+            {
+              name: 'qcExamineStatus',
+              query: {
+                data: JSON.stringify(filteredArray)
+              }
+            });
+          //     console.log(filteredArray)
+          //   }
+        } else {
+          this.$message({
+            message: '课题计划尚未提交',
+            type: 'warning',
+            duration: 1500
+          })
         }
-        this.$router.push({
-          name: "qcExamineStatus",
-          query: {
-            data: JSON.stringify(filteredArray),
-          },
-        });
-      }
+      })
     },
   },
 };

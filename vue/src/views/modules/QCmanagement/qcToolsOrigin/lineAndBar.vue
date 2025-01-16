@@ -64,7 +64,7 @@ export default {
       myChart: {},
       seriesDataBy: '折线,柱状(柱)',
       xAxisDataBy: 'A,B,C,D,E,F',
-      textBy: '折柱混合图',
+      textBy: '排列图1',
       options: [],
       value: '',
       valueConPlan: '',
@@ -361,7 +361,7 @@ export default {
       let xAxisData = []
       let legendData = []
       let title = {
-        text: '折柱图',
+        text: '排列图',
       }
       if (resultList.templateId == 0) {
         try {
@@ -376,7 +376,7 @@ export default {
             seriesData = [{
               name: '折线',
               type: 'line',
-              color: '',
+              yAxisIndex: 1,
               label: labelOption,
               emphasis: {
                 focus: 'series'
@@ -386,6 +386,7 @@ export default {
             {
               name: '柱状(柱)',
               type: 'bar',
+              yAxisIndex: 0,
               label: labelOption,
               emphasis: {
                 focus: 'series'
@@ -414,6 +415,7 @@ export default {
                 seriesData.push({
                   name: tmp2[i],
                   type: (tmp2[i].includes('(柱)') || tmp2[i].includes('（柱）')) ? 'bar' : 'line',
+                  yAxisIndex: (tmp2[i].includes('(柱)') || tmp2[i].includes('（柱）')) ? 0 : 1,
                   label: labelOption,
                   emphasis: {
                     focus: 'series'
@@ -445,6 +447,7 @@ export default {
           seriesData = resultList.templateSeries.map(item => ({
             name: item.name,
             type: (item.name.includes('(柱)') || item.name.includes('（柱）')) ? 'bar' : 'line',
+            yAxisIndex: item.name.includes("(柱)") || item.name.includes("（柱）") ? 0 : 1,
             label: labelOption,
             emphasis: {
               focus: 'series'
@@ -576,17 +579,19 @@ export default {
         ],
         yAxis: [
           {
-            type: 'value'
+            // 左边的 Y 轴，用于柱状图
+            type: 'value',
+            name: '柱轴',
+            position: 'left',
+            alignTicks: true, // 对齐刻度
           },
-          // {
-          //   type: 'value',
-          //   name: '线',
-          //   // interval: 5,
-          //   splitLine: { show: false },
-          //   axisLabel: {
-          //     formatter: '{value} '
-          //   }
-          // }
+          {
+            // 右边的 Y 轴，用于折线图
+            type: 'value',
+            name: '线轴',
+            position: 'right',
+            alignTicks: true, // 对齐刻度
+          }
         ],
         series: seriesData,
         animation: false,

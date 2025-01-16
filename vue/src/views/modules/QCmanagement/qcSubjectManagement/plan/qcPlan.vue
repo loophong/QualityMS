@@ -63,7 +63,7 @@
         </el-form>
         <el-table :data="dataList" :row-class-name="tableRowClassName" border v-loading="dataListLoading"
           @selection-change="selectionChangeHandle" style="width: 100%;"
-          :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
+          :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row height="800">
           <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column> -->
           <el-table-column prop="qcsrId" header-align="center" align="center" label="课题ID" fixed sortable width="100">
@@ -74,7 +74,6 @@
           </el-table-column>
           <el-table-column prop="topicNumber" header-align="center" align="center" label="课题编号">
           </el-table-column>
-
           <el-table-column prop="topicLeader" header-align="center" align="center" label="课题组长">
             <template slot-scope="scope">
               {{ numberToName(scope.row.topicLeader) }}
@@ -85,7 +84,7 @@
               {{ numberToName(scope.row.topicConsultant) }}
             </template>
           </el-table-column>
-          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员" width="300">
             <template slot-scope="scope">
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
@@ -109,14 +108,14 @@
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
-            <template slot-scope="scope">
+            <!-- <template slot-scope="scope">
               <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
-              <span v-else>--</span> <!-- 处理未知状态 -->
-            </template>
+              <span v-else>--</span>
+            </template> -->
           </el-table-column>
 
           <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
@@ -128,7 +127,7 @@
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
                 @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
-                :disabled="scope.row.resultType"
+                :disabled="scope.row.resultType ? true : false"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
                 @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
@@ -203,7 +202,8 @@
           </el-form-item>
         </el-form>
         <el-table :data="subjectLeadList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
+          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row
+          height="800">
           <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column> -->
           <el-table-column prop="qcsrId" header-align="center" align="center" label="课题ID" fixed sortable width="100">
@@ -224,7 +224,7 @@
               {{ numberToName(scope.row.topicConsultant) }}
             </template>
           </el-table-column>
-          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员" width="300">
             <template slot-scope="scope">
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
@@ -248,14 +248,14 @@
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
-            <template slot-scope="scope">
+            <!-- <template slot-scope="scope">
               <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
-              <span v-else>--</span> <!-- 处理未知状态 -->
-            </template>
+              <span v-else>--</span>
+            </template> -->
           </el-table-column>
 
           <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
@@ -268,7 +268,7 @@
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
                 @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
-                :disabled="scope.row.resultType"
+                :disabled="scope.row.resultType ? true : false"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
                 @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
@@ -342,7 +342,8 @@
           </el-form-item>
         </el-form>
         <el-table :data="subjectJoinList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
+          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row
+          height="800">
           <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column> -->
           <el-table-column prop="qcsrId" header-align="center" align="center" label="课题ID" fixed sortable width="100">
@@ -363,7 +364,7 @@
               {{ numberToName(scope.row.topicConsultant) }}
             </template>
           </el-table-column>
-          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员" width="300">
             <template slot-scope="scope">
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
@@ -387,14 +388,14 @@
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
-            <template slot-scope="scope">
+            <!-- <template slot-scope="scope">
               <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
-              <span v-else>--</span> <!-- 处理未知状态 -->
-            </template>
+              <span v-else>--</span>
+            </template> -->
           </el-table-column>
 
           <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
@@ -407,7 +408,7 @@
               <el-button type="text" size="small" v-if="isAuth('qcPlan:step:list')"
                 @click="newPlanHandle(scope.row.qcsrId, scope.row)">关联计划</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcSubject:plan:submit')"
-                :disabled="scope.row.resultType"
+                :disabled="scope.row.resultType ? true : false"
                 @click="addOrUpdateHandle(scope.row.qcsrId, scope.row.topicActivityStatus, scope.row.topicType)">成果提交</el-button>
               <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:list')"
                 @click="examineStatus(scope.row, scope.row.resultType)">审核状态</el-button>
@@ -530,7 +531,6 @@ export default {
           })
         };
       });
-      // console.log(this.membersOptions)
     });
   },
   computed: {
@@ -622,34 +622,39 @@ export default {
     },
     //计划审批跳转
     examineStatus(row, resultType) {
-      // console.log(resultType)
-      // console.log(id)
       console.log(row)
-      if (resultType === null || resultType === '') {
-        this.$message({
-          message: '课题计划尚未提交',
-          type: 'warning',
-          duration: 1500
-        })
-      } else {
-        let filteredArray = [];
+      this.$http({
+        url: this.$http.adornUrl(`/qcManagement/examineStatus/subjectInfo/${row.qcsrId}`),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({ data }) => {
+        if (data && data.code === 0 && data.ifExist == true) {
+          let filteredArray = [];
+          // for (let i = 0; i < this.dataList.length; i++) {
+          //   if (this.dataList[i].qcsrId === id) {
+          //     // 如果满足条件，将对象添加到新数组中
+          filteredArray.push(row);
+          this.$router.push(
+            {
+              name: 'qcExamineStatus',
+              query: {
+                data: JSON.stringify(filteredArray)
+              }
+            });
+          //     console.log(filteredArray)
+          //   }
+        } else {
+          this.$message({
+            message: '课题计划尚未提交',
+            type: 'warning',
+            duration: 1500
+          })
+        }
+      })
+      // console.log(id)
+      // console.log(row)
 
-        // for (let i = 0; i < this.dataList.length; i++) {
-        //   if (this.dataList[i].qcsrId === id) {
-        //     // 如果满足条件，将对象添加到新数组中
-        filteredArray.push(row);
-        //     console.log(filteredArray)
-        //   }
-        // }
-
-        this.$router.push(
-          {
-            name: 'qcExamineStatus',
-            query: {
-              data: JSON.stringify(filteredArray)
-            }
-          });
-      }
+      // }
     },
     // 获取我参与课题数据列表
     async getJoinList() {
@@ -929,6 +934,7 @@ export default {
           this.addOrUpdateVisible = true
           this.$nextTick(() => {
             this.$refs.addOrUpdate.init(id)
+            this.$refs.addOrUpdate.usersOption = this.membersOptions
           })
         }
       } else {
@@ -940,10 +946,11 @@ export default {
             duration: 1500
           })
         } else {
-          console.log('创')
           this.addOrUpdateVisible = true
           this.$nextTick(() => {
             this.$refs.addOrUpdate.init(id)
+            this.$refs.addOrUpdate.usersOption = this.membersOptions
+            // console.log(this.membersOptions)
           })
         }
       }

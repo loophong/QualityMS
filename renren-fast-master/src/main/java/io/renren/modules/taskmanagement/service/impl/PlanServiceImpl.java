@@ -518,10 +518,10 @@ public class PlanServiceImpl extends ServiceImpl<PlanDao, PlanEntity> implements
                 log.info("当前任务不存在，新增任务");
                 task.setTaskCurrentState(TaskStatus.PREAPPROVAL_IN_PROGRESS);
                 // 新建任务前检查是否有正在审批的记录，如果有则改为取消
-                approvalService.update(new LambdaUpdateWrapper<ApprovalEntity>()
-                        .eq(ApprovalEntity::getTaskId, taskEntity.getTaskId())
-                        .eq(ApprovalEntity::getApprovalStatus, ApprovalStatus.PENDING)
-                        .set(ApprovalEntity::getApprovalStatus, ApprovalStatus.CANCEL));
+//                approvalService.update(new LambdaUpdateWrapper<ApprovalEntity>()
+//                        .eq(ApprovalEntity::getTaskId, taskEntity.getTaskId())
+//                        .eq(ApprovalEntity::getApprovalStatus, ApprovalStatus.PENDING)
+//                        .set(ApprovalEntity::getApprovalStatus, ApprovalStatus.CANCEL));
                 approvalService.createTaskApproval(task, "NEW");
 
                 newTaskList.add(task);

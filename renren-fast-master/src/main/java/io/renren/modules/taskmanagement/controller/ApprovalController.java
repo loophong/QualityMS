@@ -209,7 +209,6 @@ public class ApprovalController {
 //        }
 
         //检查任务是否存在
-
         if (taskService.getByTaskId(taskManagementApprovalTable.getTaskId()) == null) {
             return R.error("任务不存在");
         }
@@ -256,7 +255,58 @@ public class ApprovalController {
 
         // 发送消息
         messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskManagementApprovalTable.getApprover()), new Long[]{Long.valueOf(taskManagementApprovalTable.getSubmitter())},
-                "您有一个任务审批结果，请及时查看！", "任务审批结果通知","task_page"));
+                "您有一个任务审批结果，请及时查看！", "任务审批结果通知", "task_page"));
+        return R.ok();
+    }
+
+
+    /**
+     * @description: 审批
+     * @author: hong
+     * @date: 2024/8/30 16:39
+     * @version: 1.0
+     */
+    @RequestMapping("/approval")
+    @RequiresPermissions("taskmanagement:approval:update")
+    public R approval(@RequestBody ApprovalEntity taskManagementApprovalTable) {
+
+        //检查任务是否存在
+        if (taskService.getByTaskId(taskManagementApprovalTable.getTaskId()) == null) {
+            return R.error("任务不存在");
+        }
+        TaskEntity task = taskService.getByTaskId(taskManagementApprovalTable.getTaskId());
+        if (taskManagementApprovalTable.getApprovalStatus() == ApprovalStatus.APPROVED) {
+            // 如果审批通过，则将任务状态改为已完成，并且记录相关信息
+            task.setTaskCurrentState(TaskStatus.NOT_STARTED);
+            task.setTaskIsCompleted(0L);
+            // 项目实际完成时间
+            task.setTaskActualCompletionDate(null);
+            // 项目实际完成天数
+            task.setTaskActualDays(null);
+
+            // 任务是否超期,设置超期时间
+            task.setTaskIsOverdue(0L);
+            task.setTaskLagDays(0L);
+
+            // 任务是否按时完工
+            task.setTaskIsOnTime(null);
+
+            // 任务是否提前完工
+            task.setTaskEarlyCompletionDays(0L);
+
+        } else {
+            if (taskManagementApprovalTable.getApprovalType().equals("NEW")) {
+                task.setTaskCurrentState(TaskStatus.PREAPPROVAL_NOT_PASSED);
+            } else if (taskManagementApprovalTable.getApprovalType().equals("UPDATE")) {
+                task.setTaskCurrentState(TaskStatus.UPDATE_APPROVAL_NOT_PASSED);
+            }
+        }
+        taskService.updateById(task);
+        approvalService.updateById(taskManagementApprovalTable);
+
+        // 发送消息
+        messageService.sendMessages(new CreateNoticeParams(Long.parseLong(taskManagementApprovalTable.getApprover()), new Long[]{Long.valueOf(taskManagementApprovalTable.getSubmitter())},
+                "您有一个任务审批结果，请及时查看！", "任务审批结果通知", "task_page"));
         return R.ok();
     }
 

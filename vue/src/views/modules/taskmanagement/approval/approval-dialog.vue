@@ -11,9 +11,6 @@
       <el-form-item label="任务内容" prop="taskContent">
         <el-input v-model="dataForm.taskContent" readonly placeholder="任务内容"></el-input>
       </el-form-item>
-      <!-- <el-form-item label="开始日期" prop="taskStartDate">
-          <el-input v-model="dataForm.taskStartDate" readonly placeholder="开始日期"></el-input>
-      </el-form-item> -->
       <el-form-item label="开始日期" prop="taskStartDate">
         <el-date-picker v-model="dataForm.taskStartDate" disabled type="date" placeholder="选择日期"
                         value-format="yyyy-MM-dd">
@@ -22,74 +19,71 @@
       <el-form-item label="相关计划编号" prop="taskAssociatedPlanId">
         <el-input v-model="dataForm.taskAssociatedPlanId" readonly placeholder="相关计划编号"></el-input>
       </el-form-item>
-      <!-- <el-form-item label="负责人" prop="taskPrincipal">
-    <el-input v-model="dataForm.taskPrincipal" placeholder="负责人"></el-input>
-  </el-form-item> -->
+
       <el-table-column prop="taskPrincipal" header-align="center" align="center" label="负责人">
         <template slot-scope="scope">
           {{ getUserameByUserId(scope.row.taskPrincipal) }}
         </template>
       </el-table-column>
-      <!-- <el-form-item label="执行人" prop="taskExecutor">
-    <el-input v-model="dataForm.taskExecutor" placeholder="执行人"></el-input>
-  </el-form-item> -->
-      <!-- <el-table-column prop="taskExecutor" header-align="center" align="center" label="执行人" width="110">
-    <template slot-scope="scope">
-      <span v-for="(executorId, index) in scope.row.taskExecutor" :key="executorId">
-        {{ getUserameByUserId(executorId) }}
-        <span v-if="index !== scope.row.taskExecutor.length - 1">, </span>
-      </span>
-    </template>
-  </el-table-column> -->
 
-
-      <!--        <el-input v-model="dataForm.taskAssociatedIndicatorsId" readonly placeholder="关联指标编号"></el-input>-->
-<!--      <el-form-item label="关联指标编号" prop="taskAssociatedIndicatorsId">-->
-<!--        <div v-if="dataForm.taskAssociatedIndicatorsId">-->
-<!--          <el-input v-model="dataForm.taskAssociatedIndicatorsId" readonly placeholder="关联指标编号"></el-input>-->
-<!--        </div>-->
-<!--        <div v-else>-->
-<!--          无关联指标-->
-<!--        </div>-->
-<!--      </el-form-item>-->
-      <el-form-item v-if="dataForm.taskAssociatedIndicatorsId" label="关联指标编号" prop="taskAssociatedIndicatorsId">
-        <el-input v-model="dataForm.taskAssociatedIndicatorsId" readonly placeholder="关联指标编号"></el-input>
+      <el-form-item label="关联指标" prop="planAssociatedIndicatorsId">
+        <el-select v-model="dataForm.taskAssociatedIndicatorsId" disabled placeholder="请选择">
+          <el-option v-for="item in indicatorOptions" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
-
 
       <el-form-item label="任务送审时间" prop="taskSubmissionTime">
         <el-input v-model="dataForm.taskSubmissionTime" readonly placeholder="任务送审时间"></el-input>
       </el-form-item>
-      <!-- <el-form-item label="审批结束时间" prop="approvalEndTime">
-    <el-input v-model="dataForm.approvalEndTime" placeholder="审批结束时间"></el-input>
-  </el-form-item> -->
-      <!-- <el-form-item label="审批人" prop="approver">
-    <el-input v-model="dataForm.approver" placeholder="审批人"></el-input>
-  </el-form-item> -->
-      <!-- <el-form-item label="送审人" prop="submitter">
-    <el-input v-model="dataForm.submitter" placeholder="送审人"></el-input>
-  </el-form-item> -->
+
       <el-table-column prop="submitter" header-align="center" align="center" label="送审人">
         <template slot-scope="scope">
           {{ getUserameByUserId(scope.row.submitter) }}
         </template>
       </el-table-column>
-      <!-- <el-form-item label="审批状态" prop="approvalStatus">
-    <el-input v-model="dataForm.approvalStatus" placeholder="审批状态"></el-input>
-  </el-form-item> -->
-      <el-form-item label="审批内容" prop="approvalContent">
-        <el-input v-model="dataForm.approvalContent" readonly placeholder="审批内容"></el-input>
-      </el-form-item>
-      <el-form-item v-if="dataForm.files && dataForm.files.length > 0" label="附件">
-        <el-row v-for="file in dataForm.files" :key="file.name" style="margin-bottom: 4px">
-          <el-col :span="12">
-            {{ file.name }}
-          </el-col>
-          <el-col :span="12">
-            <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>
-          </el-col>
-        </el-row>
-      </el-form-item>
+
+      <!--  如果审批类型为FINISH，则显示一下几个form-item    -->
+      <p v-if="dataForm.approvalType === 'FINISH'">
+        <el-form-item label="现状">
+          <el-input v-model="dataForm.currentStatus" readonly type="textarea" :rows="3"
+                    placeholder="请输入现状"></el-input>
+        </el-form-item>
+        <el-form-item label="目标">
+          <el-input v-model="dataForm.objectiveGoal" readonly type="textarea" :rows="3"
+                    placeholder="请输入任务目标"></el-input>
+        </el-form-item>
+        <el-form-item label="主要措施">
+          <el-input v-model="dataForm.keyMeasuresActions" readonly type="textarea" :rows="3"
+                    placeholder="请输入主要措施"></el-input>
+        </el-form-item>
+        <el-form-item label="实施人">
+          <el-select v-model="dataForm.implementerResponsiblePerson" readonly multiple filterable placeholder="实施人">
+            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.value">
+              </el-option>
+            </el-option-group>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="开展时间">
+          <el-date-picker v-model="dataForm.implementationStartTime" readonly value-format="yyyy-MM-dd"
+                          type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+          </el-date-picker>
+        </el-form-item>
+
+        <el-form-item v-if="dataForm.files && dataForm.files.length > 0" label="附件">
+          <el-row v-for="file in dataForm.files" :key="file.name" style="margin-bottom: 4px">
+            <el-col :span="12">
+              {{ file.name }}
+            </el-col>
+            <el-col :span="12">
+              <el-button type="primary" @click="downloadFile(file.url)">下载</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </p>
+
 
       <el-form-item label="审批状态" prop="approvalStatus">
         <!-- <el-input v-model="dataForm.approvalStatus" placeholder="审批状态"></el-input> -->
@@ -105,7 +99,7 @@
         <el-input v-model="dataForm.remarks" placeholder="备注"></el-input>
       </el-form-item>
     </el-form>
-    <span slot="footer" class="dialog-footer">
+    <span slot="footer" class="dialog-footer" style="display: flex; justify-content: center;">
             <el-button @click="visible = false">取消</el-button>
             <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
         </span>
@@ -134,7 +128,12 @@ export default {
         approvalStatus: '',
         approvalComments: '',
         files: [],
-        remarks: ''
+        remarks: '',
+        implementationStartTime: [new Date(), new Date()],
+        //员工列表
+        options: [],
+        // 指标列表
+        indicatorOptions: [],
       },
       dataRule: {
         // taskId: [
@@ -190,6 +189,37 @@ export default {
       }
     }
   },
+
+
+  async created() {
+    // 获取分组后的员工数据
+    // const response = await fetch('/taskmanagement/user/getEmployeesGroupedByDepartment'); // 假设这是你的 API 路由
+    // const data = await response.json();
+
+    // 获取分组后的员工数据
+    await this.$http({
+      url: this.$http.adornUrl(`/taskmanagement/user/getName`),
+      method: 'get',
+    }).then(({data}) => {
+      this.options = data;
+      console.log(data);
+    })
+
+
+    this.$http({
+      url: this.$http.adornUrl(`/indicator/indicatordatadictionary/getIndicatorsList`),
+      method: 'get',
+    }).then(response => {
+      const opt = response.data.map(item => ({
+        value: item.value,
+        label: item.label
+      }));
+      console.log(opt);
+      this.indicatorOptions = opt;
+    })
+  },
+
+
   methods: {
     init(id) {
       console.log(12344444444)
@@ -220,6 +250,18 @@ export default {
               this.dataForm.approvalComments = data.taskManagementApprovalTable.approvalComments
               this.dataForm.remarks = data.taskManagementApprovalTable.remarks
               this.dataForm.approvalContent = data.taskManagementApprovalTable.approvalContent
+              this.dataForm.approvalType = data.taskManagementApprovalTable.approvalType
+              this.dataForm.currentStatus = data.taskManagementApprovalTable.currentStatus
+              this.dataForm.objectiveGoal = data.taskManagementApprovalTable.objectiveGoal
+              this.dataForm.keyMeasuresActions = data.taskManagementApprovalTable.keyMeasuresActions
+
+
+              this.dataForm.implementerResponsiblePerson = data.taskManagementApprovalTable.implementerResponsiblePerson
+                .split(',');
+
+              console.log(this.dataForm.implementerResponsiblePerson);
+              this.dataForm.implementationStartTime[0] = data.taskManagementApprovalTable.implementationStartTime
+              this.dataForm.implementationStartTime[1] = data.taskManagementApprovalTable.implementationEndTime
               this.dataForm.files = data.files
             }
           })
@@ -238,42 +280,69 @@ export default {
     dataFormSubmit() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.$http({
-            url: this.$http.adornUrl(`/taskmanagement/approval/${!this.dataForm.approvalId ? 'save' : 'update'}`),
-            method: 'post',
-            data: this.$http.adornData({
-              'approvalId': this.dataForm.approvalId || undefined,
-              'taskId': this.dataForm.taskId,
-              'taskName': this.dataForm.taskName,
-              'taskContent': this.dataForm.taskContent,
-              'taskStartDate': this.dataForm.taskStartDate,
-              'taskAssociatedPlanId': this.dataForm.taskAssociatedPlanId,
-              'taskPrincipal': this.dataForm.taskPrincipal,
-              'taskExecutor': this.dataForm.taskExecutor,
-              'taskAssociatedIndicatorsId': this.dataForm.taskAssociatedIndicatorsId,
-              'taskSubmissionTime': this.dataForm.taskSubmissionTime,
-              'approvalEndTime': this.dataForm.approvalEndTime,
-              'approver': this.dataForm.approver,
-              'submitter': this.dataForm.submitter,
-              'approvalStatus': this.dataForm.approvalStatus,
-              'approvalComments': this.dataForm.approvalComments,
-              'remarks': this.dataForm.remarks
+
+          let data = {
+            'approvalId': this.dataForm.approvalId || undefined,
+            'taskId': this.dataForm.taskId,
+            'taskName': this.dataForm.taskName,
+            'taskContent': this.dataForm.taskContent,
+            'taskStartDate': this.dataForm.taskStartDate,
+            'taskAssociatedPlanId': this.dataForm.taskAssociatedPlanId,
+            'taskPrincipal': this.dataForm.taskPrincipal,
+            'taskExecutor': this.dataForm.taskExecutor,
+            'taskAssociatedIndicatorsId': this.dataForm.taskAssociatedIndicatorsId,
+            'taskSubmissionTime': this.dataForm.taskSubmissionTime,
+            'approvalEndTime': this.dataForm.approvalEndTime,
+            'approver': this.dataForm.approver,
+            'submitter': this.dataForm.submitter,
+            'approvalStatus': this.dataForm.approvalStatus,
+            'approvalComments': this.dataForm.approvalComments,
+            'remarks': this.dataForm.remarks,
+            'approvalType': this.dataForm.approvalType
+          };
+
+          if (this.dataForm.approvalType === "FINISH") {
+            this.$http({
+              url: this.$http.adornUrl(`/taskmanagement/approval/${!this.dataForm.approvalId ? 'save' : 'update'}`),
+              method: 'post',
+              data: this.$http.adornData(data)
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
             })
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.visible = false
-                  this.$emit('refreshDataList')
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
+          } else {
+
+            this.$http({
+              url: this.$http.adornUrl(`/taskmanagement/approval/approval`),
+              method: 'post',
+              data: this.$http.adornData(data)
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
         }
       })
     },

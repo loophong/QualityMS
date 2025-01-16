@@ -90,9 +90,9 @@ public class PlanApprovalTableController {
         List<TaskEntity> taskList = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, planApprovalTable.getPlanId()));
         log.info("更新任务状态" + taskList);
         for (TaskEntity task : taskList) {
-            if (planApprovalTable.getApprovalStatus() == ApprovalStatus.APPROVED) {
+            if (planApprovalTable.getApprovalStatus() == ApprovalStatus.APPROVED && task.getTaskCurrentState() == TaskStatus.PREAPPROVAL_IN_PROGRESS) {
                 task.setTaskCurrentState(TaskStatus.NOT_STARTED);
-            } else if (planApprovalTable.getApprovalStatus() == ApprovalStatus.REJECTED) {
+            } else if (planApprovalTable.getApprovalStatus() == ApprovalStatus.REJECTED && task.getTaskCurrentState() == TaskStatus.PREAPPROVAL_IN_PROGRESS) {
                 task.setTaskCurrentState(TaskStatus.PREAPPROVAL_NOT_PASSED);
             }
             taskService.updateById(task);

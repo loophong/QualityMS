@@ -26,11 +26,11 @@ public interface QcExamineStatusDao extends BaseMapper<QcExamineStatusEntity> {
     })
     Integer countWithoutExamined();
 
-    //统计已完成课题数
+    //统计已获奖课题数
     @Select({
             "SELECT COUNT(*)",
-            "FROM qc_examine_status",
-            "WHERE qc_examine_current  = '完成'",
+            "FROM qc_subject_registration",
+            "WHERE topic_activity_result IN ('一等奖', '二等奖', '三等奖', '四等奖', '鼓励奖')",
     })
     Integer countExamined();
 }

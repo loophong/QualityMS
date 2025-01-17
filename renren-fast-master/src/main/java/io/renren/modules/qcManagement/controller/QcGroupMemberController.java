@@ -71,6 +71,8 @@ public class QcGroupMemberController {
         return R.ok().put("result", result);
     }
 
+
+
     /**
      * 注册号
      */

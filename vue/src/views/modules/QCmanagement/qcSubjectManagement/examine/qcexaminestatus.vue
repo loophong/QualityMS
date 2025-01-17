@@ -104,7 +104,7 @@
       </el-table-column> -->
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" size="small" v-if="isAuth('qcManagement:group:admin')"
+              <el-button type="text" size="small" v-if="isAuth('qcManagement:examineStatus:update')"
                 @click="addOrUpdateHandle(scope.row.qcExamineId)">修改</el-button>
               <!-- <el-button type="text" size="small" @click="deleteHandle(scope.row.qcExamineId)">删除</el-button> -->
             </template>
@@ -127,6 +127,7 @@ export default {
   data() {
     return {
       activeName: '1',
+      groupLead: false,
       dataForm: {
         key: ''
       },
@@ -144,8 +145,21 @@ export default {
   },
   activated() {
     this.getDataList()
+    this.ifGroupLead()
   },
   methods: {
+    async ifGroupLead() {
+      this.$http({
+        url: this.$http.adornUrl('/qcSubject/registration/ifGroupLead'),
+        method: 'get',
+        params: this.$http.adornParams({
+        })
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.groupLead = data.ifLead
+        }
+      });
+    },
     // 获取数据列表
     getDataList() {
       this.dataListLoading = true
@@ -188,6 +202,7 @@ export default {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
+        this.$refs.addOrUpdate.groupLeadSure = this.groupLead
       })
     },
     // 删除

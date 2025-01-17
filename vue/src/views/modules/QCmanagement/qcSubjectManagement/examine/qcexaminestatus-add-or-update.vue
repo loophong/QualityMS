@@ -54,6 +54,7 @@
 export default {
   data() {
     return {
+      groupLeadSure: false,
       visible: false,
       qcFirstAll: [],
       qcSecondAll: [],

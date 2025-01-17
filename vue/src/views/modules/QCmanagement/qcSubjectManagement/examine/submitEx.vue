@@ -354,6 +354,7 @@
             <el-option label="三等奖" value="三等奖"></el-option>
             <el-option label="四等奖" value="四等奖"></el-option>
             <el-option label="鼓励奖" value="鼓励奖"></el-option>
+            <el-option label="未获奖" value="未获奖"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="审核结果" :label-width="formLabelWidth" prop="result">
@@ -554,14 +555,17 @@ export default {
       } else {
       }
     });
-
     // console.log(this.commentTable)
     this.initActiveName()
+    this.ifMessage()
   },
   computed: {
 
   },
   methods: {
+    ifMessage() {
+
+    },
     initActiveName() {
       let first = this.routerParam[0].firstExaminePeople
       let firstAll = this.dataFormEx.qcFirstAll
@@ -898,6 +902,13 @@ export default {
         url: '',
         status: ifEmpty == '' ? 'A' : 'B',
       };
+      if (ifEmpty == '') {
+        this.$message({
+          message: '未进行成果提交，当前只可读！',
+          type: 'warning',
+          duration: 3000,
+        })
+      }
       // console.log(this.routerParam[0].resultType ? '1111' : '2222')
       // const statusId = this.dataFormEx[0].qcExamineCurrent
       this.initStatus(this.dataFormEx.qcExamineCurrent) // 初始化状态

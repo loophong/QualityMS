@@ -41,6 +41,7 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
     @Select({
             "SELECT COUNT(*)",
             "FROM qc_subject_registration",
+            "WHERE topic_review_status  = '3'"
     })
     Integer countRegistration();
 
@@ -54,11 +55,22 @@ public interface QcSubjectRegistrationDao extends BaseMapper<QcSubjectRegistrati
 
     //查询编号最大值
 
- @Select("SELECT MAX(CAST(SUBSTRING_INDEX(topic_number, '-', -1) AS UNSIGNED)) AS max_id " +
+    @Select("SELECT MAX(CAST(SUBSTRING_INDEX(topic_number, '-', -1) AS UNSIGNED)) AS max_id " +
             "FROM qc_subject_registration " +
             "WHERE topic_number LIKE CONCAT('PJHLQCKT-', #{currentYear}, '-%')")
     Integer maxOfId(@Param("currentYear") String currentYear);
 
+    //根据课题名查询课题个数
+    @Select({
+            "<script>",
+            "WITH TotalCount AS (SELECT COUNT(*) as cnt FROM qc_subject_registration WHERE group_name = #{groupName}),",
+            "WonCount AS (SELECT COUNT(*) as cnt FROM qc_subject_registration ",
+            "             WHERE group_name = #{groupName} AND topic_activity_result IS NOT NULL AND topic_activity_result != '未获奖')",
+            "SELECT COALESCE(CAST(WonCount.cnt AS DECIMAL) / NULLIF(TotalCount.cnt, 0), 0) AS reword_rate",
+            "FROM TotalCount, WonCount",
+            "</script>"
+    })
+    Double rewordRate(@Param("groupName") String groupName);
 
     //查询课题名称是否重复
     boolean ifExistSubjectName(String name);

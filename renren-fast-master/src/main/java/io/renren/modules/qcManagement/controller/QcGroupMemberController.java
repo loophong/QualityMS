@@ -71,6 +71,8 @@ public class QcGroupMemberController {
         return R.ok().put("result", result);
     }
 
+
+
     /**
      * 注册号
      */
@@ -130,6 +132,21 @@ public class QcGroupMemberController {
     }
 
     /**
+     * 所有列表包括已注销
+     */
+    @RequestMapping("/allList")
+    @RequiresPermissions("qcMembers:qcGroupMember:list")
+    public R allList(@RequestParam Map<String, Object> params) {
+        PageUtils page = qcGroupMemberService.queryPage(params);
+        //获取delete_flag不为1的数据
+        List<QcGroupMemberEntity> resultList = qcGroupMemberDao.allGroupMemberList();
+        page.setList(resultList);
+        page.setTotalCount(resultList.size());
+//        long id = ShiroUtils.getUserId();
+        return R.ok().put("page", page);
+    }
+
+    /**
      * 我的列表
      */
     @RequestMapping("/myList")
@@ -137,7 +154,6 @@ public class QcGroupMemberController {
     public R myList(@RequestParam Map<String, Object> params) {
 //        PageUtils page = qcGroupMemberService.queryPage(params);
         String userName = ShiroUtils.getUserEntity().getUsername();
-
         PageUtils page = qcGroupMemberService.queryPage(params);
 //        PageUtils page2 = qcGroupMemberService.myQueryPage(params,userName);
         //获取delete_flag不为1的数据
@@ -148,6 +164,23 @@ public class QcGroupMemberController {
         return R.ok().put("page", page).put("userName", userName);
     }
 
+    /**
+     * 我的所有列表
+     */
+    @RequestMapping("/allMyList")
+    @RequiresPermissions("qcMembers:qcGroupMember:list")
+    public R allMyList(@RequestParam Map<String, Object> params) {
+//        PageUtils page = qcGroupMemberService.queryPage(params);
+        String userName = ShiroUtils.getUserEntity().getUsername();
+        PageUtils page = qcGroupMemberService.queryPage(params);
+//        PageUtils page2 = qcGroupMemberService.myQueryPage(params,userName);
+        //获取delete_flag不为1的数据
+        List<QcGroupMemberEntity> resultList = qcGroupMemberDao.allGroupMemberList();
+        page.setList(resultList);
+        page.setTotalCount(resultList.size());
+//        List<QcGroupMemberEntity> filterList = resultList.stream().filter(e -> e.getName().equals(userName)).collect(Collectors.toList());
+        return R.ok().put("page", page).put("userName", userName);
+    }
 
     /**
      * 信息

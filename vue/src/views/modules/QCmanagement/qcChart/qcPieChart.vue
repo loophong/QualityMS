@@ -140,16 +140,16 @@ export default {
           this.stageNumData.forEach(item => {
             console.log(item.topicActivityResult)
             if (item.topicActivityResult) {
-              if (85 <= item.topicActivityResult) {
+              if ('一等奖' == item.topicActivityResult) {
                 this.scoreResult.first++
-              } else if (75 <= item.topicActivityResult < 85) {
+              } else if ('二等奖' == item.topicActivityResult) {
                 this.scoreResult.second++
-              } else if (65 <= item.topicActivityResult < 75) {
+              } else if ('三等奖' == item.topicActivityResult) {
                 this.scoreResult.third++
               }
-              else if (55 <= item.topicActivityResult < 65) {
+              else if ('四等奖' == item.topicActivityResult) {
                 this.scoreResult.fourth++
-              } else if (45 <= item.topicActivityResult < 55) {
+              } else if ('鼓励奖' == item.topicActivityResult) {
                 this.scoreResult.fifth++
               }
             }

@@ -24,6 +24,12 @@ public enum TaskStatus {
     OVERDUE,
 
     //审批中
-    APPROVAL_IN_PROGRESS
+    APPROVAL_IN_PROGRESS,
+
+    //修改审批
+    UPDATE_APPROVAL_IN_PROGRESS,
+
+    // 修改审批未通过
+    UPDATE_APPROVAL_NOT_PASSED,
 
 }

@@ -9,6 +9,7 @@ import com.alibaba.excel.util.DateUtils;
 import com.aliyun.oss.common.utils.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import io.renren.common.utils.ShiroUtils;
@@ -83,7 +84,7 @@ public class TaskController {
                 .last("limit 1") // 限制结果为一条记录
                 .one();// 获取一条记录
         // 检查是否有审批文件
-        if(approval == null){
+        if (approval == null) {
             return R.ok().put("task", task).put("approval", null).put("fileList", null);
         }
 
@@ -199,23 +200,77 @@ public class TaskController {
      * @version: 1.0
      */
     @PostMapping("/decomposition")
-//    @RequiresPermissions("taskmanagement:task:list")
+    @Transactional
     public R decompositionTask(@RequestBody TaskUpdateDTO taskUpdateDto) {
         log.info("当前分解的任务详情为：" + taskUpdateDto);
-        if(taskUpdateDto.getChildTask() == null || taskUpdateDto.getChildTask().size() == 0){
+
+        TaskEntity parentTask = taskUpdateDto.getParentTask();
+        List<TaskEntity> childTask = taskUpdateDto.getChildTask();
+        childTask.forEach(taskEntity -> {
+            // 检查当前任务是否存在
+
+            TaskEntity task = taskService.getOne(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskId, taskEntity.getTaskId()));
+
+            // 检查task是否发生改变
+            if (task != null) {
+                if (!task.getTaskName().equals(taskEntity.getTaskName()) || !task.getTaskContent().equals(taskEntity.getTaskContent())
+                        || !task.getTaskStartDate().equals(taskEntity.getTaskStartDate()) || !task.getTaskScheduleCompletionDate().equals(taskEntity.getTaskScheduleCompletionDate())
+                        || !task.getTaskPrincipal().equals(taskEntity.getTaskPrincipal()) || !task.getTaskAuditor().equals(taskEntity.getTaskAuditor())
+                        || !task.getTaskExecutor().equals(taskEntity.getTaskExecutor())) {
+
+                    log.info("任务存在，发生改变，更新任务");
+                    taskEntity.setTaskCurrentState(TaskStatus.UPDATE_APPROVAL_IN_PROGRESS);
+                    // 检查修改前任务是否有正在审批的记录，如果有则改为取消
+                    approvalService.update(new LambdaUpdateWrapper<ApprovalEntity>()
+                            .eq(ApprovalEntity::getTaskId, taskEntity.getTaskId())
+                            .eq(ApprovalEntity::getApprovalStatus, ApprovalStatus.PENDING)
+                            .set(ApprovalEntity::getApprovalStatus, ApprovalStatus.CANCEL));
+
+
+                    approvalService.createTaskApproval(taskEntity, "UPDATE");
+
+                } else {
+                    log.info("任务存在，未发生改变，不更新任务");
+                }
+            } else {
+                taskEntity.setTaskCurrentState(TaskStatus.PREAPPROVAL_IN_PROGRESS);
+                log.info("当前任务不存在，新增任务");
+                // 新建任务前检查是否有正在审批的记录，如果有则改为取消
+                approvalService.update(new LambdaUpdateWrapper<ApprovalEntity>()
+                        .eq(ApprovalEntity::getTaskId, taskEntity.getTaskId())
+                        .eq(ApprovalEntity::getApprovalStatus, ApprovalStatus.PENDING)
+                        .set(ApprovalEntity::getApprovalStatus, ApprovalStatus.CANCEL));
+                approvalService.createTaskApproval(taskEntity, "NEW");
+            }
+
+        });
+
+        log.info("当前任务详情为：" + childTask);
+
+        if (taskUpdateDto.getChildTask() == null || taskUpdateDto.getChildTask().size() == 0) {
             taskService.remove(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskParentNode, taskUpdateDto.getParentTask().getTaskId()));
         }
-        taskService.saveDecompositionTasks(taskUpdateDto.getChildTask());
+//        taskService.saveBatch(childTask);
+        taskService.saveDecompositionTasks(childTask);
+
+        // 以下操作是将当前计划的未审批任务，如果不在任务表中，则取消审批
+        // 获取当前计划的 未审批 列表
+        List<ApprovalEntity> unApprovalList = approvalService.list(
+                new LambdaQueryWrapper<ApprovalEntity>()
+                        .eq(ApprovalEntity::getTaskAssociatedPlanId, parentTask.getTaskAssociatedPlanId())
+                        .eq(ApprovalEntity::getApprovalStatus, ApprovalStatus.PENDING));
+        for (ApprovalEntity approval : unApprovalList) {
+            // 查询审批的任务 是否在任务表中
+            int size = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskId, approval.getTaskId())).size();
+            if (size == 0) {
+                approval.setApprovalStatus(ApprovalStatus.CANCEL);
+                approvalService.updateById(approval);
+            }
+        }
+
+
         return R.ok();
     }
-//    @PostMapping("/decomposition")
-////    @RequiresPermissions("taskmanagement:task:list")
-//    public R decompositionTask(@RequestBody TaskDetailDTO taskDetailDTO) {
-//        log.info("当前分解的任务详情为：" + taskDetailDTO);
-//        int i = taskService.saveDecompositionTasks(taskDetailDTO.getTasks());
-//        return R.ok();
-//
-//    }
 
 
     /**
@@ -268,6 +323,16 @@ public class TaskController {
             approvalEntity.setTaskContent(task.getTaskContent());
             approvalEntity.setTaskAssociatedPlanId(task.getTaskAssociatedPlanId());
             approvalEntity.setTaskPrincipal(task.getTaskPrincipal());
+            // 新增字段
+            approvalEntity.setCurrentStatus(taskSubmitApprovalDTO.getCurrentStatus());
+            approvalEntity.setObjectiveGoal(taskSubmitApprovalDTO.getObjectiveGoal());
+            approvalEntity.setKeyMeasuresActions(taskSubmitApprovalDTO.getKeyMeasuresActions());
+            approvalEntity.setImplementerResponsiblePerson(taskSubmitApprovalDTO.getImplementerResponsiblePerson());
+            approvalEntity.setImplementationStartTime(taskSubmitApprovalDTO.getImplementationStartTime());
+            approvalEntity.setImplementationEndTime(taskSubmitApprovalDTO.getImplementationEndTime());
+            // 设置审批类型
+            approvalEntity.setApprovalType("FINISH");
+
             log.info("当前任务的AssociatedIndicatorsId为：" + task.getTaskAssociatedIndicatorsId());
             if (task.getTaskAssociatedIndicatorsId() != null && !task.getTaskAssociatedIndicatorsId().equals("")) {
                 approvalEntity.setTaskAssociatedIndicatorsId(task.getTaskAssociatedIndicatorsId());
@@ -510,8 +575,6 @@ public class TaskController {
 //        return R.ok();
 
 //    }
-
-
 
 
     /**

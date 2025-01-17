@@ -185,7 +185,7 @@ export default {
           name: {}
         }
       };
-      let dataR = [(this.currentCount / this.allCount) * 100, this.activityDataResult, (this.countData.countExamined / this.countData.countSubmitted) * 100]
+      let dataR = [((this.currentCount / this.allCount) * 100).toFixed(2), this.activityDataResult, ((this.countData.countSubmitted / this.countData.countRegistration) * 100).toFixed(2)]
       let formattedData = [
         { value: dataR[0], itemStyle: { normal: { color: '#409eff' } } },
         { value: dataR[1], itemStyle: { normal: { color: '#67c23a' } } },
@@ -234,7 +234,10 @@ export default {
         yAxis: [
           {
             type: 'value',
+            min: 0,
+            max: 100,
             axisLabel: {
+              formatter: '{value} %',
               color: '#ffffff' // 设置y轴标签字体颜色为白色
             },
             splitLine: {

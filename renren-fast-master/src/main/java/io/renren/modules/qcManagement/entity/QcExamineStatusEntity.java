@@ -115,6 +115,22 @@ public class QcExamineStatusEntity implements Serializable {
 	/**
 	 * 入库标识
 	 */
+	private String qcSevenAvg;
+	/**
+	 * 入库标识
+	 */
+	private String qcSevenLevel;
+	/**
+	 * 入库标识
+	 */
 	private String qcStorageFlag;
+	/**
+	 * 初评综合
+	 */
+	private String qcFirstAll;
+	/**
+	 * 复评综合
+	 */
+	private String qcSecondAll;
 
 }

@@ -139,7 +139,7 @@
         </el-table-column>
         <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">查看附件</el-button>
+            <el-button type="text" size="small" @click="viewAttachments(scope.row.planId)">计划附件</el-button>
             <el-button type="text" size="small" @click="showPlanTree(scope.row.planId)">查看结构</el-button>
             <el-button type="text" size="small" @click="removeFromBase(scope.row.tmPid)">移除</el-button>
           </template>
@@ -406,7 +406,7 @@ export default {
 
     exportFile(){
       this.$http({
-        url: this.$http.adornUrl('/taskmanagement/plan/export'),
+        url: this.$http.adornUrl('/taskmanagement/plan/exportBase'),
         method: 'get',
         params: this.$http.adornParams(),
         responseType: 'blob'

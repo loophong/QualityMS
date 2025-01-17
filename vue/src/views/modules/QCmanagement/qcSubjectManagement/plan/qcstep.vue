@@ -14,7 +14,7 @@
         <el-button type="" @click="wordExport(form2, dataList)">导出为word</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="dataListLoading" stripe style="width: 100%;">
+    <el-table :data="dataList" border v-loading="dataListLoading" stripe style="width: 100%;" height="800">
       <!-- <el-table-column prop="stepId" header-align="center" align="center" label="步骤主键id">
       </el-table-column> -->
       <!-- <el-table-column prop="stepSubjectId" header-align="center" align="center" label="关联课题id">

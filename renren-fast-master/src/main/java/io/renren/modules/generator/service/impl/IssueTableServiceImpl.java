@@ -31,11 +31,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -257,6 +260,7 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         queryWrapper.select("MONTH(creation_time) AS month", "COUNT(*) AS count")
                 .eq("YEAR(creation_time)", year) // 筛选出指定年份的数据
                 .eq("over_due", "true") // 筛选 out over_due 为 "true" 的记录重复问题
+                .isNull("parent_Question").or().eq("parent_Question", "")
                 .groupBy("MONTH(creation_time)") // 按月分组
                 .orderByAsc("month"); // 按月份排序
 
@@ -436,6 +440,245 @@ public class IssueTableServiceImpl extends ServiceImpl<IssueTableDao, IssueTable
         this.saveOrUpdateBatch(list);
         return true;
     }
+
+    @Override
+    public int getallissue() {
+        // 获取当前日期和本月的第一天、最后一天
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).with(LocalTime.MIN);
+        LocalDateTime endOfMonth = LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
+
+        // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.between("creation_time", startOfMonth, endOfMonth)
+                .isNull("parent_Question").or().eq("parent_Question", "");
+
+        // 执行查询返回记录总数
+        return this.count(queryWrapper);
+    }
+
+    @Override
+    public Map<String, Object> getThirdIssue() {
+
+        Map<String, Object> statistics = new HashMap<>();
+
+        // 1. 计算超期的总数和累计超期时间
+        QueryWrapper<IssueTableEntity> overdueWrapper = new QueryWrapper<>();
+        overdueWrapper.isNotNull("required_completion_time").isNotNull("actual_completion_time");
+        List<IssueTableEntity> issues = this.list(overdueWrapper);
+
+        int overdueCount = 0;
+        double totalOverdueTime = 0;
+
+        for (IssueTableEntity issue : issues) {
+            LocalDateTime requiredCompletionTime = issue.getRequiredCompletionTime().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+            LocalDateTime actualCompletionTime = issue.getActualCompletionTime().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+
+            if (actualCompletionTime.isAfter(requiredCompletionTime)) {
+                overdueCount++;
+
+                // 精确计算时间差，以小时为单位
+                long overdueMilliseconds = Duration.between(requiredCompletionTime, actualCompletionTime).toMillis();
+                System.out.println("overdueMilliseconds: " + overdueMilliseconds);
+                double overdueDays = overdueMilliseconds / (1000.0 * 60 * 60 * 24); // 转换为天数（带小数）
+                System.out.println("overdueDays: " + overdueDays);
+                totalOverdueTime += overdueDays;
+            }
+
+        }
+        statistics.put("超期总数", overdueCount);
+        // 格式化为小数点后两位
+        statistics.put("累计超期时间", String.format("%.2f", totalOverdueTime));
+
+        // 2. 统计 "等待整改记录填写" 的数据条数以及总数据条数
+        int pendingRectificationCount = countIssuesBylevel("等待整改记录填写");
+        int totalIssuesCount = this.count(); // 统计所有记录的总数
+
+        statistics.put("等待整改记录填写数量", pendingRectificationCount);
+        statistics.put("总数据条数", totalIssuesCount);
+
+        // 3. 统计 "等待验证"、"验证未通过"、"结项" 的数据条数
+        int waitingForVerification = countIssuesBylevel("等待验证");
+        int verificationFailed = countIssuesBylevel("未通过验证");
+        int completedIssues = countIssuesBylevel("结项");
+
+        statistics.put("等待验证数量", waitingForVerification);
+        statistics.put("验证未通过数量", verificationFailed);
+        statistics.put("结项数量", completedIssues);
+
+        System.out.println("第三部分统计数据"+statistics+"++++++ ");
+
+        return statistics;
+    }
+
+    @Override
+    public Map<String, Map<String, Integer>> getIssuebyDepartment(String startDate, String endDate) {
+        // 创建统计结果的容器
+        Map<String, Map<String, Integer>> departmentStatistics = new HashMap<>();
+
+        // 获取指定时间范围内的所有记录的责任科室和完成状态
+        List<IssueTableEntity> issueList = getIssuesByDateRange(startDate, endDate);
+
+        // 遍历记录，统计每个责任科室的问题总数和已完成问题总数
+        for (IssueTableEntity issue : issueList) {
+            String department = issue.getResponsibleDepartment(); // 责任科室
+            String state = issue.getState(); // 完成情况
+
+            // 初始化科室统计数据
+            departmentStatistics.putIfAbsent(department, new HashMap<>());
+            Map<String, Integer> completionStats = departmentStatistics.get(department);
+
+            completionStats.putIfAbsent("total", 0);       // 默认值为 0
+            completionStats.putIfAbsent("completed", 0);  // 默认值为 0
+
+            // 更新问题总数
+            completionStats.put("total", completionStats.getOrDefault("total", 0) + 1);
+
+            // 更新已完成问题数
+            if ("已完成".equals(state)) {
+                completionStats.put("completed", completionStats.getOrDefault("completed", 0) + 1);
+            }
+        }
+//        System.out.println("wancehngqingkuang" + departmentStatistics +"------------");
+
+        return departmentStatistics;
+    }
+
+    @Override
+    public Map<String, Map<String, Object>> getbyindemnification(String startDate, String endDate) {
+        // 定义结果集：每种赔偿件类型对应一个 Map，包含发生次数和成本总和
+        Map<String, Map<String, Object>> indemnificationTypeStatistics = new HashMap<>();
+
+        // 获取当前月份所有赔偿件数据
+        List<IssueTableEntity> indemnificationIssues = getIndemnificationIssues(startDate, endDate);
+
+        // 遍历赔偿件数据，统计每种赔偿件的发生次数和成本总和
+        for (IssueTableEntity issue : indemnificationIssues) {
+            String indemnificationType = issue.getIndemnification(); // 获取赔偿件类型
+            double qualityCost = issue.getQualitycost(); // 获取成本字段
+
+            // 如果当前赔偿件类型不存在，则初始化
+            // 初始化赔偿件统计数据
+            indemnificationTypeStatistics.putIfAbsent(indemnificationType, new HashMap<>());
+            Map<String, Object> typeStats = indemnificationTypeStatistics.get(indemnificationType);
+
+            // 初始化字段 "count" 和 "totalCost"，默认为 0
+            typeStats.putIfAbsent("count", 0);       // 初始化次数为 0
+            typeStats.putIfAbsent("totalCost", 0.0); // 初始化成本总和为 0.0
+
+            // 更新赔偿件的发生次数和成本总和
+            typeStats.put("count", (int) typeStats.get("count") + 1); // 次数加 1
+            typeStats.put("totalCost", (double) typeStats.get("totalCost") + qualityCost); // 成本累加
+        }
+        System.out.println("赔偿将统计数量" + indemnificationTypeStatistics + "+++++");
+        return indemnificationTypeStatistics;
+    }
+
+    @Override
+    public Map<String, Map<String, Object>> getbyvendor(String startDate, String endDate) {
+        // 定义结果集：每种赔偿件类型对应一个 Map，包含发生次数和成本总和
+        Map<String, Map<String, Object>> venderTypeStatistics = new HashMap<>();
+
+        // 获取当前月份所有赔偿件数据
+        List<IssueTableEntity> venderIssues = getvenderIssues(startDate, endDate);
+
+        // 遍历赔偿件数据，统计每种赔偿件的发生次数和成本总和
+        for (IssueTableEntity issue : venderIssues) {
+            String venderType = issue.getVendor(); // 获取赔偿件类型
+            double qualityCost = issue.getQualitycost(); // 获取成本字段
+
+            // 如果当前供应商不存在，则初始化
+            // 初始化供应商统计数据
+            venderTypeStatistics.putIfAbsent(venderType, new HashMap<>());
+            Map<String, Object> typeStats = venderTypeStatistics.get(venderType);
+
+            // 初始化字段 "count" 和 "totalCost"，默认为 0
+            typeStats.putIfAbsent("count", 0);       // 初始化次数为 0
+            typeStats.putIfAbsent("totalCost", 0.0); // 初始化成本总和为 0.0
+
+            // 更新供应商的发生次数和成本总和
+            typeStats.put("count", (int) typeStats.get("count") + 1); // 次数加 1
+            typeStats.put("totalCost", (double) typeStats.get("totalCost") + qualityCost); // 成本累加
+        }
+        System.out.println("赔偿将统计数量" + venderTypeStatistics + "+++++");
+        return venderTypeStatistics;
+    }
+
+    @Override
+    public Map<String, Map<String, Object>> getbyvehicletype(String startDate, String endDate) {
+        // 定义结果集：每种车型对应一个 Map，包含发生次数和成本总和
+        Map<String, Map<String, Object>> carModelStatistics = new HashMap<>();
+
+        // 获取当前月份所有问题的车型数据
+        List<IssueTableEntity> issueList = getIssuesByCarModel(startDate, endDate);
+
+        // 遍历问题数据，统计每种车型的发生次数和生成成本
+        for (IssueTableEntity issue : issueList) {
+            String vehicleTypeIds = issue.getVehicleTypeId(); // 获取车型字段（可能是多个车型，例如 "A,B,C"）
+            double generationCost = issue.getQualitycost(); // 获取生成成本字段
+
+            // 拆分车型数据，处理每种车型
+            String[] vehicleTypes = vehicleTypeIds.split(",");
+            for (String vehicleType : vehicleTypes) {
+                vehicleType = vehicleType.trim(); // 去除多余的空格
+
+                // 如果当前车型不存在，则初始化
+                carModelStatistics.putIfAbsent(vehicleType, new HashMap<>());
+                Map<String, Object> typeStats = carModelStatistics.get(vehicleType);
+
+                // 初始化字段 "count" 和 "totalCost"，默认为 0
+                typeStats.putIfAbsent("count", 0);       // 初始化次数为 0
+                typeStats.putIfAbsent("totalCost", 0.0); // 初始化成本总和为 0.0
+
+                // 更新车型的发生次数和生成成本总和
+                typeStats.put("count", (int) typeStats.get("count") + 1); // 次数加 1
+                typeStats.put("totalCost", (double) typeStats.get("totalCost") + generationCost); // 成本累加
+            }
+        }
+
+        System.out.println("车型统计数据：" + carModelStatistics);
+        return carModelStatistics;
+    }
+
+    @Override
+    public Map<String, Map<String, Object>> getbyregiontype(String startDate, String endDate) {
+        // 定义结果集：每个区域对应一个 Map，包含发生次数和成本总和
+        Map<String, Map<String, Object>> regionStatistics = new HashMap<>();
+
+        // 获取当前月份所有问题的区域数据
+        List<IssueTableEntity> issueList = getIssuesByRegion(startDate, endDate);
+
+        // 遍历问题数据，统计每个区域的发生次数和生成成本
+        for (IssueTableEntity issue : issueList) {
+            String regions = issue.getRegion(); // 获取区域字段（可能是多个区域，例如 "East,West,North"）
+            double generationCost = issue.getQualitycost(); // 获取生成成本字段
+
+            // 拆分区域数据，处理每个区域
+            String[] regionArray = regions.split(",");
+            for (String region : regionArray) {
+                region = region.trim(); // 去除多余的空格
+
+                // 如果当前区域不存在，则初始化
+                regionStatistics.putIfAbsent(region, new HashMap<>());
+                Map<String, Object> regionStats = regionStatistics.get(region);
+
+                // 初始化字段 "count" 和 "totalCost"，默认为 0
+                regionStats.putIfAbsent("count", 0);       // 初始化次数为 0
+                regionStats.putIfAbsent("totalCost", 0.0); // 初始化成本总和为 0.0
+
+                // 更新区域的发生次数和生成成本总和
+                regionStats.put("count", (int) regionStats.get("count") + 1); // 次数加 1
+                regionStats.put("totalCost", (double) regionStats.get("totalCost") + generationCost); // 成本累加
+            }
+        }
+
+        System.out.println("区域统计数据：" + regionStatistics);
+        return regionStatistics;
+    }
+
 
     @Override
     public Map<String, Integer> gettruecurrentall() {
@@ -923,16 +1166,11 @@ public R closeRelatedTasks(Long issueId, Integer closeRelated) {
     }
 
     @Override
-    public Map<String, Integer> getcurrentMonthInProgressCategoryStats() {
+    public Map<String, Integer> getcurrentMonthInProgressCategoryStats(String startDate, String endDate) {
         Map<String, Integer> categoryStatistics = new HashMap<>();
 
-        // 获取当前月份的起止日期
-        String currentMonthStart = LocalDate.now().withDayOfMonth(1).format(DateTimeFormatter.ISO_DATE);
-        LocalDate nextMonthFirstDay = LocalDate.now().plusMonths(1).withDayOfMonth(1);
-        String nextMonthFirstDayString = nextMonthFirstDay.format(DateTimeFormatter.ISO_DATE);
-
         // 获取当前月份所有问题的 issue_category_id
-        List<String> issueCategoryIds = getIssueCategoryIds(currentMonthStart, nextMonthFirstDayString);
+        List<String> issueCategoryIds = getIssueCategoryIds(startDate, endDate);
 
         // 使用 issueCategoryIds 统计每个问题类型的数量
         for (String categoryId : issueCategoryIds) {
@@ -1325,7 +1563,8 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
     private List<String> getIssueCategoryIds(String currentMonthStart, String nextMonthFirstDayString) {
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.ge("creation_time", currentMonthStart)
-                .lt("creation_time", nextMonthFirstDayString);
+                .lt("creation_time", nextMonthFirstDayString)
+                .isNull("parent_Question").or().eq("parent_Question", "");
 
         // 查询当月所有问题，获取 issue_category_id 字段
         List<IssueTableEntity> issueList = this.list(queryWrapper);
@@ -1336,6 +1575,69 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
                 .collect(Collectors.toList());
     }
 
+    private List<String> getVehicleTypeIds(String currentMonthStart, String nextMonthFirstDayString) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("creation_time", currentMonthStart)
+                .lt("creation_time", nextMonthFirstDayString);
+
+        // 查询当月所有问题，获取 vehicle_type_id 字段（车型数据）
+        List<IssueTableEntity> issueList = this.list(queryWrapper);
+
+        // 提取 vehicle_type_id 并返回
+        return issueList.stream()
+                .map(IssueTableEntity::getVehicleTypeId) // 获取每个记录的 vehicle_type_id
+                .collect(Collectors.toList());
+    }
+    // 辅助方法：获取当前月份所有赔偿件数据
+    private List<IssueTableEntity> getIndemnificationIssues(String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("creation_time", startDate) // 筛选创建时间 >= 本月起始日期
+                .lt("creation_time", endDate)  // 筛选创建时间 < 下月第一天
+                .isNotNull("indemnification"); // 仅筛选有赔偿件类型的记录
+
+        // 查询满足条件的所有记录
+        return this.list(queryWrapper);
+    }
+
+    private List<IssueTableEntity> getvenderIssues(String startDate, String endDate) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("creation_time", startDate) // 筛选创建时间 >= 本月起始日期
+                .lt("creation_time", endDate)  // 筛选创建时间 < 下月第一天
+                .isNotNull("vendor"); // 仅筛选有赔偿件类型的记录
+
+        // 查询满足条件的所有记录
+        return this.list(queryWrapper);
+    }
+
+    private List<IssueTableEntity> getIssuesByDateRange(String startDate, String endDate) {
+        // 构建查询条件
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("creation_time", startDate) // 起始时间
+                .lt("creation_time", endDate); // 结束时间
+
+        // 查询符合条件的记录
+        return this.list(queryWrapper);
+    }
+
+    private List<IssueTableEntity> getIssuesByCarModel(String currentMonthStart, String nextMonthFirstDayString) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("creation_time", currentMonthStart)  // 起始日期
+                .lt("creation_time", nextMonthFirstDayString)
+                .isNotNull("vehicle_type_id"); // 结束日期
+
+        // 查询当月所有问题，获取 vehicle_type_id 和 qualitycost 字段（车型数据和生成成本）
+        return this.list(queryWrapper);
+    }
+
+    private List<IssueTableEntity> getIssuesByRegion(String currentMonthStart, String nextMonthFirstDayString) {
+        QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ge("creation_time", currentMonthStart)  // 起始日期
+                .lt("creation_time", nextMonthFirstDayString)
+                .isNotNull("region");; // 结束日期
+
+        // 查询当月所有问题，获取 region 和 qualitycost 字段（区域数据和生成成本）
+        return this.list(queryWrapper);
+    }
     private Integer countAllIssues() {
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
         // 查询所有记录
@@ -1354,7 +1656,11 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
                                 .or().like("verification_conclusion", "持续")
                 )
                 .ge("creation_time", startDate)
-                .le("creation_time", endDate);
+                .le("creation_time", endDate)
+                // 筛选出parent_Question字段为空或者null的数据
+                .and(wrapper -> wrapper.isNull("parent_Question").or().eq("parent_Question", ""))
+               ;
+
 
         return this.count(queryWrapper);
     }
@@ -1362,6 +1668,7 @@ public Map<String, Integer> getCurrentMonthCompletionRate() {
         QueryWrapper<IssueTableEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.and(wrapper ->
                 wrapper.isNull("verification_conclusion")
+                        .isNull("parent_Question").or().eq("parent_Question", "")
                         .or().eq("verification_conclusion", "")
                         .or().like("verification_conclusion", "持续")
         );

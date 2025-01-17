@@ -49,6 +49,18 @@ public class IssueTableEntity implements Serializable {
 	 */
 	private String issueCategoryId;
 	/**
+	 * 赔偿件
+	 */
+	private String indemnification;
+	/**
+	 * 图号
+	 */
+	private String figurenumber;
+	/**
+	 * 质量成本
+	 */
+	private Double qualitycost;
+	/**
 	 * 系统分类
 	 */
 	private String systematicClassification;
@@ -69,6 +81,18 @@ public class IssueTableEntity implements Serializable {
 	 */
 	private String faultModel;
 	/**
+	 * 问题件分类
+	 */
+	private String problematicpieces;
+	/**
+	 * 供应商名称
+	 */
+	private String vendor;
+	/**
+	 * 是否为新产品
+	 */
+	private String isnew;
+	/**
 	 * 车型ID
 	 */
 	private String vehicleTypeId;
@@ -76,6 +100,22 @@ public class IssueTableEntity implements Serializable {
 	 * 车号ID
 	 */
 	private String vehicleNumberId;
+	/**
+	 * 销售时间
+	 */
+	private String saleTiming;
+	/**
+	 * 使用时间
+	 */
+	private String useTiming;
+	/**
+	 * 问题区域
+	 */
+	private String region;
+	/**
+	 * 地区
+	 */
+	private String industry;
 	/**
 	 * 问题描述
 	 */

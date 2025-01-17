@@ -9,6 +9,22 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="初评人员" prop="firstExaminePeople">
+        <el-select v-model="dataForm.firstExaminePeople" clearable multiple filterable placeholder="请选择角色">
+          <el-option-group v-for="group in usersOption" :key="group.label" :label="group.label">
+            <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
+            </el-option>
+          </el-option-group>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="复评人员" prop="secondExaminePeople">
+        <el-select v-model="dataForm.secondExaminePeople" clearable multiple filterable placeholder="请选择角色">
+          <el-option-group v-for="group in usersOption" :key="group.label" :label="group.label">
+            <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.label">
+            </el-option>
+          </el-option-group>
+        </el-select>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -21,6 +37,7 @@
 export default {
   data() {
     return {
+      usersOption: [],
       options: [{
         value: '安全',
         label: '安全'
@@ -65,6 +82,8 @@ export default {
         deleteFlag: '',
         note: '',
         resultType: [],
+        firstExaminePeople: [],
+        secondExaminePeople: [],
       },
       dataFormEx: {
         qcExamineId: 0,
@@ -114,7 +133,11 @@ export default {
             params: this.$http.adornParams()
           }).then(({ data }) => {
             let resultTypeString = data.qcSubjectRegistration.resultType;
-            let resultArray = resultTypeString.split(",");
+            if (resultTypeString != '') {
+              var resultArray = resultTypeString.split(",");
+            } else {
+              var resultArray = ''
+            }
             if (data && data.code === 0) {
               this.dataForm.topicReviewStatus = data.qcSubjectRegistration.topicReviewStatus
               this.dataForm.resultType = resultArray
@@ -127,12 +150,26 @@ export default {
     dataFormSubmit() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          let tmpFirstList = this.dataForm.firstExaminePeople.map(item => ({
+            name: item,
+            score: [],
+            result: '',
+            comment: ''
+          }));
+          let tmpSecondList = this.dataForm.secondExaminePeople.map(item => ({
+            name: item,
+            score: [],
+            result: '',
+            comment: ''
+          }));
           this.$http({
             url: this.$http.adornUrl(`/qcSubject/registration/update`),
             method: 'post',
             data: this.$http.adornData({
               'qcsrId': this.dataForm.qcsrId || undefined,
               'resultType': `${this.dataForm.resultType}`,
+              'firstExaminePeople': JSON.stringify(this.dataForm.firstExaminePeople),
+              'secondExaminePeople': JSON.stringify(this.dataForm.secondExaminePeople),
               'topicReviewStatus': 3,
             })
           }).then(({ data }) => {
@@ -145,6 +182,8 @@ export default {
                   'qcExamineSubject': this.dataForm.qcsrId,
                   'qcExamineCurrent': '0',
                   'qcStatusOne': '0',
+                  'qcFirstAll': JSON.stringify(tmpFirstList),
+                  'qcSecondAll': JSON.stringify(tmpSecondList),
                 })
               }).then(({ data }) => {
                 if (data && data.code === 0) {

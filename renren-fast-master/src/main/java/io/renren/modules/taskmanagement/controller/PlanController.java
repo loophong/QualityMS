@@ -11,6 +11,7 @@ import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.renren.modules.app.service.UserService;
 import io.renren.modules.taskmanagement.dto.PlanDTO;
 import io.renren.modules.taskmanagement.dto.PlanQueryParamDTO;
 import io.renren.modules.taskmanagement.entity.*;
@@ -22,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import io.renren.common.utils.PageUtils;
@@ -55,9 +57,37 @@ public class PlanController {
     private ObjectMapper objectMapper;
     @Autowired
     private PlanApprovalTableService planApprovalTableService;
+    @Autowired
+    private UserService userService;
+    /**
+     * @description: 全部计划导出
+     * @param: response
+     * @return: void
+     * @author: hong
+     * @date: 2024/12/22 10:29
+     */
     @RequestMapping("/export")
     public void export(HttpServletResponse response) {
         List<PlanExportVO> planExportVO = planService.export();
+        String fileName = "任务表" + System.currentTimeMillis() + ".xlsx";
+        try {
+            EasyExcel.write(response.getOutputStream(), PlanExportVO.class).sheet("任务表").doWrite(planExportVO);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    /**
+     * @description: 知识库导出
+     * @param: response
+     * @return: void
+     * @author: hong
+     * @date: 2024/12/22 10:29
+     */
+    @RequestMapping("/exportBase")
+    public void exportBase(HttpServletResponse response) {
+        List<PlanExportVO> planExportVO = planService.exportBase();
         String fileName = "任务表" + System.currentTimeMillis() + ".xlsx";
         try {
             EasyExcel.write(response.getOutputStream(), PlanExportVO.class).sheet("任务表").doWrite(planExportVO);
@@ -275,6 +305,7 @@ public class PlanController {
      * @author: hong
      * @date: 2024/11/10 17:20
      */
+    @Transactional
     @PostMapping("/save")
     @RequiresPermissions("taskmanagement:plan:save")
     public R save(@RequestBody PlanDTO planDTO) {
@@ -290,6 +321,7 @@ public class PlanController {
      * @author: hong
      * @date: 2024/12/15 13:18
      */
+    @Transactional
     @PostMapping("/saveAndApproval")
     @RequiresPermissions("taskmanagement:plan:save")
     public R saveAndApproval(@RequestBody PlanDTO planDTO) {
@@ -305,6 +337,7 @@ public class PlanController {
      * @author: hong
      * @date: 2024/12/20 13:13
      */
+    @Transactional
     @RequestMapping("/reApproval")
     @RequiresPermissions("taskmanagement:plan:update")
     public R reApproval(@RequestBody PlanDTO planDTO) {
@@ -341,6 +374,7 @@ public class PlanController {
 //
 //        return R.ok();
 //    }
+    @Transactional
     @RequestMapping("/update")
     @RequiresPermissions("taskmanagement:plan:update")
     public R update(@RequestBody PlanDTO planDTO) {
@@ -355,6 +389,7 @@ public class PlanController {
      * @date: 2024/8/30 15:51
      * @version: 1.0
      */
+    @Transactional
     @RequestMapping("/delete/{planId}")
     @RequiresPermissions("taskmanagement:plan:delete")
     public R delete(@PathVariable String planId) {
@@ -431,6 +466,34 @@ public class PlanController {
 
         return planDTO;
     }
+
+
+    /**
+     * @description: 树状图展示计划的结构
+     * @param: planId
+     * @return: io.renren.modules.taskmanagement.dto.PlanDTO
+     * @author: hong
+     * @date: 2024/12/25 9:56
+     */
+    @GetMapping("/planTreeDisplay")
+    public PlanDTO planTreeDisplay(@RequestParam String planId) {
+        log.info("planId:{}", planId);
+
+        PlanDTO planDTO = new PlanDTO();
+
+        PlanEntity plan = planService.getOne(new LambdaQueryWrapper<PlanEntity>().eq(PlanEntity::getPlanId, planId));
+        List<TaskEntity> taskList = taskService.list(new LambdaQueryWrapper<TaskEntity>().eq(TaskEntity::getTaskAssociatedPlanId, planId));
+        List<FileEntity> fileList = fileService.list(new LambdaQueryWrapper<FileEntity>().eq(FileEntity::getPlanId, planId));
+
+        planDTO.setPlan(plan);
+        planDTO.setTasks(taskList);
+        planDTO.setFiles(fileList);
+
+        return planDTO;
+    }
+
+
+
 
     /**
      * @description: 查询计划的全部信息、直属任务、文件

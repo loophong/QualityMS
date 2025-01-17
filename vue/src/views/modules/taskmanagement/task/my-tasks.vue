@@ -480,15 +480,9 @@
 
 
     <!-- 审批人弹窗 -->
-    <el-dialog title="选择审批人" :visible.sync="submitApprovalDialogVisible" width="50%">
-      <!-- <el-form :model="form"> -->
-      <!-- <el-form-item label="审批人" :label-width="formLabelWidth">
-          <el-select v-model="form.approver" placeholder="请选择审批人">
-            <el-option v-for="item in approvers" :key="item.id" :label="item.name" :value="item.id">
-            </el-option>
-          </el-select>
-        </el-form-item> -->
+    <el-dialog title="任务送审" :visible.sync="submitApprovalDialogVisible" width="50%">
       <el-form ref="formRef" :model="approvalForm" label-width="80px">
+
         <el-form-item label="审核人" prop="taskApprovalor">
           <el-select v-model="approvalForm.taskApprovalor" filterable placeholder="请选择审核人">
             <el-option-group v-for="group in options" :key="group.label" :label="group.label">
@@ -497,20 +491,50 @@
             </el-option-group>
           </el-select>
         </el-form-item>
-        <el-form-item label="审核内容">
-          <el-input v-model="approvalForm.approvalContent" type="textarea" :rows="4"
-                    placeholder="请输入审核内容"></el-input>
+        <el-form-item label="现状">
+          <el-input v-model="approvalForm.currentStatus" type="textarea" :rows="3" placeholder="请输入现状"></el-input>
         </el-form-item>
+        <el-form-item label="目标">
+          <el-input v-model="approvalForm.objectiveGoal" type="textarea" :rows="3"
+                    placeholder="请输入任务目标"></el-input>
+        </el-form-item>
+        <el-form-item label="主要措施">
+          <el-input v-model="approvalForm.keyMeasuresActions" type="textarea" :rows="3"
+                    placeholder="请输入主要措施"></el-input>
+        </el-form-item>
+        <el-form-item label="实施人">
+          <el-select v-model="approvalForm.implementerResponsiblePerson" multiple filterable placeholder="实施人">
+            <el-option-group v-for="group in options" :key="group.label" :label="group.label">
+              <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                         :value="item.value">
+              </el-option>
+            </el-option-group>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="开展时间">
+          <el-date-picker
+            v-model="approvalForm.implementationStartTime"
+            value-format="yyyy-MM-dd"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
+        </el-form-item>
+
+        <!--        <el-form-item label="审核内容">-->
+        <!--          <el-input v-model="approvalForm.approvalContent" type="textarea" :rows="4" placeholder="请输入审核内容"></el-input>-->
+        <!--        </el-form-item>-->
+
         <el-form-item label="上传附件">
-          <el-upload ref="file" :file-list="approvalFiles" :action="uploadUrl"
-                     :on-remove="handleRemove" :before-remove="beforeRemove" :on-change="uploadFile"
-                     :auto-upload="false">
+          <el-upload ref="file" :file-list="approvalFiles" :action="uploadUrl" :on-remove="handleRemove"
+                     :before-remove="beforeRemove" :on-change="uploadFile" :auto-upload="false">
             <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
           </el-upload>
         </el-form-item>
 
       </el-form>
-      <!-- </el-form> -->
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="submitApprovalDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitApprover">确 定</el-button>
@@ -594,7 +618,14 @@ export default {
       approvalForm: {
         taskId: '',
         taskApprovalor: '',
-        approvalContent: ''
+        approvalContent: '',
+        currentStatus: '',
+        objectiveGoal: '',
+        keyMeasuresActions: '',
+        implementerResponsiblePerson: '',
+        implementationStartTime: [new Date(), new Date()],
+        implementationEndTime: '',
+
       },
       approvalFiles: [],
       uploadUrl: '',
@@ -647,9 +678,21 @@ export default {
     showApproverDialog(row) {
       this.approvalForm.taskApprovalor = row.taskAuditor;
       this.approvalForm.taskId = row.taskId;
-      // this.fetchApprovers().then(() => {
+      this.approvalForm.currentStatus = ''
+      this.approvalForm.keyMeasuresActions = ''
+      this.approvalForm.objectiveGoal = ''
+      this.approvalForm.implementerResponsiblePerson = row.taskExecutor
+      // console.log(row.taskStartDate)
+      // this.approvalForm.implementationStartTime[0] = new Date(row.taskStartDate).toISOString().slice(0, 10)
+      // this.approvalForm.implementationStartTime[1] = new Date().toISOString().slice(0, 10)
+      // 使用 $set 确保响应式更新
+      this.$set(this.approvalForm, 'implementationStartTime', [
+        new Date(row.taskStartDate).toISOString().slice(0, 10),
+        new Date().toISOString().slice(0, 10)
+      ]);
+      this.approvalFiles = []
+      // console.log(this.approvalForm.implementationStartTime[0])
       this.submitApprovalDialogVisible = true;
-      // });
     },
 
     // 取消审批
@@ -970,7 +1013,14 @@ export default {
         data: this.$http.adornParams({
           'taskId': this.approvalForm.taskId,
           'approvalor': this.approvalForm.taskApprovalor,
-          'approvalContent': this.approvalForm.approvalContent,
+          // 'approvalContent': this.approvalForm.approvalContent,
+          'currentStatus': this.approvalForm.currentStatus,
+          'objectiveGoal': this.approvalForm.objectiveGoal,
+          'keyMeasuresActions': this.approvalForm.keyMeasuresActions,
+          // 'implementerResponsiblePerson': this.approvalForm.implementerResponsiblePerson,
+          'implementerResponsiblePerson': this.approvalForm.implementerResponsiblePerson ? String(this.approvalForm.implementerResponsiblePerson) : '',
+          'implementationStartTime': this.approvalForm.implementationStartTime[0],
+          'implementationEndTime': this.approvalForm.implementationStartTime[1],
           'files': this.approvalFiles
         })
       }).then(({data}) => {

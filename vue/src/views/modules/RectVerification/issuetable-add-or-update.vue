@@ -84,6 +84,19 @@
           secondFaultyParts: '',
           faultType: '',
           faultModel: '',
+
+          indemnification: '',
+          indemnificationname: '',
+          figurenumber: '',
+          qualitycost: '',
+          problematicpieces: '',
+          vendor: '',
+          isnew: '',
+          saleTiming: '',
+          useTiming: '',
+          region: '',
+          industry: '',
+
           vehicleNumberId: '',
           issueDescription: '',
           vehicleTypeOptions: [],
@@ -467,6 +480,18 @@
             'issueNumber': this.connectissue,
             'inspectionDepartment': this.dataForm.inspectionDepartment,
             'inspectionDate': this.dataForm.inspectionDate,
+
+            'indemnification': this.dataForm.indemnification,
+            'figurenumber': this.dataForm.figurenumber,
+            'qualitycost': this.dataForm.qualitycost,
+            'problematicpieces': this.dataForm.problematicpieces,
+            'vendor': this.dataForm.vendor,
+            'isnew': this.dataForm.isnew,
+            'saleTiming': this.dataForm.saleTiming,
+            'useTiming': this.dataForm.useTiming,
+            'region': this.dataForm.region,
+            'industry': this.dataForm.industry,
+
             'issueCategoryId': this.dataForm.issueCategoryId, // 使用转换后的字符串
             'vehicleTypeId': this.dataForm.vehicleTypeId,
             'vehicleNumberId': this.dataForm.vehicleNumberId,
@@ -529,7 +554,7 @@
         // 生成问题编号
         this.newissuenumber = await this.generateSerialNumber();
         this.connectissue = await this.generateconnectNumber(id, issuenumber);
-        console.log("成功生成问题编号：", this.connectissue)
+        // console.log("成功生成问题编号：", this.connectissue)
         this.dataForm.issueId = id || 0
         this.visible = true
         // console.log("成功获取用户名：" ,this.dataForm.userinfo)
@@ -546,6 +571,18 @@
                 this.dataForm.issueNumber = data.issueTable.issueNumber
                 this.dataForm.inspectionDepartment = data.issueTable.inspectionDepartment
                 this.dataForm.inspectionDate = data.issueTable.inspectionDate
+
+                this.dataForm.indemnification = data.issueTable.indemnification
+                this.dataForm.figurenumber = data.issueTable.figurenumber
+                this.dataForm.qualitycost = data.issueTable.qualitycost
+                this.dataForm.problematicpieces = data.issueTable.problematicpieces
+                this.dataForm.vendor = data.issueTable.vendor
+                this.dataForm.isnew = data.issueTable.isnew
+                this.dataForm.saleTiming = data.issueTable.saleTiming
+                this.dataForm.useTiming = data.issueTable.useTiming
+                this.dataForm.region = data.issueTable.region
+                this.dataForm.industry = data.issueTable.industry
+
                 this.dataForm.issueCategoryId = data.issueTable.issueCategoryId
                 this.dataForm.vehicleTypeId = data.issueTable.vehicleTypeId
                 this.dataForm.vehicleTypeIds = data.issueTable.vehicleTypeId ? data.issueTable.vehicleTypeId.split(',') : [] // 将逗号分隔的字符串转换为数组

@@ -1,62 +1,35 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="myQueryParam" @keyup.enter.native="getDataList()">
-      
-      <!-- 查询输入框 -->  
       <el-form-item>
-        <el-input v-model="myQueryParam.issueDescription" placeholder="问题描述" clearable></el-input>
-      </el-form-item>
-      <!-- <el-form-item>
-        <el-input v-model="myQueryParam.creationTime" placeholder="创建时间" clearable></el-input>
-      </el-form-item> -->
-      <el-form-item label="问题发生时间" prop="creationTime"></el-form-item>
-      <el-date-picker 
-          v-model="myQueryParam.creationTime"
-          type="date"
-          placeholder="选择创建时间"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-        ></el-date-picker>
-      <!-- <el-form-item label="问题类别" prop="issueCategoryId">
-        <el-select v-model="queryParams.issueCategoryId" filterable placeholder="请选择问题类别">
-          <el-option
-            v-for="item in issueCategoryOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="车型" prop="vehicleTypeId">
-        <el-select v-model="queryParams.vehicleTypeId" filterable placeholder="请选择车型">
-          <el-option
-            v-for="item in vehicleTypeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="责任科室" prop="responsibleDepartment">
-        <el-select v-model="queryParams.responsibleDepartment" filterable placeholder="请选择责任科室">
-          <el-option
-            v-for="department in departmentOptions"
-            :key="department.value"
-            :label="department.label"
-            :value="department.value">
-          </el-option>
-        </el-select>
-      </el-form-item> -->
+          <el-input v-model="myQueryParam.issueDescription" placeholder="问题描述" clearable></el-input>
+        </el-form-item>
+        <!-- <el-form-item>
+          <el-input v-model="myQueryParam.creationTime" placeholder="创建时间" clearable></el-input>
+        </el-form-item> -->
+        <el-form-item label="问题发生时间" prop="creationTime"></el-form-item>
+        <el-date-picker 
+            v-model="myQueryParam.creationTime"
+            type="date"
+            placeholder="选择创建时间"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
+          ></el-date-picker>
+     
+        
+   
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="exportAll()">导出</el-button>    
+        <el-button @click="downloadTemplate()">下载模板</el-button> 
+        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>    
       </el-form-item>
-      <el-form-item>
+      <!-- <el-form-item>
         <el-button @click="downloadTemplate()">下载模板</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button @click="exportAll()">导出</el-button>     
-        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>   
-      </el-form-item>
+        <el-button @click="exportAll()">导出</el-button>
+      </el-form-item> -->
     </el-form>
     <el-dialog :visible.sync="taskDetailVisible" title="问题详情">
       <div>
@@ -65,6 +38,7 @@
       </div>
       <div id="task-chart" style="width: 100%; height: 400px;"></div> <!-- 用于echarts图表 -->
       <div slot="footer">
+        <el-button v-if="isAuth('generator:issuemasktable:admin')" @click="openTaskList">任务列表</el-button>
         <el-button @click="taskDetailVisible = false">关闭</el-button>
       </div>
     </el-dialog>
@@ -88,10 +62,11 @@
     </el-dialog>
     <el-table
       :data="dataList"
+      height="750"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
-      :row-class-name="getRowClassName"
+      :row-class-name="rowClassName"
       style="width: 100%;">
     <el-table-column
         type="selection"
@@ -99,17 +74,22 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
-        prop="serialNumber"
-        header-align="center"
-        align="center"
-        label="序号">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="serialNumber"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="序号">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="issueNumber"
         header-align="center"
         align="center"
         label="问题编号">
+        <template slot-scope="scope">
+           <span :style="{ color: scope.row.overDue === 'true' ? 'red' : 'black' }">
+              {{ scope.row.issueNumber }}
+            </span>
+        </template>
       </el-table-column>
       <el-table-column
         prop="inspectionDepartment"
@@ -146,6 +126,12 @@
         header-align="center"
         align="center"
         label="问题描述">
+      </el-table-column>
+      <el-table-column
+        prop="peliminaryAnalysis"
+        header-align="center"
+        align="center"
+        label="初步分析">
       </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="issuePhoto"-->
@@ -210,6 +196,17 @@
         align="center"
         label="实际完成时间">
       </el-table-column>
+      <el-table-column
+        prop="rectificationPhotoDeliverable"
+        header-align="center"
+        align="center"
+        label="整改照片交付物">
+        <template slot-scope="scope">
+          <el-button type="text" @click="showFileList(scope.row.rectificationPhotoDeliverable)">
+            预览
+          </el-button>
+        </template>
+      </el-table-column>
 <!--      <el-table-column-->
 <!--        prop="rectificationPhotoDeliverable"-->
 <!--        header-align="center"-->
@@ -219,32 +216,35 @@
 <!--          <el-button type="text" size="small" @click="handleFileAction(scope.row.rectificationPhotoDeliverable)">预览</el-button>-->
 <!--        </template>-->
 <!--      </el-table-column>-->
-      <el-table-column
-        prop="rectificationPhotoDeliverable"
-        header-align="center"
-        align="center"
-        label="整改照片交付物">
-        <template slot-scope="scope">
-          <img
-            :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"
-            alt="整改照片交付物"
-            style="width: 100px; height: auto; cursor: pointer;"
-            @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"
-          />
-        </template>
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="rectificationPhotoDeliverable"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="整改照片交付物">-->
+<!--        <template slot-scope="scope">-->
+<!--          <img-->
+<!--            :src="getImageUrl(scope.row.rectificationPhotoDeliverable)"-->
+<!--            alt="整改照片交付物"-->
+<!--            style="width: 100px; height: auto; cursor: pointer;"-->
+<!--            @click="handleFileAction(scope.row.rectificationPhotoDeliverable)"-->
+<!--          />-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="rectificationResponsiblePerson"
         header-align="center"
         align="center"
         label="整改责任人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.rectificationResponsiblePerson) }}
+        </template>
       </el-table-column>
-      <el-table-column
-        prop="requiredSecondRectificationTime"
-        header-align="center"
-        align="center"
-        label="要求二次整改时间">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="requiredSecondRectificationTime"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="要求二次整改时间">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="remark"
         header-align="center"
@@ -256,6 +256,9 @@
         header-align="center"
         align="center"
         label="创建人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.creator) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="creationTime"
@@ -263,30 +266,31 @@
         align="center"
         label="创建时间">
       </el-table-column>
-      <el-table-column
-        prop="lastModifier"
-        header-align="center"
-        align="center"
-        label="最后修改人">
-      </el-table-column>
-      <el-table-column
-        prop="lastModificationTime"
-        header-align="center"
-        align="center"
-        label="最后修改时间">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="lastModifier"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="最后修改时间">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="lastModificationTime"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="最后修改时间">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="associatedRectificationRecords"
         header-align="center"
         align="center"
-        label="关联问题整改记录">
+        label="关联问题">
       </el-table-column>
-      <el-table-column
-        prop="associatedIssueAddition"
-        header-align="center"
-        align="center"
-        label="关联问题添加">
-      </el-table-column>
+
+<!--      <el-table-column-->
+<!--        prop="associatedIssueAddition"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="关联问题添加">-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="creationDuration"
         header-align="center"
@@ -333,12 +337,12 @@
         <template slot-scope="scope">
           <div>
             <span v-for="(state, index) in getStates(scope.row.verificationConclusion)" :key="index">
-                <el-tag v-if="state === '未完成'" type="danger" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '暂停'" type="info" disable-transitions>{{ state }}</el-tag>
+                <el-tag v-if="state === '持续'" type="danger" disable-transitions>{{ state }}</el-tag>
+<!--                <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>-->
+                <el-tag v-else-if="state === '暂缓'" type="info" disable-transitions>{{ state }}</el-tag>
                 <el-tag v-else-if="state === '结项'" type="warning" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '未完成，暂停'" type="danger" disable-transitions>{{ state }}</el-tag>
-                <el-tag v-else-if="state === '暂停，未完成'" type="info" disable-transitions>{{ state }}</el-tag>
+<!--                <el-tag v-else-if="state === '持续，暂停'" type="danger" disable-transitions>{{ state }}</el-tag>-->
+<!--                <el-tag v-else-if="state === '暂停，未完成'" type="info" disable-transitions>{{ state }}</el-tag>-->
                 <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
             </span>
           </div>
@@ -350,6 +354,9 @@
         header-align="center"
         align="center"
         label="验证人">
+        <template slot-scope="scope">
+          {{ getUsernameByUserId(scope.row.verifier) }}
+        </template>
       </el-table-column>
       <el-table-column
         prop="formula"
@@ -357,8 +364,8 @@
         align="center"
         label="公式">
       </el-table-column>
-
     </el-table>
+  
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -385,33 +392,39 @@
   export default {
     data () {
       return {
-        //查询参数
+      
         queryParams:{
           issueCategoryId: '',
           vehicleTypeId: '',
           responsibleDepartment: '',
         },
+        tempParams:{
+          issueId: '',
+          issueNumber: '',
+        },
         issueCategoryOptions: [],
         vehicleTypeOptions: [],
         departmentOptions: [
-          { value: '财务科', label: '财务科' },
-          { value: '市场科', label: '市场科' },
-          { value: '安环科', label: '安环科' },
-          { value: '生产科', label: '生产科' },
-          { value: '供应科', label: '供应科' },
-          { value: '技术科', label: '技术科' },
-          { value: '企管科', label: '企管科' }
-          // 其他科室选项
+          // { value: '财务科', label: '财务科' },
+          // { value: '市场科', label: '市场科' },
+          // { value: '安环科', label: '安环科' },
+          // { value: '生产科', label: '生产科' },
+          // { value: '供应科', label: '供应科' },
+          // { value: '技术科', label: '技术科' },
+          // { value: '企管科', label: '企管科' }
+          // // 其他科室选项
         ],
+        heightTable: 0,
+        currentIssues: [],
         tableData: [],
         dataForm: {
           key: ''
         },
         dataList: [],
         myQueryParam: {
-            creationTime: '',
-            issueDescription: '',
-          },
+              creationTime: '',
+              issueDescription: '',
+            },
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
@@ -432,6 +445,7 @@
         dialogVisible1: false, // 控制对话框显示
         fullCause: '',    // 用于存储完整描述
         fullstatus: '',
+        dataList01: [], //列表数据(不分页)
         dialogVisible2: false,
         dialogVisible3: false,
         fullRetStates:'',
@@ -442,15 +456,100 @@
       AddOrUpdateD,
       AddOrUpdate
     },
+    async created(){
+      // 获取分组后的员工数据
+      this.$http({
+        url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
+        method: 'get',
+      }).then(({data}) => {
+        this.options = data;
+        console.log(this.options);
+      });
+    },
     activated () {
       this.fetchIssueCategories()
       this.fetchVehicleTypes()
       this.getDataList()
-      this.fetchData()
+      this.fetchDepartments()
+      // this.fetchData()
+    },
+    computed: {
+
+
     },
     methods: {
+      // 显示文件列表弹窗
+      showFileList(annex) {
+        try {
+          if (!annex) {
+            this.$message.warning("没有附件可预览！");
+            return;
+          }
+          // 解析数据库中存储的附件信息
+          const parsedAnnex = JSON.parse(annex);
+          if (Array.isArray(parsedAnnex) && parsedAnnex.length > 0) {
+            this.fileList = parsedAnnex;
+            this.fileDialogVisible = true; // 打开弹窗
+          } else {
+            this.$message.warning("附件数据格式不正确！");
+          }
+        } catch (error) {
+          console.error("附件解析失败:", error);
+          this.$message.error("附件数据解析失败！");
+        }
+      },
+      // 点击预览具体文件
+      previewFile(fileUrl) {
+        const token = this.$cookie.get("token"); // 获取当前的 token
+        if (!fileUrl) {
+          this.$message.warning("文件路径为空，无法预览！");
+          return;
+        }
+        if (!token) {
+          this.$message.error("登录已过期，请重新登录！");
+          return;
+        }
+        // 拼接带有 token 的预览地址
+        const url = `${this.$http.adornUrl(`/generator/issuetable/${fileUrl}`)}?token=${token}`;
+        window.open(url, "_blank");
+      },
+      getUsernameByUserId(auditorId) {
+        for (const category of this.options) {
+          for (const auditor of category.options) {
+            if (auditor.value === auditorId) {
+              return auditor.label;
+            }
+          }
+        }
+        return "-";
+      },
+      // rowStyle({ row }) {
+      //   console.log("染色")
+      //   return row.overDue === 'true' ? { color: 'red' } : {};
+      // },
+      // formatIssueNumber(row) {
+      //   if (row.overDue === 'true') {
+      //     // 当 overDue 为 true 时，返回带有红色样式的 HTML
+      //     return `<span style="color: red;">${row.issueNumber}</span>`;
+      //   }
+      //   return `<span>${row.issueNumber}</span>`;
+      // },
+      rowClassName({ row }) {
+        return row.overDue === 'true' ? 'overdue-text' : '';
+      },
 
-      
+      openTaskList() {
+        // console.log('打开任务列表', this.tempParams.issueId)
+        // console.log('打开任务列表', this.tempParams.issueNumber)
+        this.taskDetailVisible = false;
+        this.$router.push({
+          name: 'issue-issueAllmask',
+          params: {
+            issueId: this.tempParams.issueId,
+            issueNumber: this.tempParams.issueNumber
+          }
+        })
+      },
       getImageUrl(fileflag) {
         const token = this.$cookie.get('token'); // 获取当前的 token
         if (!token) {
@@ -468,9 +567,7 @@
         console.log('获取的地址 ' ,fileflag)
         // 拼接带有 token 的请求地址
         const url = `${this.$http.adornUrl(`/generator/issuetable/${fileflag}`)}?token=${token}`;
-
           window.open(url);
-
       },
 
       getStates(verificationConclusion) {
@@ -478,8 +575,10 @@
         // 按照逗号分隔，并去除多余的空格
         return verificationConclusion.split(',').map(state => state.trim());
       },
-      showTaskDetails(issueNumber) {
+      showTaskDetails(issueNumber,issueId) {
         this.fetchTaskDetails(issueNumber);
+        this.tempParams.issueId = issueId;
+        this.tempParams.issueNumber = issueNumber;
         this.taskDetailVisible = true; // 显示弹窗
       },
       fetchTaskDetails(issueNumber) {
@@ -499,6 +598,28 @@
             this.$message.error(data.msg);
           }
         });
+      },
+      fetchDepartments () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/departmenttable/fetchDepartments'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            console.log('Successfully fetched departmentOptions:', data.departmentTableEntities)
+            this.departmentOptions = data.departmentTableEntities.map(departmentTableEntities => ({
+              value: departmentTableEntities.departmentName,
+              label: departmentTableEntities.departmentName
+            }))
+          } else {
+
+            console.error('Failed to fetch issue categories:', data.msg)
+          }
+        }).catch(error => {
+          console.error('There was an error fetching the issue categories!', error)
+        })
+        // console.log('Successfully fetched departmentOptions:', this.departmentOptions)
+
       },
       initECharts() {
         // 使用ECharts初始化环形图
@@ -540,99 +661,93 @@
         myChart.setOption(option);
       }
       ,
-      // previewImage (imageUrl) {
-      //   const token = localStorage.getItem('token');
-      //   console.log("cur imageUrl====>" + imageUrl);
-      //   window.open(imageUrl + '?token' + '03fa820c47519bd3e2f845b9f720fa96');
-      //   console.log("图片地址：" ,imageUrl)
-      // },
-      // previewImage(imageUrl) {
-      //   // 获取当前的 token，假设它存储在 localStorage 中
-      //   const token = this.$cookie.get('token');
-      //   if (token) {
-      //   } else {
-      //     console.error('Token not found!');
-      //   }
-      //   // 将 token 作为参数添加到 URL
-      //   const imageUrlWithToken = `${imageUrl}?token=${token}`;
-      //   // 打开包含 token 的图片地址
-      //   window.open(imageUrlWithToken);
-      //
-      // },
-      // previewImagetest2(flag) {
-      //   // 获取当前的 token，假设它存储在 localStorage 中
-      //   const token = this.$cookie.get('token');
-      //   if (token) {
-      //   } else {
-      //     console.error('Token not found!');
-      //   }
-      //   // 将 token 作为参数添加到 URL
-      //   const imageUrlWithToken = `${imageUrl}?token=${token}`;
-      //   // 打开包含 token 的图片地址
-      //   window.open(imageUrlWithToken);
-      //
-      // },
-      getRowClassName({ row, rowIndex }) {
-        return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
+      showAssociatedIssues(associatedRectificationRecords) {
+        // 将数据库中的字符串分割成数组
+        if(associatedRectificationRecords === null || associatedRectificationRecords === undefined || associatedRectificationRecords === ''){
+          this.$message.error('没有关联问题！');
+        }
+        else {
+        this.currentIssues = associatedRectificationRecords.split(',');
+        this.dialogVisible3 = true; // 打开对话框
+        }
       },
+      viewIssueDetails(associatedRectificationRecords) {
+        // 将数据库中的字符串分割成数组
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.viewIssueDetails(associatedRectificationRecords)
+        })
+        this.dialogVisible3 = false; // 打开对话框
+      },
+      // getRowClassName({ row, rowIndex }) {
+      //   return rowIndex % 2 === 0 ? 'row-even' : 'row-odd';
+      // },
       // 关闭相关任务
-      closeRelatedTasks(id) {
-        // 提示用户确认
-        this.$confirm(`是否删除此问题并删除关联问题？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          // 用户确认后执行删除请求
-          this.$http({
-            url: this.$http.adornUrl(`/generator/issuetable/closeRelatedTasks/${id}`), // 修改为正确的URL
-            method: 'post'
-            // 此处不需要 data，因为我们在方法定义中直接使用了@PathVariable来接收ID
-          }).then(({data}) => {
+      // 打开弹窗
+      openCloseDialog(issueId) {
+        this.currentIssueId = issueId; // 记录当前问题ID
+        this.showCloseDialog = true; // 显示弹窗
+      },
+      // 提交关闭问题请求
+      closeRelatedTasks() {
+        this.$http({
+          url: this.$http.adornUrl(
+            `/generator/issuetable/closeRelatedTasks/${this.currentIssueId}/${this.selectedOption}`
+          ),
+          method: 'post',
+        })
+          .then(({ data }) => {
             if (data && data.code === 0) {
-              // 删除成功的提示
+              // 关闭成功提示
               this.$message({
                 message: '任务已成功关闭',
                 type: 'success',
                 duration: 1500,
                 onClose: () => {
-                  // 删除成功后刷新数据列表
+                  // 刷新列表
                   this.getDataList();
-                }
+                },
               });
             } else {
-              // 删除失败的提示
+              // 失败提示
               this.$message.error(data.msg);
             }
-          });
-        }).catch(() => {
-          // 用户点击了取消，不执行任何操作
-          this.$message.info('操作已取消');
-        });
-      },
-
-      fetchData () {
-        // Assuming you have an API endpoint to fetch the data
-        fetch('/api/data')
-          .then(response => response.json())
-          .then(data => {
-            const promises = data.map(item => {
-              if (item.issuePhoto) {
-                return fetch(`/api/images/${item.issuePhoto}`)
-                  .then(response => response.blob())
-                  .then(blob => this.blobToBase64(blob))
-                  .then(base64Data => {
-                    item.issuePhoto = base64Data
-                  })
-              }
-              return Promise.resolve()
-            })
-
-            Promise.all(promises).then(() => {
-              this.tableData = data
-            })
           })
+          .catch(() => {
+            this.$message.error('操作失败，请稍后重试');
+          })
+          .finally(() => {
+            this.showCloseDialog = false; // 关闭弹窗
+          });
       },
+      // 取消操作
+      cancelCloseDialog() {
+        this.showCloseDialog = false; // 隐藏弹窗
+        // this.$message.info('操作已取消');
+      },
+
+      // fetchData () {
+      //   // Assuming you have an API endpoint to fetch the data
+      //   fetch('/api/data')
+      //     .then(response => response.json())
+      //     .then(data => {
+      //       const promises = data.map(item => {
+      //         if (item.issuePhoto) {
+      //           return fetch(`/api/images/${item.issuePhoto}`)
+      //             .then(response => response.blob())
+      //             .then(blob => this.blobToBase64(blob))
+      //             .then(base64Data => {
+      //               item.issuePhoto = base64Data
+      //             })
+      //         }
+      //         return Promise.resolve()
+      //       })
+      //
+      //       Promise.all(promises).then(() => {
+      //         this.tableData = data
+      //       })
+      //     })
+      // },
       blobToBase64 (blob) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader()
@@ -641,34 +756,64 @@
           reader.readAsDataURL(blob)
         })
       },
+      // getDataList () {
+      //   this.dataListLoading = true
+      //   this.$http({
+      //     url: this.$http.adornUrl('/generator/issuetable/list'),
+      //     method: 'get',
+      //     params: this.$http.adornParams({
+      //       'page': this.pageIndex,
+      //       'limit': this.pageSize,
+      //       'key': this.dataForm.key
+      //     })
+      //   }).then(({data}) => {
+      //     if (data && data.code === 0) {
+      //       this.dataList = data.page.list.map(item => {
+      //         // 确保图片路径有效
+      //         if (!item.issuePhoto || !this.isValidImageUrl(item.issuePhoto)) {
+      //           // item.issuePhoto = '默认图片路径' // 设置默认图片路径
+      //         }
+      //         return item
+      //       })
+      //       this.totalPage = data.page.totalCount
+      //     } else {
+      //       this.dataList = []
+      //       this.totalPage = 0
+      //     }
+      //     this.dataListLoading = false
+      //   })
+      // },
       getDataList () {
-        this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl('/generator/issuetable/verlist'),//xiugaiweizhi/list
-          method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'issueDescription': this.myQueryParam.issueDescription,
-            'creationTime': this.myQueryParam.creationTime,
-          })
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.dataList = data.page.list.map(item => {
-              // 确保图片路径有效
-              if (!item.issuePhoto || !this.isValidImageUrl(item.issuePhoto)) {
-                // item.issuePhoto = '默认图片路径' // 设置默认图片路径
-              }
-              return item
+          this.dataListLoading = true
+          this.$http({
+            url: this.$http.adornUrl('/generator/issuetable/verlist'),//xiugaiweizhi/list
+            method: 'get',
+            params: this.$http.adornParams({
+              'page': this.pageIndex,
+              'limit': this.pageSize,
+              'issueDescription': this.myQueryParam.issueDescription,
+              'creationTime': this.myQueryParam.creationTime,
             })
-            this.totalPage = data.page.totalCount
-          } else {
-            this.dataList = []
-            this.totalPage = 0
-          }
-          this.dataListLoading = false
-        })
-      },
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.dataList = data.page.list.map(item => {
+                // 确保图片路径有效
+                if (!item.issuePhoto || !this.isValidImageUrl(item.issuePhoto)) {
+                  // item.issuePhoto = '默认图片路径' // 设置默认图片路径
+                }
+                return item
+              })
+              console.log('接受数据' , this.dataList)
+              this.totalPage = data.page.totalCount
+            } else {
+              this.dataList = []
+              this.totalPage = 0
+            }
+            this.dataListLoading = false
+          })
+        },
+
+
       getQueryList () {
         this.dataListLoading = true
         this.$http({
@@ -699,7 +844,7 @@
         })
       },
       //重置
-      /*resetQuery() {
+      resetQuery() {
         this.queryParams = {
           indicatorName: null,
           indicatorValue: null,
@@ -713,7 +858,7 @@
           managementContentCurrentAnalysis: null,
         }
         this.getDataList()
-      },*/
+      },
       // 问题重写
       reuseTask (id) {
         this.addOrUpdateVisible = true
@@ -747,35 +892,36 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
+      // 删除
       deleteHandle (id) {
-          var ids = id ? [id] : this.dataListSelections.map(item => {
-            return item.issueId
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.issueId
+        })
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/generator/issuetable/delete'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
           })
-          this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            this.$http({
-              url: this.$http.adornUrl('/generator/issuetable/delete'),
-              method: 'post',
-              data: this.$http.adornData(ids, false)
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.getDataList()
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          })
-        },
+        })
+      },
       truncateDescription(description) {
         if (!description || typeof description !== 'string') return '';
         return description.length > 20 ? description.slice(0, 20) : description;
@@ -796,6 +942,18 @@
         this.fullRetStates = rectificationVerificationStatus; // 存储整改验证情况完整描述
         this.dialogVisible2 = true; // 显示对话框
       },
+      // 通用数组去重方法
+      removeDuplicates(array, key) {
+        const seen = new Set();
+        return array.filter(item => {
+          const val = key ? item[key] : item; // 如果有 key，按 key 去重，否则直接按值去重
+          if (seen.has(val)) {
+            return false;
+          }
+          seen.add(val);
+          return true;
+        });
+      },
       fetchIssueCategories () {
         this.$http({
           url: this.$http.adornUrl('/generator/issuetypetable/issuestype'),
@@ -808,6 +966,7 @@
               value: category.concreteIssueCategory,
               label: category.concreteIssueCategory
             }))
+            this.issueCategoryOptions = this.removeDuplicates( this.issueCategoryOptions ,'value')
           } else {
             console.error('Failed to fetch issue categories:', data.msg)
           }
@@ -852,136 +1011,105 @@
           console.error(error);
         });
       },
-      //导出
+      // 导出
       exportAll(){
-        const loadingInstance = this.$loading({
-        lock: true,
-        text: "正在导出，请稍后...",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)",
-      });
-
-      this.$http({
-        url: this.$http.adornUrl('/generator/issuetable/issuesAllExport'),
-        method: 'get',
-        params: this.$http.adornParams(this.queryParams),
-      }).then(({data}) => {
-        if (data && data.length > 0) {
-          const processedData = data.map((tableRow, index) => ({
-            序号: index + 1,
-            问题编号: tableRow.issueNumber,
-            检查科室: tableRow.inspectionDepartment,
-            检查日期: tableRow.inspectionDate,
-            问题类别: tableRow.issueCategoryId,
-            系统分类: tableRow.systematicClassification,
-            故障类别: tableRow.faultType,
-            故障件一级: tableRow.firstFaultyParts,
-            故障件二级: tableRow.secondFaultyParts,
-            故障模式: tableRow.faultModel,
-            车型: tableRow.vehicleTypeId,
-            车号: tableRow.vehicleNumberId,
-            初步分析: tableRow.peliminaryAnalysis,
-            问题描述: tableRow.issueDescription,
-            整改要求: tableRow.rectificationRequirement,
-            要求完成时间: tableRow.requiredCompletionTime,
-            责任科室: tableRow.responsibleDepartment,
-            整改情况: tableRow.rectificationStatus,
-            实际完成时间: tableRow.actualCompletionTime,
-            整改责任人: tableRow.rectificationResponsiblePerson,
-            关联问题: tableRow.associatedIssueAddition,
-            整改验证情况: tableRow.rectificationVerificationStatus,
-            验证截止时间: tableRow.verificationDeadline,
-            验证结论: tableRow.verificationConclusion,
-            验证人: tableRow.verifier,
-
-          }));
-            const ws = XLSX.utils.json_to_sheet(processedData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "问题列表");
-
-            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-            saveAs(
-              new Blob([wbout], { type: "application/octet-stream" }),
-              "已结项问题月度数据总台账.xlsx"
-            )}else {
-          this.$message.error("没有可导出的数据！");
-        }
-
-            // // 提交数据到Vuex Store
-            // this.updateExportedData(data);
-
-
-          })
-          .finally(() => {
-            loadingInstance.close();
-          })
-          .catch((error) => {
-            console.error("导出失败:", error);
-            loadingInstance.close();
-          });
-      },
-       // 删除
-  // 批量删除
- deleteHandle() {
-  var ids = this.dataListSelections.map(item => {
-    return item.issueId;
-  });
-  console.log("ids:"+ids);
-
-  this.$confirm(`确定对[id=${ids.join(',')}]进行[批量删除]操作?`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    this.$http({
-      url: this.$http.adornUrl('/generator/issuetable/clearStorageFlag'),
-      method: 'post',
-      data: this.$http.adornData(ids,false)
-    }).then(({ data }) => {
-      if (data && data.code === 0) {
-        this.getDataList()
-      }
-      console.log(data);
-    });
-
-
-  });
-},
-
-
-/* // 清除storageFlag
-async clearStorageFlag(ids) {
-  try {
-    const response = await this.$http({
-      url: this.$http.adornUrl('/generator/issuetable/clearStorageFlag'),
-      method: 'post',
-      data: this.$http.adornData(ids)
-    });
-
-    if (response.data && response.data.code === 0) {
-      this.$message({
-        message: '操作成功',
-        type: 'success',
-        duration: 1500,
-        onClose: () => {
-          // 刷新数据列表的操作已移至 deleteHandle 方法中
-        }
-      });
-      return true;
-    } else {
-      this.$message.error(response.data.msg);
-      return false;
-    }
-  } catch (error) {
-    console.error('清除storageFlag失败:', error);
-    this.$message.error('操作失败，请重试');
-    return false;
-  }
-}, */
-    }
-    
-  }
+          const loadingInstance = this.$loading({
+          lock: true,
+          text: "正在导出，请稍后...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
   
+        this.$http({
+          url: this.$http.adornUrl('/generator/issuetable/issuesAllExport'),
+          method: 'get',
+          params: this.$http.adornParams(this.queryParams),
+        }).then(({data}) => {
+          if (data && data.length > 0) {
+            const processedData = data.map((tableRow, index) => ({
+              序号: index + 1,
+              问题编号: tableRow.issueNumber,
+              检查科室: tableRow.inspectionDepartment,
+              检查日期: tableRow.inspectionDate,
+              问题类别: tableRow.issueCategoryId,
+              系统分类: tableRow.systematicClassification,
+              故障类别: tableRow.faultType,
+              故障件一级: tableRow.firstFaultyParts,
+              故障件二级: tableRow.secondFaultyParts,
+              故障模式: tableRow.faultModel,
+              车型: tableRow.vehicleTypeId,
+              车号: tableRow.vehicleNumberId,
+              初步分析: tableRow.peliminaryAnalysis,
+              问题描述: tableRow.issueDescription,
+              整改要求: tableRow.rectificationRequirement,
+              要求完成时间: tableRow.requiredCompletionTime,
+              责任科室: tableRow.responsibleDepartment,
+              整改情况: tableRow.rectificationStatus,
+              实际完成时间: tableRow.actualCompletionTime,
+              整改责任人: tableRow.rectificationResponsiblePerson,
+              关联问题: tableRow.associatedIssueAddition,
+              整改验证情况: tableRow.rectificationVerificationStatus,
+              验证截止时间: tableRow.verificationDeadline,
+              验证结论: tableRow.verificationConclusion,
+              验证人: tableRow.verifier,
+  
+            }));
+              const ws = XLSX.utils.json_to_sheet(processedData);
+              const wb = XLSX.utils.book_new();
+              XLSX.utils.book_append_sheet(wb, ws, "问题列表");
+  
+              const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+              saveAs(
+                new Blob([wbout], { type: "application/octet-stream" }),
+                "已结项问题月度数据总台账.xlsx"
+              )}else {
+            this.$message.error("没有可导出的数据！");
+          }
+  
+              // // 提交数据到Vuex Store
+              // this.updateExportedData(data);
+  
+  
+            })
+            .finally(() => {
+              loadingInstance.close();
+            })
+            .catch((error) => {
+              console.error("导出失败:", error);
+              loadingInstance.close();
+            });
+        },
+
+        // 批量删除
+   deleteHandle() {
+    var ids = this.dataListSelections.map(item => {
+      return item.issueId;
+    });
+    console.log("ids:"+ids);
+  
+    this.$confirm(`确定对[id=${ids.join(',')}]进行[批量删除]操作?`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(async () => {
+      this.$http({
+        url: this.$http.adornUrl('/generator/issuetable/clearStorageFlag'),
+        method: 'post',
+        data: this.$http.adornData(ids,false)
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.getDataList()
+        }
+        console.log(data);
+      });
+  
+  
+    });
+  },
+
+
+    }
+  }
 </script>
 
 <style scoped>
@@ -1017,4 +1145,12 @@ async clearStorageFlag(ids) {
   margin-top: 10px;
   font-size: 14px; /* 分页器字体大小 */
 }
+.overdue-text {
+  color: red;  /* 红色字体 */
+}
+
+
 </style>
+
+
+

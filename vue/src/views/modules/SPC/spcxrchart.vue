@@ -5,6 +5,16 @@
     <el-tabs v-model="firstactivename" type="card">
 
       <el-tab-pane label="正态分布图表" name="first">
+
+        <el-select v-model="PTDselectedTable" placeholder="请选择">  
+          <el-option  
+            v-for="tableName in PTDtableNames"  
+            :key="tableName"  
+            :label="tableName"  
+            :value="tableName">  
+          </el-option>  
+        </el-select>
+
         <div ref="lineChartPTD" style="width: 1500px;height:300px;"></div>
         <h1>PValue: {{ PValue }}</h1>
     
@@ -17,6 +27,7 @@
             <el-button v-if="isAuth('spc:spcptd:save')" type="primary" @click="PTDChartaddOrUpdateHandle()">新增</el-button>
             <el-button v-if="isAuth('spc:spcptd:delete')" type="danger" @click="PTDChartdeleteHandle()" :disabled="PTDChartdataListSelections.length <= 0">批量删除</el-button>
             <el-button type="primary" @click="showDialog1 = true">导入Excel文件</el-button>
+            <el-button type="primary" @click="PTDdownloadExcel('PTDModel')">下载 Excel</el-button>
           </el-form-item>
         </el-form>
         <el-table
@@ -173,6 +184,7 @@
             <el-button v-if="isAuth('spc:spcxrchart:delete')" type="danger" @click="XRChartdeleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
             <el-button type="primary" @click="showDialog = true">控制用数据导入</el-button>
             <el-button type="primary" @click="showDialog2 = true">统计用数据导入</el-button>
+            <el-button type="primary" @click="XRdownloadExcel('XRModel')">下载 Excel</el-button>
           </el-form-item>
         </el-form>
         <el-table
@@ -544,9 +556,11 @@
               <el-button @click="getPChartDataList()">查询</el-button>
               <el-button v-if="isAuth('spc:spcpchart:save')" type="primary" @click="PChartaddOrUpdateHandle()">新增</el-button>
               <el-button v-if="isAuth('spc:spcpchart:delete')" type="danger" @click="PChartdeleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-             <!-- 1216 TODO 计数型 excel数据导入  -->
-             <el-button type="primary" @click="showDialog3 = true">控制用数据导入</el-button>
+              <!-- 1216 TODO 计数型 excel数据导入  -->
+              <el-button type="primary" @click="showDialog3 = true">控制用数据导入</el-button>
               <el-button type="primary" @click="showDialog4 = true">统计用数据导入</el-button>
+              <el-button type="primary" @click="PdownloadExcel('PModel')">下载 Excel</el-button>
+
             </el-form-item>
           </el-form>
           <el-table
@@ -1033,6 +1047,7 @@
         //I-MR图相关参数
         IMRChartData: [],
 
+
         //P图相关参数
         PChartData: [],
 
@@ -1057,6 +1072,10 @@
         PtableNames: [],  // 存放从后端获取的表名  
         PselectedTable: null,  // 选中的表名  
 
+        //PTD图对应的表名和选中的表名
+        PTDtableNames: [],
+        PTDselectedTable: null,
+
         //控制watch参数
         chartInitialized: false,
 
@@ -1077,9 +1096,6 @@
           await this.getMeRchart();
           await this.getIMRchart();
 
-          console.log(this.XbarRChartData[0].length);
-          console.log("---"+ this.chartInitialized);
-
           //更新图表
           this.updateChartXbarR_Xbar();
           this.updateChartXbarR_R();
@@ -1096,14 +1112,14 @@
         }  
       },
 
-      PselectedTable(newValue, oldValue) {  
+      async PselectedTable(newValue, oldValue) {  
         // 当 PselectedTable 改变时调用更新图表的函数  
         if (newValue !== oldValue && this.chartInitialized) {  
             //获取新数据
-            this.getPchart();
-            this.getNPchart();
-            this.getUchart();
-            this.getCchart();
+            await this.getPchart();
+            await this.getNPchart();
+            await this.getUchart();
+            await this.getCchart();
 
             //更新图表
             this.updateChartP();
@@ -1112,7 +1128,19 @@
             this.updateChartC();
 
         }  
-      }  
+      },
+      
+      async PTDselectedTable(newValue, oldValue) {  
+        // 当 PTDselectedTable 改变时调用更新图表的函数  
+        if (newValue !== oldValue && this.chartInitialized) {  
+            //获取新数据
+            await this.getPTDchart();
+
+            //更新图表
+            this.updateChartPTD();
+
+        }  
+      },
     }, 
 
     components: {
@@ -1132,6 +1160,8 @@
           // 获取表名  
           await this.fetchOptionsXR();  
           await this.fetchOptionsP();
+          await this.fetchOptionsPTD();
+
           this.chartInitialized = true; // 由于fetch完成，设置图表已初始化 
 
           // 加载 Xbar R Chart 数据  
@@ -1222,10 +1252,20 @@
           } else {  
               console.error("PTDChartData length is less than 3");  
           }   
-        
         } catch (error) {  
             console.error("Error loading data:", error);  
         }   
+
+        //对图表数据进行预警
+        await this.XRWarning(this.XbarRChartData, "Xbar图", "R图");
+        await this.XRWarning(this.XbarSChartData, "Xbar图", "S图");
+        await this.XRWarning(this.MeRChartData, "Me图", "R图");
+        await this.XRWarning(this.IMRChartData, "I图", "MR图");
+
+        await this.PWarning(this.PChartData, "P图");
+        await this.PWarning(this.NPChartData, "NP图");
+        await this.PWarning(this.UChartData, "U图");
+        await this.PWarning(this.CChartData, "C图")
     },
 
     methods: {
@@ -1668,6 +1708,9 @@
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcptd/chart/ptd'),  
                 method: 'get',  
+                params: this.$http.adornParams({  
+                    tableName: this.PTDselectedTable  // 直接通过 params 传递 PTDselectedTable  
+                }),
             });  
 
             // 检查 data 对象是否包含 np-chart_Info 属性  
@@ -1690,6 +1733,9 @@
             const { data } = await this.$http({  
                 url: this.$http.adornUrl('/spc/spcptd/chart/pValue'),  
                 method: 'get',  
+                params: this.$http.adornParams({  
+                    tableName: this.PTDselectedTable  // 直接通过 params 传递 PTDselectedTable  
+                }),
             });  
 
             // 检查 data 对象是否包含 np-chart_Info 属性  
@@ -4107,18 +4153,236 @@
         }  
       }, 
 
+      //获取PTD表名
+      async fetchOptionsPTD() {  
+        try {  
+            const response = await this.$http({  
+                url: this.$http.adornUrl('/spc/spcptd/options'), 
+                method: 'get', // 使用 GET 方法   
+            });  
+            
+            this.PTDtableNames = response.data.table_name;  // 获取表名列表  
+            
+            // 设置默认选中的表名为列表中的最后一个  
+            if (this.PTDtableNames.length > 0) {  
+                this.PTDselectedTable = this.PTDtableNames[this.PTDtableNames.length - 1]; // 默认选中最后一个表名  
+            } else {  
+                this.PTDselectedTable = null; // 如果没有表名，清空选中  
+            }   
+
+
+        } catch (error) {  
+            console.error('获取表名时出错：', error);  
+            this.PTDselectedTable = null; // 在出错时清空选中  
+        }  
+      }, 
 
       //预警方法
+      async XRWarning(ChartData, tableName1, tableName2){
+
+        // 定义一个延迟函数  
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms)); 
+
+        try {  
+            const { data } = await this.$http({  
+                url: this.$http.adornUrl('/SPC/spc/XR/warning'), // 根据需要调整接口地址  
+                method: 'post', // 使用 POST 方法发送数据  
+                data: ChartData, // 将图表数据放入请求体中  
+                headers: {  
+                    'Content-Type': 'application/json' // 如果发送 JSON 格式的数据，设置内容类型为 JSON  
+                }  
+            });  
+
+            // 处理后端的响应
+            if (data) {  
+                if (data.Warning) {  
+                    const resultsGroup1 = data.Warning[0]; // 第一组布尔结果  
+                    const resultsGroup2 = data.Warning[1]; // 第二组布尔结果  
+
+                    // 检查第一组数据  
+                    for (let index = 0; index < resultsGroup1.length; index++) {  
+                        const result = resultsGroup1[index];  
+                        if (result) {  
+                          this.$notify({  
+                            title: '注意',  
+                            message: `请注意 ${tableName1} 第 ${index + 1} 条准则`,  
+                            type: 'warning',  
+                          });  
+                            await delay(1000); // 延迟  
+                        }  
+                    }  
+
+                    // 检查第二组数据  
+                    for (let index = 0; index < resultsGroup2.length; index++) {  
+                        const result = resultsGroup2[index];  
+                        if (result) {  
+                            this.$notify({  
+                              title: '注意',  
+                              message: `请注意 ${tableName2} 第 ${index + 1} 条准则`,  
+                              type: 'warning',  
+                            });  
+                            await delay(1000); // 延迟  
+                        }  
+                    } 
+                } else {  
+                    console.error("发送数据失败:", data.message || "未知错误");  
+                }  
+            } else {  
+                console.error("未收到有效的响应数据");  
+            }  
+        } catch (error) {  
+            // 处理任何网络或其他错误  
+            console.error('错误:', error);  
+        }  
+      },
+
+      async PWarning(ChartData, tableName){
+
+        // 定义一个延迟函数  
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms)); 
+
+        try {  
+            const { data } = await this.$http({  
+                url: this.$http.adornUrl('/SPC/spc/P/warning'), // 根据需要调整接口地址  
+                method: 'post', // 使用 POST 方法发送数据  
+                data: ChartData, // 将图表数据放入请求体中  
+                headers: {  
+                    'Content-Type': 'application/json' // 如果发送 JSON 格式的数据，设置内容类型为 JSON  
+                }  
+            });  
+
+            // 处理后端的响应
+            if (data) {  
+                if (data.Warning) {  
+                    const resultsGroup1 = data.Warning; // 第一组布尔结果  
+
+                    // 检查第一组数据  
+                    for (let index = 0; index < resultsGroup1.length; index++) {  
+                        const result = resultsGroup1[index];  
+                        if (result) {  
+                            this.$notify({  
+                              title: '注意',  
+                              message: `请注意 ${tableName} 第 ${index + 1} 条准则`,  
+                              type: 'warning',  
+                            });  
+                            await delay(1000); // 延迟  
+                        }  
+                    }  
+                } else {  
+                    console.error("发送数据失败:", data.message || "未知错误");  
+                }  
+            } else {  
+                console.error("未收到有效的响应数据");  
+            }  
+        } catch (error) {  
+            // 处理任何网络或其他错误  
+            console.error('错误:', error);  
+        }  
+      },
 
       //PTD图预警
       PTDWarning(){
         if(this.PValue > 0.05){
-          this.$message({
-            message: 'P值大于0.05',
-            type: 'warning'
-          });
+          this.$notify({  
+            title: '注意',  
+            message: 'P值大于0.05',  
+            type: 'warning',  
+          });  
         }
       },
+
+      //模板文件下载
+      PTDdownloadExcel(flag) {  
+        try {  
+          const response = this.$http({  
+            url: this.$http.adornUrl(`/spc/spcptd/${encodeURIComponent(flag)}`), // 调整接口地址  
+            method: 'post', // 使用 POST 方法  
+            responseType: 'blob', // 指定响应类型  
+            headers: {  
+              'Content-Type': 'application/json', // 如果后端期望接收 JSON 数据  
+            }  
+          }); 
+
+          const data = response.data; 
+
+          // 创建一个 blob 对象并生成下载链接  
+          const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });  
+          const link = document.createElement('a');  
+          link.href = URL.createObjectURL(blob);  
+          link.download = `${flag}.xlsx`; // 可选择性命名下载的文件  
+
+          // 添加链接到文档并触发下载  
+          document.body.appendChild(link);  
+          link.click();  
+
+          // 移除链接  
+          document.body.removeChild(link);  
+        } catch (error) {  
+          console.error('下载文件失败:', error); // 处理错误  
+        }  
+      },  
+
+      //模板文件下载
+      XRdownloadExcel(flag) {  
+        try {  
+          const response = this.$http({  
+            url: this.$http.adornUrl(`/spc/spcxrchart/${encodeURIComponent(flag)}`), // 调整接口地址  
+            method: 'post', // 使用 POST 方法  
+            responseType: 'blob', // 指定响应类型  
+            headers: {  
+              'Content-Type': 'application/json', // 如果后端期望接收 JSON 数据  
+            }  
+          }); 
+
+          const data = response.data; 
+
+          // 创建一个 blob 对象并生成下载链接  
+          const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });  
+          const link = document.createElement('a');  
+          link.href = URL.createObjectURL(blob);  
+          link.download = `${flag}.xlsx`; // 可选择性命名下载的文件  
+
+          // 添加链接到文档并触发下载  
+          document.body.appendChild(link);  
+          link.click();  
+
+          // 移除链接  
+          document.body.removeChild(link);  
+        } catch (error) {  
+          console.error('下载文件失败:', error); // 处理错误  
+        }  
+      },  
+
+      //模板文件下载
+      PdownloadExcel(flag) {  
+        try {  
+          const response = this.$http({  
+            url: this.$http.adornUrl(`/spc/spcpchart/${encodeURIComponent(flag)}`), // 调整接口地址  
+            method: 'post', // 使用 POST 方法  
+            responseType: 'blob', // 指定响应类型  
+            headers: {  
+              'Content-Type': 'application/json', // 如果后端期望接收 JSON 数据  
+            }  
+          }); 
+
+          const data = response.data; 
+
+          // 创建一个 blob 对象并生成下载链接  
+          const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });  
+          const link = document.createElement('a');  
+          link.href = URL.createObjectURL(blob);  
+          link.download = `${flag}.xlsx`; // 可选择性命名下载的文件  
+
+          // 添加链接到文档并触发下载  
+          document.body.appendChild(link);  
+          link.click();  
+
+          // 移除链接  
+          document.body.removeChild(link);  
+        } catch (error) {  
+          console.error('下载文件失败:', error); // 处理错误  
+        }  
+      },  
 
     }
   }

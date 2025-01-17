@@ -52,7 +52,7 @@ public class QcSubjectRegistrationController {
         Integer countSubmitted = qcSubjectRegistrationDao.countSubmitted();
         //已提交未审核完课题数
         Integer countWithoutExamined = qcExamineStatusDao.countWithoutExamined();
-        //已完成课题数
+        //已获奖课题数
         Integer countExamined = qcExamineStatusDao.countExamined();
         Map<String, Object> result = new HashMap<>();
         result.put("countRegistration", countRegistration);
@@ -60,6 +60,18 @@ public class QcSubjectRegistrationController {
         result.put("countWithoutExamined", countWithoutExamined);
         result.put("countExamined", countExamined);
         return R.ok().put("count", result);
+    }
+
+    /**
+     * QC小组获奖率
+     */
+    @RequestMapping("/rewordRate")
+//    @RequiresPermissions("qcMembers:qcGroupMember:list")
+    public R rewordRateList(String groupName) {
+        Double rewordNumbers = qcSubjectRegistrationDao.rewordRate(groupName);
+        Map<String, Object> result = new HashMap<>();
+        result.put("rewordNumbers", rewordNumbers);
+        return R.ok().put("result", result);
     }
 
     /**
@@ -261,6 +273,7 @@ public class QcSubjectRegistrationController {
     @RequestMapping("/finishedList")
     @RequiresPermissions("qcSubject:registration:list")
     public R finishedList(@RequestParam Map<String, Object> params){
+//        log.info("QC知识库："+params);
         PageUtils page =  qcSubjectRegistrationService.queryPageFinishedList(params);
         return R.ok().put("page", page);
     }

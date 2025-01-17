@@ -127,7 +127,6 @@ const mainRoutes = {
       props: true
     },
 
-
     //QC
     {
       path: '/qcPlanNew',
@@ -225,7 +224,7 @@ const mainRoutes = {
       path: '/issue-issuetable',
       component: _import('modules/issueexamine/issueExamine'),
       name: 'issue-issueexamine',
-      meta: {title: '任务审核', isDynamic: true, isTab: true}
+      meta: {title: '任务审核', isTab: true}
     },
     {
       path: '/issue-issuemask',
@@ -261,7 +260,7 @@ const mainRoutes = {
       path: '/otherToIssue',
       component: _import('modules/issuefind/findissue'),
       name: 'otherToIssue',
-      meta: {title: '问题操作', isDynamic: true, isTab: true}
+      meta: {title: '问题操作', isTab: true}
     },
     {
       path: '/issue-issueView',
@@ -300,7 +299,7 @@ const mainRoutes = {
       path: '/toNotice',
       component: _import('modules/notice/messagenotification'),
       name: 'toNotice',
-      meta: {title: '消息通知', isDynamic: true, isTab: false}
+      meta: {title: '消息通知', isDynamic: false, isTab: true}
     },
 
   ],

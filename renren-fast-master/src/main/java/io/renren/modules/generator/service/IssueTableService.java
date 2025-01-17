@@ -77,7 +77,7 @@ public interface IssueTableService extends IService<IssueTableEntity> {
 
     Map<String, Integer> getmonthlyDuplicateStats(int year);
 
-    Map<String, Integer> getcurrentMonthInProgressCategoryStats();  // 当前月进行中类别统计
+    Map<String, Integer> getcurrentMonthInProgressCategoryStats(String startDate, String endDate);  // 当前月进行中类别统计
 
 
     List<IssueTableEntity> listAll01(Map<String, Object> params);
@@ -87,5 +87,19 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     boolean updateParentQuestion(String issueNumber);
 
     boolean clearStorageFlag(List<Integer> ids);//删除功能
+
+    int getallissue();
+
+    Map<String, Object> getThirdIssue();
+
+    Map<String, Map<String, Integer>> getIssuebyDepartment(String startDate, String endDate);
+
+    Map<String, Map<String, Object>> getbyindemnification(String startDate, String endDate);
+
+    Map<String, Map<String, Object>> getbyvendor(String startDate, String endDate);
+
+    Map<String, Map<String, Object>> getbyvehicletype(String startDate, String endDate);
+
+    Map<String, Map<String, Object>> getbyregiontype(String startDate, String endDate);
 }
 

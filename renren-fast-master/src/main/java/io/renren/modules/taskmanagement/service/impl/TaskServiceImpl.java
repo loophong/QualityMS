@@ -220,7 +220,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskDao, TaskEntity> implements
                     newTaskList.add(newTask);
                 } else {
                     // 插入
-                    task.setTaskCurrentState(TaskStatus.NOT_STARTED);
+//                    task.setTaskCurrentState(TaskStatus.NOT_STARTED);
                     newTaskList.add(task);
                 }
                 log.info("父节点"+task.getTaskParentNode());

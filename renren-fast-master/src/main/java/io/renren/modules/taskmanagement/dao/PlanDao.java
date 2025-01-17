@@ -32,4 +32,6 @@ public interface PlanDao extends BaseMapper<PlanEntity> {
 
     List<PlanExportVO> export();
     List<PlanExportVO> exportKnowledgeBase();
+
+    List<PlanExportVO> exportBase();
 }

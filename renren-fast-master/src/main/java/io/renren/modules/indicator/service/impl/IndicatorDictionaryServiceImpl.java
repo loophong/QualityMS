@@ -117,6 +117,13 @@ public class IndicatorDictionaryServiceImpl extends ServiceImpl<IndicatorDiction
         return new PageUtils(page);
     }
 
+    //不分页
+    public List<IndicatorDictionaryEntity> getIndicatorDictionaryList() {
+        QueryWrapper<IndicatorDictionaryEntity> queryWrapper = new QueryWrapper<>();
+        List<IndicatorDictionaryEntity> list = this.list(queryWrapper);
+        return list;
+    }
+
     public List<IndicatorDictionaryEntity> getDictionaryEntitiesByName(String indicatorName) {
         QueryWrapper<IndicatorDictionaryEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("indicator_name", indicatorName);

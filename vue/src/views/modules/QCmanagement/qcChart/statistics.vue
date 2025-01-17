@@ -1,10 +1,18 @@
 <template>
-  <div>
+  <div class="container">
+    <!-- 统计组件 -->
     <qc-all-count v-if="isAuth('qcManagement:qcAllCount:info')" @allCount="handleEvent"></qc-all-count>
-    <div style="display: flex;">
-      <div id="barChart" ref="barChart" style="width: 50%; height: 300px;"></div>
-      <div id="pieChart" ref="pieChart" style="width: 50%; height: 300px;"></div>
-      <div id="pieChart2" ref="pieChart2" style="width: 50%; height: 300px;"></div>
+
+    <!-- 图表区域 -->
+    <div class="charts-container">
+      <div class="chart-wrapper" id="barChart" ref="barChart" style="height: 300px;"></div>
+      <div class="chart-wrapper" id="pieChart" ref="pieChart" style="height: 300px;"></div>
+    </div>
+
+    <!-- 课题获奖情况 -->
+    <div class="award-section">
+      <div class="chart-wrapper" id="groupChart3" ref="groupChart3" style="height: 300px;"></div>
+      <div class="chart-wrapper" id="pieChart2" ref="pieChart2" style="height: 300px;"></div>
     </div>
   </div>
 </template>
@@ -49,15 +57,18 @@ export default {
         standardization: 0,
       },
       //获奖情况统计
-      scoreResult: {
-        first: 0,
-        second: 0,
-        third: 0,
-        fourth: 0,
-        fifth: 0,
-      },
+      // scoreResult: [{
+      //   groupName:'',
+      //   first: 0,
+      //   second: 0,
+      //   third: 0,
+      //   fourth: 0,
+      //   fifth: 0,
+      // }],
+      scoreResult: {},
       allCount: '',
       currentCount: '',
+      pieTwoLegend: [],
     }
   },
   components: {
@@ -72,6 +83,21 @@ export default {
     this.pieChart() //课题阶段分布
     this.myChart3 = echarts.init(document.getElementById('pieChart2'))
     this.pieChart2() //课题获奖分布
+    this.myChart4 = echarts.init(document.getElementById('groupChart3'))
+    this.groupChart3() //点检小组情况
+    //QC小组活动率
+    await this.$http({
+      url: this.$http.adornUrl('/qcSubject/registration/rewordRate'),
+      method: 'get',
+      groupName: 'ces',
+    }).then(({ data }) => {
+      if (data && data.code === 0) {
+
+      } else {
+        this.activityData = {}
+      }
+      this.chartLoading = false
+    })
   },
   methods: {
     handleEvent(data) {
@@ -184,20 +210,45 @@ export default {
           });
           this.stageNumData.forEach(item => {
             if (item.topicActivityResult) {
-              if (85 <= item.topicActivityResult) {
-                this.scoreResult.first++
-              } else if (75 <= item.topicActivityResult < 85) {
-                this.scoreResult.second++
-              } else if (65 <= item.topicActivityResult < 75) {
-                this.scoreResult.third++
+              if (!(item.groupName in this.scoreResult)) {
+                this.scoreResult[item.groupName] = {
+                  first: 0,
+                  second: 0,
+                  third: 0,
+                  fourth: 0,
+                  fifth: 0,
+                  allCount: 0,
+                }
               }
-              else if (55 <= item.topicActivityResult < 65) {
-                this.scoreResult.fourth++
-              } else if (45 <= item.topicActivityResult < 55) {
-                this.scoreResult.fifth++
+              this.scoreResult[item.groupName].allCount++
+              if ('一等奖' == item.topicActivityResult) {
+                this.scoreResult[item.groupName].first++
+              } else if ('二等奖' == item.topicActivityResult) {
+                this.scoreResult[item.groupName].second++
+              } else if ('三等奖' == item.topicActivityResult) {
+                this.scoreResult[item.groupName].third++
               }
+              else if ('四等奖' == item.topicActivityResult) {
+                this.scoreResult[item.groupName].fourth++
+              } else if ('鼓励奖' == item.topicActivityResult) {
+                this.scoreResult[item.groupName].fifth++
+              }
+            } else {
+              if (!(item.groupName in this.scoreResult)) {
+                this.scoreResult[item.groupName] = {
+                  first: 0,
+                  second: 0,
+                  third: 0,
+                  fourth: 0,
+                  fifth: 0,
+                  allCount: 0,
+                }
+              }
+              this.scoreResult[item.groupName].allCount++
             }
+
           });
+          console.log('scoreResult:', this.scoreResult)
         } else {
           this.stageNumData = {}
         }
@@ -297,13 +348,17 @@ export default {
         align: app.config.align,
         verticalAlign: app.config.verticalAlign,
         rotate: app.config.rotate,
-        formatter: '{c} %',
+        formatter: function (params) {
+          // 确保 params.value 是数值类型，并添加百分号
+          return `${params.value} %`;
+        },
         fontSize: 16,
         rich: {
           name: {}
         }
       };
-      let dataR = [(this.currentCount / this.allCount) * 100, this.activityDataResult, (this.countData.countExamined / this.countData.countSubmitted) * 100]
+      let dataR = [((this.currentCount / this.allCount) * 100).toFixed(2), this.activityDataResult, ((this.countData.countSubmitted / this.countData.countRegistration) * 100).toFixed(2)]
+      console.log({ dataR })
       let formattedData = [
         { value: dataR[0], itemStyle: { normal: { color: '#409eff' } } },
         { value: dataR[1], itemStyle: { normal: { color: '#67c23a' } } },
@@ -312,7 +367,7 @@ export default {
       option = {
         title: {
           text: '点检统计',
-          left: 'center', // 居中对齐
+          left: 'left', // 居中对齐
         },
         tooltip: {
           trigger: 'axis',
@@ -344,8 +399,13 @@ export default {
         yAxis: [
           {
             type: 'value',
+            min: 0,
+            max: 100,
             splitLine: {
               show: true,
+            },
+            axisLabel: {
+              formatter: '{value} %'
             }
           }
         ],
@@ -398,7 +458,7 @@ export default {
       option = {
         title: {
           text: '课题阶段状态',
-          left: 'center'
+          left: 'left'
         },
         tooltip: {
           trigger: 'item',
@@ -437,7 +497,7 @@ export default {
 
       option && myChart.setOption(option);
     },
-    //课题获奖情况饼图
+    //课题获奖情况图
     pieChart2() {
       var app = {};
 
@@ -535,17 +595,35 @@ export default {
           name: {}
         }
       };
-      let formattedData = [
-        { value: this.scoreResult.first, itemStyle: { normal: { color: '#8dc147' } } },
-        { value: this.scoreResult.second, itemStyle: { normal: { color: '#66a2d8' } } },
-        { value: this.scoreResult.third, itemStyle: { normal: { color: '#906aae' } } },
-        { value: this.scoreResult.fourth, itemStyle: { normal: { color: '#00FF00' } } },
-        { value: this.scoreResult.fifth, itemStyle: { normal: { color: '#ADD8E6' } } },
-      ];
+      let legendData = [];
+      let seriesData = [];
+      // 遍历 this.scoreResult 来填充 legend 和 series
+      Object.keys(this.scoreResult).forEach(groupName => {
+        console.log('+', this.scoreResult[groupName])
+        if (this.scoreResult[groupName].first != 0 || this.scoreResult[groupName].second != 0 || this.scoreResult[groupName].third != 0 || this.scoreResult[groupName].fourth != 0 || this.scoreResult[groupName].fifth != 0) {
+          legendData.push(groupName); // 将每个 groupName 添加到 legend
+          // 为每个 groupName 创建一个系列条目
+          seriesData.push({
+            name: groupName,
+            type: 'bar',
+            data: [
+              this.scoreResult[groupName].first,
+              this.scoreResult[groupName].second,
+              this.scoreResult[groupName].third,
+              this.scoreResult[groupName].fourth,
+              this.scoreResult[groupName].fifth
+            ],
+            label: {
+              show: true
+            }
+          });
+        }
+      });
+      console.log('stageNumData', this.stageNumData)
       option = {
         title: {
-          text: '课题获奖状态',
-          left: 'center', // 居中对齐
+          text: '课题获奖状态\n',
+          left: 'left', // 居中对齐
         },
         tooltip: {
           trigger: 'axis',
@@ -567,6 +645,9 @@ export default {
             saveAsImage: { show: true }
           }
         },
+        legend: {
+          data: legendData
+        },
         xAxis: [
           {
             type: 'category',
@@ -577,36 +658,199 @@ export default {
         yAxis: [
           {
             type: 'value',
+            axisLabel: {
+              show: true,
+              formatter: function (value) {
+                // 只显示整数，小数部分不显示
+                return Number.isInteger(value) ? value : '';
+              }
+            },
             splitLine: {
               show: true,
             }
           }
         ],
-        series: [
-          {
-            name: '值',
-            type: 'bar',
-            barGap: 0,
-            label: labelOption,
-            emphasis: {
-              focus: 'series'
-            },
-            // itemStyle: {
-            //   normal: {
-            //     color: '#17b3a3' // 设置柱状图颜色为橙色
-            //   }
-            // },
-            data: formattedData
-          },
-
-          // },
-
-        ]
+        series: seriesData,
       };
+      option && myChart.setOption(option);
+    },
+    //点检小组情况图
+    groupChart3() {
+      var app = {};
 
+      var chartDom = document.getElementById('groupChart3');
+      var myChart = echarts.init(chartDom);
+      var option;
+
+      const posList = [
+        'left',
+        'right',
+        'top',
+        'bottom',
+        'inside',
+        'insideTop',
+        'insideLeft',
+        'insideRight',
+        'insideBottom',
+        'insideTopLeft',
+        'insideTopRight',
+        'insideBottomLeft',
+        'insideBottomRight'
+      ];
+      app.configParameters = {
+        rotate: {
+          min: -90,
+          max: 90
+        },
+        align: {
+          options: {
+            left: 'left',
+            center: 'center',
+            right: 'right'
+          }
+        },
+        verticalAlign: {
+          options: {
+            top: 'top',
+            middle: 'middle',
+            bottom: 'bottom'
+          }
+        },
+        position: {
+          options: posList.reduce(function (map, pos) {
+            map[pos] = pos;
+            return map;
+          }, {})
+        },
+        distance: {
+          min: 0,
+          max: 100
+        }
+      };
+      app.config = {
+        rotate: 90,
+        align: 'left',
+        verticalAlign: 'middle',
+        position: 'top',
+        distance: 15,
+        onChange: function () {
+          const labelOption = {
+            rotate: app.config.rotate,
+            align: app.config.align,
+            verticalAlign: app.config.verticalAlign,
+            position: app.config.position,
+            distance: app.config.distance
+          };
+          myChart.setOption({
+            series: [
+              {
+                label: labelOption
+              },
+              {
+                label: labelOption
+              },
+              {
+                label: labelOption
+              },
+              {
+                label: labelOption
+              }
+            ]
+          });
+        }
+      };
+      const labelOption = {
+        show: true,
+        position: app.config.position,
+        distance: app.config.distance,
+        align: app.config.align,
+        verticalAlign: app.config.verticalAlign,
+        rotate: app.config.rotate,
+        formatter: '{c} %',
+        fontSize: 16,
+        rich: {
+          name: {}
+        }
+      };
+      let legendData = [];
+      let seriesData = [];
+      Object.keys(this.scoreResult).forEach(groupName => {
+        legendData.push(groupName);
+        seriesData.push({
+          name: groupName,
+          type: 'bar',
+          label: labelOption,
+          data: [
+            0,
+            0,
+            (((this.scoreResult[groupName].first + this.scoreResult[groupName].second + this.scoreResult[groupName].third + this.scoreResult[groupName].fourth + this.scoreResult[groupName].fifth) / this.scoreResult[groupName].allCount) * 100).toFixed(2),
+          ],
+          label: {
+            show: true
+          }
+        });
+      });
+      console.log('stageNumData', this.stageNumData)
+      option = {
+        title: {
+          text: '小组点检统计',
+          left: 'left',
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+
+        toolbox: {
+          show: false,
+          orient: 'vertical',
+          left: 'right',
+          top: 'center',
+          feature: {
+            mark: { show: true },
+            dataView: { show: true, readOnly: false },
+            magicType: { show: true, type: ['line', 'bar'] },
+            restore: { show: true },
+            saveAsImage: { show: true }
+          }
+        },
+        legend: {
+          type: 'scroll',
+          animationDurationUpdate: 0,
+          data: legendData
+        },
+        xAxis: [
+          {
+            type: 'category',
+            axisTick: { show: false },
+            data: ['普及率', '活动率', '成果率'],
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            min: 0,
+            max: 100,
+            axisLabel: {
+              show: true,
+              formatter: function (value) {
+                return value + '%';
+              }
+            },
+            splitLine: {
+              show: true,
+            }
+          }
+        ],
+        series: seriesData,
+      };
       option && myChart.setOption(option);
     }
+
   },
+
 
 
 }
@@ -618,27 +862,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#barChart {
-  width: 1000px;
-  height: 600px;
-  margin: 40px auto;
+.container {
+  padding: 20px;
 }
 
-
-.block {
-  margin-top: 50px;
-  text-align: center;
+.charts-container,
+.award-section {
+  display: flex;
+  gap: 20px;
+  /* 为图表之间添加间距 */
+  margin-top: 20px;
+  border-top: 3px solid #ccc;
+  /* 添加顶部分隔线 */
+  padding-top: 20px;
+  flex-wrap: nowrap;
+  /* 确保图表不会换行 */
 }
 
-#pieChart {
-  width: 1000px;
-  height: 600px;
-  margin: 40px auto;
-}
-
-#pieChart2 {
-  width: 1000px;
-  height: 600px;
-  margin: 40px auto;
+.chart-wrapper {
+  flex: 1;
+  /* 让每个图表平分可用空间 */
+  min-width: 0;
+  /* 防止内容溢出 */
+  border: 3px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  padding: 20px;
+  /* 增加内边距 */
+  height: calc(300px - 40px);
+  /* 减去内边距的高度，保持总高度不变 */
 }
 </style>

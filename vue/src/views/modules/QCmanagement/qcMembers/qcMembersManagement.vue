@@ -29,6 +29,14 @@
             </el-select>
           </el-form-item>
           <el-form-item>
+            <el-select style="width: 100px;" v-model="dataListQueryAdmin.groupType" placeholder="类型" clearable>
+              <el-option label="攻关" value="攻关"></el-option>
+              <el-option label="现场" value="现场"></el-option>
+              <el-option label="管理" value="管理"></el-option>
+              <el-option label="服务" value="服务"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
             <el-input style="width: 120px;" v-model="dataListQueryAdmin.consultant" placeholder="顾问"
               clearable></el-input>
           </el-form-item>
@@ -36,6 +44,12 @@
             <el-date-picker v-model="dataListQueryAdmin.buildTime" type="daterange" range-separator="-"
               start-placeholder="开始" end-placeholder="结束" value-format="yyyy-MM-dd">
             </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="dataListQueryAdmin.aboutMe" placeholder="关于我" clearable>
+              <el-option label="我创办" value="我创办"></el-option>
+              <el-option label="我参与" value="我参与"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item>
             <el-button @click="upQueryAdmin()">查询</el-button>
@@ -51,7 +65,10 @@
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="120">
             <template slot-scope="scope">
-              <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
+              <el-tag v-if="scope.row.deleteFlag === 1 && scope.row.parentId" type="info">/</el-tag>
+              <el-tag v-else-if="scope.row.deleteFlag === 1" type="info">已注销</el-tag>
+              <el-tag
+                v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
               <el-tag
                 v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
@@ -59,7 +76,7 @@
               <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">未通过(科室)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
                 }}</el-tag>
-              <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
+              <el-tag v-else type="info">--</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
@@ -73,7 +90,7 @@
           </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="100">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="120">
+          <el-table-column prop="department" header-align="center" align="center" label="科室" width="120">
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="100">
           </el-table-column>
@@ -89,11 +106,14 @@
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作">
             <template slot-scope="scope">
-              <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save'))" type="text" size="small"
-                @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:update')"
+              <el-button
+                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.deleteFlag != 1)"
+                type="text" size="small" @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
+              <el-button type="text" size="small"
+                v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.deleteFlag != 1)"
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-              <el-button type="text" size="small" v-if="isAuth('qcMembers:qcGroupMember:delete')"
+              <el-button type="text" size="small"
+                v-if="(isAuth('qcMembers:qcGroupMember:delete') && scope.row.deleteFlag != 1)"
                 @click="deleteHandle(scope.row.id)">删除</el-button>
               <!-- <el-button type="text" size="small" v-if="scope.row.parentId&&isAuth('qcMembers:leader:change')"
                 @click="leaderChangeHandle(scope.row.id, scope.row.parentId)">移交组长</el-button> -->
@@ -136,12 +156,26 @@
             </el-select>
           </el-form-item>
           <el-form-item>
+            <el-select style="width: 100px;" v-model="dataListQuery.groupType" placeholder="类型" clearable>
+              <el-option label="攻关" value="攻关"></el-option>
+              <el-option label="现场" value="现场"></el-option>
+              <el-option label="管理" value="管理"></el-option>
+              <el-option label="服务" value="服务"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
             <el-input style="width: 120px;" v-model="dataListQuery.consultant" placeholder="顾问" clearable></el-input>
           </el-form-item>
           <el-form-item>
             <el-date-picker v-model="dataListQuery.buildTime" type="daterange" range-separator="-"
               start-placeholder="开始" end-placeholder="结束" value-format="yyyy-MM-dd">
             </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-select style="width: 120px;" v-model="dataListQuery.aboutMe" placeholder="关于我" clearable>
+              <el-option label="我创办" value="我创办"></el-option>
+              <el-option label="我参与" value="我参与"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item>
             <el-button @click="upQuery()">查询</el-button>
@@ -152,14 +186,17 @@
           </el-form-item>
         </el-form>
         <el-table :data="dataListAfterQuery" stripe border v-loading="dataListLoading"
-          @selection-change="selectionChangeHandle" style="width: 100%;" row-key="id">
+          @selection-change="selectionChangeHandle" style="width: 100%;" height="600" row-key="id">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="groupName" header-align="center" align="center" label="小组名" width="160">
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
             <template slot-scope="scope">
-              <el-tag v-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
+              <el-tag v-if="scope.row.deleteFlag === 1 && scope.row.parentId" type="info">/</el-tag>
+              <el-tag v-else-if="scope.row.deleteFlag === 1" type="info">已注销</el-tag>
+              <el-tag
+                v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment != '1'">待审核(科室)</el-tag>
               <el-tag
                 v-else-if="(scope.row.examineStatus === '待审核') && scope.row.examineDepartment == '1'">待审核(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过' && scope.row.examineGroup === '0'"
@@ -179,7 +216,7 @@
           </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="100">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="120">
+          <el-table-column prop="department" header-align="center" align="center" label="科室" width="120">
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="100">
           </el-table-column>
@@ -195,18 +232,20 @@
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作">
             <template slot-scope="scope">
-              <el-button v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.admitEdit)"
+              <el-button
+                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.admitEdit && scope.row.deleteFlag != 1)"
                 type="text" size="small" @click="addMemberHandle(scope.row.id, scope.row.memberName)">新增成员</el-button>
               <el-button
-                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus == '未通过')"
+                v-if="(!scope.row.parentId && isAuth('qcMembers:qcGroupMember:save') && scope.row.examineStatus == '未通过' && scope.row.deleteFlag != 1)"
                 type="text" size="small" @click="handleReexamine(scope.row.id)">提交审核</el-button>
               <el-button type="text" size="small"
-                v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.admitEdit)"
+                v-if="(isAuth('qcMembers:qcGroupMember:update') && scope.row.admitEdit && scope.row.deleteFlag != 1)"
                 @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
               <el-button type="text" size="small"
-                v-if="(isAuth('qcMembers:qcGroupMember:delete') && scope.row.admitEdit)"
+                v-if="(isAuth('qcMembers:qcGroupMember:delete') && scope.row.admitEdit && scope.row.deleteFlag != 1)"
                 @click="deleteHandle(scope.row.id)">删除</el-button>
-              <el-button type="text" size="small" v-if="scope.row.parentId && scope.row.management"
+              <el-button type="text" size="small"
+                v-if="(scope.row.parentId && scope.row.management && scope.row.deleteFlag != 1)"
                 @click="changeHandle(scope.row.id, scope.row.parentId)">移交组长</el-button>
               <!-- <el-button type="text" size="small" @click="ad(scope.row)">移交组长</el-button> -->
             </template>
@@ -226,7 +265,7 @@
         </el-form> -->
         <el-table :data="examineList" stripe border v-loading="dataListLoading"
           :default-sort="{ prop: 'department', order: 'descending' }" @selection-change="selectionChangeHandle"
-          style="width: 100%;" row-key="id">
+          style="width: 100%;" row-key="id" height="1000">
           <el-table-column header-align="center" align="center" label="" width="40">
           </el-table-column>
           <el-table-column prop="examineStatus" header-align="center" align="center" label="小组审核状态" width="140">
@@ -252,7 +291,7 @@
           </el-table-column> -->
           <el-table-column prop="roleInTopic" header-align="center" align="center" label="组内角色" width="160">
           </el-table-column>
-          <el-table-column prop="department" header-align="center" align="center" label="单位" width="160" sortable>
+          <el-table-column prop="department" header-align="center" align="center" label="科室" width="160" sortable>
           </el-table-column>
           <el-table-column prop="team" header-align="center" align="center" label="小组类型" width="140">
           </el-table-column>
@@ -283,31 +322,30 @@
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination> -->
         <el-dialog :title="'处理审核'" :close-on-click-modal="false" :visible.sync="dialogFormVisible">
-          <el-form :model="examineFrom" :rules="examineRules">
-            <el-form-item v-if="already == '1'" label="管理员审核结果" prop="result">
+          <el-form :model="examineFrom" ref="examineFrom" :rules="handleExamineRules">
+            <el-form-item v-if="already == '1'" label="管理员审核结果" prop="group">
               <el-select v-model="examineFrom.group" placeholder="请选择">
                 <el-option label="通过" value="1"></el-option>
                 <el-option label="未通过" value="0"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item v-else label="科室审核结果" prop="result">
+            <el-form-item v-else label="科室审核结果" prop="department">
               <el-select v-model="examineFrom.department" placeholder="请选择">
                 <el-option label="通过" value="1"></el-option>
                 <el-option label="未通过" value="0"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item v-if="already == '1'" label="管理员审核意见" prop="comment">
+            <el-form-item v-if="already == '1'" label="管理员审核意见" prop="secondComment">
               <el-input v-model="examineFrom.secondComment" autosize type="textarea" placeholder="管理员审核意见"></el-input>
             </el-form-item>
-            <el-form-item v-else label="科室审核意见" prop="comment">
+            <el-form-item v-else label="科室审核意见" prop="firstComment">
               <el-input v-model="examineFrom.firstComment" autosize type="textarea" placeholder="科室审核意见"></el-input>
             </el-form-item>
-
           </el-form>
-          <div slot="footer" class="dialog-footer">
+          <span slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
             <el-button type="primary" @click="examineSubmit()">确 定</el-button>
-          </div>
+          </span>
         </el-dialog>
       </div>
     </el-tab-pane>
@@ -333,6 +371,7 @@ import { update } from 'lodash';
 export default {
   data() {
     return {
+      tableHeightGroup: '1000',
       activeName: '1',
       examineId: '',
       num: '',
@@ -342,6 +381,8 @@ export default {
         examineStatus: '',
         buildTime: [],
         consultant: '',
+        aboutMe: '',
+        groupType: '',
       },
       dataListQueryAdmin: {
         groupName: '',
@@ -349,6 +390,8 @@ export default {
         examineStatus: '',
         buildTime: [],
         consultant: '',
+        aboutMe: '',
+        groupType: '',
       },
       dataForm: {
         key: ''
@@ -382,15 +425,18 @@ export default {
       map: {},
       GroupMemberList: [],
       membersOptions: [],
-
+      currentUserName: '',
       // 角色列表
       roleIdList: [],
       dataListAfterQuery: [],
       tableDataAfterQueryAdmin: [],
       exportList: [],
       exportListMine: [],
-      examineRules: {
-        result: [
+      handleExamineRules: {
+        department: [
+          { required: true, message: '请选择审核结果', trigger: 'blur' }
+        ],
+        group: [
           { required: true, message: '请选择审核结果', trigger: 'blur' }
         ]
       }
@@ -410,14 +456,24 @@ export default {
         this.groupList = groupList;
       });
       // console.log(this.tableData)
-      this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
+      this.examineList = this.tableData.filter(item => item.examineStatus == '待审核' && item.deleteFlag != 1);
       this.totalPageExamine = this.examineList.length;
       // console.log(this.examineList.length)
     }
     if (!this.isAuth('qcManagement:group:admin')) {
       await this.getGroupList();
     }
-
+    await this.$http({
+      url: this.$http.adornUrl("/qcSubject/registration/user"),
+      method: "get",
+      params: this.$http.adornParams({
+      }),
+    }).then(({ data }) => {
+      if (data && data.code === 0) {
+        this.currentUserName = data.userName;
+      } else {
+      }
+    });
 
     // 获取分组后的员工数据
     await this.$http({
@@ -449,6 +505,20 @@ export default {
       } else {
         return false;
       }
+    },
+    dynamicTableHeight() {
+      // 计算行高，假设每行固定高度为 40px（包括边距和内边距）
+      const rowHeight = 40;
+      // 固定表头高度，假设为 50px
+      const headerHeight = 50;
+      // 计算总高度，确保最小高度，例如 200px
+      const minHeight = 600;
+
+      // 根据数据量计算表格高度，并加上表头高度
+      const calculatedHeight = this.dataListAfterQuery.length * rowHeight + headerHeight;
+
+      // 返回最大值，以保证表格至少有最小高度
+      return Math.max(calculatedHeight, minHeight);
     }
   },
   methods: {
@@ -461,6 +531,11 @@ export default {
         console.log('进入科室')
         console.log(this.dataListQuery.department)
         tmpList = tmpList.filter(item => item.department == this.dataListQuery.department)
+      }
+      if (this.dataListQuery.groupType != '' && this.dataListQuery.groupType != null) {
+        console.log('进入类型')
+        console.log(this.dataListQuery.groupType)
+        tmpList = tmpList.filter(item => item.team == this.dataListQuery.groupType)
       }
       if (this.dataListQuery.consultant != '' && this.dataListQuery.consultant != null) {
         console.log('进入顾问')
@@ -492,6 +567,18 @@ export default {
         console.log(this.dataListQuery.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQuery.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQuery.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
       }
+      if (this.dataListQuery.aboutMe != '' && this.dataListQuery.aboutMe != null) {
+        console.log('进入关于我')
+        console.log(this.dataListQuery.aboutMe)
+        console.log(this.currentUserName)
+        if (this.dataListQuery.aboutMe == '我创办') {
+          console.log('我创办筛选')
+          tmpList = tmpList.filter(item => item.memberName == this.currentUserName)
+        } else if (this.dataListQuery.aboutMe == '我参与') {
+          console.log('我参与筛选')
+          tmpList = tmpList.filter(item => item.memberName != this.currentUserName)
+        }
+      }
       this.dataListAfterQuery = tmpList
     },
     upQueryAdmin() {
@@ -504,6 +591,11 @@ export default {
       }
       if (this.dataListQueryAdmin.department != '' && this.dataListQueryAdmin.department != null) {
         tmpList = tmpList.filter(item => item.department == this.dataListQueryAdmin.department)
+      }
+      if (this.dataListQueryAdmin.groupType != '' && this.dataListQueryAdmin.groupType != null) {
+        console.log('进入类型')
+        console.log(this.dataListQueryAdmin.groupType)
+        tmpList = tmpList.filter(item => item.team == this.dataListQueryAdmin.groupType)
       }
       console.log('顾问前' + this.dataListQueryAdmin.consultant)
       if (this.dataListQueryAdmin.consultant != '' && this.dataListQueryAdmin.consultant != null) {
@@ -535,6 +627,25 @@ export default {
         console.log('进入日期')
         console.log(this.dataListQueryAdmin.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQueryAdmin.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQueryAdmin.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
+      }
+      if (this.dataListQueryAdmin.aboutMe != '' && this.dataListQueryAdmin.aboutMe != null) {
+        console.log('进入关于我')
+        console.log(this.dataListQueryAdmin.aboutMe)
+        console.log(this.currentUserName)
+        if (this.dataListQueryAdmin.aboutMe == '我创办') {
+          console.log('我创办筛选')
+          tmpList = tmpList.filter(item => item.memberName == this.currentUserName)
+        } else if (this.dataListQueryAdmin.aboutMe == '我参与') {
+          console.log('我参与筛选')
+          tmpList = tmpList.filter(item => item.memberName != this.currentUserName)
+          // 筛选 tmpList 中 children 数组包含 currentUserName 的项
+          tmpList = tmpList.filter(item => {
+            // 检查当前项是否包含在 children 中
+            const hasParticipation = item.children.some(child => child.memberName === this.currentUserName);
+            return hasParticipation;
+          });
+
+        }
       }
       console.log(tmpList)
       this.tableDataAfterQueryAdmin = tmpList
@@ -603,7 +714,7 @@ export default {
     async getGroupList() {
       this.dataListLoading = true
       await this.$http({
-        url: this.$http.adornUrl('/qcMembers/qcGroupMember/myList'),
+        url: this.$http.adornUrl('/qcMembers/qcGroupMember/allMyList'),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
@@ -671,6 +782,7 @@ export default {
                 firstComment: item.firstComment,
                 secondComment: item.secondComment,
                 registrationNum: item.registrationNum,
+                deleteFlag: item.deleteFlag,
                 children: []
               };
             }
@@ -687,6 +799,7 @@ export default {
                 department: item.department,
                 roleInTopic: item.roleInTopic,
                 parentId: item.parentId,
+                deleteFlag: item.deleteFlag,
               });
             }
           });
@@ -754,17 +867,103 @@ export default {
             seen.forEach(s => {
               this.exportListMine = this.exportListMine.filter(e => e.parentId != s.qcgmId);
             })
+            const sameList = [];
+            // this.dataList = data.page.list
+            data.page.list.forEach(item => {
+              if (item.memberName == data.userName) {
+                item.admitEdit = 1 //标识当前角色可修改
+                sameList.push(item)
+              }
+            });
+            console.log(sameList)
+            const resultList = [];
+            const seen2 = new Set(); // 用于去重
+
+            sameList.forEach(item => {
+              if (!seen2.has(item.qcgmId)) {
+                resultList.push(item);
+                seen2.add(item.qcgmId);
+              }
+
+              if (item.parentId) {
+                data.page.list.forEach(row => {
+                  if ((row.parentId == item.parentId || row.qcgmId == item.parentId) && !seen2.has(row.qcgmId)) {
+                    resultList.push(row);
+                    seen2.add(row.qcgmId);
+                  }
+                });
+              } else {
+                data.page.list.forEach(row => {
+                  if (row.parentId == item.qcgmId && !seen2.has(row.qcgmId)) {
+                    row.management = 1 //标识当前角色为组长，可以移交组长
+                    row.admitEdit = 1 //标识当前角色可修改
+                    resultList.push(row);
+                    seen2.add(row.qcgmId);
+                  }
+                });
+              }
+            });
+            this.exportListMine = resultList
             console.log('----------before------------')
             console.log(this.exportListMine)
-
+            // 按 roleInTopic 是否为 "组长" 和 participationDate 降序排列
             this.exportListMine.sort((a, b) => {
-              if (a.groupName === b.groupName) {
-                // 如果groupName相同，则按roleInTopic是否为"组长"排序
-                return a.roleInTopic === "组长" ? -1 : (b.roleInTopic === "组长" ? 1 : 0);
+              const dateA = new Date(a.participationDate);
+              const dateB = new Date(b.participationDate);
+
+              if (isNaN(dateA) || isNaN(dateB)) {
+                console.warn('无效的参与日期:', a.participationDate, b.participationDate);
+                return 0; // 如果日期无效，保持原有顺序
               }
-              // 如果groupName不同，则按groupName字母顺序排序
-              return a.groupName.localeCompare(b.groupName);
+
+              if (a.roleInTopic === "组长" && b.roleInTopic !== "组长") {
+                return -1;
+              } else if (a.roleInTopic !== "组长" && b.roleInTopic === "组长") {
+                return 1;
+              } else {
+                // 如果都是组长或都不是组长，则按 participationDate 降序排列
+                return dateB - dateA;
+              }
+            });// 创建一个映射来存储每个组长后面的成员
+            const groupMap = new Map();
+
+            // 遍历排序后的列表，构建组映射
+            this.exportListMine.forEach(item => {
+              if (item.roleInTopic !== "组长") {
+                if (!groupMap.has(item.groupName)) {
+                  groupMap.set(item.groupName, []);
+                }
+                groupMap.get(item.groupName).push(item);
+              }
             });
+
+            // 创建新的有序列表
+            const orderedList = [];
+
+            // 再次遍历排序后的列表，构建最终的有序列表
+            this.exportListMine.forEach(item => {
+              if (item.roleInTopic === "组长") {
+                orderedList.push(item);
+                if (groupMap.has(item.groupName)) {
+                  // 将同组的成员插入到组长后面，并按 participationDate 降序排列
+                  orderedList.push(...groupMap.get(item.groupName).sort((a, b) => {
+                    const dateA = new Date(a.participationDate);
+                    const dateB = new Date(b.participationDate);
+
+                    if (isNaN(dateA) || isNaN(dateB)) {
+                      console.warn('无效的参与日期:', a.participationDate, b.participationDate);
+                      return 0; // 如果日期无效，保持原有顺序
+                    }
+
+                    return dateB - dateA;
+                  }));
+                  groupMap.delete(item.groupName); // 移除已经处理过的组
+                }
+              }
+            });
+
+            // 更新 exportListMine 为新的有序列表
+            this.exportListMine = orderedList;
             console.log('----------after------------')
             console.log(this.exportListMine)
 
@@ -778,20 +977,21 @@ export default {
           spinner: "el-icon-loading",
           background: "rgba(0, 0, 0, 0.7)",
         });
-        // console.log(this.exportList)
+        console.log(this.exportListMine)
         const promises = this.exportListMine.map((tableRow, index) => {
           return {
             序号: index + 1,
             小组名: tableRow.groupName,
             组内角色: tableRow.roleInTopic,
-            姓名: tableRow.memberName,
-            员工编号: tableRow.number,
-            单位: tableRow.department,
+            姓名: this.numberToName(tableRow.memberName),
+            科室: tableRow.department,
             小组类型: tableRow.team,
+            顾问: this.numberToName(tableRow.position),
             注册号: tableRow.registrationNum,
             创建小组时间: tableRow.participationDate,
           };
         });
+        console.log({ promises })
         Promise.all(promises)
           .then((data) => {
             const ws = XLSX.utils.json_to_sheet(data);
@@ -838,15 +1038,70 @@ export default {
             })
             console.log('----------before------------')
             console.log(this.exportList)
-
+            // this.exportList.sort(function (a, b) {
+            //   const dateA = new Date(a.participationDate);
+            //   const dateB = new Date(b.participationDate);
+            //   // 比较两个日期对象，降序排列
+            //   return dateB - dateA;
+            // })
+            // 按 roleInTopic 是否为 "组长" 和 participationDate 降序排列
             this.exportList.sort((a, b) => {
-              if (a.groupName === b.groupName) {
-                // 如果groupName相同，则按roleInTopic是否为"组长"排序
-                return a.roleInTopic === "组长" ? -1 : (b.roleInTopic === "组长" ? 1 : 0);
+              const dateA = new Date(a.participationDate);
+              const dateB = new Date(b.participationDate);
+
+              if (isNaN(dateA) || isNaN(dateB)) {
+                console.warn('无效的参与日期:', a.participationDate, b.participationDate);
+                return 0; // 如果日期无效，保持原有顺序
               }
-              // 如果groupName不同，则按groupName字母顺序排序
-              return a.groupName.localeCompare(b.groupName);
+
+              if (a.roleInTopic === "组长" && b.roleInTopic !== "组长") {
+                return -1;
+              } else if (a.roleInTopic !== "组长" && b.roleInTopic === "组长") {
+                return 1;
+              } else {
+                // 如果都是组长或都不是组长，则按 participationDate 降序排列
+                return dateB - dateA;
+              }
+            });// 创建一个映射来存储每个组长后面的成员
+            const groupMap = new Map();
+
+            // 遍历排序后的列表，构建组映射
+            this.exportList.forEach(item => {
+              if (item.roleInTopic !== "组长") {
+                if (!groupMap.has(item.groupName)) {
+                  groupMap.set(item.groupName, []);
+                }
+                groupMap.get(item.groupName).push(item);
+              }
             });
+
+            // 创建新的有序列表
+            const orderedList = [];
+
+            // 再次遍历排序后的列表，构建最终的有序列表
+            this.exportList.forEach(item => {
+              if (item.roleInTopic === "组长") {
+                orderedList.push(item);
+                if (groupMap.has(item.groupName)) {
+                  // 将同组的成员插入到组长后面，并按 participationDate 降序排列
+                  orderedList.push(...groupMap.get(item.groupName).sort((a, b) => {
+                    const dateA = new Date(a.participationDate);
+                    const dateB = new Date(b.participationDate);
+
+                    if (isNaN(dateA) || isNaN(dateB)) {
+                      console.warn('无效的参与日期:', a.participationDate, b.participationDate);
+                      return 0; // 如果日期无效，保持原有顺序
+                    }
+
+                    return dateB - dateA;
+                  }));
+                  groupMap.delete(item.groupName); // 移除已经处理过的组
+                }
+              }
+            });
+
+            // 更新 exportList 为新的有序列表
+            this.exportList = orderedList;
             console.log('----------after------------')
             console.log(this.exportList)
 
@@ -866,11 +1121,10 @@ export default {
             序号: index + 1,
             小组名: tableRow.groupName,
             组内角色: tableRow.roleInTopic,
-            姓名: tableRow.memberName,
-            员工编号: tableRow.number,
-            单位: tableRow.department,
+            姓名: this.numberToName(tableRow.memberName),
+            科室: tableRow.department,
             小组类型: tableRow.team,
-            顾问: tableRow.position,
+            顾问: this.numberToName(tableRow.position),
             注册号: tableRow.registrationNum,
             创建小组时间: tableRow.participationDate,
           };
@@ -907,7 +1161,7 @@ export default {
         let groupList = [];
         this.dataListLoading = true;
         this.$http({
-          url: this.$http.adornUrl('/qcMembers/qcGroupMember/list'),
+          url: this.$http.adornUrl('/qcMembers/qcGroupMember/allList'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -918,9 +1172,10 @@ export default {
           if (data && data.code === 0) {
             this.tmpList = data.page.list;
             this.totalPage = data.page.totalCount;
-            groupList = this.tmpList.filter(function (item) {
-              return item.deleteFlag !== 1;
-            });
+            // groupList = this.tmpList.filter(function (item) {
+            //   return item.deleteFlag !== 1;
+            // });
+            groupList = this.tmpList;
             console.log(groupList);
             // 分组
             this.tableData = []; // 清空 tableData
@@ -943,6 +1198,7 @@ export default {
                   firstComment: item.firstComment,
                   secondComment: item.secondComment,
                   registrationNum: item.registrationNum,
+                  deleteFlag: item.deleteFlag,
                   children: []
                 };
               }
@@ -957,6 +1213,7 @@ export default {
                   roleInTopic: item.roleInTopic,
                   department: item.department,
                   parentId: item.parentId,
+                  deleteFlag: item.deleteFlag,
                 });
               }
             });
@@ -981,7 +1238,7 @@ export default {
             this.tmpList = [];
             this.totalPage = 0;
           }
-          this.examineList = this.tableData.filter(item => item.examineStatus == '待审核');
+          this.examineList = this.tableData.filter(item => item.examineStatus == '待审核' && item.deleteFlag != 1);
           this.dataListLoading = false;
           resolve(groupList);
         }).catch(error => {
@@ -1093,68 +1350,76 @@ export default {
         this.registrationNum = null;
       }
       this.dialogFormVisible = true;
+      this.examineFrom.group = '';
+      this.examineFrom.department = '';
       this.examineId = id;
     },
     //提交审核结果
     async examineSubmit() {
-      this.num = null;
-      var result = ''
-      if (this.examineFrom.department == '0' || this.examineFrom.group == '0') {
-        result = '未通过'
-      } else if (this.examineFrom.department == '1' && (this.examineFrom.group == '' || this.examineFrom.group == 'null' || this.examineFrom.group == 'undefined')) {
-        result = '待审核'
-      } else if (this.already == '1' && this.examineFrom.group == '1') {
-        result = '通过'
-        //生成注册号
-        await this.$http({
-          url: this.$http.adornUrl(`/qcMembers/qcGroupMember/registration`),
-          method: 'get',
-        }).then(({ data }) => {
-          this.num = data.result.registrationNum + 1
-        })
-        if (this.num !== '') {
-          const year = new Date().getFullYear();
-          if (this.num < 10) {
-            this.num = `PJHLQC-${year}-00${this.num}`;
-          } else if (this.num < 100) {
-            this.num = `PJHLQC-${year}-0${this.num}`;
-          } else {
-            this.num = `PJHLQC-${year}-${this.num}`;
+      this.$refs['examineFrom'].validate(async (valid) => {
+        if (valid) {
+          this.num = null;
+          var result = ''
+          if (this.examineFrom.department == '0' || this.examineFrom.group == '0') {
+            result = '未通过'
+          } else if (this.examineFrom.department == '1' && (this.examineFrom.group == '' || this.examineFrom.group == 'null' || this.examineFrom.group == 'undefined')) {
+            result = '待审核'
+          } else if (this.already == '1' && this.examineFrom.group == '1') {
+            result = '通过'
+            //生成注册号
+            await this.$http({
+              url: this.$http.adornUrl(`/qcMembers/qcGroupMember/registration`),
+              method: 'get',
+            }).then(({ data }) => {
+              this.num = data.result.registrationNum + 1
+            })
+            if (this.num !== '') {
+              const year = new Date().getFullYear();
+              if (this.num < 10) {
+                this.num = `PJHLQC-${year}-00${this.num}`;
+              } else if (this.num < 100) {
+                this.num = `PJHLQC-${year}-0${this.num}`;
+              } else {
+                this.num = `PJHLQC-${year}-${this.num}`;
+              }
+            }
           }
-        }
-      }
-      await this.$http({
-        url: this.$http.adornUrl(`/qcMembers/qcGroupMember/update`),
-        method: 'post',
-        data: this.$http.adornData({
-          'qcgmId': this.examineId,
-          'examineGroup': this.examineFrom.group,
-          'examineDepartment': this.examineFrom.group == '0' ? '' : this.examineFrom.department,
-          'examineStatus': result,
-          'firstComment': this.examineFrom.firstComment,
-          'secondComment': this.examineFrom.secondComment,
-          'registrationNum': (this.registrationNum == '' || this.registrationNum == null) ? this.num : this.registrationNum,
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.$message({
-            message: '审核成功',
-            type: 'success',
-            duration: 1500,
-            onClose: () => {
-              this.examineFrom.department = ''
-              this.examineFrom.group = ''
-              this.dialogFormVisible = false;
-              this.getGroupList();
-              this.getDataList();
-              this.examineList = this.tableData.filter(item => item.examineStatus === '待审核');
-              this.totalPageExamine = this.examineList.length;
+          await this.$http({
+            url: this.$http.adornUrl(`/qcMembers/qcGroupMember/update`),
+            method: 'post',
+            data: this.$http.adornData({
+              'qcgmId': this.examineId,
+              'examineGroup': this.examineFrom.group,
+              'examineDepartment': this.examineFrom.group == '0' ? '' : this.examineFrom.department,
+              'examineStatus': result,
+              'firstComment': this.examineFrom.firstComment,
+              'secondComment': this.examineFrom.secondComment,
+              'registrationNum': (this.registrationNum == '' || this.registrationNum == null) ? this.num : this.registrationNum,
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '审核成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.examineFrom.department = ''
+                  this.examineFrom.group = ''
+                  this.dialogFormVisible = false;
+                  this.getGroupList();
+                  this.getDataList();
+                  this.examineList = this.tableData.filter(item => item.examineStatus === '待审核' && item.deleteFlag != 1);
+                  this.totalPageExamine = this.examineList.length;
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
             }
           })
-        } else {
-          this.$message.error(data.msg)
+
         }
       })
+
     },
     // 提交审核按钮
     handleReexamine(id) {
@@ -1244,6 +1509,7 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
+                this.getGroupList();
                 this.getDataList()
               }
             })

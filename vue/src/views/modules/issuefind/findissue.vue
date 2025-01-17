@@ -55,6 +55,45 @@
         </el-table-column>
         <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
         </el-table-column>
+        <el-table-column
+          prop="indemnification"
+          header-align="center"
+          align="center"
+          label="赔偿件">
+          <template slot-scope="scope">
+            {{ getindemnificationById(scope.row.indemnification) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="figurenumber"
+          header-align="center"
+          align="center"
+          label="图号">
+        </el-table-column>
+        <el-table-column
+          prop="qualitycost"
+          header-align="center"
+          align="center"
+          label="质量成本">
+        </el-table-column>
+        <el-table-column
+          prop="problematicpieces"
+          header-align="center"
+          align="center"
+          label="问题件分类">
+        </el-table-column>
+        <el-table-column
+          prop="vendor"
+          header-align="center"
+          align="center"
+          label="供应商">
+        </el-table-column>
+        <el-table-column
+          prop="isnew"
+          header-align="center"
+          align="center"
+          label="是否为新产品">
+        </el-table-column>
         <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
         </el-table-column>
         <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
@@ -68,6 +107,34 @@
         <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
         </el-table-column>
         <el-table-column prop="vehicleNumberId" header-align="center" align="center" label="车号">
+        </el-table-column>
+        <el-table-column
+          prop="saleTiming"
+          label="销售时间"
+        >
+          <template slot-scope="scope">
+            {{ formatSaletime(scope.row.saleTiming) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="useTiming"
+          label="使用时间"
+        >
+          <template slot-scope="scope">
+            {{ formatSaletime(scope.row.useTiming) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="region"
+          header-align="center"
+          align="center"
+          label="问题区域">
+        </el-table-column>
+        <el-table-column
+          prop="industry"
+          header-align="center"
+          align="center"
+          label="行业">
         </el-table-column>
         <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
         </el-table-column>
@@ -100,16 +167,26 @@
         </el-table-column>
 <!--        <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--        </el-table-column>-->
-        <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+        <el-table-column prop="level" header-align="center" align="center" width="150" label="问题状态" fixed="right">
           <template slot-scope="scope">
             <div>
       <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
-        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
-      </span>
+  <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '已完成'" type="success" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else class="bold-large-text">
+    {{ state }}
+  </el-tag> <!-- 处理未定义的状态 -->
+    </span>
             </div>
           </template>
         </el-table-column>
@@ -153,6 +230,45 @@
           </el-table-column>
           <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
           </el-table-column>
+          <el-table-column
+            prop="indemnification"
+            header-align="center"
+            align="center"
+            label="赔偿件">
+            <template slot-scope="scope">
+              {{ getindemnificationById(scope.row.indemnification) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="figurenumber"
+            header-align="center"
+            align="center"
+            label="图号">
+          </el-table-column>
+          <el-table-column
+            prop="qualitycost"
+            header-align="center"
+            align="center"
+            label="质量成本">
+          </el-table-column>
+          <el-table-column
+            prop="problematicpieces"
+            header-align="center"
+            align="center"
+            label="问题件分类">
+          </el-table-column>
+          <el-table-column
+            prop="vendor"
+            header-align="center"
+            align="center"
+            label="供应商">
+          </el-table-column>
+          <el-table-column
+            prop="isnew"
+            header-align="center"
+            align="center"
+            label="是否为新产品">
+          </el-table-column>
           <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
           </el-table-column>
           <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
@@ -166,6 +282,34 @@
           <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
           </el-table-column>
           <el-table-column prop="vehicleNumberId" header-align="center" align="center" label="车号">
+          </el-table-column>
+          <el-table-column
+            prop="saleTiming"
+            label="销售时间"
+          >
+            <template slot-scope="scope">
+              {{ formatSaletime(scope.row.saleTiming) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="useTiming"
+            label="使用时间"
+          >
+            <template slot-scope="scope">
+              {{ formatSaletime(scope.row.useTiming) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="region"
+            header-align="center"
+            align="center"
+            label="问题区域">
+          </el-table-column>
+          <el-table-column
+            prop="industry"
+            header-align="center"
+            align="center"
+            label="行业">
           </el-table-column>
           <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
           </el-table-column>
@@ -323,16 +467,26 @@
           </el-table-column>
 <!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--          </el-table-column>-->
-          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+          <el-table-column prop="level" header-align="center" align="center" width="150" label="问题状态" fixed="right">
             <template slot-scope="scope">
               <div>
-      <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
-        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-        <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
-      </span>
+     <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+  <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else-if="state === '已完成'" type="success" disable-transitions class="bold-large-text">
+    {{ state }}
+  </el-tag>
+  <el-tag v-else class="bold-large-text">
+    {{ state }}
+  </el-tag> <!-- 处理未定义的状态 -->
+    </span>
               </div>
             </template>
           </el-table-column>
@@ -398,6 +552,45 @@
           </el-table-column>
           <el-table-column prop="issueCategoryId" header-align="center" align="center" label="问题类别">
           </el-table-column>
+          <el-table-column
+            prop="indemnification"
+            header-align="center"
+            align="center"
+            label="赔偿件">
+            <template slot-scope="scope">
+              {{ getindemnificationById(scope.row.indemnification) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="figurenumber"
+            header-align="center"
+            align="center"
+            label="图号">
+          </el-table-column>
+          <el-table-column
+            prop="qualitycost"
+            header-align="center"
+            align="center"
+            label="质量成本">
+          </el-table-column>
+          <el-table-column
+            prop="problematicpieces"
+            header-align="center"
+            align="center"
+            label="问题件分类">
+          </el-table-column>
+          <el-table-column
+            prop="vendor"
+            header-align="center"
+            align="center"
+            label="供应商">
+          </el-table-column>
+          <el-table-column
+            prop="isnew"
+            header-align="center"
+            align="center"
+            label="是否为新产品">
+          </el-table-column>
           <el-table-column prop="systematicClassification" header-align="center" align="center" label="系统分类">
           </el-table-column>
           <el-table-column prop="firstFaultyParts" header-align="center" align="center" label="故障件一级">
@@ -411,6 +604,34 @@
           <el-table-column prop="vehicleTypeId" header-align="center" align="center" label="车型">
           </el-table-column>
           <el-table-column prop="vehicleNumberId" header-align="center" align="center" label="车号">
+          </el-table-column>
+          <el-table-column
+            prop="saleTiming"
+            label="销售时间"
+          >
+            <template slot-scope="scope">
+              {{ formatSaletime(scope.row.saleTiming) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="useTiming"
+            label="使用时间"
+          >
+            <template slot-scope="scope">
+              {{ formatSaletime(scope.row.useTiming) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="region"
+            header-align="center"
+            align="center"
+            label="问题区域">
+          </el-table-column>
+          <el-table-column
+            prop="industry"
+            header-align="center"
+            align="center"
+            label="行业">
           </el-table-column>
           <el-table-column prop="issueDescription" header-align="center" align="center" label="问题描述">
           </el-table-column>
@@ -601,16 +822,26 @@
           </el-table-column>
 <!--          <el-table-column prop="level" header-align="center" align="center" width="120" label="问题状态" fixed="right">-->
 <!--          </el-table-column>-->
-          <el-table-column prop="level" header-align="center" align="center" width="140" label="问题状态" fixed="right">
+          <el-table-column prop="level" header-align="center" align="center" width="150" label="问题状态" fixed="right">
             <template slot-scope="scope">
               <div>
-                <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
-                  <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions>{{ state }}</el-tag>
-                  <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions>{{ state }}</el-tag>
-                  <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions>{{ state }}</el-tag>
-                  <el-tag v-else-if="state === '已完成'" type="success" disable-transitions>{{ state }}</el-tag>
-                  <el-tag v-else>{{ state }}</el-tag> <!-- 处理未定义的状态 -->
-                </span>
+                           <span v-for="(state, index) in getStates(scope.row.level)" :key="index">
+        <el-tag v-if="state === '等待整改记录填写'" type="info" disable-transitions class="bold-large-text">
+          {{ state }}
+        </el-tag>
+        <el-tag v-else-if="state === '等待任务下发(处理)'" type="warning" disable-transitions class="bold-large-text">
+          {{ state }}
+        </el-tag>
+        <el-tag v-else-if="state === '等待验证'" type="primary" disable-transitions class="bold-large-text">
+          {{ state }}
+        </el-tag>
+        <el-tag v-else-if="state === '已完成'" type="success" disable-transitions class="bold-large-text">
+          {{ state }}
+        </el-tag>
+        <el-tag v-else class="bold-large-text">
+          {{ state }}
+        </el-tag> <!-- 处理未定义的状态 -->
+          </span>
               </div>
             </template>
           </el-table-column>
@@ -725,6 +956,7 @@ export default {
       dialogVisible2: false,
       options: '',
       fullRetStates: '',
+      indemnificationoptions: [],
     }
   },
   components: {
@@ -732,14 +964,25 @@ export default {
     AddOrUpdateT,
     AddOrUpdateV
   },
-  created() {
+  async created() {
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
     }).then(({ data }) => {
       this.options = data;
       // console.log("所有的用户信息" ,data);
-    })
+    });
+    // 获取赔偿件数据
+    this.$http({
+      url: this.$http.adornUrl(`/generator/indemnificationtable/list1`),
+      method: 'get',
+    }).then(({data}) => {
+      this.indemnificationOptions = data.result.map(item => ({
+        id: item.indeId,
+        name: item.indemnification,
+      }));
+      console.log("peichangjian", this.indemnificationOptions);
+    });
   },
   activated() {
     this.getDataList()
@@ -979,7 +1222,21 @@ export default {
       console.error('上传错误:', error);  // 打印错误对象
       this.$message.error('文件上传失败：' + (error.response ? error.response.data.message : error.message)); // 提供更详细的错误信息
     },
-
+    formatSaletime(saletime) {
+      if (!saletime) return '';
+      // 将逗号分隔的时间字符串分割成数组
+      const dates = saletime.split(',').map(dateStr => dateStr.trim());
+      // 对每个时间字符串进行格式化
+      const formattedDates = dates.map(dateStr => {
+        const date = new Date(dateStr);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // 月份从0开始
+        const day = date.getDate();
+        return `${year}-${month}-${day}`;
+      });
+      // 将格式化后的日期用逗号拼接回字符串
+      return formattedDates.join(',');
+    },
     // 获取数据列表
     getDataList() {
       this.dataListLoading = true
@@ -1117,6 +1374,15 @@ export default {
     //   console.log(file);
     //   window.open(file);
     // },
+    getindemnificationById(auditorId) {
+      // console.log("peichangjian", this.indemnificationOptions);
+      for (const category of this.indemnificationOptions) {
+        if (category.id == auditorId) {
+          return category.name;
+        }
+      }
+      return "-";
+    },
     openflow(issueId, issueNumber) {
       this.$router.push({
         name: 'issue-issueflow',
@@ -1242,4 +1508,10 @@ export default {
   margin-top: 10px;
   font-size: 14px; /* 分页器字体大小 */
 }
+
+ .bold-large-text {
+   font-weight: bold;
+   font-size: 14px;
+ }
+
 </style>

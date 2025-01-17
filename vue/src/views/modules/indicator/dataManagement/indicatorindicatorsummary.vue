@@ -69,125 +69,130 @@
         <el-button  type="primary" @click="exportAll()">导出</el-button>
       </el-col>
     </el-row>
-    <el-table
-      :data="dataList"
-      border
-      v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
-      style="width: 100%; margin-top: 10px;">
-      <el-table-column
-        type="selection"
-        header-align="center"
-        align="center"
-        width="50">
-      </el-table-column>
-      <!-- 序号列 -->
-      <el-table-column
-        header-align="center"
-        align="center"
-        label="序号"
-        width="60"
-      >
-        <template slot-scope="scope">
-          {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
-        </template>
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="indicatorId"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="指标ID">-->
-<!--      </el-table-column>-->
-      <el-table-column
-        prop="indicatorName"
-        header-align="center"
-        align="center"
-        label="指标名称">
-      </el-table-column>
-      <el-table-column
-        prop="yearMonth"
-        header-align="center"
-        align="center"
-        label="年月">
-      </el-table-column>
-      <el-table-column
-        prop="indicatorValue"
-        header-align="center"
-        align="center"
-        label="指标目标值">
-      </el-table-column>
-      <el-table-column
-        prop="indicatorActualValue"
-        header-align="center"
-        align="center"
-        label="指标完成值">
-      </el-table-column>
-<!--      <el-table-column-->
-<!--        prop="indicatorValueUpperBound"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="指标值上界">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--        prop="indicatorValueLowerBound"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="指标值下界">-->
-<!--      </el-table-column>-->
-      <el-table-column
-        prop="managementDepartment"
-        header-align="center"
-        align="center"
-        label="管理部门">
-      </el-table-column>
-      <el-table-column
-        prop="assessmentDepartment"
-        header-align="center"
-        align="center"
-        label="考核部门">
-      </el-table-column>
-      <el-table-column
-        prop="indicatorClassification"
-        header-align="center"
-        align="center"
-        label="指标分级">
-      </el-table-column>
-      <el-table-column
-        prop="finishedFlag"
-        header-align="center"
-        align="center"
-        label="完成情况">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.finishedFlag === 1" type="success">
-            达标
-          </el-tag>
-          <el-tag v-else-if="scope.row.finishedFlag === 0" type="danger">
-            未达标
-          </el-tag>
-          <el-tag v-else type="info">
-            -
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="indicatorCreatTime"
-        header-align="center"
-        align="center"
-        label="指标填报时间">
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="150"
-        label="操作">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.indicatorId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.indicatorId)">删除</el-button>
-          <el-button type="text" size="small" @click="addPlanHandle(scope.row.indicatorName)">新建计划</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+
+    <div class="table-container">
+      <el-table
+        :data="dataList"
+        border
+        v-loading="dataListLoading"
+        @selection-change="selectionChangeHandle"
+        style="width: 100%; margin-top: 10px;"
+        height="1000">
+        <el-table-column
+          type="selection"
+          header-align="center"
+          align="center"
+          width="50">
+        </el-table-column>
+        <!-- 序号列 -->
+        <el-table-column
+          header-align="center"
+          align="center"
+          label="序号"
+          width="60"
+        >
+          <template slot-scope="scope">
+            {{ (pageIndex - 1) * pageSize + scope.$index + 1 }}
+          </template>
+        </el-table-column>
+        <!--      <el-table-column-->
+        <!--        prop="indicatorId"-->
+        <!--        header-align="center"-->
+        <!--        align="center"-->
+        <!--        label="指标ID">-->
+        <!--      </el-table-column>-->
+        <el-table-column
+          prop="indicatorName"
+          header-align="center"
+          align="center"
+          label="指标名称">
+        </el-table-column>
+        <el-table-column
+          prop="yearMonth"
+          header-align="center"
+          align="center"
+          label="年月">
+        </el-table-column>
+        <el-table-column
+          prop="indicatorValue"
+          header-align="center"
+          align="center"
+          label="指标目标值">
+        </el-table-column>
+        <el-table-column
+          prop="indicatorActualValue"
+          header-align="center"
+          align="center"
+          label="指标完成值">
+        </el-table-column>
+        <!--      <el-table-column-->
+        <!--        prop="indicatorValueUpperBound"-->
+        <!--        header-align="center"-->
+        <!--        align="center"-->
+        <!--        label="指标值上界">-->
+        <!--      </el-table-column>-->
+        <!--      <el-table-column-->
+        <!--        prop="indicatorValueLowerBound"-->
+        <!--        header-align="center"-->
+        <!--        align="center"-->
+        <!--        label="指标值下界">-->
+        <!--      </el-table-column>-->
+        <el-table-column
+          prop="managementDepartment"
+          header-align="center"
+          align="center"
+          label="管理部门">
+        </el-table-column>
+        <el-table-column
+          prop="assessmentDepartment"
+          header-align="center"
+          align="center"
+          label="考核部门">
+        </el-table-column>
+        <el-table-column
+          prop="indicatorClassification"
+          header-align="center"
+          align="center"
+          label="指标分级">
+        </el-table-column>
+        <el-table-column
+          prop="finishedFlag"
+          header-align="center"
+          align="center"
+          label="完成情况">
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.finishedFlag === 1" type="success">
+              达标
+            </el-tag>
+            <el-tag v-else-if="scope.row.finishedFlag === 0" type="danger">
+              未达标
+            </el-tag>
+            <el-tag v-else type="info">
+              -
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="indicatorCreatTime"
+          header-align="center"
+          align="center"
+          label="指标填报时间">
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          header-align="center"
+          align="center"
+          width="150"
+          label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.indicatorId)">修改</el-button>
+            <el-button type="text" size="small" @click="deleteHandle(scope.row.indicatorId)">删除</el-button>
+            <el-button type="text" size="small" @click="addPlanHandle(scope.row.indicatorName)">新建计划</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -602,3 +607,9 @@
     }
   }
 </script>
+
+<style scoped>
+.table-container .el-table {
+  max-height: calc(100vh - 300px );
+}
+</style>

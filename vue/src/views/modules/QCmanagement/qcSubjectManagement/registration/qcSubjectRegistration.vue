@@ -58,7 +58,8 @@
           </el-form-item>
         </el-form>
         <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%;" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
+          style="width: 100%;" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row
+          height="800">
           <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column>
           <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed>
@@ -92,7 +93,7 @@
               {{ numberToName(scope.row.topicConsultant) }}
             </template>
           </el-table-column>
-          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员" width="300">
             <template slot-scope="scope">
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
@@ -114,21 +115,22 @@
           <el-table-column prop="topicActivityStatus" header-align="center" align="center" label="课题活动状态">
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
-            <template slot-scope="scope">
+            <!-- <template slot-scope="scope">
               <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
               <span v-else>--</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
-          </el-table-column>
-          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见">
+            </template> -->
           </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见" width="180">
+          </el-table-column>
+
 
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
@@ -210,7 +212,8 @@
           </el-form-item>
         </el-form>
         <el-table :data="subjectLeadList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row>
+          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" highlight-current-row
+          height="800">
           <!-- <el-table-column type="selection" header-align="center" align="center" width="50">
           </el-table-column> -->
           <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed width="90">
@@ -243,7 +246,7 @@
               {{ numberToName(scope.row.topicConsultant) }}
             </template>
           </el-table-column>
-          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员" width="300">
             <template slot-scope="scope">
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
@@ -272,21 +275,24 @@
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果" sortable>
-            <template slot-scope="scope">
+            <!-- <template slot-scope="scope">
               <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
-              <span v-else>--</span> <!-- 处理未知状态 -->
-            </template>
+              <span v-else>--</span>
+            </template> -->
           </el-table-column>
           <!-- <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
           </el-table-column> -->
-          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
-          </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见" width="180">
+          </el-table-column>
+
 
           <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
@@ -367,7 +373,7 @@
           </el-form-item>
         </el-form>
         <el-table :data="subjectJoinList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
-          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }">
+          style="width: 100%" stripe :default-sort="{ prop: 'qcsrId', order: 'descending' }" height="800">
           <el-table-column prop="qcsrId" header-align="center" align="center" label="课题id" sortable fixed>
           </el-table-column>
           <el-table-column prop="topicName" header-align="center" align="center" label="课题名称" fixed>
@@ -398,7 +404,7 @@
               {{ numberToName(scope.row.topicConsultant) }}
             </template>
           </el-table-column>
-          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员">
+          <el-table-column prop="teamNumberIds" header-align="center" align="center" label="小组成员" width="300">
             <template slot-scope="scope">
               {{ numberToNameArray(scope.row.teamNumberIds) }}
             </template>
@@ -425,21 +431,24 @@
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果" sortable>
-            <template slot-scope="scope">
+            <!-- <template slot-scope="scope">
               <span v-if="scope.row.topicActivityResult && 85 <= scope.row.topicActivityResult">一等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 75 <= scope.row.topicActivityResult < 85">二等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 65 <= scope.row.topicActivityResult < 75">三等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 55 <= scope.row.topicActivityResult < 65">四等奖</span>
               <span v-else-if="scope.row.topicActivityResult && 45 <= scope.row.topicActivityResult < 55">鼓励奖</span>
-              <span v-else>--</span> <!-- 处理未知状态 -->
-            </template>
+              <span v-else>--</span>
+            </template> -->
           </el-table-column>
           <!-- <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
           </el-table-column> -->
-          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见">
-          </el-table-column>
           <el-table-column prop="note" header-align="center" align="center" label="备注">
           </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="课题初审意见" width="180">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员初审意见" width="180">
+          </el-table-column>
+
           <!-- <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.qcsrId)">修改</el-button>
@@ -1260,7 +1269,11 @@ export default {
         })
       }).then(({ data }) => {
         if (data) {
-          this.exportList = data.page.list
+          let tmp = data.page.list
+          tmp.forEach(item => {
+            item.teamNumberIds = JSON.parse(item.teamNumberIds)
+          });
+          this.exportList = tmp
         } else {
           this.exportList = []
         }
@@ -1278,9 +1291,9 @@ export default {
           课题ID: tableRow.qcsrId,
           科室: tableRow.topicDepartment,
           课题编号: tableRow.topicNumber,
-          课题组长: tableRow.topicLeader,
-          课题顾问: tableRow.topicConsultant,
-          课题成员: tableRow.teamNumberIds,
+          课题组长: this.numberToName(tableRow.topicLeader),
+          课题顾问: this.numberToName(tableRow.topicConsultant),
+          课题成员: this.numberToNameArray(tableRow.teamNumberIds),
           课题描述: tableRow.topicDescription,
           课题类型: tableRow.topicType,
           活动特性: tableRow.activityCharacteristics,

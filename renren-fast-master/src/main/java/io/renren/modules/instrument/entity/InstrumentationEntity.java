@@ -148,7 +148,8 @@ public class InstrumentationEntity implements Serializable {
 	/**
 	 * 创建时间
 	 */
-	private Date creatTime;
+
+	private String creatTime;
 	/**
 	 * 创建人
 	 */

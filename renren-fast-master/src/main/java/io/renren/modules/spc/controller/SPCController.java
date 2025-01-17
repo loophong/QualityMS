@@ -838,10 +838,18 @@ public class SPCController {
             SpcPtdEntity spcPtdEntity = new SpcPtdEntity();
             spcPtdEntity.setWorkTime(getNumericCellValue(row.getCell(0)));
             spcPtdEntity.setAcceptanceRegion(getNumericCellValue(row.getCell(1)));
-            spcPtdEntity.setFrequency(getCellValueAsInt(row.getCell(3)));
             spcPtdEntity.setDataImportTime(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
             spcPtdEntity.setSpare(table_name);
             dataList.add(spcPtdEntity);
+        }
+        List<Double> work_time = getWorkTime(dataList);
+        List<Double> acceptanceRegion = getAcceptanceRegion(dataList);
+
+        List<Integer> frequency = calculateWorkTimeForRegions(work_time, acceptanceRegion);
+
+        for(int i = 0; i < dataList.size(); i++){
+            SpcPtdEntity spcPtdEntity = dataList.get(i);
+            spcPtdEntity.setFrequency(frequency.get(i));
         }
 
         return dataList;
@@ -946,4 +954,75 @@ public class SPCController {
         BigDecimal ucl = p.subtract(BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(Math.sqrt(sqrt))));
         return ucl.setScale(4, RoundingMode.HALF_UP);
     }
+
+    //工时
+    public List<Double> getWorkTime(List<SpcPtdEntity> datalist){
+        List<Double> work_time = new ArrayList<>();
+        for(SpcPtdEntity spcPtdEntity : datalist){
+            if(spcPtdEntity.getWorkTime() != null){
+                work_time.add(spcPtdEntity.getWorkTime());
+            }
+            else {
+                work_time.add(0.0);
+            }
+        }
+        return work_time;
+    }
+
+    //接收区域
+    public List<Double> getAcceptanceRegion(List<SpcPtdEntity> datalist){
+        List<Double> acceptance_region = new ArrayList<>();
+        for(SpcPtdEntity spcPtdEntity : datalist){
+            if(spcPtdEntity.getAcceptanceRegion() != null){
+                acceptance_region.add(spcPtdEntity.getAcceptanceRegion());
+            }
+            else {
+                acceptance_region.add(0.0);
+            }
+        }
+        return acceptance_region;
+    }
+
+    // 计算在指定范围内的工作时间数量
+    public int countWorkTimeInAcceptanceRegion(List<Double> workTime, double lowerBound, Double upperBound) {
+        int count = 0;
+
+        for (Double time : workTime) {
+            // 处理上界为 null 时，只检查下界
+            if (upperBound == null) {
+                if (time >= lowerBound) {
+                    count++;
+                }
+            } else {
+                // 标准范围检验
+                if (time >= lowerBound && time < upperBound) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    // 对 acceptanceRegion 中的每个区间计算工作时间
+    public List<Integer> calculateWorkTimeForRegions(List<Double> workTime, List<Double> acceptanceRegion) {
+        // 确保 acceptanceRegion 至少包含一个元素
+        if (acceptanceRegion.isEmpty()) {
+            throw new IllegalArgumentException("acceptanceRegion list must contain at least one element for calculations.");
+        }
+
+        List<Integer> result = new ArrayList<>();
+
+        for (int i = 0; i < acceptanceRegion.size(); i++) {
+            double lowerBound = acceptanceRegion.get(i);
+            Double upperBound = (i < acceptanceRegion.size() - 1) ? acceptanceRegion.get(i + 1) : null; // 最后一项不提供上界
+
+            int count = countWorkTimeInAcceptanceRegion(workTime, lowerBound, upperBound);
+            result.add(count);
+        }
+
+        return result;
+    }
+
+
 }

@@ -69,6 +69,8 @@
                 <el-tag type="success" disable-transitions>已通过</el-tag></span>
               <span v-else-if="scope.row.approvalStatus === 'REJECTED'">
                 <el-tag type="danger" disable-transitions>已拒绝</el-tag></span>
+              <span v-else-if="scope.row.approvalStatus === 'CANCEL'">
+                <el-tag type="info" disable-transitions>已取消</el-tag></span>
               <span v-else>-</span> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
@@ -160,6 +162,8 @@
                 <el-tag type="success" disable-transitions>已通过</el-tag></span>
               <span v-else-if="scope.row.approvalStatus === 'REJECTED'">
                 <el-tag type="danger" disable-transitions>已拒绝</el-tag></span>
+              <span v-else-if="scope.row.approvalStatus === 'CANCEL'">
+                <el-tag type="info" disable-transitions>已取消</el-tag></span>
               <span v-else>-</span> <!-- 处理未知状态 -->
             </template>
           </el-table-column>

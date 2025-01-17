@@ -535,6 +535,7 @@ export default {
           }).then(({data}) => {
             console.log(data);
             if (data) {
+              this.dataForm.tmPid = data.plan.tmPid
               this.dataForm.planId = data.plan.planId
               this.dataForm.planName = data.plan.planName
               this.dataForm.planContent = data.plan.planContent

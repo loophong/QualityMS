@@ -25,6 +25,10 @@ public class VendorTableEntity implements Serializable {
 	@TableId
 	private Integer vendorId;
 	/**
+	 * 供应商编号
+	 */
+	private String vendornumber;
+	/**
 	 * 供应商
 	 */
 	private String vendor;

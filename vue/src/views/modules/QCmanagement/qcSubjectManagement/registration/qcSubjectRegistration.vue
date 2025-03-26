@@ -271,7 +271,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-                }}</span>
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果" sortable>
@@ -427,7 +427,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-                }}</span>
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果" sortable>
@@ -657,8 +657,13 @@ export default {
       console.log(this.membersOptions)
     });
     this.ifGroupLead();
+    await this.$http({
+      url: this.$http.adornUrl(`/qcManagement/qcAllCount/tableData`),
+      method: 'get',
+      tableName: 'qc_step'
+    }).then(({ data }) => {
 
-    console.log(this.nameToNumber('QC账号的昵称'))
+    });
   },
   methods: {
     numberToNameArray(numbers) {

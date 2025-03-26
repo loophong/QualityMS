@@ -1,8 +1,11 @@
 package io.renren.modules.qcManagement.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import io.renren.modules.qcManagement.dao.QcAllCountDao;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +33,10 @@ import io.renren.common.utils.R;
 public class QcAllCountController {
     @Autowired
     private QcAllCountService qcAllCountService;
+    @Autowired
+    private QcAllCountDao qcAllCountDao;
 
-    /**
+    /**getListByTableName
      * 列表
      */
     @RequestMapping("/list")

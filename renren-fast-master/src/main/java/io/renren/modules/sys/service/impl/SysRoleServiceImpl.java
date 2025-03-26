@@ -48,12 +48,14 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> i
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		String roleName = (String)params.get("roleName");
+		String remark = (String)params.get("remark");
 		Long createUserId = (Long)params.get("createUserId");
 
 		IPage<SysRoleEntity> page = this.page(
 			new Query<SysRoleEntity>().getPage(params),
 			new QueryWrapper<SysRoleEntity>()
 				.like(StringUtils.isNotBlank(roleName),"role_name", roleName)
+				.like(StringUtils.isNotBlank(remark),"remark", remark)
 				.eq(createUserId != null,"create_user_id", createUserId)
 		);
 

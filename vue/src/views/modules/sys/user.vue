@@ -5,6 +5,9 @@
         <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
       </el-form-item>
       <el-form-item>
+        <el-input v-model="dataForm.nickName" placeholder="昵称" clearable></el-input>
+      </el-form-item>
+      <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('sys:user:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()"
@@ -61,7 +64,8 @@ export default {
   data() {
     return {
       dataForm: {
-        userName: ''
+        userName: '',
+        nickName: ''
       },
       dataList: [],
       pageIndex: 1,
@@ -88,7 +92,8 @@ export default {
         params: this.$http.adornParams({
           'page': this.pageIndex,
           'limit': this.pageSize,
-          'username': this.dataForm.userName
+          'username': this.dataForm.userName,
+          'nickname': this.dataForm.nickName
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {

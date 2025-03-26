@@ -89,5 +89,17 @@ public interface IssueTableService extends IService<IssueTableEntity> {
     boolean clearStorageFlag(List<Integer> ids);//删除功能
 
     int getallissue();
+
+    Map<String, Object> getThirdIssue();
+
+    Map<String, Map<String, Integer>> getIssuebyDepartment(String startDate, String endDate);
+
+    Map<String, Map<String, Object>> getbyindemnification(String startDate, String endDate);
+
+    Map<String, Map<String, Object>> getbyvendor(String startDate, String endDate);
+
+    Map<String, Map<String, Object>> getbyvehicletype(String startDate, String endDate);
+
+    Map<String, Map<String, Object>> getbyregiontype(String startDate, String endDate);
 }
 

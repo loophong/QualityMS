@@ -57,6 +57,29 @@
             </el-option>
           </el-select>
         </el-form-item>
+
+          <!-- Indemnification 下拉框 -->
+          <el-form-item label="赔偿件">
+            <el-select v-model="dataForm.indemnification" placeholder="请选择" @change="handleIndemnificationChange">
+              <el-option
+                v-for="item in indemnificationOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+
+          <!-- Figure Number -->
+          <el-form-item label="图号">
+            <el-input v-model="dataForm.figurenumber" disabled />
+          </el-form-item>
+
+          <!-- Quality Cost -->
+          <el-form-item label="质量成本">
+            <el-input v-model="dataForm.qualitycost" disabled />
+          </el-form-item>
+
         <el-form-item label="系统分类" prop="systematicClassification">
           <el-select
             v-model="selectedSystematic"
@@ -131,6 +154,31 @@
           </el-select>
         </el-form-item>
 
+        <el-form-item label="问题件分类" prop="problematicpieces">
+          <el-radio-group v-model="dataForm.problematicpieces">
+            <el-radio label="自制件">自制件</el-radio>
+            <el-radio label="外购件">外购件</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="供应商" prop="vendor">
+          <el-select v-model="dataForm.vendor" filterable placeholder="请选择">
+            <el-option
+              v-for="department in vendorOptions"
+              :key="department.value"
+              :label="department.label"
+              :value="department.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="是否为新产品" prop="isnew">
+          <el-radio-group v-model="dataForm.isnew">
+            <el-radio label="是">是</el-radio>
+            <el-radio label="否">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
         <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
           <div v-for="(vehicle, index) in dataForm.vehicles" :key="vehicle.key">
             <el-form-item :label="'车型 ' + (index + 1)" :prop="'vehicles.' + index + '.vehicleTypeId'" :rules="{ required: true, message: '请选择车型', trigger: 'change' }" label-width="140px">
@@ -157,9 +205,41 @@
             <el-button type="primary" @click="addVehicle">新增一组车型和车号</el-button>
           </el-form-item>
         </el-form>
+        <el-form :model="form">
+          <div v-for="(group, index) in form.fieldGroups" :key="index" class="field-group">
+            <el-row :gutter="20">
+              <el-col :span="6">
+                <el-form-item label="销售时间">
+                  <el-date-picker v-model="group.saleTiming" type="date" placeholder="选择日期" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="使用时间">
+                  <el-date-picker v-model="group.useTiming" type="date" placeholder="选择日期" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="问题区域">
+                  <el-input v-model="group.region" placeholder="输入地区" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="行业">
+                  <el-input v-model="group.industry" placeholder="输入行业" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-button type="danger" icon="el-icon-remove" @click="removeGroup(index)">删除</el-button>
+            </el-row>
+            <el-divider></el-divider>
+          </div>
+          <el-button type="primary" icon="el-icon-plus" @click="addGroup">新增</el-button>
+        </el-form>
         <el-form-item label="问题描述" prop="issueDescription">
           <el-input v-model="dataForm.issueDescription" placeholder="问题描述"></el-input>
         </el-form-item>
+
         <el-form-item label="初步分析" prop="peliminaryAnalysis">
           <el-select v-model="dataForm.peliminaryAnalysis" filterable placeholder="请选择初步分析">
             <el-option
@@ -888,6 +968,17 @@ export default {
         inspectionDepartment: '',
         inspectionDate: '',
         issueCategoryId: '',
+        indemnification: '',
+        indemnificationname: '',
+        figurenumber: '',
+        qualitycost: '',
+        problematicpieces: '',
+        vendor: '',
+        isnew: '',
+        saleTiming: '',
+        useTiming: '',
+        region: '',
+        industry: '',
         vehicleTypeId: '',
         vehicleNumberId: '',
         peliminaryAnalysis: '',
@@ -925,14 +1016,21 @@ export default {
         formula: '',
         isRelatedIssue: '否',  // 添加此行以初始化
       },
+      form: {
+        fieldGroups: [
+          { saleTiming: '', useTiming: '', region: '', industry: '' },
+        ],
+      },
       commenverificationDuration: '',
       vehicleTypeOptions: [],
+      vendorOptions: [],
       // issueCategoryOptions: [],
       departments: [],
       selectedIssue: '',
       issueOptions: [], // 所有问题编号选项
       taskList: [], // 任务列表
       departmentOptions: [],
+      indemnificationOptions: [],//故障件
       // 数据列表
       conplanDataList: [],
       dataRule: {
@@ -950,6 +1048,7 @@ export default {
   },
   created () {
     this.fetchIssueCategories()
+    this.fetchvendor()
     this.fetchuserinform()
     this.fetchVehicleTypes()
     this.fetchIssueOptions() // 获取所有问题编号选项
@@ -957,6 +1056,7 @@ export default {
     this.fetchAnalysis()
     this.fetchFaultOptions()
     this.fetchverificationDuration()
+    this.fetchIndemnificationOptions()
     this.$http({
       url: this.$http.adornUrl(`/taskmanagement/user/getEmployeesGroupedByDepartment`),
       method: 'get',
@@ -974,6 +1074,46 @@ export default {
 
   },
   methods: {
+    addGroup() {
+      this.form.fieldGroups.push({ saleTiming: '', useTiming: '', region: '', industry: '' });
+    },
+    removeGroup(index) {
+      this.form.fieldGroups.splice(index, 1);
+    },
+    // 获取 Indemnification 下拉数据
+    async fetchIndemnificationOptions() {
+      await this.$http({
+        url: this.$http.adornUrl("/generator/indemnificationtable/list1"),
+        method: "get",
+        params: this.$http.adornParams({}), // 可选参数，根据需求填充
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.indemnificationOptions = data.result.map(item => ({
+            id: item.indeId,
+            name: item.indemnification,
+          }));
+        } else {
+          this.$message.error("加载 Indemnification 数据失败！");
+        }
+      });
+    },
+    // Indemnification 选择改变时调用
+    async handleIndemnificationChange(value) {
+      await this.$http({
+        url: this.$http.adornUrl("/generator/indemnificationtable/getDetails"),
+        method: "get",
+        params: this.$http.adornParams({
+          id: value,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.dataForm.figurenumber = data.figurenumber;
+          this.dataForm.qualitycost = data.qualitycost;
+        } else {
+          this.$message.error("获取数据失败！");
+        }
+      });
+    },
     validateVerificationDuration(rule, value, callback) {
       const commonDuration = this.commenverificationDuration;
       if (value && value <= commonDuration) {
@@ -1334,6 +1474,9 @@ export default {
     cancel () {
       // 重置 vehicles 数组，只保留一个初始组合
       this.dataForm.vehicles = [{ vehicleTypeId: '', vehicleNumber: '', key: Date.now() }]
+      this.form.fieldGroups = [
+        { saleTiming: '', useTiming: '', region: '', industry: '' },
+      ]
       this.vehicleNumberOptions = []
       this.visible = false // 关闭对话框或重置其他状态
       this.visibleR = false // 关闭对话框或重置其他状态
@@ -1611,6 +1754,25 @@ export default {
           this.vehicleTypeOptions = data.carType.map(carType => ({
             value: carType.concreteVehicleType,
             label: carType.concreteVehicleType
+          }))
+        } else {
+          console.error('Failed to fetch vehicle types:', data.msg)
+        }
+      }).catch(error => {
+        console.error('There was an error fetching the vehicle types!', error)
+      })
+    },
+    fetchvendor () {
+      this.$http({
+        url: this.$http.adornUrl('/generator/vendortable/carname'),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          console.log('Successfully fetched vehicle types:', data.carType)
+          this.vendorOptions = data.carType.map(carType => ({
+            value: carType.vendor,
+            label: carType.vendor
           }))
         } else {
           console.error('Failed to fetch vehicle types:', data.msg)
@@ -1915,6 +2077,7 @@ export default {
               }),
             });
 
+
             if (checkData && checkData.code === 0) {
               // 生成问题编号
               const issueNumber = await this.generateSerialNumber();
@@ -1929,6 +2092,10 @@ export default {
                   systematicClassification: this.selectedSystematic,
                   firstFaultyParts: this.selectedFirstFaultyParts,
                   secondFaultyParts: this.selectedSecondFaultyParts,
+                  saleTiming: this.form.fieldGroups.map(group => group.saleTiming).join(','),
+                  useTiming: this.form.fieldGroups.map(group => group.useTiming).join(','),
+                  region: this.form.fieldGroups.map(group => group.region).join(','),
+                  industry: this.form.fieldGroups.map(group => group.industry).join(','),
                   faultType: this.selectedFaultType,
                   faultModel: this.selectedFaultModel,
                   level:'等待整改记录填写',
@@ -2885,5 +3052,7 @@ export default {
 .right-aligned {
   margin-left: 80px; /* 可根据需要调整移动的距离 */
 }
-
+.field-group {
+  margin-bottom: 20px;
+}
 </style>

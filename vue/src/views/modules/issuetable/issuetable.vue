@@ -120,6 +120,51 @@
         align="center"
         label="问题类别">
       </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="indemnification"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="赔偿件">-->
+<!--      </el-table-column>-->
+      <el-table-column
+        prop="indemnification"
+        header-align="center"
+        align="center"
+        label="赔偿件">
+        <template slot-scope="scope">
+          {{ getindemnificationById(scope.row.indemnification) }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="figurenumber"
+        header-align="center"
+        align="center"
+        label="图号">
+      </el-table-column>
+      <el-table-column
+        prop="qualitycost"
+        header-align="center"
+        align="center"
+        label="质量成本">
+      </el-table-column>
+      <el-table-column
+        prop="problematicpieces"
+        header-align="center"
+        align="center"
+        label="问题件分类">
+      </el-table-column>
+      <el-table-column
+        prop="vendor"
+        header-align="center"
+        align="center"
+        label="供应商">
+      </el-table-column>
+      <el-table-column
+        prop="isnew"
+        header-align="center"
+        align="center"
+        label="是否为新产品">
+      </el-table-column>
       <el-table-column
         prop="vehicleTypeId"
         header-align="center"
@@ -131,6 +176,34 @@
         header-align="center"
         align="center"
         label="车号">
+      </el-table-column>
+      <el-table-column
+        prop="saleTiming"
+        label="销售时间"
+      >
+        <template slot-scope="scope">
+          {{ formatSaletime(scope.row.saleTiming) }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="useTiming"
+        label="使用时间"
+      >
+        <template slot-scope="scope">
+          {{ formatSaletime(scope.row.useTiming) }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="region"
+        header-align="center"
+        align="center"
+        label="问题区域">
+      </el-table-column>
+      <el-table-column
+        prop="industry"
+        header-align="center"
+        align="center"
+        label="行业">
       </el-table-column>
             <el-table-column
         prop="issueDescription"
@@ -370,10 +443,17 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="formula"
+        label="完成进度"
         header-align="center"
-        align="center"
-        label="公式">
+        prop="level"
+        width="150"
+        fixed="right"
+      >
+        <template slot-scope="scope">
+          <el-progress
+            :percentage="getProgressPercentage(scope.row.level)"
+          ></el-progress>
+        </template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -534,6 +614,7 @@
         dialogVisible2: false,
         dialogVisible3: false,
         fullRetStates:'',
+        indemnificationoptions: [],
       }
 
     },
@@ -548,7 +629,18 @@
         method: 'get',
       }).then(({data}) => {
         this.options = data;
-        console.log(this.options);
+
+      });
+      // 获取赔偿件数据
+      this.$http({
+        url: this.$http.adornUrl(`/generator/indemnificationtable/list1`),
+        method: 'get',
+      }).then(({data}) => {
+        this.indemnificationOptions = data.result.map(item => ({
+          id: item.indeId,
+          name: item.indemnification,
+        }));
+        console.log("peichangjian", this.indemnificationOptions);
       });
     },
     activated () {
@@ -563,6 +655,35 @@
 
     },
     methods: {
+      formatSaletime(saletime) {
+        if (!saletime) return '';
+        // 将逗号分隔的时间字符串分割成数组
+        const dates = saletime.split(',').map(dateStr => dateStr.trim());
+        // 对每个时间字符串进行格式化
+        const formattedDates = dates.map(dateStr => {
+          const date = new Date(dateStr);
+          const year = date.getFullYear();
+          const month = date.getMonth() + 1; // 月份从0开始
+          const day = date.getDate();
+          return `${year}-${month}-${day}`;
+        });
+        // 将格式化后的日期用逗号拼接回字符串
+        return formattedDates.join(',');
+      },
+      getProgressPercentage(level) {
+        if (level === "等待整改记录填写") {
+          return 20;  // level 为 1 时，显示 33%
+        } else if (level === "等待任务下发(处理)") {
+          return 40;  // level 为 2 时，显示 66%
+        } else if (level === "等待验证指定") {
+          return 60; // level 为 3 时，显示 100%
+        }else if (level === "等待验证") {
+          return 80; // level 为 3 时，显示 100%
+        }else if (level === "未通过验证" || level === "已完成") {
+          return 100; // level 为 3 时，显示 100%
+        }
+        return 0;  // 默认值为 0
+      },
       // 显示文件列表弹窗
       showFileList(annex) {
         try {
@@ -604,6 +725,15 @@
             if (auditor.value === auditorId) {
               return auditor.label;
             }
+          }
+        }
+        return "-";
+      },
+      getindemnificationById(auditorId) {
+        // console.log("peichangjian", this.indemnificationOptions);
+        for (const category of this.indemnificationOptions) {
+            if (category.id == auditorId) {
+              return category.name;
           }
         }
         return "-";

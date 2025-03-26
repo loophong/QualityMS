@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.instrument.dao.InstrumentTestreportDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.instrument.entity.InstrumentTestreportEntity" id="instrumentTestreportMap">
+        <result property="id" column="id"/>
+        <result property="serialNumber" column="serial_number"/>
+        <result property="testReportType" column="test_report_type"/>
+        <result property="testReportName" column="test_report_name"/>
+        <result property="testItemName" column="test_item_name"/>
+        <result property="testItemStandardNumber" column="test_item_standard_number"/>
+        <result property="testItemBatchNumber" column="test_item_batch_number"/>
+        <result property="measuringEquipment" column="measuring_equipment"/>
+        <result property="measuringMethod" column="measuring_method"/>
+        <result property="tester" column="tester"/>
+        <result property="testDate" column="test_date"/>
+        <result property="testReport" column="test_report"/>
+        <result property="notes" column="notes"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="backupField" column="backup_field"/>
+    </resultMap>
+
+
+</mapper>

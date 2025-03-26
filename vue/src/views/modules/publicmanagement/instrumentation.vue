@@ -292,7 +292,7 @@
     methods: {
       //点击关联检验方法按钮，携带对应的toolNumber，跳到instrumenttestmethod.vue页面，
       // 并且调整后发送后端请求到检验方法的control模块，只显示包含toolNumber的所有检验方法。
-
+        
     linked_method(id, toolNumber) {
     this.$router.push({
       name: 'instrument-testmethod', // 确保这是在路由配置中定义的路由名称

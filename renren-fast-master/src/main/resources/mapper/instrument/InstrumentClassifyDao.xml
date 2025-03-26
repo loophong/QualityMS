@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.instrument.dao.InstrumentClassifyDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.instrument.entity.InstrumentClassifyEntity" id="instrumentClassifyMap">
+        <result property="id" column="id"/>
+        <result property="primaryCategory" column="primary_category"/>
+        <result property="secondaryCategory" column="secondary_category"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="backupField1" column="backup_field1"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+
+</mapper>

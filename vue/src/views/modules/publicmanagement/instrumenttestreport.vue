@@ -1,29 +1,20 @@
 <template>
-
-  
   <div class="mod-config">
-    <!-- 在模板中添加告警信息的展示 -->
-<div v-for="alert in alerts" :key="alert.numberId" @click="acknowledgeAlert(alert)" class="alert">
-  仪器{{ alert.numberId }}临期了！
-</div>
-
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-         <el-button v-if="isAuth('publicmanagement:instrumentledger:Fuzzy_queries')" type="primary" @click="Fuzzy_queries()">查询</el-button>
-
-        <!-- <el-button v-if="isAuth('publicmanagement:instrumentledger:list')" type="primary" @click="getDataList()"></el-button> -->
-        <!-- <el-button v-if="isAuth('publicmanagement:instrumentledger:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button> -->
-        <el-button v-if="isAuth('publicmanagement:instrumentledger:delete')"  type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-         <!--Excel 参数导入 -->
-      <!-- <el-button
+        <el-button @click="getDataList()">查询</el-button>
+        <el-button v-if="isAuth('generator:instrumenttestreport:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('generator:instrumenttestreport:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+              <!--Excel 参数导入 -->
+      <el-button
         type="primary"
         @click="showDialog = true"
-        v-if="isAuth('publicmanagement:instrumentledger:upload')"
-        ><i class="fa fa-download"></i>导入Excel文件
-      </el-button> -->
+        v-if="isAuth('generator:instrumentation:upload')"
+        ><i class="fa fa-download"></i> 导入Excel文件
+      </el-button>
       <el-dialog
         title="导入Excel文件"
         :visible.sync="showDialog"
@@ -59,7 +50,7 @@
           <el-button @click="showDialog = false">取 消</el-button>
           <el-button type="primary" @click="fileSend()">确 定</el-button>
         </span>
-      </el-dialog>
+          </el-dialog>
       </el-form-item>
     </el-form>
     <el-table
@@ -74,116 +65,109 @@
         align="center"
         width="50">
       </el-table-column>
-<!-- 
       <el-table-column
+        v-if="false"
         prop="id"
         header-align="center"
         align="center"
-        label="主键">
+        label="主键ID">
       </el-table-column>
- -->  
       <el-table-column
-        prop="companyId"
+        prop="serialNumber"
         header-align="center"
         align="center"
-        label="公司编号">
+        label="序号">
       </el-table-column>
       <el-table-column
-        prop="level"
+        prop="testReportType"
         header-align="center"
         align="center"
-        label="级别">
+        label="检验报告类别">
       </el-table-column>
       <el-table-column
-        prop="calibrationCycle"
+        prop="testReportName"
         header-align="center"
         align="center"
-        label="检定周期">
+        label="检验报告名称">
       </el-table-column>
       <el-table-column
-        prop="calibrationStatus"
+        prop="testItemName"
         header-align="center"
         align="center"
-        label="检定状态">
+        label="检验件名称">
       </el-table-column>
       <el-table-column
-        prop="usageStatus"
+        prop="testItemStandardNumber"
         header-align="center"
         align="center"
-        label="使用状态">
+        label="检验件规格型号">
       </el-table-column>
       <el-table-column
-        prop="location"
+        prop="testItemBatchNumber"
         header-align="center"
         align="center"
-        label="配置地点">
+        label="检验件批次/编号">
       </el-table-column>
       <el-table-column
-        prop="responsibleDepartment"
+        prop="measuringEquipment"
         header-align="center"
         align="center"
-        label="责任部门">
+        label="测量设备">
       </el-table-column>
-
       <el-table-column
-        prop="user"
+        prop="measuringMethod"
         header-align="center"
         align="center"
-        label="使用人">
+        label="测量方法">
       </el-table-column>
-
       <el-table-column
-        prop="calibrationDate"
+        prop="tester"
         header-align="center"
         align="center"
-        label="检校日期">
+        label="检验人">
       </el-table-column>
       <el-table-column
-        prop="calibrationValidity"
+        prop="testDate"
         header-align="center"
         align="center"
-        label="检校有效期">
+        label="检验日期">
       </el-table-column>
       <el-table-column
-        prop="calibrationUnit"
+        prop="testReport"
         header-align="center"
         align="center"
-        label="检校单位">
+        label="检验报告">
       </el-table-column>
       <el-table-column
-        prop="certificateNumber"
-        header-align="center"
-        align="center"
-        label="证书编号">
-      </el-table-column>
-      <el-table-column
-        prop="remark"
+        prop="notes"
         header-align="center"
         align="center"
         label="备注">
       </el-table-column>
-
-      <el-table-column
-        prop="quantity"
+      <!-- <el-table-column
+        prop="isDeleted"
         header-align="center"
         align="center"
-        label="数量">
+        label="逻辑删除标识 (0: 不删除, 1: 删除)">
       </el-table-column>
-<!-- 
       <el-table-column
-        prop="flag"
+        prop="createdBy"
         header-align="center"
         align="center"
-        label="逻辑删除字段">
+        label="创建人">
       </el-table-column>
-
       <el-table-column
-        prop="creatTime"
+        prop="createdAt"
         header-align="center"
         align="center"
-        label="创建日期">
+        label="创建时间">
       </el-table-column>
-      -->
+      <el-table-column
+        prop="backupField"
+        header-align="center"
+        align="center"
+        label="备用字段">
+      </el-table-column> -->
       <el-table-column
         fixed="right"
         header-align="center"
@@ -191,8 +175,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" v-if="isAuth('publicmanagement:instrumentledger:update')"  @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" v-if="isAuth('publicmanagement:instrumentledger:delete')"  @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -211,15 +195,11 @@
 </template>
 
 <script>
-  import AddOrUpdate from './instrumentledger-add-or-update'
+  import AddOrUpdate from './instrumenttestreport-add-or-update'
    import { listIndicatorSummary, uploadImports} from '@/api/indicator/indicator.js'
-  import { Notification } from 'element-ui'; // 引入 Notification 组件  
-  
-
   export default {
     data () {
       return {
-        alerts: [],
         dataForm: {
           key: ''
         },
@@ -234,76 +214,18 @@
         addOrUpdateVisible: false
       }
     },
-
     components: {
       AddOrUpdate
     },
     activated () {
       this.getDataList()
     },
-     mounted() {
-    this.getMessageList();
-  },
     methods: {
-// 在methods中添加以下方法
-acknowledgeAlert(alert) {
-  alert.state = 0;
-  this.updateMessageState(alert.numberId, 0);
-},
-
-updateMessageState(numberId, newState) {
-  this.$http({
-    url: this.$http.adornUrl(`/publicmanagement/instrumentledger/updatemessage`),
-    method: 'post',
-    data: this.$http.adornData({ numberId, state: newState }),
-  }).then(({ data }) => {
-    if (data && data.code === 0) {
-      // 更新成功，可以在这里做进一步处理
-    }
-  });
-},
-
-
-      //告警信息
-      
-getMessageList() {
-    
-this.$http({  
-    url: this.$http.adornUrl('/publicmanagement/instrumentledger/message'),  
-    method: 'post',  
-}).then(({ data }) => {  
-    if (data) {  
-        data.forEach(item => {  
-            if (item.state === 1) {  
-                // 设置延迟，例如延迟 1000 毫秒（1 秒）  
-                setTimeout(() => {  
-                    this.showAlert(item.numberId);  
-                }, 1000);  
-            }  
-        });  
-    }  
-});
-},
-
-  // this.$http({
-  //   url: this.$http.adornUrl('/publicmanagement/instrumentledger/message'),
-  //   method: 'post',
-  // }).then(({ data }) => {
-  //     if (data) {
-  //       data.forEach(item => {
-  //         if (item.state === 1) {
-  //           this.showAlert(item.numberId);
-  //         }
-          
-  //       });
-  //     }
-  //   });
-  // },
-
-  Fuzzy_queries(){
+      // 获取数据列表
+      getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/publicmanagement/instrumentledger/Fuzzy_queries'),
+          url: this.$http.adornUrl('/generator/instrumenttestreport/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -322,18 +244,7 @@ this.$http({
         })
       },
 
-  showAlert(numberId) {
-    // 在这里实现展示警告信息的功能
-    // 例如，使用Element UI的$message组件来显示警告信息
-    this.$notify({
-      message: `警告：编号为 ${numberId} 的项需要关注！`,
-      type: 'warning',
-      duration: 3000
-    });
-  },
-
-
-       //导入excel，取消按钮绑定取消所选的xlsx
+         //导入excel，取消按钮绑定取消所选的xlsx
     resetFileInput() {
       this.$refs.fileInput.value = "";
     },
@@ -347,75 +258,31 @@ this.$http({
         this.$refs.fileInput.value = ""; // 清空文件选择框
       }
     },
-    // excel 导入
-  fileSend() {
-        const formData = new FormData();
-        const file = document.getElementById("inputFile").files[0]; // 获取文件对象
-        // console.log(file);
-        formData.append("file", file);
-//         // console.log("file====>",formData)
-        // axios({
-        //   method: "post",
-        //   // this $axios.post,
-        //   url: "http://localhost:8080/market/ledger/import",
-        //   // params:{
-        //   //   userName: this.$store.state.user.name,
-        //   // },
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //   },
-        //   withCredentials: true,
-        //   data: formData,
-        //   onUploadProgress: (progressEvent) => {
-        //     this.progress = Math.round(
-        //       (progressEvent.loaded * 100) / progressEvent.total
-        //     );
-        //   },
-        // });
-console.log("file====>",formData)
-   const  url=this.$http.adornUrl(`/publicmanagement/instrumentledger/import`)
-        uploadImports(formData,url)
-console.log("file====>",formData)
-        .then(response => {
-          // 文件上传成功
+         // excel 导入
+  fileSend() {  
+    const formData = new FormData();  
+    const file = document.getElementById("inputFile").files[0]; // 获取文件对象  
 
-          setTimeout(() => {
-            this.showDialog = false; // 关闭上传面板
-            location.reload(); // 调用此方法刷新页面数据
-          }, 5000); // 2000毫秒后关闭
-          this.$message.success("上传成功");
-        })
-        .catch(error => {
-          // 处理错误
-          console.error('Error uploading file:', error);
-        });
+    formData.append("file", file);  
 
-        
-
-    },
-
-      // 获取数据列表
-      getDataList () {
-        this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl('/publicmanagement/instrumentledger/list'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'key': this.dataForm.key
-          })
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
-          } else {
-            this.dataList = []
-            this.totalPage = 0
-          }
-          this.dataListLoading = false
-        })
-      },
+    console.log("file====>", formData);  
+    const url = this.$http.adornUrl(`/generator/instrumenttestreport/import`);  
+    
+    uploadImports(formData, url)  
+        .then(response => {  
+            // 文件上传成功  
+            this.$message.success("上传成功"); // 显示成功消息  
+            
+            // 关闭上传面板  
+            this.showDialog = false;   
+            location.reload(); // 刷新页面数据  
+        })  
+        .catch(error => {  
+            // 处理错误  
+            console.error('Error uploading file:', error);  
+            this.$message.error("上传失败，请重试。"); // 显示错误消息  
+        });  
+} ,
       // 每页数
       sizeChangeHandle (val) {
         this.pageSize = val
@@ -449,7 +316,7 @@ console.log("file====>",formData)
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/publicmanagement/instrumentledger/delete'),
+            url: this.$http.adornUrl('/generator/instrumenttestreport/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

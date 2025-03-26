@@ -368,13 +368,96 @@ public class IssueTableController {
     }
 
     /**
+     * 获取问题统计（当月统计超期问题、整改记录填写、验证完成）
+     */
+    @RequestMapping("/getThirdIssue")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getThirdIssue() {
+        Map<String, Object> stats = issueTableService.getThirdIssue();
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取问题统计（当月统计不同科室）
+     */
+    @RequestMapping("/getIssuebyDepartment")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getIssuebyDepartment(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+//        System.out.println("开始获取问题统计数据"+startDate+endDate);
+        Map<String, Map<String, Integer>> stats = issueTableService.getIssuebyDepartment(startDate, endDate);
+        // 打印返回给前端的数据
+        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取问题统计（当月统计不同赔偿件）
+     */
+    @RequestMapping("/getbyindemnification")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getbyindemnification(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+//        System.out.println("开始获取问题统计数据"+startDate+endDate);
+        Map<String, Map<String, Object>> stats = issueTableService.getbyindemnification(startDate, endDate);
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取问题统计（当月统计不同供应商）
+     */
+    @RequestMapping("/getbyvendor")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getbyvendor(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+//        System.out.println("开始获取问题统计数据"+startDate+endDate);
+        Map<String, Map<String, Object>> stats = issueTableService.getbyvendor(startDate, endDate);
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
      * 获取问题统计（当月统计不同类型）
      */
     @RequestMapping("/currentMonthInProgressCategoryStats")
     @RequiresPermissions("generator:issuetable:list") // 权限控制
     public R getcurrentMonthInProgressCategoryStats(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
-        System.out.println("开始获取问题统计数据"+startDate+endDate);
+//        System.out.println("开始获取问题统计数据"+startDate+endDate);
         Map<String, Integer> stats = issueTableService.getcurrentMonthInProgressCategoryStats(startDate, endDate);
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取问题统计（当月统计不同车型）
+     */
+    @RequestMapping("/getbyvehicletype")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getbyvehicletype(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+//        System.out.println("开始获取问题统计数据"+startDate+endDate);
+        Map<String, Map<String, Object>> stats = issueTableService.getbyvehicletype(startDate, endDate);
+        // 打印返回给前端的数据
+//        System.out.println("返回前端的统计数据: " + stats);
+
+        return R.ok().put("stats", stats);
+    }
+
+    /**
+     * 获取问题统计（当月统计不同地区）
+     */
+    @RequestMapping("/getbyregiontype")
+    @RequiresPermissions("generator:issuetable:list") // 权限控制
+    public R getbyregiontype(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+//        System.out.println("开始获取问题统计数据"+startDate+endDate);
+        Map<String, Map<String, Object>> stats = issueTableService.getbyregiontype(startDate, endDate);
         // 打印返回给前端的数据
 //        System.out.println("返回前端的统计数据: " + stats);
 
@@ -635,7 +718,7 @@ public class IssueTableController {
     @RequiresPermissions("generator:issuetable:save")
     public R save(@RequestBody IssueTableEntity issueTable){
         issueTableService.save(issueTable);
-
+        System.out.println("开始保存数据"+issueTable);
         return R.ok();
     }
 
@@ -646,9 +729,9 @@ public class IssueTableController {
     @RequiresPermissions("generator:issuetable:update")
     public R update(@RequestBody IssueTableEntity issueTable){
 
-        System.out.println("开始修改整改数据"+issueTable);
+//        System.out.println("开始修改整改数据"+issueTable);
         issueTableService.updateById(issueTable);
-        System.out.println("结束修改整改数据");
+//        System.out.println("结束修改整改数据");
         return R.ok();
     }
 

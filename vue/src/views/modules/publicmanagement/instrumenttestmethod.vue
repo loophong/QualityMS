@@ -24,12 +24,13 @@
         align="center"
         width="50">
       </el-table-column>
-      <!-- <el-table-column
+      <el-table-column
+        v-if="false"
         prop="id"
         header-align="center"
         align="center"
         label="">
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column
         prop="department"
         header-align="center"

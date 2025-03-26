@@ -370,7 +370,7 @@ export default {
     },
     addMember() {
       const currentDate = new Date().toISOString().slice(0, 10);
-      this.dataForm.members.push({ qcgmId: '', name: '', number: '', participationDate: currentDate, parentId: this.dataForm.qcgmId, roleInTopic: '' });
+      this.dataForm.members.push({ qcgmId: '', name: '', number: '', participationDate: currentDate, parentId: this.dataForm.qcgmId, roleInTopic: '成员' });
     },
     removeMember(item) {
       var index = this.dataForm.members.indexOf(item);

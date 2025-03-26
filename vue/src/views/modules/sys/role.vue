@@ -5,6 +5,9 @@
         <el-input v-model="dataForm.roleName" placeholder="角色名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
+        <el-input v-model="dataForm.remark" placeholder="备注" clearable></el-input>
+      </el-form-item>
+      <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('sys:role:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('sys:role:delete')" type="danger" @click="deleteHandle()"
@@ -47,7 +50,8 @@ export default {
   data() {
     return {
       dataForm: {
-        roleName: ''
+        roleName: '',
+        remark: ''
       },
       dataList: [],
       pageIndex: 1,
@@ -74,7 +78,8 @@ export default {
         params: this.$http.adornParams({
           'page': this.pageIndex,
           'limit': this.pageSize,
-          'roleName': this.dataForm.roleName
+          'roleName': this.dataForm.roleName,
+          'remark': this.dataForm.remark
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {

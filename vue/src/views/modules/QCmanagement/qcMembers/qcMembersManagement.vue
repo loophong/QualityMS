@@ -57,6 +57,10 @@
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
             <el-button type="warning" @click="exportAll()">小组导出</el-button>
+            <el-button type="primary" @click="showExamineComment = true"
+              v-if="showExamineComment == false">显示审核意见</el-button>
+            <el-button type="primary" @click="showExamineComment = false"
+              v-if="showExamineComment == true">隐藏审核意见</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="tableDataAfterQueryAdmin" stripe border v-loading="dataListLoading"
@@ -102,6 +106,12 @@
           <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="160">
           </el-table-column>
           <el-table-column prop="date" header-align="center" align="center" label="创建小组时间" width="180">
+          </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="科室意见"
+            v-if="showExamineComment">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员意见"
+            v-if="showExamineComment">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作">
@@ -183,6 +193,10 @@
               @click="addOrUpdateHandle()">新增小组</el-button>
             <el-button type="danger" @click="toIssue()">问题添加</el-button>
             <el-button type="warning" @click="exportAll('mine')">小组导出</el-button>
+            <el-button type="primary" @click="showExamineComment = true"
+              v-if="showExamineComment == false">显示审核意见</el-button>
+            <el-button type="primary" @click="showExamineComment = false"
+              v-if="showExamineComment == true">隐藏审核意见</el-button>
           </el-form-item>
         </el-form>
         <el-table :data="dataListAfterQuery" stripe border v-loading="dataListLoading"
@@ -228,6 +242,12 @@
           <el-table-column prop="registrationNum" header-align="center" align="center" label="注册号" width="160">
           </el-table-column>
           <el-table-column prop="date" header-align="center" align="center" label="加入小组时间" width="180">
+          </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="科室意见"
+            v-if="showExamineComment">
+          </el-table-column>
+          <el-table-column prop="secondComment" header-align="center" align="center" label="管理员意见"
+            v-if="showExamineComment">
           </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作">
@@ -304,6 +324,8 @@
           </el-table-column> -->
           <el-table-column prop="date" header-align="center" align="center" label="创建小组时间">
           </el-table-column>
+          <el-table-column prop="firstComment" header-align="center" align="center" label="科室审核意见">
+          </el-table-column>
           <el-table-column fixed="right" v-if="isAuth('qcMembers:qcGroupMember:save')" header-align="center"
             align="center" label="操作" width="160">
             <template slot-scope="scope">
@@ -374,6 +396,7 @@ export default {
       tableHeightGroup: '1000',
       activeName: '1',
       examineId: '',
+      showExamineComment: false,
       num: '',
       dataListQuery: {
         groupName: '',
@@ -426,6 +449,7 @@ export default {
       GroupMemberList: [],
       membersOptions: [],
       currentUserName: '',
+      notifyOffset: 0,
       // 角色列表
       roleIdList: [],
       dataListAfterQuery: [],
@@ -455,10 +479,8 @@ export default {
       await this.getDataList().then(groupList => {
         this.groupList = groupList;
       });
-      // console.log(this.tableData)
       this.examineList = this.tableData.filter(item => item.examineStatus == '待审核' && item.deleteFlag != 1);
       this.totalPageExamine = this.examineList.length;
-      // console.log(this.examineList.length)
     }
     if (!this.isAuth('qcManagement:group:admin')) {
       await this.getGroupList();
@@ -496,8 +518,10 @@ export default {
       });
       console.log(this.membersOptions)
     });
+    this.handleTip()
   },
   computed: {
+
 
     isAdmin() {
       if (!this.dataForm.parentId || this.dataForm.parentId == '') {
@@ -522,6 +546,50 @@ export default {
     }
   },
   methods: {
+    handleTip() {
+      console.log(this.examineList)
+      this.examineList.forEach(item => {
+        if (item.examineStatus == '待审核' && this.isAuth("qcManagement:group:examine")) {
+          console.log('进入1')
+          if (item.examineDepartment != '1') {
+            console.log('进入2')
+            if (item.department == '质量科' && this.isAuth('department:quality:leader')) {
+              this.activeName = '3'
+              this.showNotification(`质量科小组审核`);
+            } else if (item.department == '生产科' && this.isAuth('department:product:leader')) {
+              this.activeName = '3'
+              this.showNotification("生产科小组审核");
+            } else if (item.department == '财务科' && this.isAuth('department:financial:leader')) {
+              this.activeName = '3'
+              this.showNotification("财务科小组审核");
+            } else if (item.department == '市场科' && this.isAuth('department:market:leader')) {
+              this.activeName = '3'
+              this.showNotification("市场科小组审核");
+            } else if (item.department == '供应科' && this.isAuth('department:supply:leader')) {
+              this.activeName = '3'
+              this.showNotification("供应科小组审核");
+            } else if (item.department == '技术科' && this.isAuth('department:tech:leader')) {
+              this.activeName = '3'
+              this.showNotification("技术科小组审核");
+            } else if (item.department == '安环设备科' && this.isAuth('department:safety:leader')) {
+              this.activeName = '3'
+              this.showNotification("安环科小组审核");
+            } else if (item.department == '企业管理科' && this.isAuth('department:enterprise:leader')) {
+              this.activeName = '3'
+              this.showNotification("企管科小组审核");
+            } else if (item.department && item.department.includes('党群') && this.isAuth('department:party:leader')) {
+              this.activeName = '3'
+              this.showNotification("党群科小组审核");
+            }
+          } else if (this.isAuth('qcManagement:group:admin')) {
+            console.log('进入3')
+            this.activeName = '3'
+            this.showNotification("管理员小组审核");
+          }
+        }
+      })
+
+    },
     upQuery() {
       let tmpList = JSON.parse(JSON.stringify(this.dataList))
       if (this.dataListQuery.groupName != '' && this.dataListQuery.groupName != null) {
@@ -581,11 +649,12 @@ export default {
       }
       this.dataListAfterQuery = tmpList
     },
+
     upQueryAdmin() {
 
-      console.log(this.tableData)
+      // console.log(this.tableData)
       let tmpList = JSON.parse(JSON.stringify(this.tableData))
-      console.log(tmpList)
+      // console.log(tmpList)
       if (this.dataListQueryAdmin.groupName != '' && this.dataListQueryAdmin.groupName != null) {
         tmpList = tmpList.filter(item => item.groupName.includes(this.dataListQueryAdmin.groupName))
       }
@@ -593,28 +662,28 @@ export default {
         tmpList = tmpList.filter(item => item.department == this.dataListQueryAdmin.department)
       }
       if (this.dataListQueryAdmin.groupType != '' && this.dataListQueryAdmin.groupType != null) {
-        console.log('进入类型')
-        console.log(this.dataListQueryAdmin.groupType)
+        // console.log('进入类型')
+        // console.log(this.dataListQueryAdmin.groupType)
         tmpList = tmpList.filter(item => item.team == this.dataListQueryAdmin.groupType)
       }
       console.log('顾问前' + this.dataListQueryAdmin.consultant)
       if (this.dataListQueryAdmin.consultant != '' && this.dataListQueryAdmin.consultant != null) {
-        console.log('进入顾问')
-        console.log(this.dataListQueryAdmin.consultant)
-        console.log(this.nameToNumber(this.dataListQueryAdmin.consultant))
+        // console.log('进入顾问')
+        // console.log(this.dataListQueryAdmin.consultant)
+        // console.log(this.nameToNumber(this.dataListQueryAdmin.consultant))
         var trueConsultant = this.dataListQueryAdmin.consultant
-        console.log({ trueConsultant })
+        // console.log({ trueConsultant })
         if (this.nameToNumber(this.dataListQueryAdmin.consultant)) {
-          console.log('进入顾问内部转换')
+          // console.log('进入顾问内部转换')
           let tmp = this.nameToNumber(this.dataListQueryAdmin.topicLeader)
           this.dataListQueryAdmin.consultant = this.nameToNumber(this.dataListQueryAdmin.consultant);
-          console.log({ tmp })
+          // console.log({ tmp })
         }
         tmpList = tmpList.filter(item => item.position == this.dataListQueryAdmin.consultant)
       }
-      console.log({ tmpList })
+      // console.log({ tmpList })
       if (this.dataListQueryAdmin.examineStatus != '' && this.dataListQueryAdmin.examineStatus != null) {
-        console.log('进入审核状态')
+        // console.log('进入审核状态')
         if (this.dataListQueryAdmin.examineStatus == '待审核(科室)') {
           tmpList = tmpList.filter(item => item.examineStatus == '待审核' && item.examineDepartment != '1')
         } else if (this.dataListQueryAdmin.examineStatus == '待审核(管理员)') {
@@ -624,19 +693,19 @@ export default {
         }
       }
       if (Array.isArray(this.dataListQueryAdmin.buildTime) && this.dataListQueryAdmin.buildTime.length == 2) {
-        console.log('进入日期')
+        // console.log('进入日期')
         console.log(this.dataListQueryAdmin.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQueryAdmin.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQueryAdmin.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
       }
       if (this.dataListQueryAdmin.aboutMe != '' && this.dataListQueryAdmin.aboutMe != null) {
-        console.log('进入关于我')
+        // console.log('进入关于我')
         console.log(this.dataListQueryAdmin.aboutMe)
         console.log(this.currentUserName)
         if (this.dataListQueryAdmin.aboutMe == '我创办') {
-          console.log('我创办筛选')
+          // console.log('我创办筛选')
           tmpList = tmpList.filter(item => item.memberName == this.currentUserName)
         } else if (this.dataListQueryAdmin.aboutMe == '我参与') {
-          console.log('我参与筛选')
+          // console.log('我参与筛选')
           tmpList = tmpList.filter(item => item.memberName != this.currentUserName)
           // 筛选 tmpList 中 children 数组包含 currentUserName 的项
           tmpList = tmpList.filter(item => {
@@ -647,12 +716,12 @@ export default {
 
         }
       }
-      console.log(tmpList)
+      // console.log(tmpList)
       this.tableDataAfterQueryAdmin = tmpList
       // this.dataListQueryAdmin.consultant = trueConsultant
     },
     checkIfAdmit(department, examineStatus, examineDepartment) {
-      console.log(examineStatus + '/////' + examineDepartment);
+
 
       if (examineStatus === '待审核' && examineDepartment != '1') {
         if ((department == '生产科' && this.isAuth('department:product:leader'))) {
@@ -697,6 +766,20 @@ export default {
         })
       });
       return result
+    },
+    showNotification(keyword, offsetAdjustment = 65) {
+      // 根据传递进来的参数计算新的偏移量
+      const newOffset = this.notifyOffset + offsetAdjustment;
+      // 显示通知
+      this.$notify({
+        dangerouslyUseHTMLString: true,
+        message: `<span>您有小组</span><span style="color: #2d7ad6;">[${keyword}]</span><span>审核中，请及时处理</span>`,
+        type: "warning",
+        offset: newOffset,
+        duration: 7000,
+      });
+      // 更新偏移量，避免堆叠
+      this.notifyOffset = newOffset;
     },
     //昵称转用户名
     nameToNumber(name) {

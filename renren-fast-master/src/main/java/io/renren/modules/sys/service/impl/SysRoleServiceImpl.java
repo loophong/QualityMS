@@ -57,6 +57,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> i
 				.like(StringUtils.isNotBlank(roleName),"role_name", roleName)
 				.like(StringUtils.isNotBlank(remark),"remark", remark)
 				.eq(createUserId != null,"create_user_id", createUserId)
+				.orderByDesc("role_id")
 		);
 
 		return new PageUtils(page);

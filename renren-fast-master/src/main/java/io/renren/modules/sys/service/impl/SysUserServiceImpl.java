@@ -44,6 +44,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 	private SysUserRoleService sysUserRoleService;
 	@Autowired
 	private SysRoleService sysRoleService;
+    @Autowired
+    private SysUserDao sysUserDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -121,8 +123,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		return this.update(userEntity,
 				new QueryWrapper<SysUserEntity>().eq("user_id", userId).eq("password", password));
 	}
-	
-	/**
+
+    @Override
+    public Long getUserIdByNickname(String nickname) {
+		SysUserEntity user = sysUserDao.selectOne(
+				new QueryWrapper<SysUserEntity>().eq("nickname", nickname)
+		);
+		return user != null ? user.getUserId() : null;
+    }
+
+    /**
 	 * 检查角色是否越权
 	 */
 	private void checkRole(SysUserEntity user){

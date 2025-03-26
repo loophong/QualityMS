@@ -214,8 +214,8 @@
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="使用时间">
-                  <el-date-picker v-model="group.useTiming" type="date" placeholder="选择日期" />
+                <el-form-item label="使用时间(小时)">
+                  <el-input v-model="group.useTiming"  placeholder="输入使用时间" />
                 </el-form-item>
               </el-col>
               <el-col :span="6">

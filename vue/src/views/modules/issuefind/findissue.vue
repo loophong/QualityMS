@@ -116,13 +116,19 @@
             {{ formatSaletime(scope.row.saleTiming) }}
           </template>
         </el-table-column>
+<!--        <el-table-column-->
+<!--          prop="useTiming"-->
+<!--          label="使用时间"-->
+<!--        >-->
+<!--          <template slot-scope="scope">-->
+<!--            {{ formatSaletime(scope.row.useTiming) }}-->
+<!--          </template>-->
+<!--        </el-table-column>-->
         <el-table-column
           prop="useTiming"
-          label="使用时间"
-        >
-          <template slot-scope="scope">
-            {{ formatSaletime(scope.row.useTiming) }}
-          </template>
+          header-align="center"
+          align="center"
+          label="使用时间（小时）">
         </el-table-column>
         <el-table-column
           prop="region"
@@ -291,13 +297,19 @@
               {{ formatSaletime(scope.row.saleTiming) }}
             </template>
           </el-table-column>
+<!--          <el-table-column-->
+<!--            prop="useTiming"-->
+<!--            label="使用时间"-->
+<!--          >-->
+<!--            <template slot-scope="scope">-->
+<!--              {{ formatSaletime(scope.row.useTiming) }}-->
+<!--            </template>-->
+<!--          </el-table-column>-->
           <el-table-column
             prop="useTiming"
-            label="使用时间"
-          >
-            <template slot-scope="scope">
-              {{ formatSaletime(scope.row.useTiming) }}
-            </template>
+            header-align="center"
+            align="center"
+            label="使用时间（小时）">
           </el-table-column>
           <el-table-column
             prop="region"
@@ -613,13 +625,19 @@
               {{ formatSaletime(scope.row.saleTiming) }}
             </template>
           </el-table-column>
+<!--          <el-table-column-->
+<!--            prop="useTiming"-->
+<!--            label="使用时间"-->
+<!--          >-->
+<!--            <template slot-scope="scope">-->
+<!--              {{ formatSaletime(scope.row.useTiming) }}-->
+<!--            </template>-->
+<!--          </el-table-column>-->
           <el-table-column
             prop="useTiming"
-            label="使用时间"
-          >
-            <template slot-scope="scope">
-              {{ formatSaletime(scope.row.useTiming) }}
-            </template>
+            header-align="center"
+            align="center"
+            label="使用时间（小时）">
           </el-table-column>
           <el-table-column
             prop="region"

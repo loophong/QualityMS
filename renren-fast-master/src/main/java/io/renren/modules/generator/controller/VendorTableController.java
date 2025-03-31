@@ -8,17 +8,13 @@ import java.util.Map;
 import io.renren.modules.generator.entity.IssueCarTypeTableEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.generator.entity.VendorTableEntity;
 import io.renren.modules.generator.service.VendorTableService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
-
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -34,6 +30,17 @@ public class VendorTableController {
     @Autowired
     private VendorTableService vendorTableService;
 
+    /**
+     * Excel上传
+     */
+    @PostMapping("/uploadExcel")
+    @RequiresPermissions("generator:issuetable:update")
+    public R uploadExcel(@RequestParam("file") MultipartFile file) {
+        // 上传文件
+//        System.out.println("接收到的文件名: " + file.getOriginalFilename());
+        return vendorTableService.uploadExcelFile(file);
+
+    }
 
     /**
      * 获取供应商信息

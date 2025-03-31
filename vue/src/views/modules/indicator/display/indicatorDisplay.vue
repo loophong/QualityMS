@@ -8,6 +8,7 @@
         :name="tab.name"
       >
         <div ref="treeChart" style="width: 100%; height: 100%;"></div>
+<!--        <vue2-org-tree :data="treeData[index]" horizontal collapsable :render-content="renderContent" @on-expand="onExpand" @on-node-click="NodeClick" />-->
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -26,6 +27,7 @@ export default {
       dataList: [], // 指标管理列表
       monthlyDataList: [], //最新一月数据管理列表
       formattedData: [], // 格式化后的数据
+      treeData: [], // 用于存储每个 tab 的树形图数据
     };
   },
   mounted() {
@@ -91,6 +93,92 @@ export default {
         }
       });
     },
+    // renderTree() {
+    //   const mainContainer = document.querySelector('main');
+    //   const mainWidth = mainContainer.clientWidth;
+    //   const mainHeight = mainContainer.clientHeight;
+    //
+    //   // 创建一个映射，将 monthlyDataList 中的指标名称和实际完成值关联起来
+    //   const monthlyDataMap = new Map();
+    //   console.log('monthlyDataList:', this.monthlyDataList);
+    //   this.monthlyDataList.forEach(item => {
+    //     monthlyDataMap.set(item.indicatorName, {
+    //       indicatorActualValue: item.indicatorActualValue,
+    //       finishedFlag: item.finishedFlag
+    //     });
+    //   });
+    //   console.log('monthlyDataMap:', monthlyDataMap);
+    //   const rootNode = {
+    //     id: 1,
+    //     name: '公司质量指标管控体系',
+    //     parentName: '',
+    //     url: '',
+    //     classification: 'A'
+    //   };
+    //
+    //   this.formattedData = [rootNode, ...this.dataList.map(item => {
+    //     const monthlyData = monthlyDataMap.get(item.indicatorName) || {};
+    //     return {
+    //       id: item.indicatorId,
+    //       name: item.indicatorName,
+    //       parentName: item.indicatorParentNode,
+    //       url: 'indicatorchart',
+    //       classification: item.indicatorClassification,
+    //       indicatorDefinition: item.indicatorDefinition,
+    //       weight: item.weight,
+    //       indicatorPlannedValue: item.indicatorPlannedValue,
+    //       assessmentDepartment: item.assessmentDepartment,
+    //       managementDepartment: item.managementDepartment,
+    //       indicatorActualValue: monthlyData.indicatorActualValue || null,
+    //       finishedFlag: monthlyData.finishedFlag
+    //     };
+    //   })];
+    //   console.log('formattedData:', this.formattedData);
+    //
+    //   // 获取所有没有父节点的数据项
+    //   const rootNodes = this.formattedData.filter(item => item.parentName === '');
+    //   console.log('rootNodes:', rootNodes);
+    //   rootNodes.forEach(rootNode => {
+    //     rootNode.children = [];
+    //   });
+    //
+    //   // 遍历每个根节点并构建树形图数据
+    //   this.treeData = rootNodes.map(rootNode => this.buildTree(this.formattedData, rootNode.parentName));
+    //   console.log('treeData:', this.treeData);
+    //
+    //   // 创建 tabs
+    //   this.treeData.forEach((tree, index) => {
+    //     const tabName = `tab-${this.tabCounter++}`;
+    //     this.tabs.push({
+    //       title: tree.label, // 使用 label 而不是 name
+    //       name: tabName,
+    //     });
+    //   });
+    //
+    //   // 设置默认激活第一个标签页
+    //   if (this.tabs.length > 0) {
+    //     this.activeTab = this.tabs[0].name;
+    //   }
+    // },
+    // buildTree(data, parentName = '') {
+    //   return data
+    //     .filter(item => item.parentName === parentName)
+    //     .map(item => ({
+    //       id: item.id,
+    //       label: item.name, // 使用 label 而不是 name
+    //       classification: item.classification,
+    //       url: item.url,
+    //       indicatorDefinition: item.indicatorDefinition,
+    //       weight: item.weight,
+    //       indicatorPlannedValue: item.indicatorPlannedValue,
+    //       indicatorActualValue: item.indicatorActualValue,
+    //       finishedFlag: item.finishedFlag,
+    //       assessmentDepartment: item.assessmentDepartment,
+    //       managementDepartment: item.managementDepartment,
+    //       children: this.buildTree(data, item.name)
+    //     }));
+    // },
+
     renderTree() {
       const mainContainer = document.querySelector('main');
       const mainWidth = mainContainer.clientWidth;
@@ -166,21 +254,30 @@ export default {
               .append('g');
 
             const root = d3.hierarchy(treeData[index]);
-            const treeLayout = d3.tree().size([height * 3, width * 2]); // 增加高度比例
+            const treeLayout = d3.tree().size([height * 2.5, width * 1])
+              .separation((a, b) => (a.parent === b.parent ? 0.1 : 0.2)); // 调整节点之间的水平间距; // 增加高度比例
             treeLayout(root);
 
-            const links = svg.selectAll('line.link')  // 连线
+            // 使用自定义的路径生成逻辑
+            const links = svg.selectAll('path.link')  // 连线
               .data(root.links())
               .enter()
-              .append('line')
+              .append('path')
               .attr('class', 'link')
               .attr('id', (d, i) => `link-${i}`)  // 为每个连线添加唯一 id
-              .attr('x1', d => d.source.y + 100)
-              .attr('y1', d => d.source.x + 10)
-              .attr('x2', d => d.target.y - 100)
-              .attr('y2', d => d.target.x + 10)
+              .attr('d', d => {
+                const sourceX = d.source.y + 100; // 节点宽度的一半
+                const sourceY = d.source.x;
+                const targetX = d.target.y;
+                const targetY = d.target.x;
+                const midX = (sourceX + targetX) / 2; // 中间水平位置
+                const pathData = `M${sourceX},${sourceY}H${midX}V${targetY}H${targetX}`;
+                console.log(`Path data for link ${d.source.id} to ${d.target.id}: ${pathData}`);
+                return pathData;
+              })
               .style('stroke', '#333')
-              .style('stroke-width', 2);  // 加粗线条
+              .style('stroke-width', 2)  // 加粗线条
+              .style('fill', 'none');  // 确保线条没有填充
 
             const nodes = svg.selectAll('g.node')
               .data(root.descendants())
@@ -188,7 +285,7 @@ export default {
               .append('g')
               .attr('class', 'node')
               .attr('id', d => `node-${d.data.id}`)  // 为每个节点添加唯一 id
-              .attr('transform', d => `translate(${d.y},${d.x})`)
+              .attr('transform', d => `translate(${d.y + 100},${d.x})`)  // 节点宽度的一半
               .on('click', (event, d) => {
                 this.$router.push({
                   name: d.data.url,
@@ -249,7 +346,7 @@ export default {
                   .attr('class', 'tooltip')
                   .style('display', 'block')
                   .style('pointer-events', 'none')
-                  .attr('transform', `translate(${d.y + 100}, ${d.x - 100})`);
+                  .attr('transform', `translate(${d.y + 200}, ${d.x - 100})`);  // 节点宽度的一半
 
                 // 添加表格内容
                 const table = tooltip.append('g')
@@ -313,23 +410,23 @@ export default {
             };
 
             nodes.append('rect')
-              .attr('width', 200)
-              .attr('height', 80)
-              .attr('x', -100)
-              .attr('y', -25)
+              .attr('width', 200)  // 保持宽度不变
+              .attr('height', 60)  // 新的高度
+              .attr('x', -100)     // 保持宽度的一半不变
+              .attr('y', -30)     // 节点高度的一半 (60 / 2 = 30)
               .attr('rx', 10)
               .attr('ry', 10)
               .style('fill', d => colorScale[d.data.classification] || '#000');
 
             nodes.append('circle')  // 添加圆圈
-              .attr('cx', -90)
-              .attr('cy', -15)
+              .attr('cx', -90)    // 保持不变
+              .attr('cy', -20)    // 调整圆圈的位置 (60 / 2 - 10 = 30 - 10 = 20)
               .attr('r', 10)
               .style('fill', '#fff');
 
             nodes.append('text')      // 圆圈添加文本
-              .attr('x', -90)
-              .attr('y', -15)
+              .attr('x', -90)       // 保持不变
+              .attr('y', -20)       // 调整文本的位置 (60 / 2 - 10 = 30 - 10 = 20)
               .attr('text-anchor', 'middle')
               .style('dominant-baseline', 'middle')
               .style('font-size', '10px')
@@ -337,9 +434,9 @@ export default {
               .text(d => d.data.classification);
 
             nodes.append('text')     // 节点添加文本
-              .attr('dy', '.9em')
+              .attr('dy', '-1em')   // 调整文本的位置 (60 / 2 - 25 = 30 - 25 = -10)
               .attr('x', 0)
-              .attr('y', 0)
+              .attr('y', 10)       // 调整文本的位置 (60 / 2 - 25 = 30 - 25 = -10)
               .attr('text-anchor', 'middle')
               .style('dominant-baseline', 'central')
               .text(d => d.data.name)
@@ -353,6 +450,11 @@ export default {
         this.activeTab = this.tabs[0].name;
       }
     },
+
+
+
+
+
 
 
 
@@ -373,6 +475,23 @@ export default {
           managementDepartment: item.managementDepartment,
           children: this.buildTree(data, item.name)
         }));
+    },
+
+
+    renderContent(h, data) {
+      return h("div", { class: "custom-tree-node" }, [
+        h(
+          "span",
+          { on: { click: (e) => this.NodeClick(e, data) } },
+          data.label // 使用 label 而不是 name
+        ),
+      ]);
+    },
+    onExpand(e, data) {
+      // ... 保持不变
+    },
+    NodeClick(e, data) {
+      // ... 保持不变
     },
   }
 };

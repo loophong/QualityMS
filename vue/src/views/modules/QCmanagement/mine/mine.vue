@@ -113,7 +113,7 @@
             <template slot-scope="scope">
               <span>{{
                 toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-                }}</span>
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="topicActivityResult" header-align="center" align="center" label="课题活动评分结果">
@@ -244,7 +244,7 @@
                 type="danger">未通过(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">未通过(科室)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
-                }}</el-tag>
+              }}</el-tag>
               <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
@@ -361,7 +361,7 @@
                 type="danger">未通过(管理员)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus === '未通过'" type="danger">未通过(科室)</el-tag>
               <el-tag v-else-if="scope.row.examineStatus == '通过'" type="success">{{ scope.row.examineStatus
-                }}</el-tag>
+              }}</el-tag>
               <el-tag v-else type="info">-</el-tag> <!-- 处理未知状态 -->
             </template>
           </el-table-column>
@@ -828,7 +828,7 @@
           <template slot-scope="scope">
             <span>{{
               toStatus(scope.row.topicActivityStatus, scope.row.topicType)
-              }}</span>
+            }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="resultType" header-align="center" align="center" label="提交类型">
@@ -1240,31 +1240,31 @@ export default {
         tmpList = tmpList.filter(item => item.groupName.includes(this.dataListQuery.groupName))
       }
       if (this.dataListQuery.department != '' && this.dataListQuery.department != null) {
-        console.log('进入科室')
-        console.log(this.dataListQuery.department)
+        // console.log('进入科室')
+        // console.log(this.dataListQuery.department)
         tmpList = tmpList.filter(item => item.department == this.dataListQuery.department)
       }
       if (this.dataListQuery.groupType != '' && this.dataListQuery.groupType != null) {
-        console.log('进入类型')
-        console.log(this.dataListQuery.groupType)
+        // console.log('进入类型')
+        // console.log(this.dataListQuery.groupType)
         tmpList = tmpList.filter(item => item.team == this.dataListQuery.groupType)
       }
       if (this.dataListQuery.consultant != '' && this.dataListQuery.consultant != null) {
-        console.log('进入顾问')
-        console.log(this.dataListQuery.consultant)
-        console.log(this.nameToNumber(this.dataListQuery.consultant))
+        // console.log('进入顾问')
+        // console.log(this.dataListQuery.consultant)
+        // console.log(this.nameToNumber(this.dataListQuery.consultant))
         var trueConsultant = this.dataListQuery.consultant
-        console.log({ trueConsultant })
+        // console.log({ trueConsultant })
         if (this.nameToNumber(this.dataListQuery.consultant)) {
-          console.log('进入顾问内部转换')
+          // console.log('进入顾问内部转换')
           let tmp = this.nameToNumber(this.dataListQuery.consultant)
           this.dataListQuery.consultant = this.nameToNumber(this.dataListQuery.consultant);
-          console.log({ tmp })
+          // console.log({ tmp })
         }
         tmpList = tmpList.filter(item => item.position == this.dataListQuery.consultant)
       }
       if (this.dataListQuery.examineStatus != '' && this.dataListQuery.examineStatus != null) {
-        console.log('进入审核')
+        // console.log('进入审核')
         console.log(this.dataListQuery.examineStatus)
         if (this.dataListQuery.examineStatus == '待审核(科室)') {
           tmpList = tmpList.filter(item => item.examineStatus == '待审核' && item.examineDepartment != '1')
@@ -1275,19 +1275,19 @@ export default {
         }
       }
       if (Array.isArray(this.dataListQuery.buildTime) && this.dataListQuery.buildTime.length == 2) {
-        console.log('进入日期')
-        console.log(this.dataListQuery.buildTime)
+        // console.log('进入日期')
+        // console.log(this.dataListQuery.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQuery.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQuery.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
       }
       if (this.dataListQuery.aboutMe != '' && this.dataListQuery.aboutMe != null) {
-        console.log('进入关于我')
+        // console.log('进入关于我')
         console.log(this.dataListQuery.aboutMe)
         console.log(this.currentUserName)
         if (this.dataListQuery.aboutMe == '我创办') {
-          console.log('我创办筛选')
+          // console.log('我创办筛选')
           tmpList = tmpList.filter(item => item.memberName == this.currentUserName)
         } else if (this.dataListQuery.aboutMe == '我参与') {
-          console.log('我参与筛选')
+          // console.log('我参与筛选')
           tmpList = tmpList.filter(item => item.memberName != this.currentUserName)
         }
       }
@@ -1299,31 +1299,31 @@ export default {
         tmpList = tmpList.filter(item => item.groupName.includes(this.dataListQueryConsultant.groupName))
       }
       if (this.dataListQueryConsultant.department != '' && this.dataListQueryConsultant.department != null) {
-        console.log('进入科室')
-        console.log(this.dataListQueryConsultant.department)
+        // console.log('进入科室')
+        // console.log(this.dataListQueryConsultant.department)
         tmpList = tmpList.filter(item => item.department == this.dataListQueryConsultant.department)
       }
       if (this.dataListQueryConsultant.groupType != '' && this.dataListQueryConsultant.groupType != null) {
-        console.log('进入类型')
-        console.log(this.dataListQueryConsultant.groupType)
+        // console.log('进入类型')
+        // console.log(this.dataListQueryConsultant.groupType)
         tmpList = tmpList.filter(item => item.team == this.dataListQueryConsultant.groupType)
       }
       if (this.dataListQueryConsultant.memberName != '' && this.dataListQueryConsultant.memberName != null) {
-        console.log('进入组长')
-        console.log(this.dataListQueryConsultant.memberName)
-        console.log(this.nameToNumber(this.dataListQueryConsultant.memberName))
+        // console.log('进入组长')
+        // console.log(this.dataListQueryConsultant.memberName)
+        // console.log(this.nameToNumber(this.dataListQueryConsultant.memberName))
         var trueConsultant = this.dataListQueryConsultant.memberName
-        console.log({ trueConsultant })
+        // console.log({ trueConsultant })
         if (this.nameToNumber(this.dataListQueryConsultant.memberName)) {
-          console.log('进入组长内部转换')
+          // console.log('进入组长内部转换')
           let tmp = this.nameToNumber(this.dataListQueryConsultant.memberName)
           this.dataListQueryConsultant.memberName = this.nameToNumber(this.dataListQueryConsultant.memberName);
-          console.log({ tmp })
+          // console.log({ tmp })
         }
         tmpList = tmpList.filter(item => item.memberName == this.dataListQueryConsultant.memberName)
       }
       if (this.dataListQueryConsultant.examineStatus != '' && this.dataListQueryConsultant.examineStatus != null) {
-        console.log('进入审核')
+        // console.log('进入审核')
         console.log(this.dataListQueryConsultant.examineStatus)
         if (this.dataListQueryConsultant.examineStatus == '待审核(科室)') {
           tmpList = tmpList.filter(item => item.examineStatus == '待审核' && item.examineDepartment != '1')
@@ -1334,16 +1334,16 @@ export default {
         }
       }
       if (Array.isArray(this.dataListQueryConsultant.buildTime) && this.dataListQueryConsultant.buildTime.length == 2) {
-        console.log('进入日期')
-        console.log(this.dataListQueryConsultant.buildTime)
+        // console.log('进入日期')
+        // console.log(this.dataListQueryConsultant.buildTime)
         tmpList = tmpList.filter(item => moment(item.date).format('YYYY-MM-DD') >= moment(this.dataListQueryConsultant.buildTime[0]).startOf('day').format('YYYY-MM-DD') && moment(item.date).format('YYYY-MM-DD') <= moment(this.dataListQueryConsultant.buildTime[1]).endOf('day').format('YYYY-MM-DD'))
       }
       this.dataListAfterQueryConsultant = tmpList
     },
     handleSubmitPlan(id, status, type) {
-      console.log(id)
-      console.log(status)
-      console.log(type)
+      // console.log(id)
+      // console.log(status)
+      // console.log(type)
       if (type == '创新型') {
         if (status != '8') {
           this.$message({
@@ -1503,6 +1503,7 @@ export default {
     async handleTip() {
       let registerList = [];
       let examineList = [];
+      let firstExamineList = []
       await this.$http({
         url: this.$http.adornUrl("/qcSubject/registration/list"),
         method: "get",
@@ -1513,6 +1514,44 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           registerList = data.page.list;
+          let firstShow = JSON.parse(JSON.stringify(data.page.list))
+          firstShow.forEach(item => {
+            if (item.topicReviewStatus == 2 && this.isAuth("qc:first:examine")) {
+              if (item.topicReviewDepartment != '1') {
+                if (item.topicDepartment == '质量科' && this.isAuth('department:quality:leader')) {
+                  this.activeName = '5'
+                  this.showNotification("科室初审");
+                } else if (item.topicDepartment == '生产科' && this.isAuth('department:product:leader')) {
+                  this.activeName = '5'
+                  this.showNotification("科室初审");
+                } else if (item.topicDepartment == '财务科' && this.isAuth('department:financial:leader')) {
+                  this.activeName = '5'
+                  this.showNotification("科室初审");
+                } else if (item.topicDepartment == '市场科' && this.isAuth('department:market:leader')) {
+                  this.activeName = '5'
+                  this.showNotification("科室初审");
+                } else if (item.topicDepartment == '供应科' && this.isAuth('department:supply:leader')) {
+                  this.activeName = '5'
+                  this.showNotification("科室初审");
+                } else if (item.topicDepartment == '技术科' && this.isAuth('department:tech:leader')) {
+                  this.activeName = '5'
+                  this.showNotification("科室初审");
+                } else if (item.topicDepartment == '安环设备科' && this.isAuth('department:safety:leader')) {
+                  this.activeName = '5'
+                  this.showNotification("科室初审");
+                } else if (item.topicDepartment == '企业管理科' && this.isAuth('department:enterprise:leader')) {
+                  this.activeName = '5'
+                  this.showNotification("科室初审");
+                } else if (item.topicDepartment && item.topicDepartment.includes('党群') && this.isAuth('department:party:leader')) {
+                  this.activeName = '5'
+                  this.showNotification("科室初审");
+                }
+              } else if (item.topicReviewDepartment == '1' && this.isAuth("qcManagement:group:admin")) {
+                this.activeName = '5'
+                this.showNotification("管理员初审");
+              }
+            }
+          })
         } else {
           console.log("handleTip() error");
         }

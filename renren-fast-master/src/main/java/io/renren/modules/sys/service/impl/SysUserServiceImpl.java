@@ -44,16 +44,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 	private SysUserRoleService sysUserRoleService;
 	@Autowired
 	private SysRoleService sysRoleService;
+    @Autowired
+    private SysUserDao sysUserDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		String username = (String)params.get("username");
+		String nickname = (String)params.get("nickname");
 		Long createUserId = (Long)params.get("createUserId");
 
 		IPage<SysUserEntity> page = this.page(
 			new Query<SysUserEntity>().getPage(params),
 			new QueryWrapper<SysUserEntity>()
 				.like(StringUtils.isNotBlank(username),"username", username)
+				.like(StringUtils.isNotBlank(nickname),"nickname", nickname)
 				.eq(createUserId != null,"create_user_id", createUserId)
 		);
 
@@ -121,8 +125,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		return this.update(userEntity,
 				new QueryWrapper<SysUserEntity>().eq("user_id", userId).eq("password", password));
 	}
-	
-	/**
+
+    @Override
+    public Long getUserIdByNickname(String nickname) {
+		SysUserEntity user = sysUserDao.selectOne(
+				new QueryWrapper<SysUserEntity>().eq("nickname", nickname)
+		);
+		return user != null ? user.getUserId() : null;
+    }
+
+    /**
 	 * 检查角色是否越权
 	 */
 	private void checkRole(SysUserEntity user){

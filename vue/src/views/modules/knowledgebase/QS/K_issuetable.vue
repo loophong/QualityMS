@@ -8,21 +8,21 @@
           <el-input v-model="myQueryParam.creationTime" placeholder="创建时间" clearable></el-input>
         </el-form-item> -->
         <el-form-item label="问题发生时间" prop="creationTime"></el-form-item>
-        <el-date-picker 
+        <el-date-picker
             v-model="myQueryParam.creationTime"
             type="date"
             placeholder="选择创建时间"
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
           ></el-date-picker>
-     
-        
-   
+
+
+
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button @click="exportAll()">导出</el-button>    
-        <el-button @click="downloadTemplate()">下载模板</el-button> 
-        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>    
+        <el-button @click="exportAll()">导出</el-button>
+        <el-button @click="downloadTemplate()">下载模板</el-button>
+        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
       <!-- <el-form-item>
         <el-button @click="downloadTemplate()">下载模板</el-button>
@@ -110,6 +110,45 @@
         label="问题类别">
       </el-table-column>
       <el-table-column
+        prop="indemnification"
+        header-align="center"
+        align="center"
+        label="赔偿件">
+        <template slot-scope="scope">
+          {{ getindemnificationById(scope.row.indemnification) }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="figurenumber"
+        header-align="center"
+        align="center"
+        label="图号">
+      </el-table-column>
+      <el-table-column
+        prop="qualitycost"
+        header-align="center"
+        align="center"
+        label="质量成本">
+      </el-table-column>
+      <el-table-column
+        prop="problematicpieces"
+        header-align="center"
+        align="center"
+        label="问题件分类">
+      </el-table-column>
+      <el-table-column
+        prop="vendor"
+        header-align="center"
+        align="center"
+        label="供应商">
+      </el-table-column>
+      <el-table-column
+        prop="isnew"
+        header-align="center"
+        align="center"
+        label="是否为新产品">
+      </el-table-column>
+      <el-table-column
         prop="vehicleTypeId"
         header-align="center"
         align="center"
@@ -120,6 +159,34 @@
         header-align="center"
         align="center"
         label="车号">
+      </el-table-column>
+      <el-table-column
+        prop="saleTiming"
+        label="销售时间"
+      >
+        <template slot-scope="scope">
+          {{ formatSaletime(scope.row.saleTiming) }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="useTiming"
+        label="使用时间"
+      >
+        <template slot-scope="scope">
+          {{ formatSaletime(scope.row.useTiming) }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="region"
+        header-align="center"
+        align="center"
+        label="问题区域">
+      </el-table-column>
+      <el-table-column
+        prop="industry"
+        header-align="center"
+        align="center"
+        label="行业">
       </el-table-column>
             <el-table-column
         prop="issueDescription"
@@ -365,7 +432,7 @@
         label="公式">
       </el-table-column>
     </el-table>
-  
+
     <el-pagination
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
@@ -392,7 +459,7 @@
   export default {
     data () {
       return {
-      
+
         queryParams:{
           issueCategoryId: '',
           vehicleTypeId: '',
@@ -449,6 +516,7 @@
         dialogVisible2: false,
         dialogVisible3: false,
         fullRetStates:'',
+        indemnificationoptions: [],
       }
 
     },
@@ -464,6 +532,16 @@
       }).then(({data}) => {
         this.options = data;
         console.log(this.options);
+      });
+      this.$http({
+        url: this.$http.adornUrl(`/generator/indemnificationtable/list1`),
+        method: 'get',
+      }).then(({data}) => {
+        this.indemnificationOptions = data.result.map(item => ({
+          id: item.indeId,
+          name: item.indemnification,
+        }));
+        console.log("peichangjian", this.indemnificationOptions);
       });
     },
     activated () {
@@ -537,7 +615,15 @@
       rowClassName({ row }) {
         return row.overDue === 'true' ? 'overdue-text' : '';
       },
-
+      getindemnificationById(auditorId) {
+        // console.log("peichangjian", this.indemnificationOptions);
+        for (const category of this.indemnificationOptions) {
+          if (category.id == auditorId) {
+            return category.name;
+          }
+        }
+        return "-";
+      },
       openTaskList() {
         // console.log('打开任务列表', this.tempParams.issueId)
         // console.log('打开任务列表', this.tempParams.issueNumber)
@@ -1019,7 +1105,7 @@
           spinner: "el-icon-loading",
           background: "rgba(0, 0, 0, 0.7)",
         });
-  
+
         this.$http({
           url: this.$http.adornUrl('/generator/issuetable/issuesAllExport'),
           method: 'get',
@@ -1052,12 +1138,12 @@
               验证截止时间: tableRow.verificationDeadline,
               验证结论: tableRow.verificationConclusion,
               验证人: tableRow.verifier,
-  
+
             }));
               const ws = XLSX.utils.json_to_sheet(processedData);
               const wb = XLSX.utils.book_new();
               XLSX.utils.book_append_sheet(wb, ws, "问题列表");
-  
+
               const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
               saveAs(
                 new Blob([wbout], { type: "application/octet-stream" }),
@@ -1065,11 +1151,11 @@
               )}else {
             this.$message.error("没有可导出的数据！");
           }
-  
+
               // // 提交数据到Vuex Store
               // this.updateExportedData(data);
-  
-  
+
+
             })
             .finally(() => {
               loadingInstance.close();
@@ -1086,7 +1172,7 @@
       return item.issueId;
     });
     console.log("ids:"+ids);
-  
+
     this.$confirm(`确定对[id=${ids.join(',')}]进行[批量删除]操作?`, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -1102,8 +1188,8 @@
         }
         console.log(data);
       });
-  
-  
+
+
     });
   },
 

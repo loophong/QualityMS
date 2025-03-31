@@ -6,6 +6,7 @@
 	<!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="io.renren.modules.generator.entity.VendorTableEntity" id="vendorTableMap">
         <result property="vendorId" column="vendor_ID"/>
+        <result property="vendornumber" column="vendornumber"/>
         <result property="vendor" column="vendor"/>
     </resultMap>
 

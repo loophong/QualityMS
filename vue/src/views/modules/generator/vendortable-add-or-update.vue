@@ -4,6 +4,9 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+      <el-form-item label="供应商编号" prop="vendornumber">
+        <el-input v-model="dataForm.vendornumber" placeholder="供应商"></el-input>
+      </el-form-item>
     <el-form-item label="供应商" prop="vendor">
       <el-input v-model="dataForm.vendor" placeholder="供应商"></el-input>
     </el-form-item>
@@ -22,6 +25,7 @@
         visible: false,
         dataForm: {
           vendorId: 0,
+          vendornumber:'',
           vendor: ''
         },
         dataRule: {
@@ -44,6 +48,7 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
+                this.dataForm.vendornumber = data.vendorTable.vendornumber
                 this.dataForm.vendor = data.vendorTable.vendor
               }
             })
@@ -59,6 +64,7 @@
               method: 'post',
               data: this.$http.adornData({
                 'vendorId': this.dataForm.vendorId || undefined,
+                'vendornumber': this.dataForm.vendornumber,
                 'vendor': this.dataForm.vendor
               })
             }).then(({data}) => {

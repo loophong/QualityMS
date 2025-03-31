@@ -2,7 +2,9 @@ package io.renren.modules.generator.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.generator.entity.IndemnificationTableEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -21,5 +23,7 @@ public interface IndemnificationTableService extends IService<IndemnificationTab
     List<IndemnificationTableEntity> getAllIndemnifications();
 
     IndemnificationTableEntity getIndemnificationById(int id);
+
+    R uploadExcelFile(MultipartFile file);
 }
 

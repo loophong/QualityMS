@@ -203,7 +203,11 @@ export default {
             } else if (item.topicActivityStatus == '9') {
               this.stepResult.summary++
             } else {
-              this.stepResult.chooseTopic++
+              if (item.topicType == '创新型' && item.topicActivityStatus != '8') {
+                this.stepResult.chooseTopic++
+              } else if (item.topicActivityStatus != '10') {
+                this.stepResult.chooseTopic++
+              }
             }
 
 

@@ -227,6 +227,9 @@ public class QcSubjectRegistrationController {
         String currentYear = yearFormat.format(currentDate);
         //获取当前年编号个数
         Integer tmpId = qcSubjectRegistrationDao.maxOfId(currentYear);
+        if(tmpId==null){
+            tmpId=0;
+        }
         String topicNumber = "PJHLQCKT-"+currentYear +"-"+(tmpId+1);
         log.info("课题编号:"+topicNumber);
         qcSubjectRegistration.setTopicNumber(topicNumber);

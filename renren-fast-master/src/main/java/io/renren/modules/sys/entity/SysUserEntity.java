@@ -8,6 +8,7 @@
 
 package io.renren.modules.sys.entity;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -41,6 +42,7 @@ public class SysUserEntity implements Serializable {
 	 * 用户名
 	 */
 	@NotBlank(message="用户名不能为空", groups = {AddGroup.class, UpdateGroup.class})
+	@ExcelProperty(value = "员工编号")
 	private String username;
 
 	/**
@@ -94,12 +96,15 @@ public class SysUserEntity implements Serializable {
      * 2024/11/26 新增
      * 所属部门
      */
+
+	@ExcelProperty(value = "三级组织")
     private String dept;
 
 	/**
 	 * 2024/12/10 新增
 	 * 昵称
 	 */
+	@ExcelProperty(value = "姓名")
 	private String nickname;
 
 

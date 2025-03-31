@@ -8,6 +8,11 @@
 
 package io.renren.modules.sys.controller;
 
+
+import com.alibaba.*;
+import com.alibaba.*;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.read.listener.PageReadListener;
 import io.renren.common.annotation.SysLog;
 import io.renren.common.utils.Constant;
 import io.renren.common.utils.PageUtils;
@@ -16,6 +21,8 @@ import io.renren.common.validator.Assert;
 import io.renren.common.validator.ValidatorUtils;
 import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.UpdateGroup;
+import io.renren.modules.instrument.entity.InstrumentationEntity;
+import io.renren.modules.sys.dao.SysUserDao;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.form.PasswordForm;
 import io.renren.modules.sys.service.SysUserRoleService;
@@ -25,7 +32,9 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +50,8 @@ public class SysUserController extends AbstractController {
 	private SysUserService sysUserService;
 	@Autowired
 	private SysUserRoleService sysUserRoleService;
+	@Autowired
+	private SysUserDao sysUserDao;
 
 
 	/**
@@ -57,7 +68,29 @@ public class SysUserController extends AbstractController {
 
 		return R.ok().put("page", page);
 	}
-	
+
+	@PostMapping("/import")
+	public R importExcel(@RequestParam("file") MultipartFile excelFile) {
+		System.out.println("---------import--------------");
+		try {
+			EasyExcel.read(excelFile.getInputStream(), SysUserEntity.class,
+					new PageReadListener<SysUserEntity>(dataList -> {
+						for (SysUserEntity user : dataList) {
+							System.out.println(user);
+							int insert = sysUserDao.insert(user);
+							System.out.println(insert);
+						}
+					}))
+					.sheet()
+					.doRead();
+
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return R.ok();
+	}
+
 	/**
 	 * 获取登录的用户信息
 	 */

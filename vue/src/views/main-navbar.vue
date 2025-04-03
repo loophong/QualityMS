@@ -2,7 +2,7 @@
   <nav class="site-navbar" :class="'site-navbar--' + navbarLayoutType">
     <div class="site-navbar__header">
       <h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">
-        <a class="site-navbar__brand-lg" href="javascript:;">盘锦企管系统</a>
+        <a class="site-navbar__brand-lg" href="javascript:;">质量目标分解及工具应用管理系统</a>
         <a class="site-navbar__brand-mini" href="javascript:;">企管</a>
       </h1>
     </div>
@@ -211,6 +211,9 @@
   position: relative;
   top: -2px; /* 调整垂直对齐 */
   background-color: red; /* 小红点颜色 */
+}
+.site-navbar__brand-lg {
+  font-size: 14px;
 }
 </style>
 
